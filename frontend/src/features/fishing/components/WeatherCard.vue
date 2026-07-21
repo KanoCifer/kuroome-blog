@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useFishingMapStore } from '@/features/fishing/stores/fishingMap';
-import { formatDate } from '@/utils/date';
+import { formatDate } from '@/lib/dayjs';
 import DashboardCard from './DashboardCard.vue';
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
 import { motion } from 'motion-v';
-import { EASE } from '@/shared/constants/motionPresets';
+import { EASE } from '@/constants';
 
 defineProps<{
   location?: [number, number];

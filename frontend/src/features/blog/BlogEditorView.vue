@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import MarkdownEditor from './components/MarkdownEditor.vue';
-import UiButton from '@/shared/components/ui/button/Button.vue';
-import IconSave from '@/shared/components/icons/IconSave.vue';
+import { Button as UiButton, IconSave } from '@/components';
 import { blogGateway } from '@/features/blog/api/blogGateway';
 import { uploadGateway } from '@/features/blog/api';
-import { useOrigin } from '@/shared/composables';
-import { useNotificationStore } from '@/shared/stores/notification';
-import { ModalFadeTransition } from '@/shared/components/ui/modal-fade-transition';
+import { useOrigin } from '@/composables';
+import { useNotificationStore } from '@/stores';
+import { ModalFadeTransition } from '@/components';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 

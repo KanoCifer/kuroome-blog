@@ -5,7 +5,7 @@ import StatusResourcesPanel from '@/features/status/components/StatusResourcesPa
 import StatusDetailsPanel from '@/features/status/components/StatusDetailsPanel.vue';
 import { computed, ref } from 'vue';
 import { motion, AnimatePresence } from 'motion-v';
-import { EASE, EASE_SLOW } from '@/shared/constants/motionPresets';
+import { EASE, EASE_SLOW } from '@/constants';
 
 /* ── 类型 ── */
 type Tone = 'success' | 'warning' | 'destructive';

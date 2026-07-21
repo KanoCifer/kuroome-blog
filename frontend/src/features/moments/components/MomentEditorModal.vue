@@ -240,8 +240,8 @@
 </template>
 
 <script setup lang="ts">
-import IconClose from '@/shared/components/icons/IconClose.vue';
-import Modal from '@/shared/components/ui/modal/Modal.vue';
+import { IconClose } from '@/components';
+import { Modal } from '@/components';
 import type {
   Moment,
   MomentStatus,

@@ -18,11 +18,11 @@
 </template>
 
 <script setup lang="ts">
-import { useChartColors } from '@/shared/composables';
+import { useChartColors } from '@/composables';
 import type { Device } from '@/features/device/types';
 import { computed } from 'vue';
 import VChart from 'vue-echarts';
-import { ModalFadeTransition } from '@/shared/components/ui/modal-fade-transition';
+import { ModalFadeTransition } from '@/components';
 
 const props = defineProps<{
   data: Device[];

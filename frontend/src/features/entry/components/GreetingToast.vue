@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useGreeting } from '@/shared/composables';
+import { useGreeting } from '@/composables';
 import { useStorage } from '@vueuse/core';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';

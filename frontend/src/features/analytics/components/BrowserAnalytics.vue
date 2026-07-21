@@ -25,8 +25,8 @@
 </template>
 
 <script setup lang="ts">
-import IconAnalytics from '@/shared/components/icons/IconAnalytics.vue';
-import { useChartColors, withAlpha } from '@/shared/composables';
+import { IconAnalytics } from '@/components';
+import { useChartColors, withAlpha } from '@/composables';
 import { computed } from 'vue';
 import VChart from 'vue-echarts';
 

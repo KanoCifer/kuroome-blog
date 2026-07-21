@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import BentoCalendar from '@/shared/components/BentoCalendar.vue';
-import BentoProfileCard from '@/shared/components/BentoProfileCard.vue';
-import BentoTech from '@/shared/components/BentoTech.vue';
+import { BentoCalendar } from '@/components';
+import { BentoProfileCard } from '@/components';
+import { BentoTech } from '@/components';
 </script>

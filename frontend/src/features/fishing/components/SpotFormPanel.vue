@@ -25,7 +25,7 @@ import {
   X,
 } from '@lucide/vue';
 import { computed, nextTick, ref, watch } from 'vue';
-import { SlideFadeTransitionX } from '@/shared/components/ui/slide-fade-transition-x';
+import { SlideFadeTransitionX } from '@/components';
 
 const props = withDefaults(
   defineProps<{

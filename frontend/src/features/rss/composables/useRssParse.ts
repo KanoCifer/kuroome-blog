@@ -1,5 +1,5 @@
 import { rssGateway } from '@/features/rss/api';
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 import { useStorage } from '@vueuse/core';
 import { ref } from 'vue';
 import { exampleFeeds } from '@/features/rss/rssUtils';

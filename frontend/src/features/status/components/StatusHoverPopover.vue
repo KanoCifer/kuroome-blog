@@ -2,7 +2,7 @@
 import { onBeforeUnmount, ref, useTemplateRef } from 'vue';
 import { useEventListener } from '@vueuse/core';
 import StatusMini from '@/features/status/components/StatusMini.vue';
-import { useVisitorCountStore } from '@/shared/stores/visitorCount';
+import { useVisitorCountStore } from '@/stores';
 
 const visitorCount = useVisitorCountStore();
 

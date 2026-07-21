@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { ModalFadeTransition } from '@/shared/components/ui/modal-fade-transition';
+import { ModalFadeTransition } from '@/components';
 
 defineProps<{
   isOpen: boolean;

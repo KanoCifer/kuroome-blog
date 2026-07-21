@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useBackgroundStore } from '@/shared/stores/background';
-import { useThemeStore } from '@/shared/stores/theme';
+import { useBackgroundStore } from '@/stores';
+import { useThemeStore } from '@/stores';
 import ImageGrid from './ImageGrid.vue';
 import { computed, onBeforeUnmount } from 'vue';
 

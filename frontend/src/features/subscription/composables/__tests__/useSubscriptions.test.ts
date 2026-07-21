@@ -21,7 +21,7 @@ vi.mock('@/features/rss/api', () => ({
 // ── notification store mock ──────────────────────────────────────
 const success = vi.fn();
 const error = vi.fn();
-vi.mock('@/shared/stores/notification', () => ({
+vi.mock('@/stores/notification', () => ({
   useNotificationStore: () => ({
     success,
     error,
@@ -192,7 +192,10 @@ describe('useSubscriptions', () => {
   });
 
   it('handleDeleteSubscription 确认后删除 + 重选首项', async () => {
-    vi.stubGlobal('confirm', vi.fn(() => true));
+    vi.stubGlobal(
+      'confirm',
+      vi.fn(() => true),
+    );
     deleteSubscription.mockResolvedValueOnce(undefined);
 
     const { useSubscriptions: hook } = await import('../useSubscriptions');
@@ -213,7 +216,10 @@ describe('useSubscriptions', () => {
   });
 
   it('handleDeleteSubscription 取消则不操作', async () => {
-    vi.stubGlobal('confirm', vi.fn(() => false));
+    vi.stubGlobal(
+      'confirm',
+      vi.fn(() => false),
+    );
 
     const { useSubscriptions: hook } = await import('../useSubscriptions');
     const s = hook();
@@ -241,9 +247,24 @@ describe('useSubscriptions', () => {
     const { useSubscriptions: hook } = await import('../useSubscriptions');
     const s = hook();
     s.subscriptions.value = [
-      makeSubscription({ id: 1, status: 'active', price: 120, billing_cycle: 'monthly' }),
-      makeSubscription({ id: 2, status: 'paused', price: 999, billing_cycle: 'monthly' }),
-      makeSubscription({ id: 3, status: 'active', price: 120, billing_cycle: 'yearly' }),
+      makeSubscription({
+        id: 1,
+        status: 'active',
+        price: 120,
+        billing_cycle: 'monthly',
+      }),
+      makeSubscription({
+        id: 2,
+        status: 'paused',
+        price: 999,
+        billing_cycle: 'monthly',
+      }),
+      makeSubscription({
+        id: 3,
+        status: 'active',
+        price: 120,
+        billing_cycle: 'yearly',
+      }),
     ];
     // 120 + 120/12 = 130
     expect(s.monthlyEstimate.value).toBe(130);

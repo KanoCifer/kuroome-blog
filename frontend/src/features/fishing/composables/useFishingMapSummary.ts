@@ -11,7 +11,7 @@
 import { fishingGateway, fishingSpotsGateway } from '@/features/fishing/api';
 import { DEFAULT_MAP_CENTER, useFishingMapStore } from '@/features/fishing/stores/fishingMap';
 import type { TideData } from '@/features/fishing/types';
-import { formatRelative } from '@/utils/date';
+import { formatRelative } from '@/lib/dayjs';
 import dayjs from 'dayjs';
 import { computed, ref, type Ref } from 'vue';
 

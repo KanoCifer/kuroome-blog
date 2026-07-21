@@ -5,7 +5,7 @@
  * 放在 dashboard 顶部 (Map / Index 之上),没有 routeInfo 时显示。
  * 不再用 warning 色调,改成 muted + 主按钮,跟 dashboard 网格协调。
  */
-import { SlideFadeTransition } from '@/shared/components/ui/slide-fade-transition';
+import { SlideFadeTransition } from '@/components';
 
 defineProps<{
   disabled?: boolean;

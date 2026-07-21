@@ -6,13 +6,13 @@ import type { FriendLink, SelfInfo } from '../useFriendLinks';
 
 // ── 模块 mock ────────────────────────────────────────────────────
 const handleImageError = vi.fn();
-vi.mock('@/shared/composables', () => ({
+vi.mock('@/composables', () => ({
   useImageError: () => ({ handleImageError }),
 }));
 
 const noticeSuccess = vi.fn();
 const noticeError = vi.fn();
-vi.mock('@/shared/stores/notification', () => ({
+vi.mock('@/stores/notification', () => ({
   useNotificationStore: () => ({
     success: (...args: unknown[]) => noticeSuccess(...args),
     error: (...args: unknown[]) => noticeError(...args),
@@ -29,13 +29,51 @@ const { selfData, linkData, sites } = vi.hoisted(() => {
     tags: ['blog'],
   };
   const linkData: FriendLink[] = [
-    { id: '1', name: 'A', description: 'a', url: 'https://a.com', icon: '', tags: [] },
-    { id: '2', name: 'B', description: 'b', url: 'https://b.com', icon: '', tags: [] },
+    {
+      id: '1',
+      name: 'A',
+      description: 'a',
+      url: 'https://a.com',
+      icon: '',
+      tags: [],
+    },
+    {
+      id: '2',
+      name: 'B',
+      description: 'b',
+      url: 'https://b.com',
+      icon: '',
+      tags: [],
+    },
   ];
   const sites = [
-    { id: '1', name: 'SiteA', description: 'a', url: 'https://a.com', icon: '', category: 'dev', tags: [] },
-    { id: '2', name: 'SiteB', description: 'b', url: 'https://b.com', icon: '', category: 'dev', tags: [] },
-    { id: '3', name: 'SiteC', description: 'c', url: 'https://c.com', icon: '', category: 'dev', tags: [] },
+    {
+      id: '1',
+      name: 'SiteA',
+      description: 'a',
+      url: 'https://a.com',
+      icon: '',
+      category: 'dev',
+      tags: [],
+    },
+    {
+      id: '2',
+      name: 'SiteB',
+      description: 'b',
+      url: 'https://b.com',
+      icon: '',
+      category: 'dev',
+      tags: [],
+    },
+    {
+      id: '3',
+      name: 'SiteC',
+      description: 'c',
+      url: 'https://c.com',
+      icon: '',
+      category: 'dev',
+      tags: [],
+    },
   ];
   return { selfData, linkData, sites };
 });
@@ -44,7 +82,7 @@ vi.mock('@/features/friend-links/data/friendlinks.json', () => ({
   default: { self: selfData, links: linkData },
 }));
 
-vi.mock('@/shared/data/websites.json', () => ({
+vi.mock('@/data/websites.json', () => ({
   default: { sites },
 }));
 
@@ -73,7 +111,13 @@ describe('useFriendLinks', () => {
   it('初始状态为空（onMounted 前）', () => {
     const { links, selfInfo, dailyPick } = useFriendLinks();
     expect(links.value).toEqual([]);
-    expect(selfInfo.value).toEqual({ name: '', description: '', url: '', icon: '', tags: [] });
+    expect(selfInfo.value).toEqual({
+      name: '',
+      description: '',
+      url: '',
+      icon: '',
+      tags: [],
+    });
     expect(dailyPick.value).toBeNull();
   });
 

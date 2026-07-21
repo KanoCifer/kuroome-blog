@@ -7,7 +7,7 @@ import {
   GlobalOverlays,
   Header,
 } from './components';
-import { RouteTransition } from '@/shared/components/ui/route-transition';
+import { RouteTransition } from '@/components';
 
 const route = useRoute();
 const router = useRouter();

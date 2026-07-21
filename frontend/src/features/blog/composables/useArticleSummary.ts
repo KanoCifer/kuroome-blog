@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue';
 import { llmGateway } from '@/features/blog/api';
-import { useTypewriter } from '@/shared/composables/useTypewriter';
-import { stripHtml } from '@/utils/text';
+import { useTypewriter } from '@/composables';
+import { stripHtml } from '@/utils';
 
 export interface ArticleContext {
   title?: string;

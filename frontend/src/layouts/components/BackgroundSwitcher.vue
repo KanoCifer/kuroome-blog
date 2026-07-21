@@ -110,9 +110,9 @@
 </template>
 
 <script setup lang="ts">
-import { DropdownTransition } from '@/shared/components/ui/dropdown-transition';
+import { DropdownTransition } from '@/components';
 import { onMounted, onUnmounted, ref } from 'vue';
-import { useBackgroundStore } from '@/shared/stores/background';
+import { useBackgroundStore } from '@/stores';
 
 const store = useBackgroundStore();
 

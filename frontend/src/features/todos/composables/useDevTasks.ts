@@ -8,7 +8,7 @@ import type {
   ListDevTasksParams,
   UpdateDevTaskPayload,
 } from '@/features/todos/api';
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 
 export const useDevTasks = () => {
   const notifier = useNotificationStore();

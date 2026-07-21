@@ -249,7 +249,7 @@
 
 <script setup lang="ts">
 import { AnimatePresence, motion } from 'motion-v';
-import { SPRING_SNUG } from '@/shared/constants/motionPresets';
+import { SPRING_SNUG } from '@/constants';
 import {
   DrawerTaskCard,
   useV3DevTaskStore,

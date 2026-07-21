@@ -9,7 +9,7 @@ export { default as BlogCover } from './BlogCover.vue';
 export { default as BlogListItem } from './BlogListItem.vue';
 
 // 评论（实现下沉 shared/components，此处 re-export 保持兼容）
-export { default as TwikooComments } from '@/shared/components/TwikooComments.vue';
+export { TwikooComments } from '@/components';
 
 // 编辑器
 export { default as ImageEditorModal } from './ImageEditorModal.vue';

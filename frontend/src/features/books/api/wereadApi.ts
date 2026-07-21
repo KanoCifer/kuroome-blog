@@ -1,4 +1,4 @@
-import apiClient, { type ApiResponse } from '@/shared/api/apiClient';
+import { apiClient, type ApiResponse } from '@/lib';
 
 import type {
   BookRecommendItem,
@@ -7,7 +7,6 @@ import type {
   WereadBookProgress,
   WereadReadProgressData,
   WereadShelfData,
-  WereadUserBook,
   WereadYearlyHeatmap,
 } from '@/features/books/types';
 

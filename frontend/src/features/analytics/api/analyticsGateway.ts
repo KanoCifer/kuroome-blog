@@ -1,7 +1,10 @@
-import apiClient from '@/shared/api/apiClient';
-import type { ApiResponse } from '@/shared/api/apiClient';
+import { apiClient } from '@/lib';
+import { type ApiResponse } from '@/lib';
 
-import type { AnalyticsOverviewData, PostViewData } from '@/features/analytics/types';
+import type {
+  AnalyticsOverviewData,
+  PostViewData,
+} from '@/features/analytics/types';
 
 export interface AnalyticsGateway {
   getOverview(days: number): Promise<AnalyticsOverviewData>;
@@ -40,7 +43,8 @@ export const analyticsGateway: AnalyticsGateway = {
   },
 
   async getPostViews(): Promise<ApiResponse<PostViewData[]>> {
-    const res = await apiClient.get<ApiResponse<PostViewData[]>>('v3/post/views');
+    const res =
+      await apiClient.get<ApiResponse<PostViewData[]>>('v3/post/views');
     return res.data;
   },
 

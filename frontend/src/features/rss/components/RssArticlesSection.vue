@@ -182,7 +182,7 @@
 </template>
 
 <script setup lang="ts">
-import { formatDate } from '@/utils/date';
+import { formatDate } from '@/lib/dayjs';
 import type { RssArticle } from '@/features/rss/types';
 
 defineProps<{

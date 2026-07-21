@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Mock the underlying apiClient module —— 与 blogGateway.test.ts 同模式。
-vi.mock('@/shared/api/apiClient', () => ({
+vi.mock('@/utils/apiClient', () => ({
   default: {
     get: vi.fn(),
     post: vi.fn(),
@@ -10,7 +10,7 @@ vi.mock('@/shared/api/apiClient', () => ({
   },
 }));
 
-import apiClient from '@/shared/api/apiClient';
+import { apiClient } from '@/lib';
 import { fishingSpotsGateway } from '@/features/fishing/api/fishingSpotsGateway';
 import type { FishingSpot } from '@/features/fishing/types';
 

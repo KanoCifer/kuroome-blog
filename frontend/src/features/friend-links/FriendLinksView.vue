@@ -316,24 +316,11 @@
 </template>
 
 <script setup lang="ts">
-import BasicDetail from '@/shared/components/BasicDetail.vue';
-import { TagPill } from '@/shared/components/ui/tag-pill';
+import { BasicDetail, TagPill } from '@/components';
 import { useFriendLinks } from '@/features/friend-links/composables';
 import { motion } from 'motion-v';
-import {
-  SPRING_REVEAL,
-  WHILE_IN_VIEW_FADE_UP,
-  HOVER_LIFT,
-} from '@/shared/constants/motionPresets';
-import IconCopy from '@/shared/components/icons/IconCopy.vue';
-import IconDocumentText from '@/shared/components/icons/IconDocumentText.vue';
-import IconExternalLink from '@/shared/components/icons/IconExternalLink.vue';
-import IconGlobeOutline from '@/shared/components/icons/IconGlobeOutline.vue';
-import IconInfoCircle from '@/shared/components/icons/IconInfoCircle.vue';
-import IconLinkChain from '@/shared/components/icons/IconLinkChain.vue';
-import IconRefresh from '@/shared/components/icons/IconRefresh.vue';
-import IconUsersGroup from '@/shared/components/icons/IconUsersGroup.vue';
-import TwikooComments from '@/shared/components/TwikooComments.vue';
+import { SPRING_REVEAL, WHILE_IN_VIEW_FADE_UP, HOVER_LIFT } from '@/constants';
+import { IconCopy, IconDocumentText, IconExternalLink, IconGlobeOutline, IconInfoCircle, IconLinkChain, IconRefresh, IconUsersGroup, TwikooComments } from '@/components';
 
 const {
   dailyPick,

@@ -179,9 +179,9 @@
 
 <script setup lang="ts">
 import { socialGateway } from '@/features/blog';
-import { useCardLayoutStore } from '@/shared/stores/cardLayout';
-import { useNotificationStore } from '@/shared/stores/notification';
-import SettingIcon from '@/shared/components/icons/SettingIcon.vue';
+import { useCardLayoutStore } from '@/stores';
+import { useNotificationStore } from '@/stores';
+import { SettingIcon } from '@/components';
 import { AxiosError } from 'axios';
 import { CreditCard, Rss, Smartphone, Wrench } from '@lucide/vue';
 import { onMounted, ref } from 'vue';

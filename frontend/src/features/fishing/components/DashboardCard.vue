@@ -16,7 +16,7 @@
  * Hero 专属的渐变描边/扫光是装饰层,父级 hover 触发,继续用 CSS :hover 串联。
  */
 import { motion } from 'motion-v';
-import { EASE } from '@/shared/constants/motionPresets';
+import { EASE } from '@/constants';
 import { computed } from 'vue';
 
 interface Props {

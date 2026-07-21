@@ -1,4 +1,4 @@
-import apiClient from '@/shared/api/apiClient';
+import { apiClient } from '@/lib';
 
 import type {
   CreateSubscriptionPayload,
@@ -45,9 +45,9 @@ export interface SubscriptionGateway {
 
 export const subscriptionGateway: SubscriptionGateway = {
   async getSubscriptions(): Promise<Subscription[]> {
-    const res = await apiClient.get<{ data: { subscriptions: Subscription[] } }>(
-      'v2/subscriptions',
-    );
+    const res = await apiClient.get<{
+      data: { subscriptions: Subscription[] };
+    }>('v2/subscriptions');
     return res.data.data.subscriptions;
   },
 
@@ -106,9 +106,9 @@ export const subscriptionGateway: SubscriptionGateway = {
   },
 
   async getUpcomingSubscriptions(): Promise<Subscription[]> {
-    const res = await apiClient.get<{ data: { subscriptions: Subscription[] } }>(
-      'v2/subscriptions/upcoming',
-    );
+    const res = await apiClient.get<{
+      data: { subscriptions: Subscription[] };
+    }>('v2/subscriptions/upcoming');
     return res.data.data.subscriptions;
   },
 

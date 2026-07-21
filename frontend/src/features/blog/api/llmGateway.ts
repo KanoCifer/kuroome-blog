@@ -1,4 +1,4 @@
-import apiClient from '@/shared/api/apiClient';
+import { apiClient } from '@/lib';
 import {
   consumeSseStream,
   type SseHandlers,
@@ -18,7 +18,7 @@ const API_BASE = import.meta.env.VITE_API_BASE || '/';
 /**
  * 适配 `/v2/llm/*` 端点的 gateway port。
  *
- * 沿用 `rssGateway` / `mapGateway` 模式：JSON 端点走 `@/shared/api/apiClient`(axios)，
+ * 沿用 `rssGateway` / `mapGateway` 模式：JSON 端点走 `@/utils` 的 apiClient(axios)，
  * SSE 端点走 `consumeSseStream`(raw fetch)。所有调用方通过该 port 访问 LLM，
  * 不再直接持有 fetch。
  */

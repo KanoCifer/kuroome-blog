@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, nextTick } from 'vue';
 import { motion } from 'motion-v';
-import { SPRING } from '@/shared/constants/motionPresets';
-import { useTypewriter } from '@/shared/composables';
-import { IconExternalLink } from '@/shared/components/icons';
+import { SPRING } from '@/constants';
+import { useTypewriter } from '@/composables';
+import { IconExternalLink } from '@/components';
 
 const AboutIMG = '/images/about-thumb.webp';
 

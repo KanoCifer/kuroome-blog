@@ -52,9 +52,9 @@
 </template>
 
 <script setup lang="ts">
-import websitesData from '@/shared/data/websites.json';
-import type { Website } from '@/shared/types';
-import { useImageError } from '@/shared/composables';
+import { websitesData } from '@/data';
+import type { Website } from '@/types';
+import { useImageError } from '@/composables';
 
 const { handleImageError } = useImageError();
 

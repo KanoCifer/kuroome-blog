@@ -3,8 +3,8 @@ import Footer from '@/layouts/components/Footer.vue';
 import BackToTop from '@/layouts/components/BackToTop.vue';
 import BasicNav from '@/layouts/components/BasicNav.vue';
 import { AnimatePresence } from 'motion-v';
-import { SPRING_BOUNCE } from '@/shared/constants/motionPresets';
-import { useThemeStore } from '@/shared/stores/theme';
+import { SPRING_BOUNCE } from '@/constants';
+import { useThemeStore } from '@/stores';
 import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 

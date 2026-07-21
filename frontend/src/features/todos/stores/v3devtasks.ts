@@ -5,7 +5,7 @@ import type {
   DevTaskStatus,
   UpdateDevTaskPayload,
 } from '@/features/todos/api';
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import {

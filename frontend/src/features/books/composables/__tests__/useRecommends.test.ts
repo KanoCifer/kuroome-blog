@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useRecommends } from '../useRecommends';
 import type { BookRecommendItem } from '@/features/books/api';
 
 // ── gateway mock ─────────────────────────────────────────────────

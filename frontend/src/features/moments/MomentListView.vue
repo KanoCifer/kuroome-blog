@@ -251,12 +251,12 @@
 </template>
 
 <script setup lang="ts">
-import BasicDetail from '@/shared/components/BasicDetail.vue';
+import { BasicDetail } from '@/components';
 import { useAuthStore } from '@/features/auth';
-import Modal from '@/shared/components/ui/modal/Modal.vue';
+import { Modal } from '@/components';
 import { MomentComposer } from '@/features/moments/composables';
 import { useMomentsStore } from '@/features/moments/stores/moments';
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 import type { Moment, MomentUpdatePayload } from '@/features/moments/types';
 import dayjs from 'dayjs';
 import { storeToRefs } from 'pinia';

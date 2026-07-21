@@ -216,8 +216,8 @@ import type { ReadStatsMode } from '@/features/books/api';
 import { useReadStatsStore } from '@/features/books/stores/readStats';
 import { useHeatmap } from '@/features/books/composables/useHeatmap';
 import { useRecommends } from '@/features/books/composables/useRecommends';
-import { formatDuration } from '@/utils/date';
-import PageHero from '@/shared/components/shared/PageHero.vue';
+import { formatDuration } from '@/lib/dayjs';
+import { PageHero } from '@/components';
 import dayjs from 'dayjs';
 import { computed, onMounted, ref, watch } from 'vue';
 import StatsPreferencesSection from './components/StatsPreferencesSection.vue';
@@ -241,10 +241,7 @@ const MODES = [
 ] as const satisfies ReadonlyArray<{ key: ReadStatsMode; label: string }>;
 
 const statsStore = useReadStatsStore();
-const {
-  yearlyHeatmap,
-  fetchYearlyHeatmap,
-} = useHeatmap();
+const { yearlyHeatmap, fetchYearlyHeatmap } = useHeatmap();
 const {
   recommends,
   isLoadingRecommends,

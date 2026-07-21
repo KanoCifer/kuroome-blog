@@ -30,8 +30,8 @@
 </template>
 
 <script setup lang="ts">
-import IconTrend from '@/shared/components/icons/IconTrend.vue';
-import { useChartColors, withAlpha } from '@/shared/composables';
+import { IconTrend } from '@/components';
+import { useChartColors, withAlpha } from '@/composables';
 import dayjs from 'dayjs';
 import { computed } from 'vue';
 import VChart from 'vue-echarts';

@@ -14,12 +14,17 @@ src/
       components/   ← implementation: hidden.
       __tests__/    ← co-located tests: hidden, exercise code through entry points.
     books/          ← another deep module
+  lib/              ← infrastructure layer (framework-agnostic core)
+    request.ts      ← axios 客户端 + 拦截器
+    auth.ts         ← access-JWT 内存单例
+    dayjs.ts        ← 日期/时长/相对时间格式化
+    websocket.ts    ← WebSocketManager 类（无 Vue 依赖）
   shared/           ← shared infrastructure (NOT a package — freely importable)
     components/
     composables/
     stores/
     api/
-  utils/            ← shared infrastructure
+  utils/            ← shared infrastructure (re-exports lib/ through its barrels)
   layouts/          ← shared infrastructure
   router/           ← shared infrastructure
 ```
@@ -27,6 +32,10 @@ src/
 `shared/`, `utils/`, `layouts/`, `router/` are **shared infrastructure**: flat
 utility libraries that any feature may import freely. They are NOT subject to
 boundary rules. This mirrors the model in `react-app/.dependency-cruiser.cjs`.
+
+`lib/` is the infrastructure layer: framework-agnostic core (request, auth,
+dayjs, websocket) that `utils/` re-exports through its barrel files. Features
+import from `lib/` entry points, not from `utils/` internals.
 
 ## The rules
 

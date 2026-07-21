@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import { connectionDelay } from '@/utils/visitor';
-import { useVisitorCountStore } from '@/shared/stores/visitorCount';
-import {
-  useV3DevTaskStore,
-  useDevTaskSections,
-} from '@/features/todos';
+import { connectionDelay } from '@/utils';
+import { useVisitorCountStore } from '@/stores';
+import { useV3DevTaskStore, useDevTaskSections } from '@/features/todos';
 import { motion } from 'motion-v';
-import { SPRING_CRISP } from '@/shared/constants/motionPresets';
+import { SPRING_CRISP } from '@/constants';
 import { storeToRefs } from 'pinia';
 import { computed, onUnmounted, ref } from 'vue';
 

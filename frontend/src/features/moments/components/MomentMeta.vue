@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import PinIcon from '@/shared/components/icons/PinIcon.vue';
+import { PinIcon } from '@/components';
 import type { Moment } from '@/features/moments/types';
 import dayjs from 'dayjs';
 import { computed } from 'vue';

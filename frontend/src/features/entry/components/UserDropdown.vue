@@ -72,8 +72,8 @@
 </template>
 
 <script setup lang="ts">
-import { DropdownTransition } from '@/shared/components/ui/dropdown-transition';
-import { ChevronDownIcon } from '@/shared/components/icons';
+import { DropdownTransition } from '@/components';
+import { ChevronDownIcon } from '@/components';
 import { useAuthStore } from '@/features/auth';
 import type { Component } from 'vue';
 import { computed, onUnmounted, ref } from 'vue';

@@ -168,12 +168,16 @@
 
 <script setup lang="ts">
 import { ChevronLeft, ChevronRight } from '@lucide/vue';
-import EditIcon from '@/shared/components/icons/EditIcon.vue';
-import IconClose from '@/shared/components/icons/IconClose.vue';
-import IconDel from '@/shared/components/icons/IconDel.vue';
-import PinIcon from '@/shared/components/icons/PinIcon.vue';
-import Modal from '@/shared/components/ui/modal/Modal.vue';
-import type { Moment, MomentStatus, MomentVisibility } from '@/features/moments/types';
+import { EditIcon } from '@/components';
+import { IconClose } from '@/components';
+import { IconDel } from '@/components';
+import { PinIcon } from '@/components';
+import { Modal } from '@/components';
+import type {
+  Moment,
+  MomentStatus,
+  MomentVisibility,
+} from '@/features/moments/types';
 import dayjs from 'dayjs';
 import { computed, defineComponent, h } from 'vue';
 import MomentTagChip from './MomentTagChip.vue';

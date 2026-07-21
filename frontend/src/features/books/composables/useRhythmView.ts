@@ -1,5 +1,5 @@
 import type { ReadDetailSnapshot, ReadStatsMode } from '@/features/books/api';
-import { formatDuration } from '@/utils/date';
+import { formatDuration } from '@/lib/dayjs';
 import dayjs from 'dayjs';
 import type { ComputedRef, Ref } from 'vue';
 import { computed } from 'vue';

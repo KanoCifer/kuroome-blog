@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import IconClose from '@/shared/components/icons/IconClose.vue';
-import IconInfo from '@/shared/components/icons/IconInfo.vue';
-import IconWarning from '@/shared/components/icons/IconWarning.vue';
-import { useNotificationStore } from '@/shared/stores/notification';
+import { IconClose } from '@/components';
+import { IconInfo } from '@/components';
+import { IconWarning } from '@/components';
+import { useNotificationStore } from '@/stores';
 import { AnimatePresence, motion } from 'motion-v';
 import { computed, defineAsyncComponent, onUnmounted, ref } from 'vue';
 

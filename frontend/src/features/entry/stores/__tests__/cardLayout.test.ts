@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
-import { useCardLayoutStore } from '@/shared/stores/cardLayout';
+import { useCardLayoutStore } from '@/stores';
 
 describe('cardLayout store', () => {
   beforeEach(() => {

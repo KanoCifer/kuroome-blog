@@ -1,5 +1,5 @@
 import { subscriptionGateway } from '@/features/rss';
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 import {
   applyReminderFormValues,
   createDefaultReminderForm,
@@ -28,9 +28,7 @@ export const useReminderConfig = (subscriptions: Ref<Subscription[]>) => {
   const notifier = useNotificationStore();
 
   const isReminderModalOpen = ref<boolean>(false);
-  const reminderForm = reactive<ReminderFormState>(
-    createDefaultReminderForm(),
-  );
+  const reminderForm = reactive<ReminderFormState>(createDefaultReminderForm());
   const reminderTargetId = ref<number | null>(null);
   const reminderFormError = ref<string>('');
   const isSavingReminder = ref<boolean>(false);

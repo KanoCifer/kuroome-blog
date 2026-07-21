@@ -444,10 +444,10 @@
 <script setup lang="ts">
 import { deviceGateway } from '@/features/device/api/deviceGateway';
 import type { Device } from '@/features/device/types';
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 import { reactive, ref, watch, onMounted } from 'vue';
-import { ModalFadeTransition } from '@/shared/components/ui/modal-fade-transition';
-import { ModalScaleTransition } from '@/shared/components/ui/modal-scale-transition';
+import { ModalFadeTransition } from '@/components';
+import { ModalScaleTransition } from '@/components';
 
 type Channel = 'email' | 'feishu' | 'bark';
 

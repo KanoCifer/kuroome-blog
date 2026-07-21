@@ -134,8 +134,8 @@ import {
   type FishingMapInstance,
   type RouteInfo,
 } from '@/features/fishing/composables/useFishingRoute';
-import { formatDuration } from '@/utils/date';
-import { SlideFadeTransitionX } from '@/shared/components/ui/slide-fade-transition-x';
+import { formatDuration } from '@/lib/dayjs';
+import { SlideFadeTransitionX } from '@/components';
 import { DEFAULT_MAP_CENTER } from '@/features/fishing/stores/fishingMap';
 import {
   nextTick,

@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { motion } from 'motion-v';
-import {
-  SPRING_REVEAL,
-  WHILE_IN_VIEW_FADE_UP,
-} from '@/shared/constants/motionPresets';
+import { SPRING_REVEAL, WHILE_IN_VIEW_FADE_UP } from '@/constants';
 import { changelogGateway } from '@/features/changelog/api/changelogGateway';
 import type { Changelog } from '@/features/changelog/types';
 

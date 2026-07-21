@@ -138,8 +138,8 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@/shared/components/ui/button';
-import { ModalFadeTransition } from '@/shared/components/ui/modal-fade-transition';
+import { Button } from '@/components';
+import { ModalFadeTransition } from '@/components';
 import { ImagePlus, Loader2, UploadCloud, X } from '@lucide/vue';
 import { motion } from 'motion-v';
 import { useGalleryUpload } from '@/features/pic/composables';

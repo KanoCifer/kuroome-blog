@@ -13,10 +13,10 @@
  * - 不重复标题(drawer header 已是「智能分析」)
  * - 严格使用 semantic token,无装饰性光晕
  */
-import { useNotificationStore } from '@/shared/stores/notification';
-import { formatDate } from '@/utils/date';
+import { useNotificationStore } from '@/stores';
+import { formatDate } from '@/lib/dayjs';
 import { llmGateway } from '@/features/blog';
-import { renderMarkdown } from '@/shared/composables';
+import { renderMarkdown } from '@/composables';
 import dayjs from 'dayjs';
 import { AnimatePresence, motion } from 'motion-v';
 import { computed, onUnmounted, ref, watch } from 'vue';

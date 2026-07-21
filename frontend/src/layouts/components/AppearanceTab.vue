@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useThemeStore, type Theme, type ColorScheme } from '@/shared/stores/theme';
+import { useThemeStore, type Theme, type ColorScheme } from '@/stores';
 import { Laptop, Moon, Sun } from '@lucide/vue';
 import type { Component } from 'vue';
 

@@ -185,7 +185,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import UiModal from '@/shared/components/ui/modal/Modal.vue';
+import { Modal as UiModal } from '@/components';
 import { devTaskGateway, type McpTokenResult } from '@/features/todos/api';
 
 interface DayOption {

@@ -192,10 +192,10 @@
 <script setup lang="ts">
 import type { Device, DeviceInput } from '@/features/device/types';
 import { deviceGateway } from '@/features/device/api/deviceGateway';
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 import { ref } from 'vue';
 
-import BasicDetail from '@/shared/components/BasicDetail.vue';
+import { BasicDetail } from '@/components';
 import AddDeviceModal from './components/AddDeviceModal.vue';
 import DailyCostChart from './components/DailyCostChart.vue';
 import DeviceList from './components/DeviceList.vue';

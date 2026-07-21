@@ -1,11 +1,10 @@
-import apiClient from '@/shared/api/apiClient';
+import { apiClient } from '@/lib';
 import type {
   ParseRssPayload,
   ParseRssResponse,
   RefreshResult,
   RssArticle,
   RssArticleListResponse,
-  RssEntry,
   RssSubscription,
   SubscriptionItem,
 } from '@/features/rss/types';

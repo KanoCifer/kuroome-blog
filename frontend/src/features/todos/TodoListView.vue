@@ -267,8 +267,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import DevTaskModal from './components/DevTaskModal.vue';
-import { ConfirmDialog } from '@/shared/components/ui/confirm-dialog';
-import { SlideFadeTransition } from '@/shared/components/ui/slide-fade-transition';
+import { ConfirmDialog } from '@/components';
+import { SlideFadeTransition } from '@/components';
 import { useV3DevTaskStore } from '@/features/todos/stores/v3devtasks';
 import { useAuthStore } from '@/features/auth';
 import type { DevTask } from '@/features/todos/api';

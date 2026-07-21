@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@/components';
 import { Check, Edit2, Shuffle, Trash2, Upload } from '@lucide/vue';
 
 defineProps<{

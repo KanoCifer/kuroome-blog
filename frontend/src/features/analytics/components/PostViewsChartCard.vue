@@ -32,9 +32,9 @@
 </template>
 
 <script setup lang="ts">
-import IconDocumentText from '@/shared/components/icons/IconDocumentText.vue';
+import { IconDocumentText } from '@/components';
 import type { PostViewData } from '@/features/analytics/types';
-import { useChartColors } from '@/shared/composables';
+import { useChartColors } from '@/composables';
 import { computed } from 'vue';
 import VChart from 'vue-echarts';
 

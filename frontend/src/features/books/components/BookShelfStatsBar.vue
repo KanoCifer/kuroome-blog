@@ -66,8 +66,8 @@ import dayjs from 'dayjs';
 import { computed, h } from 'vue';
 import { useRouter } from 'vue-router';
 import type { ReadDetailSnapshot } from '@/features/books/api';
-import { formatDuration } from '@/utils/date';
-import { formatRelative } from '@/utils/date';
+import { formatDuration } from '@/lib/dayjs';
+import { formatRelative } from '@/lib/dayjs';
 
 const props = defineProps<{
   weeklySnapshot: ReadDetailSnapshot | null;

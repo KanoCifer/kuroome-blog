@@ -112,7 +112,7 @@
 
 <script setup lang="ts">
 import type { DevTask } from '@/features/todos/api';
-import { renderMarkdown } from '@/shared/composables';
+import { renderMarkdown } from '@/composables';
 import TypeBadge from './TypeBadge.vue';
 import PriorityBadge from './PriorityBadge.vue';
 import KindBadge from './KindBadge.vue';

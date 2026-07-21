@@ -27,7 +27,7 @@ function makeEvent(id: number, type = 'startup') {
 async function mountHook<R>(setupFn: () => R): Promise<{ hook: R; unmount: () => void }> {
   const Comp = defineComponent({
     setup() {
-      const hook = setupFn();
+      
       return () => h('div');
     },
   });

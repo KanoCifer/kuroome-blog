@@ -16,8 +16,8 @@ describe('useTwikoo', () => {
   });
 
   it('调用 twikoo.init 并注入 envId', async () => {
-    const { useTwikoo } = await import('@/shared/composables/useTwikoo');
-    useTwikoo({ el: '#comment', path: '/', lang: 'zh-CN' });
+    const { useTwikoo } = await import('@/composables');
+    await useTwikoo({ el: '#comment', path: '/', lang: 'zh-CN' });
 
     expect(mockInit).toHaveBeenCalledTimes(1);
     expect(mockInit).toHaveBeenCalledWith({
@@ -29,8 +29,8 @@ describe('useTwikoo', () => {
   });
 
   it('只传必要参数时 envId 仍注入', async () => {
-    const { useTwikoo } = await import('@/shared/composables/useTwikoo');
-    useTwikoo({ el: '#twikoo' });
+    const { useTwikoo } = await import('@/composables');
+    await useTwikoo({ el: '#twikoo' });
 
     expect(mockInit).toHaveBeenCalledWith({
       el: '#twikoo',

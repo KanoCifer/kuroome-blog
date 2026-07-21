@@ -1,5 +1,5 @@
 import { socialGateway } from '@/features/blog/api';
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 import { AxiosError } from 'axios';
 import { onMounted, ref, type Ref } from 'vue';
 

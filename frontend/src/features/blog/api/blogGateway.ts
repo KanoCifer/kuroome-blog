@@ -1,8 +1,6 @@
-import apiClient from '@/shared/api/apiClient';
+import { apiClient } from '@/lib';
 import type {
   BlogListResponse,
-  BlogPagination,
-  BlogPost,
   BlogPostResponse,
   BlogQuery,
   PostsByTagResponse,

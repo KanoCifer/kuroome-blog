@@ -1,5 +1,5 @@
 import { subscriptionGateway } from '@/features/rss';
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 import {
   applyFormValues,
   createDefaultSubscriptionForm,
@@ -64,7 +64,8 @@ export const useSubscriptions = () => {
   const selectedSubscription = computed<Subscription | null>(() => {
     if (selectedSubId.value === null) return null;
     return (
-      subscriptions.value.find((item) => item.id === selectedSubId.value) ?? null
+      subscriptions.value.find((item) => item.id === selectedSubId.value) ??
+      null
     );
   });
 

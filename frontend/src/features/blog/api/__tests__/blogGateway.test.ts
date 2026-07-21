@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { blogGateway } from '@/features/blog/api/blogGateway';
 
 // Mock the underlying apiClient module
-vi.mock('@/shared/api/apiClient', () => ({
+vi.mock('@/utils/apiClient', () => ({
   default: {
     get: vi.fn(),
     post: vi.fn(),
@@ -11,7 +11,7 @@ vi.mock('@/shared/api/apiClient', () => ({
   },
 }));
 
-import apiClient from '@/shared/api/apiClient';
+import { apiClient } from '@/lib';
 
 describe('blogGateway (tags migration)', () => {
   beforeEach(() => {

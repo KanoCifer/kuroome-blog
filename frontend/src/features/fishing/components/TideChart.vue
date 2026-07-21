@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import { weatherGateway } from '@/features/fishing/api';
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 import dayjs from 'dayjs';
 import { computed, onMounted, ref, watch } from 'vue';
 import VChart from 'vue-echarts';

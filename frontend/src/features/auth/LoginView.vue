@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { AuthLayout } from './components';
-import IconCloud from '@/shared/components/icons/IconCloud.vue';
-import IconKey from '@/shared/components/icons/IconKey.vue';
-import IconLock from '@/shared/components/icons/IconLock.vue';
-import type { LoginForm } from '@/shared/types';
+import { IconCloud, IconKey, IconLock } from '@/components';
+import type { LoginForm } from '@/features/auth/types';
 import { ShieldUser } from '@lucide/vue';
 import { ref } from 'vue';
 import { RouterLink } from 'vue-router';

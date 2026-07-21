@@ -330,13 +330,13 @@
 </template>
 
 <script setup lang="ts">
-import { useThemeStore } from '@/shared/stores/theme';
+import { useThemeStore } from '@/stores';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import dayjs from 'dayjs';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import VChart from 'vue-echarts';
-import { useOrigin } from '@/shared/composables';
-import { getAccessToken } from '@/shared/auth/tokenService';
+import { useOrigin } from '@/composables';
+import { getAccessToken } from '@/lib/auth';
 
 // Types
 interface ServerStatus {

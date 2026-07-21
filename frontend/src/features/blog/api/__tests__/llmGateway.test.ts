@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { llmGateway } from '@/features/blog/api/llmGateway';
 
-vi.mock('@/shared/api/apiClient', () => ({
+vi.mock('@/utils/apiClient', () => ({
   default: {
     get: vi.fn(),
     post: vi.fn(),
@@ -14,7 +14,7 @@ vi.mock('@/features/blog/composables/useSseStream', () => ({
   consumeSseStream: vi.fn(),
 }));
 
-import apiClient from '@/shared/api/apiClient';
+import { apiClient } from '@/lib';
 import { consumeSseStream } from '@/features/blog/composables/useSseStream';
 
 describe('llmGateway', () => {

@@ -19,7 +19,7 @@ vi.mock('@/features/rss/api', () => ({
 // ── notification store mock ──────────────────────────────────────
 const success = vi.fn();
 const error = vi.fn();
-vi.mock('@/shared/stores/notification', () => ({
+vi.mock('@/stores/notification', () => ({
   useNotificationStore: () => ({
     success,
     error,
@@ -48,7 +48,9 @@ function makeSubscription(overrides: Partial<Subscription> = {}): Subscription {
   };
 }
 
-function makeForm(overrides: Partial<ReminderFormState> = {}): ReminderFormState {
+function makeForm(
+  overrides: Partial<ReminderFormState> = {},
+): ReminderFormState {
   return {
     channels: ['email'],
     days_30: false,
@@ -195,9 +197,7 @@ describe('useReminderConfig', () => {
       expect.objectContaining({ channels: ['email'] }),
     );
     expect(r.reminderTestResult.value).toEqual({ email: true });
-    expect(success).toHaveBeenCalledWith(
-      '测试通知发送成功（1/1）',
-    );
+    expect(success).toHaveBeenCalledWith('测试通知发送成功（1/1）');
   });
 
   it('handleTestNotificationFromForm 全失败：notifier.error', async () => {

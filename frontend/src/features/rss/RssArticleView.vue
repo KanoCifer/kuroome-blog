@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { rssGateway } from '@/features/rss/api';
-import BasicDetail from '@/shared/components/BasicDetail.vue';
+import { BasicDetail } from '@/components';
 import { AISummary } from '@/features/blog';
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 import type { RssArticle } from '@/features/rss/types';
-import { formatDate } from '@/utils/date';
+import { formatDate } from '@/lib/dayjs';
 import { useScroll } from '@vueuse/core';
 import DOMPurify from 'dompurify';
 import { motion } from 'motion-v';
-import { SPRING } from '@/shared/constants/motionPresets';
+import { SPRING } from '@/constants';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 

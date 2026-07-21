@@ -53,8 +53,8 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from '@/shared/components/BentoCard.vue';
-import IconTags from '@/shared/components/icons/IconTags.vue';
+import { BentoCard } from '@/components';
+import { IconTags } from '@/components';
 import { blogGateway } from '@/features/blog/api/blogGateway';
 import type { BlogPost, Post, TagItem } from '@/features/blog/types';
 import { onMounted, ref, watch } from 'vue';

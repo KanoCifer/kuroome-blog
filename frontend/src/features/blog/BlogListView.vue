@@ -419,15 +419,14 @@
 </template>
 
 <script setup lang="ts">
-import BasicDetail from '@/shared/components/BasicDetail.vue';
+import { BasicDetail } from '@/components';
 import { blogGateway } from '@/features/blog/api/blogGateway';
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 import type { BlogPagination, Post } from '@/features/blog/types';
-import BentoCalendar from '@/shared/components/BentoCalendar.vue';
-import BentoProfileCard from '@/shared/components/BentoProfileCard.vue';
+import { BentoCalendar, BentoProfileCard } from '@/components';
 import { useHead } from '@vueuse/head';
 import { AnimatePresence, motion } from 'motion-v';
-import { EASE_INOUT } from '@/shared/constants/motionPresets';
+import { EASE_INOUT } from '@/constants';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import BentoCategory from './components/BentoCategory.vue';

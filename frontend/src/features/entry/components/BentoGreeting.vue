@@ -52,7 +52,7 @@
 
 <script setup lang="ts">
 import BentoCard from './BentoCard.vue';
-import { useGreeting } from '@/shared/composables';
+import { useGreeting } from '@/composables';
 
 const { isDay, greeting, changelogHint } = useGreeting();
 </script>

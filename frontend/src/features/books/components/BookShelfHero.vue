@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { CloudSync } from '@lucide/vue';
-import PageHero from '@/shared/components/shared/PageHero.vue';
+import { PageHero } from '@/components';
 
 const props = withDefaults(
   defineProps<{

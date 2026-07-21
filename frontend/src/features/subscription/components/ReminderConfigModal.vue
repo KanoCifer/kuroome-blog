@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, watch } from 'vue';
 import type { ReminderFormState } from '../types';
-import { ModalFadeTransition } from '@/shared/components/ui/modal-fade-transition';
+import { ModalFadeTransition } from '@/components';
 import {
   channelOptions,
   reminderPointOptions,

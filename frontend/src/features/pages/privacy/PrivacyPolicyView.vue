@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, h, onBeforeUnmount, onMounted, ref } from 'vue';
 import type { VNode } from 'vue';
-import IconExternalLink from '@/shared/components/icons/IconExternalLink.vue';
+import { IconExternalLink } from '@/components';
 import { useHead } from '@unhead/vue';
 
 useHead({ title: '隐私政策 · kanocifer' });

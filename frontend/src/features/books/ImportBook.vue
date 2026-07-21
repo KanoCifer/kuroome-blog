@@ -199,7 +199,7 @@
 
 <script setup lang="ts">
 import { wereadGateway } from '@/features/books/api';
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 import { computed, ref } from 'vue';
 
 const WEREAD_API_KEY_PATTERN = /^wrk-[A-Za-z0-9_-]+$/;

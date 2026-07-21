@@ -104,7 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import { DropdownTransition } from '@/shared/components/ui/dropdown-transition';
+import { DropdownTransition } from '@/components';
 import { useAuthStore } from '@/features/auth';
 import {
   BookOpenText,

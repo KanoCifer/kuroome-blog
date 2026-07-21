@@ -146,7 +146,7 @@
 
 <script setup lang="ts">
 import { truncateSummary } from '../rssUtils';
-import { formatDate } from '@/utils/date';
+import { formatDate } from '@/lib/dayjs';
 import type { ExampleFeed } from '../rssUtils';
 
 export interface RssMetadata {

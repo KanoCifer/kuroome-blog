@@ -10,15 +10,15 @@ export { default as BentoLike } from './BentoLike.vue';
 export { default as BentoNavCard } from './BentoNavCard.vue';
 export { default as BentoNewPost } from './BentoNewPost.vue';
 export { default as BentoPic } from './BentoPic.vue';
-export { default as BentoProfileCard } from '@/shared/components/BentoProfileCard.vue';
+export { BentoProfileCard } from '@/components';
 export { default as BentoReadingList } from './BentoReadingList.vue';
-export { default as BentoTech } from '@/shared/components/BentoTech.vue';
+export { BentoTech } from '@/components';
 export { default as BentoWebsites } from './BentoWebsites.vue';
 export { default as GreetingToast } from './GreetingToast.vue';
 export { default as UserDropdown } from './UserDropdown.vue';
 
 // 通用 bento 网格基元
-export { default as BentoCard } from '@/shared/components/BentoCard.vue';
+export { BentoCard } from '@/components';
 export { default as BentoPlaceholder } from './BentoPlaceholder.vue';
 export { default as BentoRecent } from './BentoRecent.vue';
 export { default as BentoRecommend } from './BentoRecommend.vue';

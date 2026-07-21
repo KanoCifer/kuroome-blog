@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import BasicDetail from '@/shared/components/BasicDetail.vue';
-import { formatDate } from '@/utils/date';
+import { BasicDetail } from '@/components';
+import { formatDate } from '@/lib/dayjs';
 import ReminderConfigModal from './components/ReminderConfigModal.vue';
 import SubscriptionCardList from './components/SubscriptionCardList.vue';
 import SubscriptionDetailPanel from './components/SubscriptionDetailPanel.vue';

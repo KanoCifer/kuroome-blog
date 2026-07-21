@@ -1,4 +1,4 @@
-import apiClient from '@/shared/api/apiClient';
+import { apiClient } from '@/lib';
 
 import type { Changelog } from '@/features/changelog/types';
 

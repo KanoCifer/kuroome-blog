@@ -28,7 +28,7 @@ const palette = ref({
   card: '#ffffff',
   series: ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de'],
 });
-vi.mock('@/shared/composables/useChartColors', () => ({
+vi.mock('@/composables/useChartColors', () => ({
   useChartColors: () => ({ palette }),
   withAlpha: (color: string, alpha: number) => `${color}${alpha}`,
 }));

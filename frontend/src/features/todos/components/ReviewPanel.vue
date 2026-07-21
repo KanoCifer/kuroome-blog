@@ -125,7 +125,7 @@ import {
   urgentActive,
   typeDistribution,
 } from '@/features/todos/composables';
-import { formatCurrentWeekRange } from '@/utils/date';
+import { formatCurrentWeekRange } from '@/lib/dayjs';
 import type { DevTaskType } from '@/features/todos/api';
 
 const store = useV3DevTaskStore();

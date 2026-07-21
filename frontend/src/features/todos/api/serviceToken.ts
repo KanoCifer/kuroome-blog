@@ -1,5 +1,5 @@
-import apiClient from '@/shared/api/apiClient';
-import { getAccessToken } from '@/shared/auth/tokenService';
+import { apiClient } from '@/lib/request';
+import { getAccessToken } from '@/lib/auth';
 
 // ── devtask service-JWT 缓存 ──
 // /v3/dev-tasks/* 走 DevTaskMiddleware（service-JWT 鉴权），与用户 JWT 是两套体系。

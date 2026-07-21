@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { fishingGateway } from '@/features/fishing/api';
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 import type {
   FishingFeedbackData,
   FishingFeedbackLevel,

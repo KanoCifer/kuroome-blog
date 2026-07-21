@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { BookRecommendItem } from '@/features/books/api';
 import { AnimatePresence, Motion } from 'motion-v';
-import { FADE, SPRING_BOUNCE } from '@/shared/constants/motionPresets';
+import { FADE, SPRING_BOUNCE } from '@/constants';
 import { onMounted, onUnmounted, watch } from 'vue';
 import { RECOMMEND_COVER_LAYOUT_ID_PREFIX } from '../helper/recommendLayoutId';
 

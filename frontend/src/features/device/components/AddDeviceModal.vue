@@ -166,12 +166,12 @@
 
 <script setup lang="ts">
 import { deviceGateway } from '@/features/device/api/deviceGateway';
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 import type { DeviceInput } from '@/features/device/types';
 import { reactive, ref, watch } from 'vue';
 import dayjs from 'dayjs';
-import { ModalFadeTransition } from '@/shared/components/ui/modal-fade-transition';
-import { ModalScaleTransition } from '@/shared/components/ui/modal-scale-transition';
+import { ModalFadeTransition } from '@/components';
+import { ModalScaleTransition } from '@/components';
 
 interface Props {
   modelValue: boolean;

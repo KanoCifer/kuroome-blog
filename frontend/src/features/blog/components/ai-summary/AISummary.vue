@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 import { useArticleChat } from '@/features/blog/composables';
 import { useArticleSummary } from '@/features/blog/composables';
-import { useShimmerTips } from '@/shared/composables';
+import { useShimmerTips } from '@/composables';
 import { AnimatePresence, motion } from 'motion-v';
-import { FADE } from '@/shared/constants/motionPresets';
+import { FADE } from '@/constants';
 import { computed, onMounted, ref, watch } from 'vue';
-import { renderMarkdown } from '@/shared/composables';
-import { ModalFadeTransition } from '@/shared/components/ui/modal-fade-transition';
+import { renderMarkdown } from '@/composables';
+import { ModalFadeTransition } from '@/components';
 
 const renderedSummary = computed(() =>
   summary.value ? renderMarkdown(summary.value) : '',

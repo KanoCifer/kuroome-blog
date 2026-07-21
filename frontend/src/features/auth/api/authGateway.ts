@@ -1,4 +1,4 @@
-import apiClient from '@/shared/api/apiClient';
+import { apiClient } from '@/lib';
 import type { UserInfo } from '@/features/auth/types';
 import type { AxiosResponse } from 'axios';
 import type {
@@ -156,10 +156,13 @@ export function createAuthGateway(): AuthGateway {
     },
 
     async login(username: string, password: string): Promise<LoginResult> {
-      const res = await apiClient.post<Envelope<LoginResponseData>>('v3/login', {
-        username,
-        password,
-      });
+      const res = await apiClient.post<Envelope<LoginResponseData>>(
+        'v3/login',
+        {
+          username,
+          password,
+        },
+      );
       const data = unwrapEnvelope(res);
       return data ? buildLoginResult(data) : emptyLoginResult();
     },

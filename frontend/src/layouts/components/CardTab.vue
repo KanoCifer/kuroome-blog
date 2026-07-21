@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useCardImage } from '@/shared/composables';
+import { useCardImage } from '@/composables';
 
 const { cardIndex, cardImages, setCardIndex } = useCardImage();
 </script>

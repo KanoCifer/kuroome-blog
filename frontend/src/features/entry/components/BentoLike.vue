@@ -19,7 +19,7 @@
 import { useLikeSummary } from '@/features/blog';
 import type { AnimationItem } from 'lottie-web';
 import { motion } from 'motion-v';
-import { HOVER_SCALE_UP } from '@/shared/constants/motionPresets';
+import { HOVER_SCALE_UP } from '@/constants';
 import { onMounted, onUnmounted, ref } from 'vue';
 
 const { likesCount, like, isSubmitting } = useLikeSummary();

@@ -190,7 +190,7 @@
 </template>
 
 <script setup lang="ts">
-import { Footer } from '@/layouts/components';
+import { Footer } from '@/layouts';
 import {
   BentoCalendar,
   BentoClock,
@@ -200,13 +200,11 @@ import {
   BentoTech,
   TodoCard,
 } from '@/features/entry/components';
-import DragWrapper from '@/layouts/components/DragWrapper.vue';
-import FloatingActionButtons from '@/layouts/components/FloatingActionButtons.vue';
-import SettingsModal from '@/layouts/components/SettingsModal.vue';
+import { DragWrapper, FloatingActionButtons, SettingsModal } from '@/layouts';
 import { useCardLayout } from '@/features/entry/composables';
-import { useCardLayoutStore } from '@/shared/stores/cardLayout';
-import { useThemeStore } from '@/shared/stores/theme';
-import cardStylesData from '@/shared/data/card-styles.json';
+import { useCardLayoutStore } from '@/stores';
+import { useThemeStore } from '@/stores';
+import { cardStylesData } from '@/data';
 import { onMounted, onUnmounted, ref } from 'vue';
 import BentoMap from './components/BentoMap.vue';
 import BentoPic from './components/BentoPic.vue';

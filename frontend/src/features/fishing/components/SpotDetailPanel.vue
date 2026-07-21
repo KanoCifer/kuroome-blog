@@ -10,7 +10,7 @@
  * 数据流:FishingSpot 经 toMapMarker 拆为 position + extraData,
  * 本组件同时消费两者(详情字段 + 迷你地图 / 路线规划都需要)。
  */
-import ConfirmDialog from '@/shared/components/ui/confirm-dialog/ConfirmDialog.vue';
+import { ConfirmDialog } from '@/components';
 import SpotMiniMap from '@/features/fishing/components/SpotMiniMap.vue';
 import SpotPhotoLightbox from '@/features/fishing/components/SpotPhotoLightbox.vue';
 import type { MapMarker } from '@/features/fishing/types';
@@ -32,8 +32,8 @@ const CARD_SHADOW = [
   'inset 0 1px 0 0 oklch(from var(--paper) l c h / 0.6)',
 ].join(', ');
 import { MapPin, Navigation, Pencil, Star, Trash2, X } from '@lucide/vue';
-import { useNotificationStore } from '@/shared/stores/notification';
-import { SlideFadeTransitionX } from '@/shared/components/ui/slide-fade-transition-x';
+import { useNotificationStore } from '@/stores';
+import { SlideFadeTransitionX } from '@/components';
 import type { AxiosError } from 'axios';
 
 const props = defineProps<{

@@ -3,7 +3,7 @@ import ImageEditorModal from './ImageEditorModal.vue';
 import { useMarkdownImage } from '@/features/blog/composables';
 import hljs from 'highlight.js/lib/common';
 import 'highlight.js/styles/github-dark.css';
-import { renderMarkdown } from '@/shared/composables';
+import { renderMarkdown } from '@/composables';
 import TurndownService from 'turndown';
 import { computed, nextTick, ref, watch } from 'vue';
 

@@ -328,9 +328,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { AnimatePresence, motion } from 'motion-v';
-import { FADE_FAST, SPRING_SNUG } from '@/shared/constants/motionPresets';
+import { FADE_FAST, SPRING_SNUG } from '@/constants';
 import type { DevTask, DevTaskStatus } from '@/features/todos/api';
-import { renderMarkdown } from '@/shared/composables';
+import { renderMarkdown } from '@/composables';
 import TypeBadge from './TypeBadge.vue';
 import PriorityBadge from './PriorityBadge.vue';
 import KindBadge from './KindBadge.vue';

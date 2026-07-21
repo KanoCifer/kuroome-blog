@@ -119,10 +119,14 @@ import PicGalleryEditBar from './components/PicGalleryEditBar.vue';
 import PicDetailModal from './components/PicDetailModal.vue';
 import PicUploadModal from './components/PicUploadModal.vue';
 import PolaroidCard from './components/PolaroidCard.vue';
-import { Button } from '@/shared/components/ui/button';
-import { useGallery, usePolaroidLayout, type Picture } from '@/features/pic/composables';
+import { Button } from '@/components';
+import {
+  useGallery,
+  usePolaroidLayout,
+  type Picture,
+} from '@/features/pic/composables';
 import { useAuthStore } from '@/features/auth';
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 import { ImageOff } from '@lucide/vue';
 import { motion } from 'motion-v';
 import { computed, onMounted, ref, watch } from 'vue';

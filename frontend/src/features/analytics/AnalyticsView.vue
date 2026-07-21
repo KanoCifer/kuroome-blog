@@ -443,8 +443,7 @@
 </template>
 
 <script setup lang="ts">
-import IconUser from '@/shared/components/icons/IconUser.vue';
-import IconAnalytics from '@/shared/components/icons/IconAnalytics.vue';
+import { IconUser, IconAnalytics } from '@/components';
 import { analyticsGateway } from '@/features/analytics/api/analyticsGateway';
 import type { PostViewData } from '@/features/analytics/types';
 import { useAuthStore } from '@/features/auth';

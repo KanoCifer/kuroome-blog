@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { BackgroundOption } from '@/shared/stores/background';
+import type { BackgroundOption } from '@/stores';
 
 defineProps<{
   images: BackgroundOption[];

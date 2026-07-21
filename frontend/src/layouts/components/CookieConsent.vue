@@ -8,7 +8,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/shared/components/ui/alert-dialog';
+} from '@/components';
 import { useStorage } from '@vueuse/core';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';

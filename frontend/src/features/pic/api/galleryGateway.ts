@@ -1,4 +1,4 @@
-import apiClient from '@/shared/api/apiClient';
+import { apiClient } from '@/lib';
 
 import type { GalleryImage, GalleryResponse } from '@/features/pic/types';
 
@@ -10,7 +10,9 @@ export interface GalleryGateway {
 
 export const galleryGateway: GalleryGateway = {
   async getGallery(): Promise<GalleryResponse> {
-    const res = await apiClient.get<{ data: GalleryResponse }>('v1/pic-gallery');
+    const res = await apiClient.get<{ data: GalleryResponse }>(
+      'v1/pic-gallery',
+    );
     return res.data.data;
   },
 

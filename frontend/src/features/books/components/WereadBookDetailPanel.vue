@@ -2,20 +2,15 @@
 import { computed, watch } from 'vue';
 import { BookOpen, Eye, EyeOff, RefreshCw, X } from '@lucide/vue';
 import { AnimatePresence, motion } from 'motion-v';
-import {
-  FADE_FAST,
-  FADE,
-  SPRING_SNUG,
-  EASE_SLOW,
-} from '@/shared/constants/motionPresets';
+import { FADE_FAST, FADE, SPRING_SNUG, EASE_SLOW } from '@/constants';
 import type { WereadBookProgress, WereadUserBook } from '@/features/books/api';
 import { useWereadBookProgress } from '../composables/useWereadBookProgress';
 import {
   deterministicCoverGradient,
   formatProgressPercent,
 } from '../helper/format';
-import { formatDuration } from '@/utils/date';
-import { formatRelative } from '@/utils/date';
+import { formatDuration } from '@/lib/dayjs';
+import { formatRelative } from '@/lib/dayjs';
 
 /**
  * 书籍详情浮层 — 点击卡片后的详情面板

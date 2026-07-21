@@ -1,5 +1,5 @@
-import apiClient from '@/shared/api/apiClient';
-import type { ApiResponse } from '@/shared/api/apiClient';
+import { apiClient } from '@/lib';
+import { type ApiResponse } from '@/lib';
 
 export interface EventItem {
   id: number;

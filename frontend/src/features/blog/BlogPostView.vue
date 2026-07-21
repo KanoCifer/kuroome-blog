@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { AISummary } from '@/features/blog/components/ai-summary';
-import TwikooComments from '@/shared/components/TwikooComments.vue';
+import { TwikooComments } from '@/components';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,16 +10,15 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/shared/components/ui/alert-dialog';
-import DelIcon from '@/shared/components/icons/DelIcon.vue';
-import EditIcon from '@/shared/components/icons/EditIcon.vue';
+} from '@/components';
+import { DelIcon, EditIcon } from '@/components';
 import { Eye, Heart } from '@lucide/vue';
 import { blogGateway } from '@/features/blog/api/blogGateway';
 import { useAuthStore } from '@/features/auth';
-import { useOrigin } from '@/shared/composables';
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useOrigin } from '@/composables';
+import { useNotificationStore } from '@/stores';
 import type { Post } from '@/features/blog/types';
-import { formatDate } from '@/utils/date';
+import { formatDate } from '@/lib/dayjs';
 import { useHead } from '@vueuse/head';
 import hljs from 'highlight.js/lib/common';
 import 'highlight.js/scss/rainbow.scss';

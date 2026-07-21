@@ -15,8 +15,5 @@
 
 <script setup lang="ts">
 import { motion } from 'motion-v';
-import {
-  HOVER_SCALE_UP,
-  TAP_SCALE_DOWN,
-} from '@/shared/constants/motionPresets';
+import { HOVER_SCALE_UP, TAP_SCALE_DOWN } from '@/constants';
 </script>

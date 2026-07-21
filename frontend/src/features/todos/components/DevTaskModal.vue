@@ -274,8 +274,8 @@
 
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue';
-import UiModal from '@/shared/components/ui/modal/Modal.vue';
-import { ConfirmDialog } from '@/shared/components/ui/confirm-dialog';
+import { Modal as UiModal } from '@/components';
+import { ConfirmDialog } from '@/components';
 import type {
   CreateDevTaskPayload,
   DevTask,

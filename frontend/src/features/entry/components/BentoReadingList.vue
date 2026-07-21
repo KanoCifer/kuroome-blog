@@ -60,14 +60,15 @@
 
 <script setup lang="ts">
 import BentoCard from './BentoCard.vue';
-import { useAnimateNumber } from '@/shared/composables';
+import { useAnimateNumber } from '@/composables';
 import { useReadingSummary } from '@/features/books';
-import { formatDuration } from '@/utils/date';
+import { formatDuration } from '@/lib/dayjs';
 import { BookOpen } from '@lucide/vue';
 import { onMounted, watch } from 'vue';
 
 const { displayValue: displayCount, animateTo } = useAnimateNumber();
-const { readingCount, weeklyMinutes, monthlyMinutes, refresh } = useReadingSummary();
+const { readingCount, weeklyMinutes, monthlyMinutes, refresh } =
+  useReadingSummary();
 const bookCovers = ['bg-red-400', 'bg-blue-400', 'bg-green-400'];
 
 watch(readingCount, (val) => animateTo(val));

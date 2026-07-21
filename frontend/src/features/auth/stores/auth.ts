@@ -1,13 +1,11 @@
 import { createAuthGateway } from '@/features/auth/api/authGateway';
-import { refreshAccessToken } from '@/shared/auth/refresh';
-import {
-  getAccessToken as getToken,
-  setAccessToken,
-} from '@/shared/auth/tokenService';
-import { reconnectWs } from '@/utils/visitor';
+import { registerTokenRefresher } from '@/lib';
+import { refreshAccessToken } from '@/features/auth/helper/refresh';
+import { getAccessToken as getToken, setAccessToken } from '@/lib/auth';
+import { reconnectWs } from '@/utils';
 import type { UserInfo } from '@/features/auth/types';
 import { userCache } from '@/features/auth/helper/userCache';
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 import { isAxiosError } from 'axios';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
@@ -58,6 +56,9 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function hydrateAuth() {
     if (isHydrated.value) return; // 避免重复初始化
+
+    // 注册 token 刷新回调，供 apiClient 401 拦截器使用
+    registerTokenRefresher(refreshAccessToken);
 
     try {
       // 1. 主动刷新 access token（利用 cookie 中的 refresh_token），

@@ -36,8 +36,8 @@
 </template>
 
 <script setup lang="ts">
-import IconPopular from '@/shared/components/icons/IconPopular.vue';
-import { useChartColors, withAlpha } from '@/shared/composables';
+import { IconPopular } from '@/components';
+import { useChartColors, withAlpha } from '@/composables';
 import { computed } from 'vue';
 import VChart from 'vue-echarts';
 

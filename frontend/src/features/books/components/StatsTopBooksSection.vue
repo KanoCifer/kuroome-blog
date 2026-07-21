@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ReadDetailSnapshot, ReadStatsMode } from '@/features/books/api';
-import { formatDuration } from '@/utils/date';
+import { formatDuration } from '@/lib/dayjs';
 import { computed, toRef } from 'vue';
 import { useLongestView } from '../composables/useLongestView';
 

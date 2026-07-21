@@ -91,12 +91,12 @@
 </template>
 
 <script setup lang="ts">
-import EditIcon from '@/shared/components/icons/EditIcon.vue';
-import IconDel from '@/shared/components/icons/IconDel.vue';
-import PinIcon from '@/shared/components/icons/PinIcon.vue';
+import { EditIcon } from '@/components';
+import { IconDel } from '@/components';
+import { PinIcon } from '@/components';
 import type { Moment } from '@/features/moments/types';
 import { motion } from 'motion-v';
-import { WHILE_IN_VIEW_FADE_UP } from '@/shared/constants/motionPresets';
+import { WHILE_IN_VIEW_FADE_UP } from '@/constants';
 import MomentMeta from './MomentMeta.vue';
 import MomentTagChip from './MomentTagChip.vue';
 

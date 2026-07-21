@@ -164,21 +164,15 @@
 </template>
 
 <script setup lang="ts">
-import BasicDetail from '@/shared/components/BasicDetail.vue';
-import { TagPill } from '@/shared/components/ui/tag-pill';
-import websitesData from '@/shared/data/websites.json';
-import { useImageError } from '@/shared/composables';
+import { BasicDetail, TagPill } from '@/components';
+import { websitesData } from '@/data';
+import { useImageError } from '@/composables';
 import { motion } from 'motion-v';
-import {
-  SPRING_REVEAL,
-  WHILE_IN_VIEW_FADE_UP,
-  HOVER_LIFT,
-} from '@/shared/constants/motionPresets';
+import { SPRING_REVEAL, WHILE_IN_VIEW_FADE_UP, HOVER_LIFT } from '@/constants';
 import { computed, ref } from 'vue';
 import { useUrlSearchParams } from '@vueuse/core';
-import IconExternalLink from '@/shared/components/icons/IconExternalLink.vue';
-import IconGlobeOutline from '@/shared/components/icons/IconGlobeOutline.vue';
-import type { Website } from '@/shared/types';
+import { IconExternalLink, IconGlobeOutline } from '@/components';
+import type { Website } from '@/types';
 
 interface CategoryOption {
   slug: string;

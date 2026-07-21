@@ -1,4 +1,4 @@
-import apiClient from '@/shared/api/apiClient';
+import { apiClient } from '@/lib';
 
 import type { Device, DeviceInput } from '@/features/device/types';
 
@@ -25,7 +25,9 @@ export interface DeviceGateway {
 
 export const deviceGateway: DeviceGateway = {
   async getUserDevices() {
-    const res = await apiClient.get<{ data: { devices: Device[] } }>('v2/device');
+    const res = await apiClient.get<{ data: { devices: Device[] } }>(
+      'v2/device',
+    );
     return res.data.data.devices;
   },
 
@@ -51,9 +53,12 @@ export const deviceGateway: DeviceGateway = {
   },
 
   async updateDevice(device_id: number, data) {
-    const res = await apiClient.put<{ data: Device }>(`v2/device/${device_id}`, {
-      device_input: data,
-    });
+    const res = await apiClient.put<{ data: Device }>(
+      `v2/device/${device_id}`,
+      {
+        device_input: data,
+      },
+    );
     return res.data.data;
   },
 

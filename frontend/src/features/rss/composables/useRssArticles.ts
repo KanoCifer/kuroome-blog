@@ -1,6 +1,6 @@
 import { rssGateway } from '@/features/rss/api';
 import type { RssArticle } from '@/features/rss/types';
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 

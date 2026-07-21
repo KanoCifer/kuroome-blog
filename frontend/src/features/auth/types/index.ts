@@ -1,5 +1,10 @@
 // 认证表单类型
 
+export interface LoginForm {
+  username: string;
+  password: string;
+}
+
 export interface ProfileForm {
   name?: string;
   username?: string;

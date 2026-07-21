@@ -1,4 +1,4 @@
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 import { ref, type Ref } from 'vue';
 import type { Picture } from './useGallery';
 

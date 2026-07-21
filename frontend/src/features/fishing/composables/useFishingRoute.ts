@@ -1,6 +1,6 @@
-import { useNotificationStore } from '@/shared/stores/notification';
+import { useNotificationStore } from '@/stores';
 import type { MapMarker } from '@/features/fishing/types';
-import { useSequencedTask } from '@/shared/composables';
+import { useSequencedTask } from '@/composables';
 import { ref } from 'vue';
 
 export interface RouteInfo {

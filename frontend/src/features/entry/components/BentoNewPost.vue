@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { motion } from 'motion-v';
-import { HOVER_SCALE_UP } from '@/shared/constants/motionPresets';
+import { HOVER_SCALE_UP } from '@/constants';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 

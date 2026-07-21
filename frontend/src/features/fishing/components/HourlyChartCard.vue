@@ -12,7 +12,7 @@
  * 契约(不可改):无 props / 无 emit;数据从 useFishingMapStore().weatherHourly
  * 注入,调色板从 useChartColors().palette 注入。父级调用 <HourlyChartCard /> 不动。
  */
-import { useChartColors, withAlpha } from '@/shared/composables';
+import { useChartColors, withAlpha } from '@/composables';
 import { useFishingMapStore } from '@/features/fishing/stores/fishingMap';
 import DashboardCard from '@/features/fishing/components/DashboardCard.vue';
 import dayjs from 'dayjs';

@@ -131,9 +131,9 @@
 
 <script setup lang="ts">
 import { AnimatePresence, motion } from 'motion-v';
-import { SPRING_SNUG } from '@/shared/constants/motionPresets';
-import IconClose from '@/shared/components/icons/IconClose.vue';
-import { ModalFadeTransition } from '@/shared/components/ui/modal-fade-transition';
+import { SPRING_SNUG } from '@/constants';
+import { IconClose } from '@/components';
+import { ModalFadeTransition } from '@/components';
 import AppearanceTab from './AppearanceTab.vue';
 import BackgroundTab from './BackgroundTab.vue';
 import CardTab from './CardTab.vue';

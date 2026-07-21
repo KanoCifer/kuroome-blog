@@ -1,9 +1,9 @@
 import { onMounted, ref } from 'vue';
-import { useNotificationStore } from '@/shared/stores/notification';
-import { useImageError } from '@/shared/composables';
-import type { Website } from '@/shared/types';
+import { useNotificationStore } from '@/stores';
+import { useImageError } from '@/composables';
+import type { Website } from '@/types';
 import friendLinksData from '@/features/friend-links/data/friendlinks.json';
-import websitesData from '@/shared/data/websites.json';
+import { websitesData } from '@/data';
 
 export interface FriendLink {
   id: string;

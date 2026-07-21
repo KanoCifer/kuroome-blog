@@ -6,14 +6,14 @@ import 'highlight.js/styles/atom-one-dark.css';
 import { createPinia, setActivePinia } from 'pinia';
 import { createApp } from 'vue';
 import App from './App.vue';
-import { isColorScheme } from '@/shared/stores/theme';
-import './assets/base.css'; // Tailwind v4 入口
-import './assets/backgrounds.css'; // 背景渐变
-import './assets/base.scss'; // font-face sass
-import './assets/route-transitions.css'; // 路由过渡动画 keyframes
-import './assets/squircle.css';
+import { isColorScheme } from '@/stores';
+import './styles/base.css'; // Tailwind v4 入口
+import './styles/backgrounds.css'; // 背景渐变
+import './styles/base.scss'; // font-face sass
+import './styles/route-transitions.css'; // 路由过渡动画 keyframes
+import './styles/squircle.css';
 import './utils/echarts';
-import { initVisitorWebSocket } from './utils/visitor';
+import { initVisitorWebSocket } from './utils';
 import router from './router';
 
 // Apply persisted color scheme before mount to avoid flash of wrong colors

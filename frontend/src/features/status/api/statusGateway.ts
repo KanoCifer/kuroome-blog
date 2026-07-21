@@ -1,5 +1,5 @@
-import apiClient from '@/shared/api/apiClient';
-import type { ApiResponse } from '@/shared/api/apiClient';
+import { apiClient } from '@/lib';
+import { type ApiResponse } from '@/lib';
 
 import type { StatusDetailData } from '@/features/status/types';
 

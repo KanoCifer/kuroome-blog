@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useHeatmap } from '../useHeatmap';
 import type { WereadYearlyHeatmap } from '@/features/books/api';
 
 // ── gateway mock ─────────────────────────────────────────────────

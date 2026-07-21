@@ -437,8 +437,8 @@
 
 <script setup lang="ts">
 import { motion } from 'motion-v';
-import { FADE } from '@/shared/constants/motionPresets';
-import { ModalFadeTransition } from '@/shared/components/ui/modal-fade-transition';
+import { FADE } from '@/constants';
+import { ModalFadeTransition } from '@/components';
 import { computed, nextTick, ref, watch } from 'vue';
 import type { ExifInfo, Picture } from '@/features/pic/composables';
 

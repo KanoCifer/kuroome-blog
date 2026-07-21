@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { authGateway, useAuthStore, useProfileForm } from '@/features/auth';
 import { AuthLayout } from './components';
-import IconCloud from '@/shared/components/icons/IconCloud.vue';
+import { IconCloud } from '@/components';
 import {
   AlertCircle,
   AtSign,
@@ -30,7 +30,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/shared/components/ui/alert-dialog';
+} from '@/components';
 
 const authStore = useAuthStore();
 const {

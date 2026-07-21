@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/features/auth';
-import { reportVisitorData } from '@/utils/visitor';
+import { reportVisitorData } from '@/utils';
 import {
   createMemoryHistory,
   createRouter,

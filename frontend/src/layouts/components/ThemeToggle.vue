@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { DropdownTransition } from '@/shared/components/ui/dropdown-transition';
-import { useThemeStore, type Theme, type ColorScheme } from '@/shared/stores/theme';
+import { DropdownTransition } from '@/components';
+import { useThemeStore, type Theme, type ColorScheme } from '@/stores';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 
 const themeStore = useThemeStore();

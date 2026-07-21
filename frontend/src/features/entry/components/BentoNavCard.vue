@@ -61,11 +61,11 @@ import {
   LoginIcon,
   LogoutIcon,
   RegisterIcon,
-} from '@/shared/components/icons';
+} from '@/components';
 import { useAuthStore } from '@/features/auth';
 import { Images, MessageCircleHeart, BookOpenText } from '@lucide/vue';
 import { Motion, type MotionProps } from 'motion-v';
-import { SPRING_BOUNCE } from '@/shared/constants/motionPresets';
+import { SPRING_BOUNCE } from '@/constants';
 import { onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { DropdownItem } from './UserDropdown.vue';

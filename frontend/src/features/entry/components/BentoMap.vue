@@ -70,13 +70,14 @@
 
 <script setup lang="ts">
 import BentoCard from './BentoCard.vue';
-import { useAnimateNumber } from '@/shared/composables';
+import { useAnimateNumber } from '@/composables';
 import { useFishingMapSummary } from '@/features/fishing';
 import { Cloud, CloudRain, FishingRod, Sun, Waves, Wind } from '@lucide/vue';
 import { computed, onMounted, watch, type Component } from 'vue';
 
 const { displayValue: displaySpots, animateTo } = useAnimateNumber();
-const { spotCount, lastRecordText, weatherText, tideStatus, refresh } = useFishingMapSummary();
+const { spotCount, lastRecordText, weatherText, tideStatus, refresh } =
+  useFishingMapSummary();
 
 const WEATHER_ICON_MAP: Record<string, Component> = {
   晴: Sun,

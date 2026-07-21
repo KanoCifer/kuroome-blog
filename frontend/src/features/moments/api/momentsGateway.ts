@@ -1,4 +1,4 @@
-import apiClient from '@/shared/api/apiClient';
+import { apiClient } from '@/lib';
 import type {
   ListAdminMomentsParams,
   ListPublicMomentsParams,
@@ -20,9 +20,12 @@ export interface MomentsGateway {
 
 export const momentsGateway: MomentsGateway = {
   async listPublic(params) {
-    const res = await apiClient.get<{ data: MomentListResponse }>('v1/moments', {
-      params,
-    });
+    const res = await apiClient.get<{ data: MomentListResponse }>(
+      'v1/moments',
+      {
+        params,
+      },
+    );
     return res.data.data;
   },
 

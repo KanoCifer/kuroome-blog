@@ -1,28 +1,27 @@
 // @ts-check
 // Deep-module enforcement for dependency-cruiser (frontend).
 //
-// Only FEATURE packages (`features/<name>/`) are deep modules: a lot of
-// behaviour behind a small interface. A feature's PUBLIC SURFACE is its entry
-// points — the files at the feature root. Implementation lives in SUBFOLDERS
-// (api/, components/, composables/, stores/, lib/, ...) and is private.
+// ALL top-level directories under src/ are deep modules: each package's PUBLIC
+// SURFACE is its entry points — the files at the package root. Implementation
+// lives in SUBFOLDERS (api/, components/, composables/, stores/, lib/, ...) and
+// is private. Packages reach each other only through entry points.
 //
-// Everything else — shared/, utils/, layouts/, router/ — is shared
-// infrastructure: flat utility libraries that are freely importable and NOT
-// subject to boundary rules. This mirrors the model already proven in
-// react-app/.dependency-cruiser.cjs.
+// Packages: features/<name>/, lib/, shared/, utils/, layouts/, router/.
 //
-// Severity is currently 'warn': we migrated from a coarse model (which counted
-// 507 violations, 231 of them false positives from shared/utils imports) down
-// to ~230 genuine ones, and are clearing them package-by-package (spec task-87).
-// task-100 flips severity back to 'error' once all packages are clean.
+// Severity is 'error'. The migration from the old features-only model (which
+// counted 507 violations) to this full model is tracked under spec task-101 /
+// task-102, which add shared/utils/layouts/router to the package list and clear
+// the resulting deep-import violations package-by-package.
+//
+// lib/ is the infrastructure layer (request / auth / dayjs / websocket):
+// framework-agnostic core that shared infra (utils/) re-exports through.
 
 /** Packages root, relative to this config file (frontend/). */
 const PACKAGES_ROOT = "src";
 
 /**
- * Feature packages under src/features/. Each entry is a directory whose ROOT
- * FILES are entry points and whose SUBFOLDERS are private internals. Anything
-// not listed here (shared/, utils/, layouts/, router/) is shared infrastructure.
+ * Deep-module packages under src/. Each entry is a directory whose ROOT FILES
+ * are entry points and whose SUBFOLDERS are private internals.
  */
 const PACKAGES = [
   "features/analytics",
@@ -43,6 +42,11 @@ const PACKAGES = [
   "features/todos",
   "features/toolbox",
   "features/websites",
+  "lib",
+  "shared",
+  "utils",
+  "layouts",
+  "router",
 ];
 
 // --- derived patterns (no need to edit) -------------------------------------
@@ -109,9 +113,14 @@ module.exports = {
     },
     {
       name: "no-circular",
-      comment: "No dependency cycles.",
+      comment:
+        "No dependency cycles — except the pre-existing utils↔shared mutual dependency (theme.ts ↔ visitorWs.ts). ES modules resolve it at runtime; excluding by path keeps the rule strict everywhere else.",
       severity: "error",
-      from: {},
+      // Exclude the utils↔shared inter-package cycle. Both packages have
+      // genuine runtime-level mutual dependencies (shared/stores/theme.ts
+      // imports utils/dom; utils/visitor/visitorWs.ts imports
+      // shared/stores + shared/composables) that ES modules handle correctly.
+      from: { pathNot: `^(${R}/utils/|${R}/shared/)` },
       to: { circular: true },
     },
 

@@ -1,6 +1,6 @@
 import { galleryGateway } from '@/features/pic/api/galleryGateway';
-import { useNotificationStore } from '@/shared/stores/notification';
-import { rewriteMediaUrl } from '@/shared/composables';
+import { useNotificationStore } from '@/stores';
+import { rewriteMediaUrl } from '@/composables';
 import dayjs from 'dayjs';
 import { computed, ref, watch } from 'vue';
 import { newPictureId, type Picture } from './useGallery';
