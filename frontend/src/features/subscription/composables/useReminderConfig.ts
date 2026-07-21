@@ -1,4 +1,4 @@
-import { subscriptionGateway } from '@/features/rss/api';
+import { subscriptionGateway } from '@/features/rss';
 import { useNotificationStore } from '@/shared/stores/notification';
 import {
   applyReminderFormValues,

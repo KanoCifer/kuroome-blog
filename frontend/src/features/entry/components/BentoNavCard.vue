@@ -67,12 +67,13 @@ import { Images, MessageCircleHeart, BookOpenText } from '@lucide/vue';
 import { Motion, type MotionProps } from 'motion-v';
 import { SPRING_BOUNCE } from '@/shared/constants/motionPresets';
 import { onUnmounted, ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import type { DropdownItem } from './UserDropdown.vue';
 import UserDropdown from './UserDropdown.vue';
 
 const auth = useAuthStore();
 const route = useRoute();
+const router = useRouter();
 
 const props = defineProps<{
   layoutId?: string;
@@ -96,7 +97,10 @@ const userMenuItems: DropdownItem[] = [
     icon: LogoutIcon,
     label: 'Logout',
     class: 'text-primary font-bold',
-    onClick: () => auth.logout(),
+    onClick: () => {
+      auth.logout();
+      router.push('/');
+    },
   },
 ];
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTwikoo } from '@/features/blog/composables';
+import { useTwikoo } from '@/shared/composables';
 import { nextTick, watch } from 'vue';
 
 const props = defineProps<{

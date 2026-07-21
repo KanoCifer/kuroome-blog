@@ -178,8 +178,8 @@
 </template>
 
 <script setup lang="ts">
-import { socialGateway } from '@/features/blog/api';
-import { useCardLayoutStore } from '@/features/entry/stores/cardLayout';
+import { socialGateway } from '@/features/blog';
+import { useCardLayoutStore } from '@/shared/stores/cardLayout';
 import { useNotificationStore } from '@/shared/stores/notification';
 import SettingIcon from '@/shared/components/icons/SettingIcon.vue';
 import { AxiosError } from 'axios';

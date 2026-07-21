@@ -24,3 +24,6 @@ export {
   MODEL_OPTIONS,
 } from './composables';
 export type { ChatMessage, UseLikeSummaryReturn } from './composables';
+
+// 组件
+export { AISummary } from './components';

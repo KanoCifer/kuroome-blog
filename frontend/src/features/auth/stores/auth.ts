@@ -1,14 +1,13 @@
 import { createAuthGateway } from '@/features/auth/api/authGateway';
-import { refreshAccessToken } from '@/features/auth/api/refresh';
+import { refreshAccessToken } from '@/shared/auth/refresh';
 import {
   getAccessToken as getToken,
   setAccessToken,
-} from '@/features/auth/helper/tokenService';
+} from '@/shared/auth/tokenService';
 import { reconnectWs } from '@/utils/visitor';
 import type { UserInfo } from '@/features/auth/types';
 import { userCache } from '@/features/auth/helper/userCache';
 import { useNotificationStore } from '@/shared/stores/notification';
-import router from '@/router';
 import { isAxiosError } from 'axios';
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
@@ -159,11 +158,8 @@ export const useAuthStore = defineStore('auth', () => {
       // 停止心跳上报
       reconnectWs();
 
-      try {
-        await router.push('/');
-      } catch (error) {
-        console.error('跳转首页失败:', error);
-      }
+      // 注意：不在此处跳转。路由导航是调用方职责，store 不应依赖 router
+      //（否则会形成 auth/store ↔ router 循环依赖）。
 
       notifier.success('已退出登录');
       loading.value = false;

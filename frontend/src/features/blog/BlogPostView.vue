@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { AISummary } from '@/features/blog/components/ai-summary';
-import TwikooComments from './components/TwikooComments.vue';
+import TwikooComments from '@/shared/components/TwikooComments.vue';
 import {
   AlertDialog,
   AlertDialogAction,

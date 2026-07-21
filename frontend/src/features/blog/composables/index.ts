@@ -6,5 +6,5 @@ export { useArticleChat, type ChatMessage } from './useArticleChat';
 export { useArticleSummary, MODEL_OPTIONS } from './useArticleSummary';
 export { useMarkdownImage } from './useMarkdownImage';
 export { consumeSseStream, parseSseChunk } from './useSseStream';
-export { useTwikoo } from './useTwikoo';
+export { useTwikoo } from '@/shared/composables/useTwikoo';
 export { useLikeSummary, type UseLikeSummaryReturn } from './useLikeSummary';

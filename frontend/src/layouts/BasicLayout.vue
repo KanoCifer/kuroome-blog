@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import {
   BackdropLayer,
   FooterToggle,
@@ -10,7 +10,12 @@ import {
 import { RouteTransition } from '@/shared/components/ui/route-transition';
 
 const route = useRoute();
+const router = useRouter();
 const isEntryView = computed(() => route.path === '/');
+
+function handleRequestLogin() {
+  router.push('/login');
+}
 </script>
 
 <template>
@@ -28,6 +33,6 @@ const isEntryView = computed(() => route.path === '/');
       <RouteTransition />
     </main>
     <FooterToggle :is-entry-view="isEntryView" />
-    <GlobalOverlays />
+    <GlobalOverlays @requestLogin="handleRequestLogin" />
   </div>
 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Footer } from '@/layouts/components';
+import Footer from '@/layouts/components/Footer.vue';
 import BackToTop from '@/layouts/components/BackToTop.vue';
 import BasicNav from '@/layouts/components/BasicNav.vue';
 import { AnimatePresence } from 'motion-v';

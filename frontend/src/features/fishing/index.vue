@@ -10,10 +10,13 @@ import IndexHeroCard from '@/features/fishing/components/IndexHeroCard.vue';
 import MapContainer from '@/features/fishing/components/MapContainer.vue';
 import SpotDetailPanel from '@/features/fishing/components/SpotDetailPanel.vue';
 import QuickFeedbackBanner from '@/features/fishing/components/QuickFeedbackBanner.vue';
-import SpotFormPanel from '@/features/fishing/components/SpotFormPanel.vue';
 import { useFishingDashboard } from '@/features/fishing/composables/useFishingDashboard';
 import { MapPin } from '@lucide/vue';
-import { onMounted } from 'vue';
+import { defineAsyncComponent, onMounted } from 'vue';
+
+const SpotFormPanel = defineAsyncComponent(
+  () => import('@/features/fishing/components/SpotFormPanel.vue'),
+);
 
 const dash = useFishingDashboard();
 const { feedback, analysis } = dash;

@@ -204,7 +204,7 @@ import DragWrapper from '@/layouts/components/DragWrapper.vue';
 import FloatingActionButtons from '@/layouts/components/FloatingActionButtons.vue';
 import SettingsModal from '@/layouts/components/SettingsModal.vue';
 import { useCardLayout } from '@/features/entry/composables';
-import { useCardLayoutStore } from '@/features/entry/stores/cardLayout';
+import { useCardLayoutStore } from '@/shared/stores/cardLayout';
 import { useThemeStore } from '@/shared/stores/theme';
 import cardStylesData from '@/shared/data/card-styles.json';
 import { onMounted, onUnmounted, ref } from 'vue';

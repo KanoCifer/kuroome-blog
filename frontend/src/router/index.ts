@@ -53,7 +53,7 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
-      component: () => import('@/features/pages/about/AboutView.vue'),
+      component: () => import('@/features/pages').then((m) => m.AboutView),
       meta: {
         title: "关于我 - Kuroome's Blog",
         description: "关于 Kuroome's Blog 项目和作者的介绍",
@@ -93,7 +93,8 @@ const router = createRouter({
     {
       path: '/privacy',
       name: 'privacy',
-      component: () => import('@/features/pages/privacy/PrivacyPolicyView.vue'),
+      component: () =>
+        import('@/features/pages').then((m) => m.PrivacyPolicyView),
       meta: {
         title: "隐私政策 - Kuroome's Blog",
         description: '了解本站如何收集、使用和保护您的个人信息',
@@ -361,7 +362,7 @@ const router = createRouter({
       // 通配符匹配所有未定义的路径
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
-      component: () => import('@/features/pages/not-found/NotFound.vue'),
+      component: () => import('@/features/pages').then((m) => m.NotFound),
     },
   ],
 });

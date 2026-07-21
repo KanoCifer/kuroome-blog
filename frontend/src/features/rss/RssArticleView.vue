@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { rssGateway } from '@/features/rss/api';
-import BasicDetail from '@/features/status/components/BasicDetail.vue';
-import { AISummary } from '@/features/blog/components/ai-summary';
+import BasicDetail from '@/shared/components/BasicDetail.vue';
+import { AISummary } from '@/features/blog';
 import { useNotificationStore } from '@/shared/stores/notification';
 import type { RssArticle } from '@/features/rss/types';
 import { formatDate } from '@/utils/date';

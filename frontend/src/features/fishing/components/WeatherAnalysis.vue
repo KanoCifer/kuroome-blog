@@ -15,7 +15,7 @@
  */
 import { useNotificationStore } from '@/shared/stores/notification';
 import { formatDate } from '@/utils/date';
-import { llmGateway } from '@/features/blog/api';
+import { llmGateway } from '@/features/blog';
 import { renderMarkdown } from '@/shared/composables';
 import dayjs from 'dayjs';
 import { AnimatePresence, motion } from 'motion-v';

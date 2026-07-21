@@ -14,7 +14,7 @@ import SpotMiniMap from '@/features/fishing/components/SpotMiniMap.vue';
 import type { CreateFishingSpotPayload } from '@/features/fishing/api';
 import { fishingSpotsGateway } from '@/features/fishing/api';
 import { DEFAULT_MAP_CENTER } from '@/features/fishing/stores/fishingMap';
-import { useGalleryUpload, type Picture } from '@/features/pic/composables';
+import { useGalleryUpload, type Picture } from '@/features/pic';
 import {
   ImagePlus,
   ImageOff,

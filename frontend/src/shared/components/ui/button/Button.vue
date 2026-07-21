@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { buttonClasses, type ButtonVariants } from '.';
+import { buttonClasses, type ButtonVariants } from './buttonClasses';
 
 interface Props {
   variant?: ButtonVariants['variant'];

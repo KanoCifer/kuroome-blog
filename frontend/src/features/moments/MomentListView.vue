@@ -251,7 +251,7 @@
 </template>
 
 <script setup lang="ts">
-import BasicDetail from '@/features/status/components/BasicDetail.vue';
+import BasicDetail from '@/shared/components/BasicDetail.vue';
 import { useAuthStore } from '@/features/auth';
 import Modal from '@/shared/components/ui/modal/Modal.vue';
 import { MomentComposer } from '@/features/moments/composables';

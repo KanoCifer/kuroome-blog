@@ -12,6 +12,8 @@
     "type-check": "vue-tsc -b --noEmit",
     "lint": "pnpm exec oxlint .",
     "lint:fix": "pnpm exec oxlint . --fix",
+    "lint:boundaries": "depcruise --ts-config tsconfig.vitest.json src",
+    "check": "run-p type-check lint lint:boundaries",
     "format": "pnpm exec prettier ./src --write"
   },
   "dependencies": {
@@ -64,6 +66,7 @@
     "@vitejs/plugin-vue": "^6.0.8",
     "@vue/test-utils": "^2.4.11",
     "@vue/tsconfig": "^0.9.1",
+    "dependency-cruiser": "^18.1.0",
     "happy-dom": "^20.10.6",
     "jiti": "^2.7.0",
     "jsdom": "^29.1.1",

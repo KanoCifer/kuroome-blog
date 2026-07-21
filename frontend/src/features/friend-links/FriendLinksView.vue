@@ -316,7 +316,7 @@
 </template>
 
 <script setup lang="ts">
-import { BasicDetail } from '@/features/status/components';
+import BasicDetail from '@/shared/components/BasicDetail.vue';
 import { TagPill } from '@/shared/components/ui/tag-pill';
 import { useFriendLinks } from '@/features/friend-links/composables';
 import { motion } from 'motion-v';
@@ -333,7 +333,7 @@ import IconInfoCircle from '@/shared/components/icons/IconInfoCircle.vue';
 import IconLinkChain from '@/shared/components/icons/IconLinkChain.vue';
 import IconRefresh from '@/shared/components/icons/IconRefresh.vue';
 import IconUsersGroup from '@/shared/components/icons/IconUsersGroup.vue';
-import TwikooComments from '@/features/blog/components/TwikooComments.vue';
+import TwikooComments from '@/shared/components/TwikooComments.vue';
 
 const {
   dailyPick,

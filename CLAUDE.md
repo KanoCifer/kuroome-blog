@@ -38,6 +38,10 @@
 
 `react-app/src/` top-level dirs are deep modules — see [src/packages/README.md](react-app/src/packages/README.md) before adding or importing one. Run `pnpm run lint:boundaries` (in `react-app/`) to verify.
 
+## Module Boundaries (frontend)
+
+`frontend/src/` top-level dirs (`features/*`, `shared/*`, `utils/*`, `layouts/*`, `router`) are deep modules — see [src/README.md](frontend/src/README.md) before adding or importing one. Each immediate child is a package; import only through its root entry points. Run `pnpm run lint:boundaries` (in `frontend/`) to verify.
+
 ## Agent skills
 
 ### Design Context

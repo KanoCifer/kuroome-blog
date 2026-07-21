@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import BasicDetail from '@/features/status/components/BasicDetail.vue';
+import BasicDetail from '@/shared/components/BasicDetail.vue';
 import { formatDate } from '@/utils/date';
 import ReminderConfigModal from './components/ReminderConfigModal.vue';
 import SubscriptionCardList from './components/SubscriptionCardList.vue';

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Subscription } from '@/features/rss/api';
+import type { Subscription } from '@/features/rss';
 
 interface Props {
   subscriptions: Subscription[];

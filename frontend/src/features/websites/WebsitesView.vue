@@ -164,7 +164,7 @@
 </template>
 
 <script setup lang="ts">
-import { BasicDetail } from '@/features/status/components';
+import BasicDetail from '@/shared/components/BasicDetail.vue';
 import { TagPill } from '@/shared/components/ui/tag-pill';
 import websitesData from '@/shared/data/websites.json';
 import { useImageError } from '@/shared/composables';

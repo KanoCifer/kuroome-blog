@@ -5,6 +5,10 @@ export { default as RssSubscriptionsView } from './RssSubscriptionsView.vue';
 export * from './components';
 export { useRssArticles, useRssParse, useRssSubscriptions } from './composables';
 export { rssGateway, subscriptionGateway } from './api';
-export type { RssGateway, SubscriptionGateway } from './api';
+export type {
+  RssGateway,
+  SubscriptionGateway,
+  Subscription,
+} from './api';
 export * from './rssUtils';
 export * from './types';

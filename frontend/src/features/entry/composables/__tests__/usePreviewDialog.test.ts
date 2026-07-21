@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { usePreviewDialog } from '../usePreviewDialog';
+import { usePreviewDialog } from '@/shared/composables/usePreviewDialog';
 
 describe('usePreviewDialog', () => {
   afterEach(() => {

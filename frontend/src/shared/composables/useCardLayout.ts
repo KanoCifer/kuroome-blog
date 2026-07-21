@@ -1,5 +1,5 @@
 import cardStyles from '@/shared/data/card-styles.json';
-import { useCardLayoutStore } from '@/features/entry/stores/cardLayout';
+import { useCardLayoutStore } from '@/shared/stores/cardLayout';
 import {
   onMounted,
   onUnmounted,
@@ -10,7 +10,7 @@ import {
   type CSSProperties,
   type Ref,
 } from 'vue';
-import { useLayoutCenter } from './useLayoutCenter';
+import { useLayoutCenter } from '@/shared/composables/useLayoutCenter';
 
 /** Card style entry from card-styles.json */
 interface CardStyle {
