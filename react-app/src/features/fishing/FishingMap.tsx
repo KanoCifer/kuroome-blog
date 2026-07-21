@@ -25,16 +25,18 @@ import { FishingFeedbackForm } from './components/FishingFeedbackForm';
 import { FishingIndexCard } from './components/FishingIndexCard';
 import { FishingIndexDetailSheet } from './components/FishingIndexDetailSheet';
 import { FishingMapTile } from './components/FishingMapTile';
+import { FishingSpotDetailSheet } from './components/FishingSpotDetailSheet';
 import { HourlyWeather } from './components/HourlyWeather';
 import { QuickFeedbackBanner } from './components/QuickFeedbackBanner';
 import { RouteBanner } from './components/RouteBanner';
 import { TideCard } from './components/TideCard';
 import { WeatherCard } from './components/WeatherCard';
 import { WeatherHero } from './components/WeatherHero';
-import { MAP_CENTER, fishingSpots } from './constants';
+import { MAP_CENTER } from './constants';
 import { AnalysisContextProvider } from './contexts/AnalysisContext';
 import { useFishingAnalysis } from './hooks/useFishingAnalysis';
 import { useFishingFeedback } from './hooks/useFishingFeedback';
+import type { MapMarker } from '@/types/marker';
 import type { FishingIndexData } from './types';
 
 export default function FishingMap() {
@@ -64,6 +66,54 @@ function FishingMapContent() {
     (s) => s.fetchWeatherAndFishing,
   );
   const indexData = useFishingMapStore((s) => s.indexData);
+  const markers = useFishingMapStore((s) => s.markers);
+  const setMarkers = useFishingMapStore((s) => s.setMarkers);
+
+  // —— 钓点详情 sheet 状态 ——
+  const [selectedMarker, setSelectedMarker] = useState<MapMarker | null>(null);
+
+  const handleMarkerSelect = useCallback((marker: MapMarker) => {
+    setSelectedMarker(marker);
+  }, []);
+
+  const handleSpotClose = useCallback(() => {
+    setSelectedMarker(null);
+  }, []);
+
+  const handleSpotRoute = useCallback((marker: MapMarker) => {
+    // 关闭详情，交由地图规划路线（当前为 stub，保留扩展点）
+    setSelectedMarker(null);
+    void marker;
+  }, []);
+
+  const handleSpotUpdated = useCallback(
+    (marker: MapMarker) => {
+      setSelectedMarker(marker);
+      // 同步地图标记源数据
+      setMarkers((prev) =>
+        prev.map((m) =>
+          m.extraData && marker.extraData
+            ? (m.extraData as { id?: string }).id ===
+              (marker.extraData as { id?: string }).id
+              ? marker
+              : m
+            : m,
+        ),
+      );
+    },
+    [setMarkers],
+  );
+
+  const handleSpotDeleted = useCallback(
+    (id: string) => {
+      setMarkers((prev) =>
+        prev.filter(
+          (m) => (m.extraData as { id?: string | undefined }).id !== id,
+        ),
+      );
+    },
+    [setMarkers],
+  );
 
   // —— 详情 sheet 状态 ——
   const [detailSheet, setDetailSheet] = useState<{
@@ -81,6 +131,12 @@ function FishingMapContent() {
   useEffect(() => {
     void fetchWeatherAndFishing(MAP_CENTER);
   }, [fetchWeatherAndFishing]);
+
+  // —— 启动时拉钓点数据 ——
+  const fetchSpots = useFishingMapStore((s) => s.fetchSpots);
+  useEffect(() => {
+    void fetchSpots();
+  }, [fetchSpots]);
 
   const showFeedbackBanner = !isPlanningRoute && !routeInfo;
 
@@ -132,7 +188,11 @@ function FishingMapContent() {
   return (
     <div className="bg-background min-h-screen">
         {/* Map — fixed full-screen background */}
-        <FishingMapTile />
+        <FishingMapTile
+          markers={markers}
+          onMarkerSelect={handleMarkerSelect}
+          focusedLocation={selectedMarker?.position ?? null}
+        />
 
         {/* Persistent DashboardSheet — draggable between collapsed / half / full */}
         <DashboardSheet>
@@ -216,9 +276,15 @@ function FishingMapContent() {
           data={detailSheet.data}
           onClose={handleDetailClose}
         />
+
+        <FishingSpotDetailSheet
+          open={selectedMarker !== null}
+          marker={selectedMarker}
+          onClose={handleSpotClose}
+          onRoute={handleSpotRoute}
+          onSpotUpdated={handleSpotUpdated}
+          onSpotDeleted={handleSpotDeleted}
+        />
       </div>
   );
 }
-
-// 引用 fishingSpots 以保树摇不掉（marker data 由 FishingMapTile 内部 useMap 直接读）
-void fishingSpots;

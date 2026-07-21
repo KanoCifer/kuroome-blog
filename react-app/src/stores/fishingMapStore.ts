@@ -3,8 +3,11 @@ import { create } from 'zustand';
 import dayjs from 'dayjs';
 
 import { useNotificationStore } from '@/stores/notificationState';
+import type { MapMarker } from '@/types/marker';
 
 import { fishingMapService } from '@/features/fishing/api/service';
+import { fishingSpotsGateway } from '@/features/fishing/api/fishingSpotsGateway';
+import { toMapMarkers } from '@/features/fishing/types';
 import type {
   FishingIndexData,
   TideData,
@@ -49,10 +52,19 @@ export interface FishingMapState {
   indexLoading: boolean;
   indexError: string;
 
+  // 钓点标记（后端获取，对齐 frontend fishingSpotsGateway.list）
+  markers: MapMarker[];
+  spotsLoading: boolean;
+  spotsError: string;
+
   fetchWeatherAndFishing: (location: [number, number]) => Promise<void>;
   fetchPanelTide: (harbor?: string, date?: string) => Promise<void>;
   setSelectedHarbor: (harbor: string) => void;
   setSelectedDate: (date: string) => void;
+  fetchSpots: () => Promise<void>;
+  setMarkers: (
+    updater: MapMarker[] | ((prev: MapMarker[]) => MapMarker[]),
+  ) => void;
 }
 
 const notifyError = (msg: string) => {
@@ -82,6 +94,11 @@ export const useFishingMapStore = create<FishingMapState>((set, get) => ({
   tideLoading: false,
   selectedHarbor: 'P2352',
   selectedDate: dayjs().format('YYYYMMDD'),
+
+  // 钓点标记初始状态
+  markers: [],
+  spotsLoading: false,
+  spotsError: '',
 
   // actions
   fetchWeatherAndFishing: async (location: [number, number]) => {
@@ -152,5 +169,27 @@ export const useFishingMapStore = create<FishingMapState>((set, get) => ({
   setSelectedDate: (date: string) => {
     set({ selectedDate: date });
     void get().fetchPanelTide(get().selectedHarbor, date);
+  },
+
+  // 钓点标记：从后端获取，对齐 frontend fishingSpotsGateway.list + toMapMarkers
+  fetchSpots: async () => {
+    set({ spotsLoading: true, spotsError: '' });
+    try {
+      const spots = await fishingSpotsGateway.list();
+      set({ markers: toMapMarkers(spots), spotsLoading: false });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '加载钓点失败';
+      notifyError(msg);
+      set({ spotsError: msg, spotsLoading: false });
+    }
+  },
+
+  setMarkers: (updater) => {
+    set((state) => ({
+      markers:
+        typeof updater === 'function'
+          ? (updater as (prev: MapMarker[]) => MapMarker[])(state.markers)
+              : updater,
+    }));
   },
 }));

@@ -10,4 +10,6 @@ export interface MapMarker {
   position: [number, number];
   content?: string;
   offset?: [number, number];
+  /** 钓点业务字段（location 除外）—— 供详情面板 / 上层消费，对齐 frontend MapMarker.extraData */
+  extraData?: Record<string, unknown>;
 }

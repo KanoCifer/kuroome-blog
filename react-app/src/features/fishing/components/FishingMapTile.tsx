@@ -4,9 +4,10 @@
  * 固定 inset-0 占据整个 viewport (z-0), 处于 DashboardSheet (z-30) 之下。
  * 路线状态 UI 全部上移至 DashboardSheet, 这里只承载地图本身。
  */
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { useRouteMapStore } from '@/stores/routeMapStore';
+import type { MapMarker } from '@/types/marker';
 
 import { useMap } from '../hooks/useMap';
 import { fishingMapService } from '../api/service';
@@ -17,41 +18,52 @@ interface FishingMapTileProps {
    * 不传则内部自管 —— 这是默认场景。
    */
   containerRef?: React.RefObject<HTMLDivElement | null>;
+  /** 钓点标记源数据（由父组件 store 管理） */
+  markers: MapMarker[];
+  /** marker 点击回调 —— 打开钓点详情 */
+  onMarkerSelect: (marker: MapMarker) => void;
+  /** 需要聚焦的坐标（打开钓点详情时由父组件传入），null 表示不聚焦 */
+  focusedLocation: [number, number] | null;
 }
 
 export function FishingMapTile({
   containerRef: externalRef,
+  markers,
+  onMarkerSelect,
+  focusedLocation,
 }: FishingMapTileProps) {
   const internalRef = useRef<HTMLDivElement | null>(null);
   const containerRef = externalRef ?? internalRef;
 
   const serviceRef = useRef(fishingMapService());
-  const planRouteAction = useRouteMapStore((s) => s.planRouteAction);
+  useRouteMapStore((s) => s.planRouteAction);
 
   const getSecurityJsCode = (): Promise<string> =>
     serviceRef.current.getSecurityJsCode();
 
   /**
-   * marker click 回调：useMap 内部已经调过 planRoute,
-   * 这里再把 planRoute 包进 store 的串行化入口（错误通知 + routeSeq 守卫）。
+   * marker click 回调：打开钓点详情面板。
+   * 签名对齐 useMap 的 onMarkerClick(index, userPosition)。
    */
-  const handleMarkerClick = async (
-    index: number,
-    userPosition: [number, number],
-  ): Promise<void> => {
+  const handleMarkerClick = (index: number, userPosition: [number, number]): void => {
     void userPosition;
-    await planRouteAction({
-      spotIndex: index,
-      runner: async () => ({ distance: 0, time: 0 }),
-      fallbackError: '路线规划失败，请检查网络连接或定位权限',
-    });
+    const marker = markers[index];
+    if (marker) onMarkerSelect(marker);
   };
 
-  const { isMapReady } = useMap(
+  const { isMapReady, focusMap } = useMap(
     containerRef,
     getSecurityJsCode,
     handleMarkerClick,
+    markers,
   );
+
+  // 父组件传入聚焦坐标时，将地图中心移至该钓点
+  useEffect(() => {
+    if (focusedLocation) {
+      focusMap(focusedLocation);
+    }
+  }, [focusedLocation, focusMap]);
 
   return (
     <div className="fixed inset-0 z-0">
