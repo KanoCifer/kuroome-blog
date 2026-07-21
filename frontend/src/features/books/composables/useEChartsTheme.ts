@@ -1,4 +1,4 @@
-import { resolveCssColor } from '@/utils';
+import { resolveCssColor } from '@/lib';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 
 /**

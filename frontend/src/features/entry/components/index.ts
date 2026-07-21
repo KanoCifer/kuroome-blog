@@ -1,11 +1,10 @@
 // entry 首页组件桶导出（网格基元 + 首页专属 Bento 卡片）
 
 // 首页专属 Bento 卡片
-export { default as BentoCalendar } from './BentoCalendar.vue';
+export { BentoCalendar } from '@/components';
 export { default as BentoCat } from './BentoCat.vue';
 export { default as BentoClock } from './BentoClock.vue';
 export { default as BentoClockTime } from './BentoClockTime.vue';
-export { default as BentoGreeting } from './BentoGreeting.vue';
 export { default as BentoLike } from './BentoLike.vue';
 export { default as BentoNavCard } from './BentoNavCard.vue';
 export { default as BentoNewPost } from './BentoNewPost.vue';

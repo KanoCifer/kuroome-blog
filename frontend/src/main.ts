@@ -12,8 +12,8 @@ import './styles/backgrounds.css'; // 背景渐变
 import './styles/base.scss'; // font-face sass
 import './styles/route-transitions.css'; // 路由过渡动画 keyframes
 import './styles/squircle.css';
-import './utils/echarts';
-import { initVisitorWebSocket } from './utils';
+import './lib/echarts';
+import { initVisitorWebSocket } from './lib';
 import router from './router';
 
 // Apply persisted color scheme before mount to avoid flash of wrong colors

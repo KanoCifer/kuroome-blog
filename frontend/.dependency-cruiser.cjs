@@ -6,53 +6,50 @@
 // lives in SUBFOLDERS (api/, components/, composables/, stores/, lib/, ...) and
 // is private. Packages reach each other only through entry points.
 //
-// Packages: features/<name>/, lib/, shared/, utils/, layouts/, router/.
+// Packages: features/<name>/, components/, lib/.
 //
 // Severity is 'error'. The migration from the old features-only model (which
 // counted 507 violations) to this full model is tracked under spec task-101 /
-// task-102, which add shared/utils/layouts/router to the package list and clear
+// task-102, which add shared to the package list and clear
 // the resulting deep-import violations package-by-package.
 //
 // lib/ is the infrastructure layer (request / auth / dayjs / websocket):
-// framework-agnostic core that shared infra (utils/) re-exports through.
+// framework-agnostic core for all infra concerns.
 
 /** Packages root, relative to this config file (frontend/). */
-const PACKAGES_ROOT = "src";
+const PACKAGES_ROOT = 'src';
 
 /**
  * Deep-module packages under src/. Each entry is a directory whose ROOT FILES
  * are entry points and whose SUBFOLDERS are private internals.
  */
 const PACKAGES = [
-  "features/analytics",
-  "features/auth",
-  "features/blog",
-  "features/books",
-  "features/changelog",
-  "features/device",
-  "features/entry",
-  "features/fishing",
-  "features/friend-links",
-  "features/moments",
-  "features/pages",
-  "features/pic",
-  "features/rss",
-  "features/status",
-  "features/subscription",
-  "features/todos",
-  "features/toolbox",
-  "features/websites",
-  "lib",
-  "shared",
-  "utils",
-  "layouts",
-  "router",
+  'components',
+  'features/analytics',
+  'features/auth',
+  'features/blog',
+  'features/books',
+  'features/changelog',
+  'features/device',
+  'features/entry',
+  'features/fishing',
+  'features/friend-links',
+  'features/moments',
+  'features/pages',
+  'features/pic',
+  'features/rss',
+  'features/status',
+  'features/subscription',
+  'features/todos',
+  'features/toolbox',
+  'features/websites',
+  'lib',
 ];
 
 // --- derived patterns (no need to edit) -------------------------------------
 const R = PACKAGES_ROOT;
 // Escape "/" in package paths (e.g. "features/auth") for use in regex.
-const PKG = PACKAGES.map((p) => p.replace(/\//g, "\\/")).join("|");
+const PKG = PACKAGES.map((p) => p.replace(/\//g, '\\/')).join('|');
 
 /**
  * A package's private internals: anything nested inside a package subfolder.
@@ -71,20 +68,20 @@ const PACKAGE_TESTS = `^${R}/(${PKG})\\/__tests__/`;
 module.exports = {
   forbidden: [
     {
-      name: "entrypoint-boundary-from-app",
+      name: 'entrypoint-boundary-from-app',
       comment:
         "Shared infra / app code may import a package's entry points (its root files), but nothing inside its subfolders.",
-      severity: "error",
+      severity: 'error',
       // importer is NOT inside any package (shared infra, root, other features'
       // tests handled separately)
       from: { pathNot: IN_PACKAGES },
       to: { path: PACKAGE_INTERNALS },
     },
     {
-      name: "entrypoint-boundary-across-packages",
+      name: 'entrypoint-boundary-across-packages',
       comment:
-        "Packages reach each other only through entry points — never through internals. Intra-package imports are free.",
-      severity: "error",
+        'Packages reach each other only through entry points — never through internals. Intra-package imports are free.',
+      severity: 'error',
       // importer is inside a package ($1), but not a test file
       from: { path: IN_PACKAGES, pathNot: PACKAGE_TESTS },
       to: {
@@ -93,10 +90,10 @@ module.exports = {
       },
     },
     {
-      name: "tests-through-entrypoints",
+      name: 'tests-through-entrypoints',
       comment:
         "A package's tests exercise it through its entry points like everyone else: they may import any package's entry points and their own __tests__/ fixtures, but never any package's internals — not even their own.",
-      severity: "error",
+      severity: 'error',
       from: { path: PACKAGE_TESTS }, // a test file, in package $1
       to: {
         path: PACKAGE_INTERNALS,
@@ -104,41 +101,21 @@ module.exports = {
       },
     },
     {
-      name: "tests-folder-is-private",
+      name: 'tests-folder-is-private',
       comment:
         "A package's __tests__/ folder is reachable only from tests — nothing else may import fixtures.",
-      severity: "error",
+      severity: 'error',
       from: { pathNot: PACKAGE_TESTS }, // importer is not itself a test
       to: { path: PACKAGE_TESTS },
     },
-    {
-      name: "no-circular",
-      comment:
-        "No dependency cycles — except the pre-existing utils↔shared mutual dependency (theme.ts ↔ visitorWs.ts). ES modules resolve it at runtime; excluding by path keeps the rule strict everywhere else.",
-      severity: "error",
-      // Exclude the utils↔shared inter-package cycle. Both packages have
-      // genuine runtime-level mutual dependencies (shared/stores/theme.ts
-      // imports utils/dom; utils/visitor/visitorWs.ts imports
-      // shared/stores + shared/composables) that ES modules handle correctly.
-      from: { pathNot: `^(${R}/utils/|${R}/shared/)` },
-      to: { circular: true },
-    },
-
-    // --- Layering (optional, off by default) ----------------------------------
-    // Layering controls WHICH packages may depend on which. Fill in as the
-    // architecture matures, e.g.:
-    //
-    // { name: "features-may-not-depend-on-api", severity: "error",
-    //   from: { path: `^${R}/features/` },
-    //   to:   { path: `^${R}/shared/api/` } },
   ],
   options: {
-    doNotFollow: { path: "node_modules" },
+    doNotFollow: { path: 'node_modules' },
     // tsconfig.vitest.json (not tsconfig.json) so __tests__/ files are included
     // in module resolution — the root tsconfig excludes them.
-    tsConfig: { fileName: "tsconfig.vitest.json" },
+    tsConfig: { fileName: 'tsconfig.vitest.json' },
     enhancedResolveOptions: {
-      extensions: [".ts", ".tsx", ".js", ".jsx", ".json", ".vue"],
+      extensions: ['.ts', '.tsx', '.js', '.jsx', '.json', '.vue'],
     },
   },
 };

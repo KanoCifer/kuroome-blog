@@ -69,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from './BentoCard.vue';
+import { BentoCard } from '@/components';
 import { useAnimateNumber } from '@/composables';
 import { useFishingMapSummary } from '@/features/fishing';
 import { Cloud, CloudRain, FishingRod, Sun, Waves, Wind } from '@lucide/vue';

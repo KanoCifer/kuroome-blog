@@ -32,6 +32,6 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from './BentoCard.vue';
+import { BentoCard } from '@/components';
 import { CircleCheckBig } from '@lucide/vue';
 </script>

@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from './BentoCard.vue';
+import { BentoCard } from '@/components';
 import {
   AboutIcon,
   BlogIcon,

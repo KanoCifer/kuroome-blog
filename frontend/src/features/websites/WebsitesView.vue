@@ -172,7 +172,7 @@ import { SPRING_REVEAL, WHILE_IN_VIEW_FADE_UP, HOVER_LIFT } from '@/constants';
 import { computed, ref } from 'vue';
 import { useUrlSearchParams } from '@vueuse/core';
 import { IconExternalLink, IconGlobeOutline } from '@/components';
-import type { Website } from '@/types';
+import type { Website } from './types';
 
 interface CategoryOption {
   slug: string;

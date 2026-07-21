@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/features/auth';
-import { reportVisitorData } from '@/utils';
+import { reportVisitorData } from '@/lib';
 import {
   createMemoryHistory,
   createRouter,

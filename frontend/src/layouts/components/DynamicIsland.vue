@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { connectionDelay } from '@/utils';
+import { connectionDelay } from '@/lib';
 import { useVisitorCountStore } from '@/stores';
 import { useV3DevTaskStore, useDevTaskSections } from '@/features/todos';
 import { motion } from 'motion-v';

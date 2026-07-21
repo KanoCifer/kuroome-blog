@@ -39,7 +39,7 @@ describe('resolveCssColor', () => {
   });
 
   it('CSS 变量为空时返回 fallback', async () => {
-    const { resolveCssColor } = await import('./resolveColor');
+    const { resolveCssColor } = await import('./color');
     expect(resolveCssColor('--primary', '#3b82f6')).toBe('#3b82f6');
   });
 
@@ -52,7 +52,7 @@ describe('resolveCssColor', () => {
       getContext: () => createMockCtx('rgb(66, 135, 245)'),
     }));
 
-    const { resolveCssColor } = await import('./resolveColor');
+    const { resolveCssColor } = await import('./color');
     const result = resolveCssColor('--primary', '#3b82f6');
     expect(result).toBe('rgb(66, 135, 245)');
   });
@@ -68,7 +68,7 @@ describe('resolveCssColor', () => {
       getContext: () => createMockCtx('#000000'),
     }));
 
-    const { resolveCssColor } = await import('./resolveColor');
+    const { resolveCssColor } = await import('./color');
     const result = resolveCssColor('--primary', '#3b82f6');
     expect(result).toBe('#3b82f6');
   });
@@ -82,7 +82,7 @@ describe('resolveCssColor', () => {
       getContext: () => createMockCtx('#000000'),
     }));
 
-    const { resolveCssColor } = await import('./resolveColor');
+    const { resolveCssColor } = await import('./color');
     const result = resolveCssColor('--primary', '#3b82f6');
     expect(result).toBe('#000000');
   });

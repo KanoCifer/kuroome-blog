@@ -506,9 +506,9 @@
 
 <script setup lang="ts">
 import { BasicDetail, Slider, ModalFadeTransition } from '@/components';
-import { useImageProcessor } from '@/composables';
+import { useImageProcessor } from '@/features/toolbox/composables/useImageProcessor';
 import { usePreviewDialog } from '@/composables';
-import { formatBytes } from '@/utils';
+import { formatBytes } from '@/features/toolbox/lib/image';
 import { useDropZone } from '@vueuse/core';
 import { computed, useTemplateRef } from 'vue';
 
@@ -542,7 +542,7 @@ const {
 
 const outputTypeLabel = computed(
   () =>
-    outputTypes.find((option) => option.value === outputType.value)?.label ??
+    outputTypes.find((option: { label: string; value: string }) => option.value === outputType.value)?.label ??
     '',
 );
 

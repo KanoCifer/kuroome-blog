@@ -1,4 +1,4 @@
-import { useCardLayoutStore } from '@/stores';
+import { useCardLayoutStore } from '@/features/entry/cardLayout';
 import { computed, ref } from 'vue';
 
 interface DragState {

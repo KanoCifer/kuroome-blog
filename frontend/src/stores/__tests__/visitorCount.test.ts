@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { setActivePinia, createPinia } from 'pinia';
-import { useVisitorCountStore } from '../visitorCount';
+import { useVisitorCountStore } from '@/features/visitor/stores/visitorCount';
 
 describe('visitorCount store', () => {
   beforeEach(() => {

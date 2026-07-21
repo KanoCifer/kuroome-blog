@@ -1,6 +1,6 @@
 import { analyticsGateway } from '@/features/analytics';
 import { UAParser } from 'ua-parser-js';
-import { getVisitorId } from './visitorId';
+import { getVisitorId } from './visitor-id';
 
 // 收集前端可获取的追踪信息
 export function collectVisitorData() {

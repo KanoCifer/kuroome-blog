@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { stripHtml } from '@/utils/stripHtml';
+import { stripHtml } from '../text';
 
 describe('stripHtml', () => {
   it('removes simple HTML tags', () => {

@@ -28,17 +28,6 @@ import { motion } from 'motion-v';
 </script>
 
 <style scoped>
-@reference "@/assets/base.css";
-
-/*.card {
-  box-shadow:
-    color-mix(in srgb, var(--color-foreground) 12%, transparent) 0px 40px
-      50px -32px,
-    color-mix(in srgb, var(--color-foreground) 8%, transparent) 0px 60px
-      80px -48px,
-    rgba(255, 255, 255, 0.35) 0px 0px 20px 0px inset;
-}*/
-
 .card {
   will-change: transform, filter;
   border: 1px solid rgb(255 255 255 / 0.6);

@@ -202,7 +202,7 @@ import {
 } from '@/features/entry/components';
 import { DragWrapper, FloatingActionButtons, SettingsModal } from '@/layouts';
 import { useCardLayout } from '@/features/entry/composables';
-import { useCardLayoutStore } from '@/stores';
+import { useCardLayoutStore } from '@/features/entry/stores/cardLayout';
 import { useThemeStore } from '@/stores';
 import { cardStylesData } from '@/data';
 import { onMounted, onUnmounted, ref } from 'vue';

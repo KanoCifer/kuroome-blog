@@ -58,7 +58,7 @@
 <script setup lang="ts">
 import { fetchStatusDetail } from '@/features/status/api/statusGateway';
 import type { StatusDetailData } from '@/features/status/types';
-import { connectionDelay, isConnected, sendPing } from '@/utils';
+import { connectionDelay, isConnected, sendPing } from '@/lib';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 
 const serverStatus = ref<StatusDetailData | null>(null);

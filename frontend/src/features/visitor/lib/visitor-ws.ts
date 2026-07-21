@@ -1,6 +1,6 @@
 import { useWebSocket } from '@/composables';
-import { useVisitorCountStore } from '@/stores';
-import { getVisitorId } from './visitorId';
+import { getVisitorId } from './visitor-id';
+import { useVisitorCountStore } from '../stores/visitorCount';
 import type { Pinia } from 'pinia';
 
 let initialized = false;

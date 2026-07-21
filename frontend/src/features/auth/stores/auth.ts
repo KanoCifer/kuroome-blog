@@ -2,7 +2,7 @@ import { createAuthGateway } from '@/features/auth/api/authGateway';
 import { registerTokenRefresher } from '@/lib';
 import { refreshAccessToken } from '@/features/auth/helper/refresh';
 import { getAccessToken as getToken, setAccessToken } from '@/lib/auth';
-import { reconnectWs } from '@/utils';
+import { reconnectWs } from '@/lib';
 import type { UserInfo } from '@/features/auth/types';
 import { userCache } from '@/features/auth/helper/userCache';
 import { useNotificationStore } from '@/stores';

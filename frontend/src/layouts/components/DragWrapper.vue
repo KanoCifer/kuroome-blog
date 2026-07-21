@@ -18,8 +18,8 @@
 </template>
 
 <script setup lang="ts">
-import { useCardDrag } from '@/composables';
-import { useCardLayoutStore } from '@/stores';
+import { useCardDrag } from '@/features/entry';
+import { useCardLayoutStore } from '@/features/entry';
 import type { CSSProperties } from 'vue';
 import { computed, inject, onMounted, useTemplateRef, watch } from 'vue';
 

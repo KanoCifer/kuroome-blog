@@ -53,7 +53,7 @@
 
 <script setup lang="ts">
 import { websitesData } from '@/data';
-import type { Website } from '@/types';
+import type { Website } from '@/features/websites';
 import { useImageError } from '@/composables';
 
 const { handleImageError } = useImageError();

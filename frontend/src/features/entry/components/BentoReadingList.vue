@@ -59,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from './BentoCard.vue';
+import { BentoCard } from '@/components';
 import { useAnimateNumber } from '@/composables';
 import { useReadingSummary } from '@/features/books';
 import { formatDuration } from '@/lib/dayjs';

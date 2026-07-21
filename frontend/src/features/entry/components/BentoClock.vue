@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import BentoCard from './BentoCard.vue';
+import { BentoCard } from '@/components';
 import BentoClockTime from './BentoClockTime.vue';
 import dayjs from 'dayjs';
 import { ref, onMounted, onUnmounted } from 'vue';

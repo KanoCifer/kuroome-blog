@@ -179,7 +179,7 @@
 
 <script setup lang="ts">
 import { socialGateway } from '@/features/blog';
-import { useCardLayoutStore } from '@/stores';
+import { useCardLayoutStore } from '@/features/entry';
 import { useNotificationStore } from '@/stores';
 import { SettingIcon } from '@/components';
 import { AxiosError } from 'axios';

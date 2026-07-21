@@ -1,6 +1,6 @@
 import { computed, nextTick, ref } from 'vue';
 import { llmGateway } from '@/features/blog/api';
-import { stripHtml } from '@/utils';
+import { stripHtml } from '../lib/text';
 
 export interface ArticleContext {
   title?: string;
