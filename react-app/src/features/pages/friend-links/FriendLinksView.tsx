@@ -1,4 +1,4 @@
-import { TwikooComments } from '@/features/blog/components/TwikooComments';
+import { TwikooComments } from '@/components';
 import { useNotificationStore } from '@/stores/notificationState';
 import friendLinksData from '@/data/friendlinks.json';
 import websitesData from '@/data/websites.json';

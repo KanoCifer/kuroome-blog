@@ -1,5 +1,5 @@
 import devtaskRequest from './devtaskRequest.ts';
-import apiClient from '@/api/apiClient.ts';
+import apiClient, { extractData } from '@/api/apiClient.ts';
 import type {
   CreateDevTaskPayload,
   DevTask,
@@ -19,8 +19,6 @@ export interface DevTaskService {
   /** 签发 MCP 服务 Token — 走用户 JWT 的 request（非 service-token） */
   issueMcpToken(days: number): Promise<McpTokenResult>;
 }
-
-const extractData = <T>(res: { data: { data: T } }): T => res.data.data;
 
 export const devTaskService = (): DevTaskService => ({
   async list(params): Promise<DevTaskListResponse> {

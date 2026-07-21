@@ -1,6 +1,6 @@
 import { socialGateway } from '@/features/home/api/socialGateway';
 import animationData from '@/assets/Success Micro Interaction.json';
-import { BentoCard } from '@/components/bento/BentoCard';
+import { BentoCard } from '@/components';
 import { useNotificationStore } from '@/stores/notificationState';
 import { useLottie } from 'lottie-react';
 import { useEffect, useState } from 'react';

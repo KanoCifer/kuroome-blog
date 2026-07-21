@@ -6,7 +6,7 @@
  */
 import { X } from 'lucide-react';
 
-import { BottomSheet } from '@/components/basic/BottomSheet';
+import { BottomSheet } from '@/components';
 import { AIAnalysisWidget } from './AIAnalysisWidget';
 
 interface FishingAnalysisDrawerProps {

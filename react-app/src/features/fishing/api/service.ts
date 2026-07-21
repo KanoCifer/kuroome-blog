@@ -1,4 +1,4 @@
-import { llmService } from '@/lib/llm';
+import { llmService } from '@/lib';
 import { fishingMapGateway } from './gateway';
 import type {
   AnalysisPayload,

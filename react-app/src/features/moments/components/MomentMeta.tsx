@@ -1,14 +1,13 @@
 import dayjs from 'dayjs';
 
-import { PinIcon } from '@/components/basic/icon/PinIcon';
+import { PinIcon } from '@/components';
 import type { Moment } from '@/types';
+import { isPureEmoji } from '@/utils/emoji';
 
 interface MomentMetaProps {
   moment: Moment;
   volumeLabel?: string;
 }
-
-const isPureEmoji = (s: string) => /\p{Extended_Pictographic}/u.test(s);
 
 export function MomentMeta({ moment, volumeLabel }: MomentMetaProps) {
   const raw = moment.published_at ?? moment.created_at;

@@ -1,6 +1,6 @@
 import { useNotificationStore } from '@/stores/notificationState';
 import { useCallback, useRef, useState } from 'react';
-import { llmService } from '@/lib/llm';
+import { llmService } from '@/lib';
 import type { ArticleContext } from './useArticleSummary';
 
 export interface ChatMessage {

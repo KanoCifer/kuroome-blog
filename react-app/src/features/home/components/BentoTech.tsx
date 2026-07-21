@@ -1,4 +1,4 @@
-import { BentoCard } from '@/components/bento/BentoCard';
+import { BentoCard } from '@/components';
 import { motion } from 'framer-motion';
 import { SPRING } from '@/constants/springs';
 

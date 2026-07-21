@@ -1,4 +1,3 @@
-export { default as TodoListView } from './TodoListView';
 export { devTaskService } from './api';
 export type { DevTaskService } from './api';
 export type {

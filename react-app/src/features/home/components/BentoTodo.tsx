@@ -1,4 +1,4 @@
-import { BentoCard } from '@/components/bento/BentoCard';
+import { BentoCard } from '@/components';
 import {
   useTodoState,
   STATUS_STYLES,

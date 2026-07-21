@@ -5,17 +5,17 @@ import dayjs from 'dayjs';
 import { useNotificationStore } from '@/stores/notificationState';
 import type { MapMarker } from '@/types/marker';
 
-import { fishingMapService } from '@/features/fishing/api/service';
-import { fishingSpotsGateway } from '@/features/fishing/api/fishingSpotsGateway';
-import { toMapMarkers } from '@/features/fishing/types';
-import type {
-  FishingIndexData,
-  TideData,
-  WeatherDay,
-  WeatherHourly,
-  WeatherIndex,
-  WeatherNow,
-} from '@/features/fishing/types';
+import {
+  fishingMapService,
+  fishingSpotsGateway,
+  toMapMarkers,
+  type FishingIndexData,
+  type TideData,
+  type WeatherDay,
+  type WeatherHourly,
+  type WeatherIndex,
+  type WeatherNow,
+} from '@/features/fishing';
 
 export const HARBOR_OPTIONS = [
   { code: 'P2352', name: '黄埔港' },

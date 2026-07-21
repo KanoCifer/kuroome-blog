@@ -1,7 +1,7 @@
 import { BlogListItem } from './components/BlogListItem';
 import type { BlogListItem as BlogListItemType } from '@/features/blog/api/blogService';
 import { blogService } from '@/features/blog/api/blogService';
-import { BentoCalendar, BentoProfile } from '@/features/home/components';
+import { BentoCalendar, BentoProfile } from '@/features/home';
 import type { BlogPagination as BlogPaginationType, TagItem } from '@/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';

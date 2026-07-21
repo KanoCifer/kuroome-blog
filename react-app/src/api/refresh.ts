@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { tokenService } from '../features/auth/api/tokenService';
+import { tokenService } from '../lib/tokenService';
 
 const refreshTokenEndpoint = '/v3/refresh-token';
 

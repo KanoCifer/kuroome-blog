@@ -1,4 +1,4 @@
-import { ArticleSummaryCard } from '@/components/basic/ArticleSummary';
+import { ArticleSummaryCard } from '@/components';
 import { rssService } from '@/features/rss/api/rssService';
 import { useNotificationStore } from '@/stores/notificationState';
 import type { RssArticle } from '@/types';

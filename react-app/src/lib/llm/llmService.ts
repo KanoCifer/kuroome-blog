@@ -1,4 +1,4 @@
-import apiClient from '@/api/apiClient';
+import apiClient, { extractData } from '@/api/apiClient';
 import { consumeSseStream } from '@/hooks/useSseStream';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -73,8 +73,6 @@ export interface LlmService {
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
-
-const extractData = <T>(res: { data: { data: T } }): T => res.data.data;
 
 const apiBase = import.meta.env.VITE_API_BASE || '/';
 

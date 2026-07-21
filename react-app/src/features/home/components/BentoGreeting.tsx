@@ -1,4 +1,4 @@
-import { BentoCard } from '@/components/bento/BentoCard';
+import { BentoCard } from '@/components';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 

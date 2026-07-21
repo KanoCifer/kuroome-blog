@@ -1,4 +1,4 @@
-import { IconGitHub } from '@/components/basic/icon/IconGitHub';
+import { IconGitHub } from '@/components';
 import { useAuthStore } from '@/stores/authState';
 import { startAuthentication } from '@simplewebauthn/browser';
 import { motion } from 'framer-motion';

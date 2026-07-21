@@ -1,13 +1,9 @@
-import apiClient from '@/api/apiClient';
+import apiClient, { extractData, type ApiResponse } from '@/api/apiClient';
 import type { UserInfo } from '@/features/auth/types';
 import { useNotificationStore } from '@/stores/notificationState';
 import type { PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/browser';
 
 const notification = useNotificationStore.getState();
-
-interface ApiResponse<T> {
-  data: T;
-}
 
 interface LoginResponseData {
   id: number;
@@ -46,11 +42,6 @@ export interface AuthGateway {
   loginWithGitHub: () => void;
   logout: () => Promise<void>;
 }
-
-// 辅助方法
-const extractData = (res: { data: ApiResponse<unknown> }): unknown => {
-  return res.data.data;
-};
 
 const buildLoginResult = (data: LoginResponseData): LoginResult => {
   const { access_token, refresh_token, ...userFields } = data;

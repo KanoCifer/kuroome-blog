@@ -1,9 +1,9 @@
-import type {
-  BookRecommendItem,
-  ReadDetailSnapshot,
-  ReadStatsMode,
-} from '@/features/books/api/wereadGateway';
-import { wereadService } from '@/features/books/api/wereadService';
+import {
+  wereadService,
+  type BookRecommendItem,
+  type ReadDetailSnapshot,
+  type ReadStatsMode,
+} from '@/features/books';
 import { create } from 'zustand';
 
 const ALL_MODES: ReadStatsMode[] = ['weekly', 'monthly', 'annually', 'overall'];

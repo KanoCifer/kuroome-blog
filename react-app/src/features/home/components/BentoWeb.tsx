@@ -1,4 +1,4 @@
-import { BentoCard } from '@/components/bento/BentoCard';
+import { BentoCard } from '@/components';
 import websitesData from '@/data/websites.json';
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence, type PanInfo } from 'framer-motion';

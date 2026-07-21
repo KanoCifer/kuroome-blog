@@ -1,4 +1,4 @@
-import { BentoCard } from '@/components/bento/BentoCard';
+import { BentoCard } from '@/components';
 import { FishingRod } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';

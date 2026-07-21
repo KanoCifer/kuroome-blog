@@ -1,4 +1,4 @@
-import { devTaskService, type DevTaskService } from '@/features/todo/api';
+import { devTaskService, type DevTaskService } from '@/features/todo';
 import { create } from 'zustand';
 import type {
   CreateDevTaskPayload,

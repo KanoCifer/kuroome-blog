@@ -1,4 +1,4 @@
-import { BentoSocial } from '@/components/bento/BentoSocial';
+import { BentoSocial } from '@/components';
 import { motion } from 'framer-motion';
 
 const AboutIMG = '/images/about.webp';

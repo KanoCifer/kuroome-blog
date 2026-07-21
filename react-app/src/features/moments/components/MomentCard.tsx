@@ -1,4 +1,4 @@
-import { PinIcon } from '@/components/basic/icon/PinIcon';
+import { PinIcon } from '@/components';
 import type { Moment } from '@/types';
 import { motion } from 'framer-motion';
 import { EditIcon, IconDel } from './InlineIcons';

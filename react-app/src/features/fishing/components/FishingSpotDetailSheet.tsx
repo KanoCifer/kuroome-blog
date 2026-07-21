@@ -28,7 +28,7 @@ import {
   X,
 } from 'lucide-react';
 
-import { BottomSheet } from '@/components/basic/BottomSheet';
+import { BottomSheet } from '@/components';
 import { useNotificationStore } from '@/stores/notificationState';
 
 import { fishingSpotsGateway } from '../api/fishingSpotsGateway';

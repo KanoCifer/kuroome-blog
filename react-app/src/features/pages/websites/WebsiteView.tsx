@@ -1,4 +1,4 @@
-import BasicDetail from '@/components/basic/BasicDetail';
+import { BasicDetail } from '@/components';
 import websitesData from '@/data/websites.json';
 import { motion } from 'framer-motion';
 

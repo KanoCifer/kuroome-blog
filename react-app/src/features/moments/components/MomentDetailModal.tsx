@@ -1,5 +1,6 @@
-import { PinIcon } from '@/components/basic/icon/PinIcon';
+import { PinIcon } from '@/components';
 import type { Moment, MomentStatus, MomentVisibility } from '@/types';
+import { isPureEmoji } from '@/utils/emoji';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect } from 'react';
 import { MomentTagChip } from './MomentTagChip';
@@ -29,8 +30,6 @@ const STATUS_LABEL: Record<MomentStatus, string> = {
   draft: '草稿',
   archived: '归档',
 };
-
-const isPureEmoji = (s: string) => /\p{Extended_Pictographic}/u.test(s);
 
 export function MomentDetailModal({
   open,

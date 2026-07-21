@@ -1,4 +1,4 @@
-import { IconGitHub } from '@/components/basic/icon/IconGitHub';
+import { IconGitHub } from '@/components';
 import { Key, Trash2 } from 'lucide-react';
 
 interface SecuritySectionProps {

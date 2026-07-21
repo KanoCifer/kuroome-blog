@@ -1,7 +1,7 @@
-import { ArticleSummaryCard } from '@/components/basic/ArticleSummary';
+import { ArticleSummaryCard } from '@/components';
 import type { BlogDetail } from '@/features/blog/api/blogService';
 import { blogService } from '@/features/blog/api/blogService';
-import { TwikooComments } from '@/features/blog/components/TwikooComments';
+import { TwikooComments } from '@/components';
 import { useAuthStore } from '@/stores/authState';
 import { useNotificationStore } from '@/stores/notificationState';
 import { formatDate } from '@/utils/formatdate';

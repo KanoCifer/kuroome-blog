@@ -1,4 +1,4 @@
-import BasicDetail from '@/components/basic/BasicDetail';
+import { BasicDetail } from '@/components';
 import { useAuthStore } from '@/stores/authState';
 import { useMomentsStore } from '@/stores/momentsState';
 import { useNotificationStore } from '@/stores/notificationState';

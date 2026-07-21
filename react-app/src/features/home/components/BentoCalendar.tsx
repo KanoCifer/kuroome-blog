@@ -1,5 +1,4 @@
-import { BentoCard } from '@/components/bento/BentoCard';
-import { BottomSheet } from '@/components/basic/BottomSheet';
+import { BentoCard, BottomSheet } from '@/components';
 import dayjs from 'dayjs';
 import { motion } from 'framer-motion';
 import { useState } from 'react';

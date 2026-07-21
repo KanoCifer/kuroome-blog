@@ -1,4 +1,4 @@
-import { momentsService, type MomentsService } from '@/features/moments/api/momentsService';
+import { momentsService, type MomentsService } from '@/features/moments';
 import type {
   Moment,
   MomentCreatePayload,

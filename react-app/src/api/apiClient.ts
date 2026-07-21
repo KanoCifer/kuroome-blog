@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import { isrefreshTokenRequest, refreshAccessToken } from './refresh';
-import { tokenService } from '../features/auth/api/tokenService';
+import { tokenService } from '../lib/tokenService';
 
 export interface ApiResponse<T = unknown> {
   message: string;
@@ -9,10 +9,10 @@ export interface ApiResponse<T = unknown> {
   errors?: Record<string, unknown>;
 }
 
-// 辅助方法
-export const extractData = (res: { data: ApiResponse<unknown> }): unknown => {
-  return res.data.data;
-};
+// 辅助方法 — 从 { data: { data: T } } 中解出 T。
+// 兼容两种响应形状：axios 直接返回的 ApiResponse 信封，或已标注的 { data: T }。
+export const extractData = <T = unknown>(res: { data: { data: T } }): T =>
+  res.data.data;
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE || '/',
