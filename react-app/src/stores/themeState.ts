@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { playThemeTransition } from '../utils/themeTransition';
+import { playThemeTransition } from '../lib/themeTransition';
 
 type Theme = 'light' | 'dark' | 'system';
 type FontFamily = 'default' | 'harmonyos';

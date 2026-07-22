@@ -1,7 +1,7 @@
 import { BasicLayout } from '@/components';
 import { Suspense } from 'react';
 import { createBrowserRouter, redirect } from 'react-router-dom';
-import { useAuthStore } from '@/stores/authState';
+import { useAuthStore } from '@/features/auth';
 import {
   About,
   BlogList,

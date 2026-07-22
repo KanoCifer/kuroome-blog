@@ -1,5 +1,5 @@
 import { galleryService, type Picture } from '@/features/pic/api/galleryService';
-import { useAuthStore } from '@/stores/authState';
+import { useAuthStore } from '@/features/auth';
 import { useNotificationStore } from '@/stores/notificationState';
 import dayjs from 'dayjs';
 import { AnimatePresence, motion } from 'framer-motion';

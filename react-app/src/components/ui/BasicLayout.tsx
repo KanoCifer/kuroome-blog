@@ -1,5 +1,5 @@
-import { BentoNavSidebar } from '@/components/basic/BasicSidebar';
-import { TrackEvent } from '@/utils/visitorTracker';
+import { BentoNavSidebar } from '@/components/ui/BasicSidebar';
+import { TrackEvent } from '@/lib/visitorTracker';
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';

@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
-import { useFishingMapStore } from '@/stores/fishingMapStore';
+import { useFishingMapStore } from '@/features/fishing/stores/fishingMapStore';
 
 export function useFishingIndex(location: [number, number]) {
   const { indexData, loading, error } = useFishingMapStore(

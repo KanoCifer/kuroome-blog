@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { authGateway, useAuthStore, useProfileForm } from '@/features/auth';
+import { authGateway, useProfileForm } from '@/features/auth';
+import { useAuthStore } from '@/features/auth';
 import { AuthLayout } from './components';
 import { IconCloud } from '@/components';
 import {

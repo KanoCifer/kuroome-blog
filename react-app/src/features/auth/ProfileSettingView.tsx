@@ -1,5 +1,5 @@
 import apiClient from '@/api/apiClient';
-import { useAuthStore } from '@/stores/authState';
+import { useAuthStore } from '@/features/auth';
 import type { ProfileForm } from '@/types';
 import { startRegistration } from '@simplewebauthn/browser';
 import { motion } from 'framer-motion';

@@ -1,10 +1,10 @@
-export { BottomSheet } from './basic/BottomSheet';
-export { ArticleSummaryCard } from './basic/ArticleSummary';
-export { default as BasicDetail } from './basic/BasicDetail';
-export { BasicLayout } from './basic/BasicLayout';
+export { BottomSheet } from './ui/BottomSheet';
+export { ArticleSummaryCard } from './ui/ArticleSummary';
+export { default as BasicDetail } from './ui/BasicDetail';
+export { BasicLayout } from './ui/BasicLayout';
 export { TwikooComments } from './TwikooComments';
-export { IconGitHub } from './basic/icon/IconGitHub';
-export { PinIcon } from './basic/icon/PinIcon';
-export { useNavVisibility } from './basic/NavVisibilityContext';
+export { IconGitHub } from './ui/icon/IconGitHub';
+export { PinIcon } from './ui/icon/PinIcon';
+export { useNavVisibility } from './ui/NavVisibilityContext';
 export { BentoCard } from './bento/BentoCard';
 export { BentoSocial } from './bento/BentoSocial';

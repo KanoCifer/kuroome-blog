@@ -8,7 +8,7 @@ import { useWereadBookProgress } from '../composables/useWereadBookProgress';
 import {
   deterministicCoverGradient,
   formatProgressPercent,
-} from '../helper/format';
+} from '../lib/format';
 import { formatDuration } from '@/lib/dayjs';
 import { formatRelative } from '@/lib/dayjs';
 

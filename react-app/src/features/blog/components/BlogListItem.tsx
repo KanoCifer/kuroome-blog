@@ -1,5 +1,5 @@
 import type { BlogListItem } from '@/features/blog/api/blogService';
-import { formatDate } from '@/utils/formatdate';
+import { formatDate } from '@/lib/formatdate';
 import { motion } from 'framer-motion';
 import { Clock, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';

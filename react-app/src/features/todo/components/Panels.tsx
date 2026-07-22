@@ -10,7 +10,7 @@ import {
   selectTypeDistribution,
   selectWeekRangeDisplay,
   useTodoState,
-} from '@/stores/todoState';
+} from '@/features/todo/stores/todoState';
 import { useMemo, useState } from 'react';
 import { FrontierCard } from './FrontierCard';
 import { TaskRow } from './TaskRow';

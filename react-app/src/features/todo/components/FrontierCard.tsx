@@ -1,6 +1,6 @@
 import { CircleCheckBig } from 'lucide-react';
 import type { DevTask } from '@/features/todo/api/types';
-import { renderMarkdown } from '@/utils/markdown';
+import { renderMarkdown } from '@/lib/markdown';
 import { KindBadge, PriorityBadge, TypeBadge } from './Badges';
 
 interface FrontierCardProps {

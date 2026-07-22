@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import type { DevTask, DevTaskStatus } from '@/features/todo/api/types';
 import { useNavVisibility } from '@/components';
 import { useEffect, useMemo } from 'react';
-import { renderMarkdown } from '@/utils/markdown';
+import { renderMarkdown } from '@/lib/markdown';
 import {
   BadgeRow,
   KindBadge,

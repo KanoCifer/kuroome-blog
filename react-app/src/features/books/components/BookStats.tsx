@@ -2,7 +2,7 @@ import {
   useReadStatsStore,
   selectSnapshotByMode,
   selectSnapshots,
-} from '@/stores/readStatsStore';
+} from '@/features/books/stores/readStatsStore';
 import ReactEChartsCore from 'echarts-for-react';
 import { HeatmapChart, LineChart, BarChart, PieChart } from 'echarts/charts';
 import {

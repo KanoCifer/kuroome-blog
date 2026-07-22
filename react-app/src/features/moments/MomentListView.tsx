@@ -1,6 +1,6 @@
 import { BasicDetail } from '@/components';
-import { useAuthStore } from '@/stores/authState';
-import { useMomentsStore } from '@/stores/momentsState';
+import { useAuthStore } from '@/features/auth';
+import { useMomentsStore } from '@/features/moments/stores/momentsState';
 import { useNotificationStore } from '@/stores/notificationState';
 import type { Moment, MomentUpdatePayload } from '@/types';
 import dayjs from 'dayjs';

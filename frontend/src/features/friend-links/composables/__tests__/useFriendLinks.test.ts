@@ -78,7 +78,7 @@ const { selfData, linkData, sites } = vi.hoisted(() => {
   return { selfData, linkData, sites };
 });
 
-vi.mock('@/features/friend-links/data/friendlinks.json', () => ({
+vi.mock('@/features/friend-links/lib/friendlinks.json', () => ({
   default: { self: selfData, links: linkData },
 }));
 

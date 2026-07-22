@@ -3,7 +3,7 @@ import { ChevronRight } from '@lucide/vue';
 import type { WereadUserBook } from '@/features/books/api';
 import dayjs from 'dayjs';
 import { computed } from 'vue';
-import { deterministicCoverGradient } from '../helper/format';
+import { deterministicCoverGradient } from '../lib/format';
 
 export type BookCardVariant = 'standard' | 'compact' | 'list';
 

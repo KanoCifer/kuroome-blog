@@ -1,6 +1,6 @@
 import { PinIcon } from '@/components';
 import type { Moment, MomentStatus, MomentVisibility } from '@/types';
-import { isPureEmoji } from '@/utils/emoji';
+import { isPureEmoji } from '@/lib/emoji';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect } from 'react';
 import { MomentTagChip } from './MomentTagChip';

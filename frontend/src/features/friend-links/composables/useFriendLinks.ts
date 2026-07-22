@@ -2,7 +2,7 @@ import { onMounted, ref } from 'vue';
 import { useNotificationStore } from '@/stores';
 import { useImageError } from '@/composables';
 import type { Website } from '@/features/websites';
-import friendLinksData from '@/features/friend-links/data/friendlinks.json';
+import friendLinksData from '@/features/friend-links/lib/friendlinks.json';
 import { websitesData } from '@/data';
 
 export interface FriendLink {

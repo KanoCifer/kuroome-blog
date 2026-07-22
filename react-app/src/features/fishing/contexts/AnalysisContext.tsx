@@ -11,7 +11,7 @@ import {
 
 import { useShallow } from 'zustand/react/shallow';
 
-import { useFishingMapStore } from '@/stores/fishingMapStore';
+import { useFishingMapStore } from '@/features/fishing/stores/fishingMapStore';
 
 interface AnalysisContextValue {
   analysisOpen: boolean;

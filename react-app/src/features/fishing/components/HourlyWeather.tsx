@@ -6,7 +6,7 @@
 import { Droplets } from 'lucide-react';
 import dayjs from 'dayjs';
 
-import { useFishingMapStore } from '@/stores/fishingMapStore';
+import { useFishingMapStore } from '@/features/fishing/stores/fishingMapStore';
 
 export function HourlyWeather() {
   const weatherHourly = useFishingMapStore((state) => state.weatherHourly);

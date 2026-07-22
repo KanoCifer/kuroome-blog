@@ -3,7 +3,7 @@ import {
   useTodoState,
   STATUS_STYLES,
   selectFrontier,
-} from '@/stores/todoState';
+} from '@/features/todo';
 import type { DevTask, DevTaskStatus } from '@/features/todo/api/types';
 import { BookCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';

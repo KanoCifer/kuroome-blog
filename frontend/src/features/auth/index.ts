@@ -1,10 +1,10 @@
 // auth 模块桶导出 — 对外公开 API
 
-export { useAuthStore } from './stores/auth';
+export { useAuthStore } from './stores/authState';
 export { useAuthenticate } from './composables/useAuthenticate';
 export { useProfileForm } from './composables/useProfileForm';
 export { authGateway, createAuthGateway } from './api/authGateway';
-export { refreshAccessToken, isrefreshTokenRequest } from './helper/refresh';
+export { refreshAccessToken, isrefreshTokenRequest } from './lib/refresh';
 export { tokenService } from '@/api/tokenService';
-export { userCache } from './helper/userCache';
+export { userCache } from './lib/userCache';
 export type { UserInfo } from './types';

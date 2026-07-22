@@ -1,10 +1,10 @@
 import { createAuthGateway } from '@/features/auth/api/authGateway';
 import { registerTokenRefresher } from '@/lib';
-import { refreshAccessToken } from '@/features/auth/helper/refresh';
+import { refreshAccessToken } from '@/features/auth/lib/refresh';
 import { tokenService } from '@/api/tokenService';
 import { reconnectWs } from '@/lib';
 import type { UserInfo } from '@/features/auth/types';
-import { userCache } from '@/features/auth/helper/userCache';
+import { userCache } from '@/features/auth/lib/userCache';
 import { useNotificationStore } from '@/stores';
 import { isAxiosError } from 'axios';
 import { defineStore } from 'pinia';

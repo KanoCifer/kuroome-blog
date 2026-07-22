@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 
 import dayjs from 'dayjs';
 
-import { HARBOR_OPTIONS, useFishingMapStore } from '@/stores/fishingMapStore';
+import { HARBOR_OPTIONS, useFishingMapStore } from '@/features/fishing/stores/fishingMapStore';
 import { useChartTheme, withAlpha } from '../hooks/useChartTheme';
 import type { TideTableItem } from '../types';
 import { SkeletonCard } from './SkeletonCard';

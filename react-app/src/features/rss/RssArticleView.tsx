@@ -2,7 +2,7 @@ import { ArticleSummaryCard } from '@/components';
 import { rssService } from '@/features/rss/api/rssService';
 import { useNotificationStore } from '@/stores/notificationState';
 import type { RssArticle } from '@/types';
-import { formatDate } from '@/utils/formatdate';
+import { formatDate } from '@/lib/formatdate';
 import DOMPurify from 'dompurify';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useEffect, useMemo, useState } from 'react';

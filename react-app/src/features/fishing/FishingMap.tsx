@@ -14,7 +14,7 @@ import { useShallow } from 'zustand/react/shallow';
 
 import { motion, useReducedMotion } from 'framer-motion';
 
-import { useFishingMapStore } from '@/stores/fishingMapStore';
+import { useFishingMapStore } from '@/features/fishing/stores/fishingMapStore';
 import { useRouteMapStore } from '@/stores/routeMapStore';
 
 import './fishingMap.css';

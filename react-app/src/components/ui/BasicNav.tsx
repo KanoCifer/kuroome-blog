@@ -19,7 +19,7 @@ import {
   Settings,
   UserPlus,
 } from 'lucide-react';
-import { useAuthStore } from '../../stores/authState';
+import { useAuthStore } from '../../features/auth';
 import { useThemeState } from '../../stores/themeState';
 import { useNavVisibility } from './NavVisibilityContext';
 import { BottomSheet } from './BottomSheet';

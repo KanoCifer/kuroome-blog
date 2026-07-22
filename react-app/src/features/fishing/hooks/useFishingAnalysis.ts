@@ -13,7 +13,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useNotificationStore } from '@/stores/notificationState';
 
-import { useFishingMapStore } from '@/stores/fishingMapStore';
+import { useFishingMapStore } from '@/features/fishing/stores/fishingMapStore';
 
 import { fishingMapService } from '../api/service';
 import type { WeatherAnalysisPayload } from '../types';

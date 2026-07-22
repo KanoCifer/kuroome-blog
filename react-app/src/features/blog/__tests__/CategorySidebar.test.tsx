@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { CategorySidebar } from '@/features/blog/components/CategorySidebar';
+import { CategorySidebar } from '@/features/blog/views';
 import type { TagItem } from '@/types';
 
 describe('CategorySidebar (React — tags)', () => {

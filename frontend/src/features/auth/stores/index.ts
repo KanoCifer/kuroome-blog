@@ -1,3 +1,3 @@
 // auth stores 桶导出
 
-export { useAuthStore } from './auth';
+export { useAuthStore } from './authState';

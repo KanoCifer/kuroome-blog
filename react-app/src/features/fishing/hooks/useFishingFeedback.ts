@@ -10,7 +10,7 @@
  */
 import { useCallback, useState } from 'react';
 
-import { useFishingMapStore } from '@/stores/fishingMapStore';
+import { useFishingMapStore } from '@/features/fishing/stores/fishingMapStore';
 
 import type { FishingFeedbackData, FishingIndexData, TideData } from '../types';
 

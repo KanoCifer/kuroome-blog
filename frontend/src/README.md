@@ -10,10 +10,17 @@ src/
   features/
     blog/           ← a deep module (package)
       index.ts      ← entry point (public). Import this from outside.
+      routes.ts     ← route definitions (public)
+      views.ts      ← view components (public)
       api/          ← implementation: hidden from outside.
       components/   ← implementation: hidden.
       __tests__/    ← co-located tests: hidden, exercise code through entry points.
     books/          ← another deep module
+  components/       ← shared UI (NOT a package — freely importable)
+    icons/
+    shared/
+    ui/
+  stores/           ← global stores (NOT a package — freely importable)
   lib/              ← infrastructure layer (framework-agnostic core)
     request.ts      ← axios 客户端 + 拦截器
     auth.ts         ← access-JWT 内存单例
@@ -26,16 +33,54 @@ src/
     api/
   utils/            ← shared infrastructure (re-exports lib/ through its barrels)
   layouts/          ← shared infrastructure
-  router/           ← shared infrastructure
+  router/           ← shared infrastructure (aggregates feature routes)
 ```
 
-`shared/`, `utils/`, `layouts/`, `router/` are **shared infrastructure**: flat
-utility libraries that any feature may import freely. They are NOT subject to
-boundary rules. This mirrors the model in `react-app/.dependency-cruiser.cjs`.
+`components/`, `stores/`, `shared/`, `utils/`, `layouts/`, `router/` are
+**shared infrastructure**: flat utility libraries that any feature may import
+freely. They are NOT subject to boundary rules. This mirrors the model in
+`react-app/.dependency-cruiser.cjs`.
 
 `lib/` is the infrastructure layer: framework-agnostic core (request, auth,
 dayjs, websocket) that `utils/` re-exports through its barrel files. Features
 import from `lib/` entry points, not from `utils/` internals.
+
+## Feature structure
+
+Every feature follows the same internal layout — 5 standard subdirectories
+plus 3 root entry points:
+
+```
+features/<name>/
+  api/                  ← API gateways / services
+  components/           ← feature-private UI
+  composables/          ← feature-private composables (Vue; hooks/ in React)
+  types/                ← feature types
+  lib/                  ← feature-private helpers
+  routes.ts             ← route definitions (public)
+  views.ts              ← view components (public)
+  index.ts              ← barrel export (public)
+```
+
+Framework-specific directories (`layouts/`, `styles/`, `composables/` vs
+`hooks/`) are kept per-platform and not forced into alignment.
+
+## Store ownership
+
+Stores are placed by **consumption scope**:
+
+- **Global** — consumed by 2+ features → top-level `stores/`
+  (`background`, `notification`, `theme`).
+- **Feature-private** — consumed by a single feature →
+  `features/<name>/stores/` (e.g. `auth/stores/`, `fishing/stores/`,
+  `books/stores/`, `todos/stores/`, `visitor/stores/`, `moments/stores/`,
+  `entry/stores/`).
+
+## Route autonomy
+
+Each feature owns its route definitions (`routes.ts`) and view components
+(`views.ts`). The top-level `router/index.ts` is a thin aggregator that pulls
+in each feature's routes — it does not define routes itself.
 
 ## The rules
 
@@ -57,7 +102,8 @@ import from `lib/` entry points, not from `utils/` internals.
   entry points — prefer that over one giant barrel `index.ts`.
 - **Implementation** goes in subfolders. Any subfolder is private.
 - **Tests** live in `__tests__/` (repo convention), co-located and private.
-- **Shared components** used by 2+ features live in `shared/components/`.
+- **Shared components** used by 2+ features live in `components/shared/`
+  (or `shared/components/`).
 
 ## Discourage barrel files
 

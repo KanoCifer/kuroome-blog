@@ -1,5 +1,5 @@
 import { IconGitHub } from '@/components';
-import { useAuthStore } from '@/stores/authState';
+import { useAuthStore } from '@/features/auth';
 import { startAuthentication } from '@simplewebauthn/browser';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, ShieldUser } from 'lucide-react';

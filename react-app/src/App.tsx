@@ -2,11 +2,11 @@ import { router } from '@/router/index';
 import { useEffect, useState } from 'react';
 import { RouterProvider } from 'react-router-dom';
 import { useWebsocket } from './hooks/useWebsocket';
-import { useAuthStore } from './stores/authState';
-import { useTodoState } from './stores/todoState';
-import { useVisitorCountStore } from './stores/visitorCountStore';
-import { getVisitorId } from './utils/visitorId';
-import { buildWsUrl } from './utils/buildWsUrl';
+import { useAuthStore } from '@/features/auth';
+import { useTodoState } from './features/todo';
+import { useVisitorCountStore } from './features/visitor';
+import { getVisitorId } from './lib/visitorId';
+import { buildWsUrl } from './lib/buildWsUrl';
 
 function App() {
   const auth = useAuthStore();

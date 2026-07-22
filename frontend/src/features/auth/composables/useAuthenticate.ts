@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/features/auth/stores/auth';
+import { useAuthStore } from '@/features/auth';
 import type { LoginForm } from '@/features/auth/types';
 import { startAuthentication } from '@simplewebauthn/browser';
 import { ref } from 'vue';

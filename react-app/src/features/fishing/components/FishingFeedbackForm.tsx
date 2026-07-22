@@ -8,7 +8,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { useNotificationStore } from '@/stores/notificationState';
 
-import { useFishingMapStore } from '@/stores/fishingMapStore';
+import { useFishingMapStore } from '@/features/fishing/stores/fishingMapStore';
 import { BottomSheet } from '@/components';
 import dayjs from 'dayjs';
 import { X } from 'lucide-react';

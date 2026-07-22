@@ -2,7 +2,7 @@ import type { WereadUserBook } from '@/features/books/api/wereadGateway';
 import {
   useReadStatsStore,
   selectWeeklySnapshot,
-} from '@/stores/readStatsStore';
+} from '@/features/books/stores/readStatsStore';
 import { wereadService } from '@/features/books/api/wereadService';
 import { ArrowLeft, ExternalLink, RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';

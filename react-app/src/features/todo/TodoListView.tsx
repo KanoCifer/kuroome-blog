@@ -1,10 +1,10 @@
-import { useAuthStore } from '@/stores/authState';
+import { useAuthStore } from '@/features/auth';
 import {
   useTodoState,
   selectFrontier,
   selectTotalActive,
   selectCompletedCount,
-} from '@/stores/todoState';
+} from '@/features/todo/stores/todoState';
 import type {
   CreateDevTaskPayload,
   DevTask,

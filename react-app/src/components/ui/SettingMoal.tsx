@@ -5,7 +5,7 @@ import {
   type Theme,
 } from '@/stores/themeState';
 import { useShallow } from 'zustand/shallow';
-import { playThemeTransition } from '@/utils/themeTransition';
+import { playThemeTransition } from '@/lib/themeTransition';
 import { useEffect } from 'react';
 import { BottomSheet } from './BottomSheet';
 

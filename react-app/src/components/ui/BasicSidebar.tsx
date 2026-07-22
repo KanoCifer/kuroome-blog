@@ -1,7 +1,7 @@
-import { BasicFooter } from '@/components/basic/BasicFooter';
-import { SettingModal } from '@/components/basic/SettingMoal';
-import { useAuthStore } from '@/stores/authState';
-import { useVisitorCountStore } from '@/stores/visitorCountStore';
+import { BasicFooter } from '@/components/ui/BasicFooter';
+import { SettingModal } from '@/components/ui/SettingMoal';
+import { useAuthStore } from '@/features/auth';
+import { useVisitorCountStore } from '@/features/visitor';
 import { motion } from 'framer-motion';
 import {
   BookOpen,

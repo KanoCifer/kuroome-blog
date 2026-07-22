@@ -189,7 +189,7 @@ export const useFishingMapStore = create<FishingMapState>((set, get) => ({
       markers:
         typeof updater === 'function'
           ? (updater as (prev: MapMarker[]) => MapMarker[])(state.markers)
-              : updater,
+          : updater,
     }));
   },
 }));
