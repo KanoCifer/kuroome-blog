@@ -270,7 +270,7 @@ watch(
             <li
               v-for="tag in spot.tags"
               :key="tag"
-              class="bg-secondary text-secondary-foreground rounded-full px-2.5 py-0.5 text-[11px] tracking-wide"
+              class="bg-secondary text-ink rounded-full px-2.5 py-0.5 text-[11px] tracking-wide"
             >
               {{ tag }}
             </li>

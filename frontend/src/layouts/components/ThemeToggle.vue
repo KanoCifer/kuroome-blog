@@ -93,7 +93,7 @@ onUnmounted(() => {
     <div class="relative">
       <button
         @click.stop="isSchemeOpen = !isSchemeOpen"
-        class="text-secondary-foreground hover:bg-muted focus:ring-ring dark:text-ink dark:hover:bg-muted flex cursor-pointer items-center gap-1 rounded-lg px-2 py-2 text-sm font-medium transition-all focus:ring-2 focus:outline-none"
+        class="text-ink hover:bg-muted focus:ring-ring dark:text-ink dark:hover:bg-muted flex cursor-pointer items-center gap-1 rounded-lg px-2 py-2 text-sm font-medium transition-all focus:ring-2 focus:outline-none"
         aria-label="Select color scheme"
         title="Color Scheme"
       >
@@ -178,7 +178,7 @@ onUnmounted(() => {
     >
       <button
         @click.stop="toggleDropdown"
-        class="text-secondary-foreground hover:bg-muted focus:ring-ring dark:text-ink dark:hover:bg-muted flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all focus:ring-2 focus:outline-none"
+        class="text-ink hover:bg-muted focus:ring-ring dark:text-ink dark:hover:bg-muted flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all focus:ring-2 focus:outline-none"
         aria-label="Toggle theme"
       >
         <span v-html="currentTheme.icon"></span>

@@ -35,7 +35,7 @@ export function AlertDialog({
         <div className="flex justify-end gap-3">
           <button
             onClick={() => onOpenChange(false)}
-            className="bg-secondary text-secondary-foreground hover:bg-muted rounded-full border-0 px-5 py-2.5 text-sm font-medium transition-all"
+            className="bg-secondary text-ink hover:bg-muted rounded-full border-0 px-5 py-2.5 text-sm font-medium transition-all"
           >
             {cancelText}
           </button>

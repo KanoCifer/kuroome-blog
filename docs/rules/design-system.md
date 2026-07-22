@@ -70,12 +70,12 @@ Layer 3 (Tailwind class: bg-background / bg-primary / border …)
 
 ### Secondary / Muted
 
-| Tailwind class              | 映射到              | 用途                |
-| --------------------------- | ------------------- | ------------------- |
-| `bg-secondary`              | `var(--warm-gray)`  | 次要背景            |
-| `text-secondary-foreground` | `var(--ink)`        | 次要背景上的文字    |
-| `bg-muted`                  | `var(--warm-gray)`  | 静默/hover 高亮背景 |
-| `text-muted-foreground`     | `var(--muted-text)` | 辅助说明文字        |
+| Tailwind class          | 映射到              | 用途                |
+| ----------------------- | ------------------- | ------------------- |
+| `bg-secondary`          | `var(--warm-gray)`  | 次要背景            |
+| `text-ink`              | `var(--ink)`        | 次要背景上的文字    |
+| `bg-muted`              | `var(--warm-gray)`  | 静默/hover 高亮背景 |
+| `text-muted-foreground` | `var(--muted-text)` | 辅助说明文字        |
 
 > `--warm-gray` 是中性灰 token 的来源。`bg-accent`/`text-accent-foreground` 已清理，统一用 `bg-muted`/`hover:bg-muted` 表达 hover 高亮。
 
@@ -125,7 +125,7 @@ Layer 3 (Tailwind class: bg-background / bg-primary / border …)
 | 消费者                           | 读取方式                                       | 用到的变量                                                                                                                                                                                                                                                                      |
 | -------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Vue / React 组件**（绝大多数） | Tailwind class                                 | `foreground`/`border`/`muted-foreground`/`surface` 等                                                                                                                                                                                                                           |
-| **ECharts 图表**                 | `resolveCssColor('--color-primary', fallback)` | `--color-primary` `--color-warning` `--color-foreground` `--color-muted-foreground` `--color-border` `--color-background` `--color-chart-1..5`                                                                                                                                  |
+| **ECharts 图表**                 | `resolveCssColor('--color-primary', fallback)` | `--color-primary` `--color-warning` `--color-foreground` `--color-muted` `--color-border` `--color-background` `--color-chart-1..5`                                                                                                                                             |
 | **主题切换动画**                 | 直接写 `data-color-scheme` 属性                | —（不读颜色，只切属性触发 transition）                                                                                                                                                                                                                                          |
 | **明/暗模式**                    | `html.dark` class                              | 主题文件里的 `.dark` 块覆盖同名列。暗色模式必须遵循分层对比度契约：`--paper` (0.22) → `--card-bg` / `--surface` (0.28) → `--warm-gray` (0.36) → `--secondary` (0.42) → `--muted-text` (0.78) → `--ink` (0.94)，每阶 ≥5 点；`--muted-text` 必须相对 `--paper` (0.22) 保持 ≥4.5:1 |
 
@@ -133,15 +133,15 @@ Layer 3 (Tailwind class: bg-background / bg-primary / border …)
 
 `useChartColors()` 提供 `ChartPalette` 响应式对象，涵盖两类颜色：
 
-| 字段              | 对应 CSS 变量              | 用途                                      |
-| ----------------- | -------------------------- | ----------------------------------------- |
-| `primary`         | `--color-primary`          | 数据线色、标记                            |
-| `warning`         | `--color-warning`          | 温度线、markLine                          |
-| `foreground`      | `--color-foreground`       | 图表文字                                  |
-| `mutedForeground` | `--color-muted-foreground` | 坐标轴标签、tooltip 辅助文字              |
-| `border`          | `--color-border`           | 轴线、分割线、tooltip 边框                |
-| `card`            | `--color-background`       | tooltip 背景                              |
-| `series`          | `--color-chart-1..5`       | ECharts `color` 数组（多系列饼图/柱图等） |
+| 字段              | 对应 CSS 变量        | 用途                                      |
+| ----------------- | -------------------- | ----------------------------------------- |
+| `primary`         | `--color-primary`    | 数据线色、标记                            |
+| `warning`         | `--color-warning`    | 温度线、markLine                          |
+| `foreground`      | `--color-foreground` | 图表文字                                  |
+| `mutedForeground` | `--color-muted`      | 坐标轴标签、tooltip 辅助文字              |
+| `border`          | `--color-border`     | 轴线、分割线、tooltip 边框                |
+| `card`            | `--color-background` | tooltip 背景                              |
+| `series`          | `--color-chart-1..5` | ECharts `color` 数组（多系列饼图/柱图等） |
 
 `withAlpha(color, alpha)` 工具函数用于渐变 `colorStops` 中取半透明版。用法：
 

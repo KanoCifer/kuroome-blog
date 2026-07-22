@@ -11,7 +11,7 @@
 
     <!-- 导航分类 -->
     <div
-      class="text-secondary-foreground dark:text-muted-foreground mb-4 px-3 text-sm font-bold tracking-wider"
+      class="text-ink dark:text-muted-foreground mb-4 px-3 text-sm font-bold tracking-wider"
     >
       GENERAL
     </div>

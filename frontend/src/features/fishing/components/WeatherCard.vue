@@ -246,7 +246,7 @@ const forecastIconClass = (textDay: string): string => {
           />
         </svg>
       </div>
-      <p class="text-secondary-foreground text-sm">查看实时天气情况</p>
+      <p class="text-ink text-sm">查看实时天气情况</p>
       <p class="text-muted-foreground mt-1 text-xs">选择最佳钓鱼时间</p>
     </div>
   </DashboardCard>

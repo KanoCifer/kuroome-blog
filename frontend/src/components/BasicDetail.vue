@@ -41,7 +41,7 @@
         class="text-muted-foreground mt-6 flex flex-wrap items-center justify-center gap-3 text-sm"
       >
         <span
-          class="bg-paper text-secondary-foreground border-border inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium tracking-wide"
+          class="bg-paper text-ink border-border inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium tracking-wide"
         >
           <span
             class="bg-accent mr-2 inline-block h-1.5 w-1.5 rounded-full"

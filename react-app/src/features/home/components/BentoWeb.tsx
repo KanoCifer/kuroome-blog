@@ -206,7 +206,7 @@ export function BentoWeb() {
                   backgroundColor:
                     i === index % 5
                       ? 'var(--color-accent)'
-                      : 'var(--color-muted-foreground)',
+                      : 'var(--color-muted)',
                 }}
                 transition={SPRING.snappy}
               />

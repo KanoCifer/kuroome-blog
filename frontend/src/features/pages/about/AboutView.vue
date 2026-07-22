@@ -238,7 +238,7 @@ onMounted(() => {
 .bio-text {
   font-size: 1.05rem;
   line-height: 1.8;
-  color: var(--color-muted-foreground);
+  color: var(--color-muted);
 }
 
 .bio-line-wrapper {
@@ -414,7 +414,7 @@ onMounted(() => {
 .social-card__handle {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.75rem;
-  color: var(--color-muted-foreground);
+  color: var(--color-muted);
   line-height: 1.2;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -424,7 +424,7 @@ onMounted(() => {
 .social-card__desc {
   font-size: 0.8125rem;
   line-height: 1.5;
-  color: var(--color-muted-foreground);
+  color: var(--color-muted);
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 1;
@@ -436,7 +436,7 @@ onMounted(() => {
   flex: none;
   width: 0.95rem;
   height: 0.95rem;
-  color: var(--color-muted-foreground);
+  color: var(--color-muted);
   opacity: 0.5;
   transition:
     transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),

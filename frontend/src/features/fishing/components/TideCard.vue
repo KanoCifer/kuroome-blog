@@ -272,9 +272,7 @@ onMounted(() => {
     <!-- Header -->
     <div class="mb-4 flex items-start justify-between gap-2">
       <div class="min-w-0">
-        <h3 class="text-ink text-lg font-semibold tracking-tight">
-          潮汐预报
-        </h3>
+        <h3 class="text-ink text-lg font-semibold tracking-tight">潮汐预报</h3>
         <p class="text-muted-foreground mt-0.5 truncate text-sm">
           {{ tideSpotName }} · {{ todayStr }}
         </p>
@@ -375,7 +373,7 @@ onMounted(() => {
           />
         </svg>
       </div>
-      <p class="text-secondary-foreground text-sm">暂无潮汐数据</p>
+      <p class="text-ink text-sm">暂无潮汐数据</p>
     </div>
   </DashboardCard>
 </template>

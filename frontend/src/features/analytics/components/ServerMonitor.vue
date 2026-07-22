@@ -205,9 +205,7 @@
         <div
           class="border-border/60 bg-paper mt-4 overflow-hidden rounded-2xl border p-6"
         >
-          <h3
-            class="text-ink mb-4 flex items-center gap-2 text-sm font-medium"
-          >
+          <h3 class="text-ink mb-4 flex items-center gap-2 text-sm font-medium">
             <svg
               class="h-4 w-4"
               fill="none"
@@ -427,7 +425,7 @@ const chartColors = computed(() => {
   const dark = isDark.value;
   return {
     text: readToken('--color-ink', dark ? '#f3f4f6' : '#1f2937'),
-    muted: readToken('--color-muted-foreground', dark ? '#9ca3af' : '#6b7280'),
+    muted: readToken('--color-muted', dark ? '#9ca3af' : '#6b7280'),
     border: readToken('--color-border', dark ? '#374151' : '#e5e7eb'),
     splitLine: readToken('--color-border', dark ? '#3f4651' : '#eef0f3'),
     tooltipBg: dark ? 'rgba(8,9,13,0.82)' : 'rgba(255,255,255,0.96)',
@@ -453,10 +451,7 @@ const getStatusColor = (percent: number): string => {
 
 // ---- layout helpers ----------------------------------------------------
 const cardClass = computed(() =>
-  [
-    'border-border/60 bg-paper border p-5 rounded-3xl',
-    props.customClass || '',
-  ]
+  ['border-border/60 bg-paper border p-5 rounded-3xl', props.customClass || '']
     .filter(Boolean)
     .join(' '),
 );

@@ -446,13 +446,13 @@ const chartOption = computed(() => {
   font-size: 10px;
   font-weight: 500;
   letter-spacing: 0.16em;
-  color: var(--color-muted-foreground);
+  color: var(--color-muted);
   text-transform: uppercase;
 }
 .hourly-sub {
   margin: 0;
   font-size: 12px;
-  color: var(--color-muted-foreground);
+  color: var(--color-muted);
   letter-spacing: 0.01em;
 }
 
@@ -528,7 +528,7 @@ const chartOption = computed(() => {
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--color-muted-foreground);
+  color: var(--color-muted);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   margin: 0;
 }
@@ -565,18 +565,18 @@ const chartOption = computed(() => {
 .metric-unit {
   font-size: 11px;
   font-weight: 500;
-  color: var(--color-muted-foreground);
+  color: var(--color-muted);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   letter-spacing: 0.04em;
 }
 .metric-dash {
   font-size: 14px;
-  color: var(--color-muted-foreground);
+  color: var(--color-muted);
   font-weight: 400;
 }
 .metric-foot {
   font-size: 10px;
-  color: var(--color-muted-foreground);
+  color: var(--color-muted);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   letter-spacing: 0.06em;
   margin-left: 2px;
@@ -611,7 +611,7 @@ const chartOption = computed(() => {
 .hourly-empty__text {
   margin: 0;
   font-size: 12px;
-  color: var(--color-muted-foreground);
+  color: var(--color-muted);
   letter-spacing: 0.04em;
 }
 
