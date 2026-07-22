@@ -2,41 +2,14 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, File, Path, Query, UploadFile
-from starlette import status
+from fastapi import APIRouter, Depends, Path, Query
 
 from app.api.des.appstate import get_app_state
-from app.api.des.auth import manager
 from app.appstate import AppState
-from app.core.exceptions import APIError
 from app.core.response import APIResponse
 from app.plugins.cache import redis_cache
-from app.utils.media import save_upload_image
 
 router = APIRouter(tags=["blog"])
-
-
-@router.post("/upload-image")
-@router.post("/blog/upload-image")
-async def upload_blog_image(
-    file: UploadFile = File(),
-    user: int = Depends(manager),
-) -> APIResponse:
-    """Upload blog image and return public URL."""
-    if not file or not file.filename:
-        raise APIError(
-            message="No image provided.",
-            code=status.HTTP_400_BAD_REQUEST,
-        )
-
-    relative_path = save_upload_image(file, f"posts/{user}")
-    return APIResponse(
-        data={
-            "url": f"/v1/media/{relative_path}",
-            "filename": relative_path,
-        },
-        message="Image uploaded successfully.",
-    )
 
 
 @router.get("/blogs")

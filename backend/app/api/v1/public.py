@@ -9,14 +9,13 @@ This module provides public endpoints that do not require authentication:
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Body, Depends, Request, UploadFile
+from fastapi import APIRouter, Body, Depends, Request
 from fastapi.responses import PlainTextResponse
 from redis.asyncio import Redis as AsyncRedis
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from app.api.des.appstate import get_app_state
-from app.api.des.auth import manager
 from app.api.des.db import get_session
 from app.api.des.limiter import limiter
 from app.api.des.redis import get_redis
@@ -28,7 +27,6 @@ from app.core.response import APIResponse
 from app.plugins.cache import redis_cache
 from app.schemas.gallery import GalleryInput
 from app.services.public_service import PublicService
-from app.utils.media import save_upload_image
 
 router = APIRouter(tags=["public"])
 
@@ -210,54 +208,6 @@ async def reverse_geocode(
     return APIResponse(
         data=data,
         message="Reverse geocode completed successfully",
-    )
-
-
-@router.post("/upload")
-async def upload_file(
-    file: UploadFile,
-    user: int = Depends(manager),
-) -> APIResponse:
-    """通用图片上传端点,独立于 gallery。
-
-    登录后可上传图片,保存到 uploads/{user}/ 下并返回公开访问 URL。
-    """
-    if not file or not file.filename:
-        raise APIError(
-            message="No image provided.",
-            code=status.HTTP_400_BAD_REQUEST,
-        )
-    relative_path = save_upload_image(file, f"uploads/{user}")
-
-    return APIResponse(
-        data={
-            "url": f"/v1/media/{relative_path}",
-            "filename": relative_path,
-        },
-        message="Image uploaded successfully.",
-    )
-
-
-@router.post("/upload-gallery-image")
-async def upload_blog_image(
-    file: UploadFile,
-    user: int = Depends(manager),
-) -> APIResponse:
-    """上传图片墙图片接口"""
-    if not file or not file.filename:
-        raise APIError(
-            message="No image provided.",
-            code=status.HTTP_400_BAD_REQUEST,
-        )
-    relative_path = save_upload_image(file, f"gallery/{user}")
-    await _safe_invalidate("get_pic_gallery")
-
-    return APIResponse(
-        data={
-            "url": f"/v1/media/{relative_path}",
-            "filename": relative_path,
-        },
-        message="Image uploaded successfully.",
     )
 
 
