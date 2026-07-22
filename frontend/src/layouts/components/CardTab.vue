@@ -7,7 +7,7 @@ const { cardIndex, cardImages, setCardIndex } = useCardImage();
 <template>
   <div class="space-y-6">
     <div>
-      <h2 class="text-foreground mb-1 font-serif text-lg font-semibold">
+      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">
         卡片配图
       </h2>
       <p class="text-muted-foreground mb-4 text-xs italic">Card cover image</p>
@@ -35,8 +35,8 @@ const { cardIndex, cardImages, setCardIndex } = useCardImage();
           class="aspect-[16/9] w-16 overflow-hidden rounded-lg border transition-all duration-200"
           :class="
             cardIndex === i
-              ? 'border-primary scale-105 !shadow-sm'
-              : 'border-border/60 hover:border-primary opacity-70 hover:opacity-100'
+              ? 'border-accent scale-105 !shadow-sm'
+              : 'border-border/60 hover:border-accent opacity-70 hover:opacity-100'
           "
           :aria-label="`卡片 ${i + 1}`"
           :aria-pressed="cardIndex === i"

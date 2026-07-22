@@ -38,7 +38,7 @@ function getIconForType(type: string) {
 //     case "warning":
 //       return "border-l-4 border-warning";
 //     default:
-//       return "border-l-4 border-primary";
+//       return "border-l-4 border-accent";
 //   }
 // }
 
@@ -51,7 +51,7 @@ function iconColorForType(type: string) {
     case 'warning':
       return 'text-warning';
     default:
-      return 'text-primary';
+      return 'text-accent';
   }
 }
 
@@ -79,7 +79,7 @@ onUnmounted(() => {
         :transition="{ type: 'spring', damping: 30, stiffness: 500 }"
         class="card"
         :class="[
-          'squircle bg-background/80 text-foreground dark:bg-background/80 dark:text-foreground absolute top-0 left-0 flex h-20 w-full items-center justify-between gap-3 backdrop-blur-sm transition-colors duration-300',
+          'squircle bg-paper/80 text-ink dark:bg-paper/80 dark:text-ink absolute top-0 left-0 flex h-20 w-full items-center justify-between gap-3 backdrop-blur-sm transition-colors duration-300',
         ]"
       >
         <component
@@ -120,12 +120,12 @@ onUnmounted(() => {
         />
 
         <div
-          class="text-muted-foreground dark:text-foreground flex-1 text-sm leading-snug font-semibold"
+          class="text-muted-foreground dark:text-ink flex-1 text-sm leading-snug font-semibold"
         >
           {{ t.message }}
         </div>
         <button
-          class="bg-secondary/60 text-foreground/80 hover:bg-secondary mr-2 ml-auto shrink-0 cursor-pointer rounded-full p-2 transition-colors"
+          class="bg-secondary/60 text-ink/80 hover:bg-secondary mr-2 ml-auto shrink-0 cursor-pointer rounded-full p-2 transition-colors"
           @click="() => store.dismiss(t.id)"
           aria-label="dismiss"
         >

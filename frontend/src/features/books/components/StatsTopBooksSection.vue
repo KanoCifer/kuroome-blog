@@ -19,7 +19,7 @@ const visible = computed(() => topBooks.value.length > 0);
 <template>
   <section v-if="visible" class="mb-14">
     <h2
-      class="text-foreground mb-6 font-serif text-2xl font-semibold tracking-tight sm:text-3xl"
+      class="text-ink mb-6 font-serif text-2xl font-semibold tracking-tight sm:text-3xl"
     >
       让你停不下来的是
     </h2>
@@ -47,7 +47,7 @@ const visible = computed(() => topBooks.value.length > 0);
         </div>
         <div class="min-w-0 flex-1">
           <p
-            class="text-foreground truncate font-serif text-base leading-tight"
+            class="text-ink truncate font-serif text-base leading-tight"
           >
             {{ book.title ?? '未知书目' }}
           </p>
@@ -64,7 +64,7 @@ const visible = computed(() => topBooks.value.length > 0);
             <span
               v-for="tag in book.tags"
               :key="tag"
-              class="bg-primary/15 text-primary rounded-full px-2 py-0.5 text-xs font-medium"
+              class="bg-accent/15 text-accent rounded-full px-2 py-0.5 text-xs font-medium"
             >
               {{ tag }}
             </span>
@@ -73,7 +73,7 @@ const visible = computed(() => topBooks.value.length > 0);
         <div class="flex flex-1 items-center gap-3">
           <div class="bg-muted h-1 flex-1 overflow-hidden rounded-full">
             <div
-              class="bg-primary h-full rounded-full transition-all duration-700"
+              class="bg-accent h-full rounded-full transition-all duration-700"
               :style="{ width: `${barPercent(book.readTime)}%` }"
             />
           </div>

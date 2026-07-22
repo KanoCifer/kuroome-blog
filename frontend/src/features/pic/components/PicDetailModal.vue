@@ -24,7 +24,7 @@
           role="dialog"
           aria-modal="true"
           aria-labelledby="pdm-title"
-          class="bg-background text-card-foreground border-border/60 relative z-10 grid w-full max-w-5xl overflow-hidden rounded-2xl border shadow-[0_12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)] md:grid-cols-[1.45fr_1fr]"
+          class="bg-paper text-card-foreground border-border/60 relative z-10 grid w-full max-w-5xl overflow-hidden rounded-2xl border shadow-[0_12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)] md:grid-cols-[1.45fr_1fr]"
         >
           <!-- ============= 左侧：胶片查看 ============= -->
           <section
@@ -47,7 +47,7 @@
                 :aria-label="`当前帧位 ${frameNo} / 36`"
               >
                 FRAME
-                <b class="text-foreground font-semibold">{{ frameNo }}</b> / 36
+                <b class="text-ink font-semibold">{{ frameNo }}</b> / 36
               </span>
             </header>
 
@@ -119,7 +119,7 @@
               >
                 <button
                   type="button"
-                  class="border-border/40 text-foreground hover:bg-background inline-flex h-8 w-8 items-center justify-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+                  class="border-border/40 text-ink hover:bg-paper inline-flex h-8 w-8 items-center justify-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
                   aria-label="上一张"
                   @click="$emit('prev')"
                 >
@@ -138,7 +138,7 @@
                 </button>
                 <button
                   type="button"
-                  class="border-border/40 text-foreground hover:bg-background inline-flex h-8 w-8 items-center justify-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+                  class="border-border/40 text-ink hover:bg-paper inline-flex h-8 w-8 items-center justify-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
                   aria-label="下一张"
                   @click="$emit('next')"
                 >
@@ -173,7 +173,7 @@
               </span>
               <button
                 type="button"
-                class="text-muted-foreground hover:text-foreground hover:bg-muted inline-flex h-8 w-8 items-center justify-center rounded-full border border-[color-mix(in_oklch,var(--ink)_12%,transparent)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+                class="text-muted-foreground hover:text-ink hover:bg-muted inline-flex h-8 w-8 items-center justify-center rounded-full border border-[color-mix(in_oklch,var(--ink)_12%,transparent)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
                 aria-label="关闭详情"
                 @click="$emit('close')"
               >
@@ -195,7 +195,7 @@
             <div>
               <h2
                 id="pdm-title"
-                class="text-foreground text-[26px] leading-[1.2] font-semibold tracking-[-0.015em]"
+                class="text-ink text-[26px] leading-[1.2] font-semibold tracking-[-0.015em]"
               >
                 {{ ex.camera || '未命名' }}
               </h2>
@@ -224,7 +224,7 @@
               role="group"
               aria-label="拍摄参数"
             >
-              <div class="bg-background p-2.5">
+              <div class="bg-paper p-2.5">
                 <div
                   class="text-muted-foreground mb-1 text-[10px] tracking-[0.16em] uppercase"
                   style="font-family: var(--font-mono)"
@@ -232,7 +232,7 @@
                   机身
                 </div>
                 <div
-                  class="text-foreground text-[12.5px] tracking-[0.02em]"
+                  class="text-ink text-[12.5px] tracking-[0.02em]"
                   style="
                     font-family: var(--font-mono);
                     font-variant-numeric: tabular-nums;
@@ -241,7 +241,7 @@
                   {{ camera }}
                 </div>
               </div>
-              <div class="bg-background p-2.5">
+              <div class="bg-paper p-2.5">
                 <div
                   class="text-muted-foreground mb-1 text-[10px] tracking-[0.16em] uppercase"
                   style="font-family: var(--font-mono)"
@@ -249,7 +249,7 @@
                   镜头
                 </div>
                 <div
-                  class="text-foreground text-[12.5px] tracking-[0.02em]"
+                  class="text-ink text-[12.5px] tracking-[0.02em]"
                   style="
                     font-family: var(--font-mono);
                     font-variant-numeric: tabular-nums;
@@ -258,7 +258,7 @@
                   {{ lens }}
                 </div>
               </div>
-              <div class="bg-background p-2.5">
+              <div class="bg-paper p-2.5">
                 <div
                   class="text-muted-foreground mb-1 text-[10px] tracking-[0.16em] uppercase"
                   style="font-family: var(--font-mono)"
@@ -266,7 +266,7 @@
                   光圈
                 </div>
                 <div
-                  class="text-foreground text-[12.5px] tracking-[0.02em]"
+                  class="text-ink text-[12.5px] tracking-[0.02em]"
                   style="
                     font-family: var(--font-mono);
                     font-variant-numeric: tabular-nums;
@@ -275,7 +275,7 @@
                   {{ aperture }}
                 </div>
               </div>
-              <div class="bg-background p-2.5">
+              <div class="bg-paper p-2.5">
                 <div
                   class="text-muted-foreground mb-1 text-[10px] tracking-[0.16em] uppercase"
                   style="font-family: var(--font-mono)"
@@ -283,7 +283,7 @@
                   地点
                 </div>
                 <div
-                  class="text-foreground text-[12.5px] tracking-[0.02em]"
+                  class="text-ink text-[12.5px] tracking-[0.02em]"
                   style="
                     font-family: var(--font-mono);
                     font-variant-numeric: tabular-nums;
@@ -320,7 +320,7 @@
                 v-model="localDescription"
                 rows="4"
                 aria-label="编辑拍摄笔记"
-                class="bg-background text-foreground placeholder:text-muted-foreground focus:border-accent focus:ring-accent/20 w-full resize-y rounded-xl border border-[color-mix(in_oklch,var(--ink)_18%,transparent)] px-4 py-3.5 text-[14.5px] leading-[1.55] transition-shadow focus:ring-2 focus:outline-none"
+                class="bg-paper text-ink placeholder:text-muted-foreground focus:border-accent focus:ring-accent/20 w-full resize-y rounded-xl border border-[color-mix(in_oklch,var(--ink)_18%,transparent)] px-4 py-3.5 text-[14.5px] leading-[1.55] transition-shadow focus:ring-2 focus:outline-none"
                 style="font-family: var(--font-sans)"
                 @keydown.esc="toggleEdit"
               ></textarea>
@@ -331,7 +331,7 @@
                   'font-family-dongfang min-h-24 rounded-xl border border-dashed px-4 py-3.5 text-[18px] leading-[1.55] whitespace-pre-wrap',
                   isEmpty
                     ? 'text-muted-foreground/70 grid place-items-center text-center italic'
-                    : 'text-foreground/90',
+                    : 'text-ink/90',
                 ]"
                 :style="
                   isEmpty
@@ -359,7 +359,7 @@
             <div class="mt-auto flex items-center gap-2.5 pt-2">
               <button
                 type="button"
-                class="text-ink/70 hover:text-ink hover:bg-primary inline-flex items-center gap-2 rounded-full border border-[color-mix(in_oklch,var(--ink)_14%,transparent)] bg-transparent px-[18px] py-2.5 text-[13.5px] font-medium tracking-[0.01em] transition-colors hover:border-[color-mix(in_oklch,var(--ink)_30%,transparent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+                class="text-ink/70 hover:text-ink hover:bg-accent inline-flex items-center gap-2 rounded-full border border-[color-mix(in_oklch,var(--ink)_14%,transparent)] bg-transparent px-[18px] py-2.5 text-[13.5px] font-medium tracking-[0.01em] transition-colors hover:border-[color-mix(in_oklch,var(--ink)_30%,transparent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
                 style="min-height: 36px"
                 aria-label="复制图片信息"
                 @click="onCopy"

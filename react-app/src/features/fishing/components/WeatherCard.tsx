@@ -49,7 +49,7 @@ function MetricRow({ icon, label, value, accessory }: MetricRowProps) {
         {label}
       </span>
       {accessory}
-      <span className="text-foreground ml-auto text-sm font-semibold tabular-nums">
+      <span className="text-ink ml-auto text-sm font-semibold tabular-nums">
         {value}
       </span>
     </div>
@@ -76,12 +76,12 @@ export function WeatherCard({
   return (
     <article className="px-1 pt-2 pb-6" aria-label="天气详情">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-foreground text-sm font-semibold">天气详情</h3>
+        <h3 className="text-ink text-sm font-semibold">天气详情</h3>
         <button
           type="button"
           onClick={openQWeather}
           aria-label="查看和风天气"
-          className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs transition-colors"
+          className="text-muted-foreground hover:text-ink inline-flex items-center gap-1 text-xs transition-colors"
         >
           和风天气
           <ExternalLink className="h-3 w-3" aria-hidden />
@@ -160,10 +160,10 @@ export function WeatherCard({
                     {i === 0 ? '今天' : dayjs(day.fxDate).format('MM/DD')}
                   </p>
                   <i
-                    className={`qi-${day.iconDay} text-2xl text-foreground/85`}
+                    className={`qi-${day.iconDay} text-2xl text-ink/85`}
                     aria-hidden
                   />
-                  <p className="text-foreground text-xs font-semibold tabular-nums">
+                  <p className="text-ink text-xs font-semibold tabular-nums">
                     {day.tempMax}° / {day.tempMin}°
                   </p>
                 </div>

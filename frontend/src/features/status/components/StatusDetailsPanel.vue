@@ -70,7 +70,7 @@ function formatLogTime(iso: string): string {
     <!-- 主机信息 -->
     <div class="space-y-4">
       <h3
-        class="text-foreground font-serif text-[17px] tracking-[-0.01em]"
+        class="text-ink font-serif text-[17px] tracking-[-0.01em]"
       >
         主机信息
       </h3>
@@ -78,7 +78,7 @@ function formatLogTime(iso: string): string {
         <dl class="divide-border divide-y">
           <div class="flex items-center justify-between py-2">
             <dt class="text-muted-foreground">操作系统 / 内核</dt>
-            <dd class="text-foreground text-right">
+            <dd class="text-ink text-right">
               {{ serverStatus.system.os_name }} ·
               {{ serverStatus.system.kernel_version }}
             </dd>
@@ -86,7 +86,7 @@ function formatLogTime(iso: string): string {
           <div class="flex items-center justify-between gap-4 py-2">
             <dt class="text-muted-foreground shrink-0">CPU 型号</dt>
             <dd
-              class="text-foreground truncate text-right"
+              class="text-ink truncate text-right"
               :title="serverStatus.system.cpu_model"
             >
               {{ serverStatus.system.cpu_model }}
@@ -94,26 +94,26 @@ function formatLogTime(iso: string): string {
           </div>
           <div class="flex items-center justify-between py-2">
             <dt class="text-muted-foreground">核心(逻辑 / 物理)</dt>
-            <dd class="text-foreground tabular-nums">
+            <dd class="text-ink tabular-nums">
               {{ serverStatus.system.cpu_count_logical }} /
               {{ serverStatus.system.cpu_count_physical }}
             </dd>
           </div>
           <div class="flex items-center justify-between py-2">
             <dt class="text-muted-foreground">总内存</dt>
-            <dd class="text-foreground tabular-nums">
+            <dd class="text-ink tabular-nums">
               {{ bytesToGB(serverStatus.system.memory_total_bytes) }}
             </dd>
           </div>
           <div class="flex items-center justify-between py-2">
             <dt class="text-muted-foreground">已用</dt>
-            <dd class="text-foreground tabular-nums">
+            <dd class="text-ink tabular-nums">
               {{ bytesToMB(serverStatus.system.memory_used_bytes) }}
             </dd>
           </div>
           <div class="flex items-center justify-between py-2">
             <dt class="text-muted-foreground">时区</dt>
-            <dd class="text-foreground">
+            <dd class="text-ink">
               {{ serverStatus.system.system_timezone }}
             </dd>
           </div>
@@ -128,7 +128,7 @@ function formatLogTime(iso: string): string {
     <!-- 运行时 -->
     <div class="space-y-4">
       <h3
-        class="text-foreground font-serif text-[17px] tracking-[-0.01em]"
+        class="text-ink font-serif text-[17px] tracking-[-0.01em]"
       >
         服务运行时
       </h3>
@@ -136,25 +136,25 @@ function formatLogTime(iso: string): string {
         <dl class="divide-border divide-y">
           <div class="flex items-center justify-between py-2">
             <dt class="text-muted-foreground">运行时</dt>
-            <dd class="text-foreground">
+            <dd class="text-ink">
               {{ serverStatus.service.runtime }}
             </dd>
           </div>
           <div class="flex items-center justify-between py-2">
             <dt class="text-muted-foreground">协程数</dt>
-            <dd class="text-foreground tabular-nums">
+            <dd class="text-ink tabular-nums">
               {{ serverStatus.service.goroutines }}
             </dd>
           </div>
           <div class="flex items-center justify-between py-2">
             <dt class="text-muted-foreground">GC 次数</dt>
-            <dd class="text-foreground tabular-nums">
+            <dd class="text-ink tabular-nums">
               {{ serverStatus.service.gc_count }}
             </dd>
           </div>
           <div class="flex items-center justify-between py-2">
             <dt class="text-muted-foreground">启动时间</dt>
-            <dd class="text-foreground tabular-nums">
+            <dd class="text-ink tabular-nums">
               {{ formatStartTime(serverStatus.service.start_time) }}
             </dd>
           </div>
@@ -169,7 +169,7 @@ function formatLogTime(iso: string): string {
     <!-- 最近事件(跨双列) -->
     <div class="space-y-4 md:col-span-2">
       <h3
-        class="text-foreground font-serif text-[17px] tracking-[-0.01em]"
+        class="text-ink font-serif text-[17px] tracking-[-0.01em]"
       >
         最近事件
       </h3>
@@ -199,7 +199,7 @@ function formatLogTime(iso: string): string {
               />
               {{ EVENT_LABEL[event.type] ?? event.type }}
             </span>
-            <span class="text-foreground min-w-0 truncate">
+            <span class="text-ink min-w-0 truncate">
               {{ event.title }}
             </span>
           </li>
@@ -219,7 +219,7 @@ function formatLogTime(iso: string): string {
       <span>
         当前版本
         <code
-          class="bg-muted text-foreground ml-1.5 rounded px-1.5 py-0.5 font-mono"
+          class="bg-muted text-ink ml-1.5 rounded px-1.5 py-0.5 font-mono"
           >v{{ serverStatus.version.current_version }}</code
         >
       </span>
@@ -227,7 +227,7 @@ function formatLogTime(iso: string): string {
         :href="serverStatus.version.repo_url"
         target="_blank"
         rel="noopener"
-        class="hover:text-foreground underline underline-offset-4 transition-colors"
+        class="hover:text-ink underline underline-offset-4 transition-colors"
         >查看仓库</a
       >
     </div>

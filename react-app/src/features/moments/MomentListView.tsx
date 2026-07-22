@@ -225,8 +225,8 @@ export default function MomentListView() {
                 className={[
                   'rounded-full px-3 py-1 font-medium transition-colors',
                   publicActiveTag === null
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'bg-background text-muted-foreground hover:bg-muted border-border/60 border',
+                    ? 'bg-accent text-accent shadow-sm'
+                    : 'bg-paper text-muted-foreground hover:bg-muted border-border/60 border',
                 ].join(' ')}
                 onClick={() => setTag(null)}
               >
@@ -239,12 +239,12 @@ export default function MomentListView() {
                   className={[
                     'rounded-full px-3 py-1 font-medium transition-colors',
                     publicActiveTag === tag
-                      ? 'bg-primary text-primary-foreground shadow-sm'
-                      : 'bg-background text-muted-foreground hover:bg-muted border-border/60 border',
+                      ? 'bg-accent text-accent shadow-sm'
+                      : 'bg-paper text-muted-foreground hover:bg-muted border-border/60 border',
                   ].join(' ')}
                   onClick={() => setTag(tag)}
                 >
-                  <span className="text-primary/70">#</span>
+                  <span className="text-accent/70">#</span>
                   {tag}
                 </button>
               ))}
@@ -285,7 +285,7 @@ export default function MomentListView() {
               {[0, 1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="bg-background/60 border-border/40 h-32 animate-pulse rounded-2xl border"
+                  className="bg-paper/60 border-border/40 h-32 animate-pulse rounded-2xl border"
                 />
               ))}
             </div>
@@ -322,7 +322,7 @@ export default function MomentListView() {
               <button
                 type="button"
                 disabled={publicPage <= 1}
-                className="bg-background text-foreground hover:bg-muted border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+                className="bg-paper text-ink hover:bg-muted border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
                 onClick={() => goPage(publicPage - 1)}
               >
                 <svg
@@ -350,7 +350,7 @@ export default function MomentListView() {
               <button
                 type="button"
                 disabled={publicPage >= totalPages}
-                className="bg-background text-foreground hover:bg-muted border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+                className="bg-paper text-ink hover:bg-muted border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
                 onClick={() => goPage(publicPage + 1)}
               >
                 下一页
@@ -380,7 +380,7 @@ export default function MomentListView() {
         <button
           type="button"
           onClick={() => openEditor(null)}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 fixed right-6 bottom-6 z-[60] inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-[13px] font-medium shadow-lg transition-all hover:shadow-xl"
+          className="bg-accent text-accent hover:bg-accent/90 fixed right-6 bottom-6 z-[60] inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-[13px] font-medium shadow-lg transition-all hover:shadow-xl"
           aria-label="新建碎碎念"
         >
           <svg
@@ -426,14 +426,14 @@ export default function MomentListView() {
       {/* 删除确认 modal（inline，避免依赖缺失的 shadcn Dialog） */}
       {deleteConfirmOpen && (
         <div
-          className="bg-background/60 fixed inset-0 z-[70] flex items-center justify-center p-4 backdrop-blur-sm"
+          className="bg-paper/60 fixed inset-0 z-[70] flex items-center justify-center p-4 backdrop-blur-sm"
           onClick={() => setDeleteConfirmOpen(false)}
         >
           <div
-            className="bg-background border-border/40 w-full max-w-[420px] rounded-xl border p-6 shadow-xl"
+            className="bg-paper border-border/40 w-full max-w-[420px] rounded-xl border p-6 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-foreground font-serif text-lg font-medium">
+            <h3 className="text-ink font-serif text-lg font-medium">
               删除这条碎碎念？
             </h3>
             <p className="text-muted-foreground mt-2 text-sm">
@@ -443,7 +443,7 @@ export default function MomentListView() {
               <button
                 type="button"
                 onClick={() => setDeleteConfirmOpen(false)}
-                className="border-border/60 text-foreground hover:bg-muted inline-flex items-center rounded-lg border px-3 py-1.5 text-[13px] transition-colors"
+                className="border-border/60 text-ink hover:bg-muted inline-flex items-center rounded-lg border px-3 py-1.5 text-[13px] transition-colors"
               >
                 取消
               </button>

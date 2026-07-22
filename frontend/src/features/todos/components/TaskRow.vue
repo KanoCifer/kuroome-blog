@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-background border-border group flex items-center gap-3 rounded-xl border px-4 py-2.5 transition-[box-shadow] duration-200 hover:shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent)]"
+    class="bg-surface border-border group hover:bg-muted flex items-center gap-3 rounded-xl border px-4 py-2.5 transition-[background-color] duration-200"
   >
     <!-- open affordance: real button (no nested interactives) -->
     <button
@@ -9,7 +9,7 @@
       @click="$emit('open', task.slug)"
     >
       <span
-        class="text-foreground min-w-0 flex-1 truncate text-sm font-medium"
+        class="text-ink min-w-0 flex-1 truncate text-sm font-medium"
         :class="{ 'text-muted-foreground line-through opacity-70': done }"
       >
         {{ task.title }}
@@ -36,7 +36,7 @@
       <button
         v-if="!done"
         type="button"
-        class="text-muted-foreground hover:bg-muted hover:text-primary focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
+        class="text-muted-foreground hover:bg-muted hover:text-accent focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
         title="推进状态"
         aria-label="推进状态"
         @click="$emit('cycle', task.slug)"

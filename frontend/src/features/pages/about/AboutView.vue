@@ -97,7 +97,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="about-page bg-background flex min-h-screen flex-col items-center justify-center px-6 py-20"
+    class="about-page bg-paper flex min-h-screen flex-col items-center justify-center px-6 py-20"
   >
     <!-- Hero: greeting + avatar -->
     <div
@@ -153,7 +153,7 @@ onMounted(() => {
       <a
         href="https://github.com/KanoCifer"
         target="_blank"
-        class="social-link text-muted-foreground hover:text-foreground"
+        class="social-link text-muted-foreground hover:text-ink"
         title="GitHub"
       >
         <svg
@@ -171,7 +171,7 @@ onMounted(() => {
       </a>
       <a
         href="mailto:kano3255@outlook.com"
-        class="social-link text-muted-foreground hover:text-foreground"
+        class="social-link text-muted-foreground hover:text-ink"
         title="Email"
       >
         <svg
@@ -232,7 +232,7 @@ onMounted(() => {
   font-size: clamp(3rem, 10vw, 6rem);
   line-height: 1;
   letter-spacing: 0.08em;
-  color: var(--color-foreground);
+  color: var(--color-ink);
 }
 
 .bio-text {
@@ -257,7 +257,7 @@ onMounted(() => {
   width: 2px;
   height: 1em;
   margin-left: 2px;
-  background-color: var(--color-primary);
+  background-color: var(--color-accent);
   vertical-align: text-bottom;
   animation: blink 1s step-end infinite;
 }
@@ -287,7 +287,7 @@ onMounted(() => {
   position: absolute;
   inset: -4px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-muted));
+  background: linear-gradient(135deg, var(--color-accent), var(--color-muted));
   opacity: 0.25;
   filter: blur(14px);
   transition: opacity 0.5s ease;
@@ -324,8 +324,8 @@ onMounted(() => {
   flex-direction: column;
   gap: 0.875rem;
   padding: 1.125rem 1.125rem 1rem;
-  background: var(--color-background);
-  color: var(--color-foreground);
+  @apply bg-paper;
+  color: var(--color-ink);
   border-radius: 0.875rem; /* rounded-xl —— DESIGN.md */
   text-decoration: none;
   outline: none;
@@ -407,7 +407,7 @@ onMounted(() => {
   font-size: 0.9375rem;
   font-weight: 500;
   letter-spacing: -0.005em;
-  color: var(--color-foreground);
+  color: var(--color-ink);
   line-height: 1.25;
 }
 
@@ -448,7 +448,7 @@ onMounted(() => {
 .social-card:focus-visible .social-card__arrow {
   transform: translate(2px, -2px);
   opacity: 1;
-  color: var(--color-foreground);
+  color: var(--color-ink);
 }
 
 @media (prefers-reduced-motion: reduce) {

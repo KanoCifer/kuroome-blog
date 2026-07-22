@@ -44,7 +44,7 @@ interface SelfInfo {
 
 function TagPill({ children }: { children: React.ReactNode }) {
   return (
-    <span className="bg-primary/10 text-primary inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold">
+    <span className="bg-accent/10 text-accent inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold">
       {children}
     </span>
   );
@@ -81,7 +81,7 @@ function DailyPickBanner() {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="border-border bg-background group cursor-pointer overflow-hidden rounded-2xl border p-4 shadow-sm transition-all duration-300 hover:shadow-md sm:p-5"
+      className="border-border bg-paper group cursor-pointer overflow-hidden rounded-2xl border p-4 shadow-sm transition-all duration-300 hover:shadow-md sm:p-5"
       onClick={() => navigate('/websites')}
     >
       <AnimatePresence mode="wait">
@@ -111,11 +111,11 @@ function DailyPickBanner() {
               <span className="text-muted-foreground text-[10px] font-bold tracking-wide uppercase">
                 每日推荐
               </span>
-              <span className="bg-primary/10 text-primary rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
+              <span className="bg-accent/10 text-accent rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
                 {pick?.category}
               </span>
             </div>
-            <h3 className="text-foreground text-base leading-tight font-bold">
+            <h3 className="text-ink text-base leading-tight font-bold">
               {pick?.name}
             </h3>
             <p className="text-muted-foreground mt-1 line-clamp-2 text-xs leading-relaxed">
@@ -132,7 +132,7 @@ function DailyPickBanner() {
 
           <div className="flex shrink-0 flex-col gap-2">
             <button
-              className="bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-transform active:scale-95"
+              className="bg-accent text-accent flex h-8 w-8 items-center justify-center rounded-lg transition-transform active:scale-95"
               onClick={(e) => {
                 e.stopPropagation();
                 refreshPick();
@@ -187,7 +187,7 @@ function SelfInfoCard() {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.05 }}
-      className="border-primary/20 bg-primary/5 overflow-hidden rounded-2xl border p-4"
+      className="border-accent/20 bg-accent/5 overflow-hidden rounded-2xl border p-4"
     >
       <div className="flex items-start gap-3">
         <img
@@ -198,8 +198,8 @@ function SelfInfoCard() {
         />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <h3 className="text-foreground text-base font-bold">{self.name}</h3>
-            <span className="bg-primary/15 text-primary rounded-full px-2 py-0.5 text-[10px] font-semibold">
+            <h3 className="text-ink text-base font-bold">{self.name}</h3>
+            <span className="bg-accent/15 text-accent rounded-full px-2 py-0.5 text-[10px] font-semibold">
               本站
             </span>
           </div>
@@ -209,21 +209,21 @@ function SelfInfoCard() {
         </div>
         <button
           onClick={copySelfInfo}
-          className="bg-primary text-primary-foreground flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-transform active:scale-95"
+          className="bg-accent text-accent flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-transform active:scale-95"
           title="复制友链信息"
         >
           <Copy className="h-4 w-4" />
         </button>
       </div>
 
-      <div className="bg-background/60 mt-3 space-y-1.5 rounded-xl p-3">
+      <div className="bg-paper/60 mt-3 space-y-1.5 rounded-xl p-3">
         <div className="flex items-center gap-2 text-xs">
           <span className="text-muted-foreground w-12 shrink-0">URL</span>
-          <code className="text-foreground truncate">{self.url}</code>
+          <code className="text-ink truncate">{self.url}</code>
         </div>
         <div className="flex items-center gap-2 text-xs">
           <span className="text-muted-foreground w-12 shrink-0">Favicon</span>
-          <code className="text-foreground truncate">{self.icon}</code>
+          <code className="text-ink truncate">{self.icon}</code>
         </div>
         <div className="flex flex-wrap gap-1.5 pt-1">
           {self.tags.map((tag) => (
@@ -256,7 +256,7 @@ function FriendLinkCard({ link, index }: { link: FriendLink; index: number }) {
         damping: 20,
         delay: index * 0.06,
       }}
-      className="border-border bg-background group hover:border-primary/25 block overflow-hidden rounded-2xl border p-4 shadow-sm transition-all duration-300 hover:shadow-md"
+      className="border-border bg-paper group hover:border-accent/25 block overflow-hidden rounded-2xl border p-4 shadow-sm transition-all duration-300 hover:shadow-md"
     >
       <div className="flex items-start gap-3.5">
         <div className="bg-muted flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full">
@@ -272,7 +272,7 @@ function FriendLinkCard({ link, index }: { link: FriendLink; index: number }) {
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-foreground group-hover:text-primary text-base font-bold transition-colors">
+          <h3 className="text-ink group-hover:text-accent text-base font-bold transition-colors">
             {link.name}
           </h3>
           <p className="text-muted-foreground mt-1 line-clamp-2 text-xs leading-relaxed">
@@ -298,38 +298,38 @@ function ApplyCard() {
       initial={{ opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="border-border bg-background overflow-hidden rounded-2xl border p-4"
+      className="border-border bg-paper overflow-hidden rounded-2xl border p-4"
     >
-      <h3 className="text-foreground mb-3 flex items-center gap-2 text-sm font-bold">
-        <Link2 className="text-primary h-4 w-4" />
+      <h3 className="text-ink mb-3 flex items-center gap-2 text-sm font-bold">
+        <Link2 className="text-accent h-4 w-4" />
         申请友链
       </h3>
       <p className="text-muted-foreground mb-3 text-xs leading-relaxed">
         通过 GitHub Issue 提交友链申请，审核通过后将在 48 小时内上线
       </p>
 
-      <div className="border-primary/15 bg-primary/5 mb-4 rounded-xl border p-3">
-        <h4 className="text-foreground mb-2 flex items-center gap-1.5 text-xs font-bold">
-          <Info className="text-primary h-3.5 w-3.5" />
+      <div className="border-accent/15 bg-accent/5 mb-4 rounded-xl border p-3">
+        <h4 className="text-ink mb-2 flex items-center gap-1.5 text-xs font-bold">
+          <Info className="text-accent h-3.5 w-3.5" />
           接入须知
         </h4>
         <ul className="text-muted-foreground space-y-1.5 text-xs">
           <li className="flex items-start gap-2">
-            <span className="text-primary mt-0.5 shrink-0 text-[8px]">●</span>
+            <span className="text-accent mt-0.5 shrink-0 text-[8px]">●</span>
             <span>网站需符合中国大陆相关法律法规</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-primary mt-0.5 shrink-0 text-[8px]">●</span>
+            <span className="text-accent mt-0.5 shrink-0 text-[8px]">●</span>
             <span>网站内容原创、非商业推广</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-primary mt-0.5 shrink-0 text-[8px]">●</span>
+            <span className="text-accent mt-0.5 shrink-0 text-[8px]">●</span>
             <span>
               已在您的网站添加本站友链（
               <a
                 href="https://kanocifer.chat"
                 target="_blank"
-                className="text-primary underline"
+                className="text-accent underline"
                 rel="noreferrer"
               >
                 kanocifer.chat
@@ -338,7 +338,7 @@ function ApplyCard() {
             </span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-primary mt-0.5 shrink-0 text-[8px]">●</span>
+            <span className="text-accent mt-0.5 shrink-0 text-[8px]">●</span>
             <span>网站可正常访问</span>
           </li>
         </ul>
@@ -348,7 +348,7 @@ function ApplyCard() {
         href="https://github.com/KanoCifer/kuroome-blog/issues/1"
         target="_blank"
         rel="noopener noreferrer"
-        className="bg-primary text-primary-foreground flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-transform active:scale-95"
+        className="bg-accent text-accent flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-transform active:scale-95"
       >
         <ExternalLink className="h-4 w-4" />
         前往 GitHub Issue 提交申请
@@ -359,7 +359,7 @@ function ApplyCard() {
 
 function EmptyState() {
   return (
-    <div className="border-border bg-background flex flex-col items-center justify-center rounded-2xl border py-12">
+    <div className="border-border bg-paper flex flex-col items-center justify-center rounded-2xl border py-12">
       <Users className="text-muted-foreground mb-3 h-12 w-12" />
       <p className="text-muted-foreground text-sm">暂无友链</p>
       <p className="text-muted-foreground mt-1 text-xs">
@@ -373,11 +373,11 @@ export default function FriendLinksView() {
   const links = friendLinksData.links as FriendLink[];
 
   return (
-    <div className="bg-background min-h-dvh">
+    <div className="bg-paper min-h-dvh">
       {/* Header */}
       <div className="bg-surface sticky top-0 z-10 backdrop-blur-md">
         <div className="ml-12 max-w-2xl px-4 py-4">
-          <h1 className="text-foreground text-2xl font-bold">友情链接</h1>
+          <h1 className="text-ink text-2xl font-bold">友情链接</h1>
           <p className="text-muted-foreground mt-1 text-sm">
             与志同道合的朋友交换链接
           </p>

@@ -18,7 +18,7 @@ export default function Home() {
   }, [showNav]);
 
   return (
-    <div className="bg-background relative">
+    <div className="bg-paper relative">
       {/* Hero — 全屏沉浸式，含视差（内部自管 scroll） */}
       <div className="relative min-h-dvh">
         <BentoHero />

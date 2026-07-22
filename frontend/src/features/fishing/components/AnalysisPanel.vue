@@ -88,7 +88,7 @@ watch(
       <aside
         v-if="open"
         ref="panelRef"
-        class="bg-background border-border/60 fixed top-6 right-6 bottom-6 z-50 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
+        class="bg-paper border-border/60 fixed top-6 right-6 bottom-6 z-50 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
         :style="CARD_SHADOW"
         role="dialog"
         aria-modal="true"
@@ -102,7 +102,7 @@ watch(
         >
           <div class="min-w-0">
             <h2
-              class="text-foreground font-family-averia text-2xl leading-snug"
+              class="text-ink font-family-averia text-2xl leading-snug"
             >
               AI 分析
             </h2>
@@ -112,7 +112,7 @@ watch(
           </div>
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors"
+            class="text-muted-foreground hover:bg-muted hover:text-ink inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors"
             aria-label="关闭分析"
             @click="emit('close')"
           >

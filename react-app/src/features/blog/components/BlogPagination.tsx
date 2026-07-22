@@ -33,7 +33,7 @@ export function BlogPagination({
 
   return (
     <nav aria-label="博客分页">
-      <ul className="border-border/80 bg-background/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2">
+      <ul className="border-border/80 bg-paper/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2">
         {/* Previous */}
         <li>
           <button
@@ -41,7 +41,7 @@ export function BlogPagination({
             onClick={() => onPageChange(pagination.prev_num || 1)}
             className={`focus-visible:ring-ring inline-flex h-10 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${
               pagination.has_prev
-                ? 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                ? 'text-muted-foreground hover:bg-muted hover:text-ink'
                 : 'text-muted-foreground/50 cursor-not-allowed'
             }`}
           >
@@ -58,8 +58,8 @@ export function BlogPagination({
                 onClick={() => onPageChange(p)}
                 className={`focus-visible:ring-ring inline-flex h-10 min-w-10 items-center justify-center rounded-xl px-3 text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${
                   p === currentPage
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                    ? 'bg-accent text-accent'
+                    : 'text-muted-foreground hover:bg-muted hover:text-ink'
                 }`}
               >
                 {p}
@@ -81,7 +81,7 @@ export function BlogPagination({
             }
             className={`focus-visible:ring-ring inline-flex h-10 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${
               pagination.has_next
-                ? 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                ? 'text-muted-foreground hover:bg-muted hover:text-ink'
                 : 'text-muted-foreground/50 cursor-not-allowed'
             }`}
           >

@@ -18,9 +18,9 @@ export function BentoTech() {
   return (
     <BentoCard className="h-full">
       <div className="h-full p-2">
-        <h3 className="text-foreground mb-3 flex items-center gap-2 text-sm font-bold">
+        <h3 className="text-ink mb-3 flex items-center gap-2 text-sm font-bold">
           <svg
-            className="text-primary h-5 w-5"
+            className="text-accent h-5 w-5"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

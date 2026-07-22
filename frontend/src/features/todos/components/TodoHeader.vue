@@ -1,10 +1,10 @@
 <template>
   <header
-    class="bg-background/75 border-border sticky top-0 z-10 flex flex-wrap items-end justify-between gap-3 border-b px-5 py-3 backdrop-blur-sm sm:px-8"
+    class="bg-paper/75 border-border sticky top-0 z-10 flex flex-wrap items-end justify-between gap-3 border-b px-5 py-3 backdrop-blur-sm sm:px-8"
   >
     <div>
       <h1
-        class="text-foreground font-serif text-2xl leading-tight font-medium tracking-tight"
+        class="text-ink font-serif text-2xl leading-tight font-medium tracking-tight"
       >
         开发任务
       </h1>

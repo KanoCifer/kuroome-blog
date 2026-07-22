@@ -44,7 +44,7 @@ export function AvatarUpload({ avatarUrl, onPhotoUpload }: AvatarUploadProps) {
           />
           <label
             htmlFor="photo-upload"
-            className="bg-primary text-primary-foreground hover:shadow-primary/50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full shadow-lg transition-all duration-300 hover:scale-110 active:scale-95"
+            className="bg-accent text-accent hover:shadow-accent/50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full shadow-lg transition-all duration-300 hover:scale-110 active:scale-95"
           >
             <IconCamera className="size-5" />
           </label>

@@ -111,7 +111,7 @@ export function BentoProfile() {
 
         {/* <!-- Content --> */}
         <div className="flex flex-col items-start text-left">
-          <h2 className="text-foreground font-serif text-2xl font-extrabold tracking-tight">
+          <h2 className="text-ink font-serif text-2xl font-extrabold tracking-tight">
             Kuroome
           </h2>
           <p className="text-muted-foreground font-medium">Developer</p>
@@ -121,7 +121,7 @@ export function BentoProfile() {
 
         <button
           title="切换到 Vue 版本"
-          className="bg-background/80 ring-border absolute top-1/2 right-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full ring-1 transition-transform duration-150 hover:scale-110 active:scale-90"
+          className="bg-paper/80 ring-border absolute top-1/2 right-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full ring-1 transition-transform duration-150 hover:scale-110 active:scale-90"
           onClick={switchToVue}
         >
           <svg viewBox="0 0 256 221" className="h-4 w-4" fill="currentColor">
@@ -131,7 +131,7 @@ export function BentoProfile() {
 
         <button
           title="喜欢这个网站吗？点个赞吧！"
-          className="bg-background/80 ring-border absolute top-1/2 right-4 -translate-y-1/2 rounded-full p-1 ring-1 transition-transform duration-150 hover:scale-110 active:scale-90"
+          className="bg-paper/80 ring-border absolute top-1/2 right-4 -translate-y-1/2 rounded-full p-1 ring-1 transition-transform duration-150 hover:scale-110 active:scale-90"
           onClick={handleLike}
         >
           <LikeAnimation />

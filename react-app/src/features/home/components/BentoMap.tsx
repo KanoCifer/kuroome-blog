@@ -14,14 +14,14 @@ export function BentoMap() {
           transition={SPRING.snappy}
         >
           <div className="flex items-center gap-3">
-            <div className="bg-primary/10 text-primary ring-primary/20 flex size-10 items-center justify-center rounded-2xl ring-1">
+            <div className="bg-accent/10 text-accent ring-accent/20 flex size-10 items-center justify-center rounded-2xl ring-1">
               <FishingRod className="size-5" />
             </div>
-            <div className="text-foreground font-serif font-medium whitespace-pre">
+            <div className="text-ink font-serif font-medium whitespace-pre">
               我的钓点
             </div>
           </div>
-          <div className="text-primary inline-flex items-center gap-1 text-xs font-semibold">
+          <div className="text-accent inline-flex items-center gap-1 text-xs font-semibold">
             Open <span aria-hidden="true">→</span>
           </div>
         </motion.div>

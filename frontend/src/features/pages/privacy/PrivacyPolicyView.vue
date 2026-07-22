@@ -95,7 +95,7 @@ const SectionHeader = (props: { number: string; title: string }) =>
       'h2',
       {
         class:
-          'text-foreground font-serif text-2xl font-semibold tracking-tight sm:text-3xl',
+          'text-ink font-serif text-2xl font-semibold tracking-tight sm:text-3xl',
       },
       props.title,
     ),
@@ -103,7 +103,7 @@ const SectionHeader = (props: { number: string; title: string }) =>
 
 const SubHeader = (props: { title: string; desc?: string }) =>
   h('div', { class: 'mt-10' }, [
-    h('h3', { class: 'text-foreground text-base font-semibold' }, props.title),
+    h('h3', { class: 'text-ink text-base font-semibold' }, props.title),
     props.desc
       ? h(
           'p',
@@ -122,7 +122,7 @@ const DataRow = (
       'span',
       {
         class:
-          'text-foreground/80 w-[5.5rem] shrink-0 font-mono text-[11px] tracking-wider uppercase',
+          'text-ink/80 w-[5.5rem] shrink-0 font-mono text-[11px] tracking-wider uppercase',
       },
       props.label,
     ),
@@ -135,7 +135,7 @@ const SecurityItem = (props: { tag: string; desc: string }) =>
       'dt',
       {
         class:
-          'text-foreground/90 font-mono text-[10px] tracking-[0.2em] uppercase',
+          'text-ink/90 font-mono text-[10px] tracking-[0.2em] uppercase',
       },
       props.tag,
     ),
@@ -160,12 +160,12 @@ const ServiceRow = (props: {
     },
     [
       h('div', { class: 'flex flex-wrap items-center gap-2' }, [
-        h('h4', { class: 'text-foreground font-medium' }, props.name),
+        h('h4', { class: 'text-ink font-medium' }, props.name),
         h(
           'span',
           {
             class:
-              'bg-background text-muted-foreground rounded-full px-2 py-0.5 font-mono text-[10px] tracking-wide',
+              'bg-paper text-muted-foreground rounded-full px-2 py-0.5 font-mono text-[10px] tracking-wide',
           },
           props.tag,
         ),
@@ -181,7 +181,7 @@ const ServiceRow = (props: {
             'dt',
             {
               class:
-                'text-foreground/80 font-mono text-[10px] tracking-[0.2em] uppercase sm:pt-0.5',
+                'text-ink/80 font-mono text-[10px] tracking-[0.2em] uppercase sm:pt-0.5',
             },
             '触发',
           ),
@@ -194,7 +194,7 @@ const ServiceRow = (props: {
             'dt',
             {
               class:
-                'text-foreground/80 font-mono text-[10px] tracking-[0.2em] uppercase sm:pt-0.5',
+                'text-ink/80 font-mono text-[10px] tracking-[0.2em] uppercase sm:pt-0.5',
             },
             '带走',
           ),
@@ -207,7 +207,7 @@ const ServiceRow = (props: {
             'dt',
             {
               class:
-                'text-foreground/80 font-mono text-[10px] tracking-[0.2em] uppercase sm:pt-0.5',
+                'text-ink/80 font-mono text-[10px] tracking-[0.2em] uppercase sm:pt-0.5',
             },
             '留在',
           ),
@@ -232,7 +232,7 @@ const RetentionRow = (props: { what: string; until: string }) =>
       h(
         'dt',
         {
-          class: 'text-foreground/90 font-mono text-[11px] tracking-[0.04em]',
+          class: 'text-ink/90 font-mono text-[11px] tracking-[0.04em]',
         },
         props.what,
       ),
@@ -246,7 +246,7 @@ const RightItem = (props: { title: string; desc: string }) =>
       'span',
       {
         class:
-          'text-foreground/80 w-[5.5rem] shrink-0 font-mono text-[11px] tracking-wider uppercase',
+          'text-ink/80 w-[5.5rem] shrink-0 font-mono text-[11px] tracking-wider uppercase',
       },
       props.title,
     ),
@@ -265,7 +265,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
       target: props.href.startsWith('http') ? '_blank' : undefined,
       rel: props.href.startsWith('http') ? 'noopener noreferrer' : undefined,
       class:
-        'bg-background border-border/60 hover:border-primary/40 group flex items-center justify-between rounded-2xl border p-4 transition-colors sm:p-5',
+        'bg-paper border-border/60 hover:border-accent/40 group flex items-center justify-between rounded-2xl border p-4 transition-colors sm:p-5',
     },
     [
       h('div', {}, [
@@ -279,27 +279,27 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
         ),
         h(
           'p',
-          { class: 'text-foreground mt-1.5 text-sm font-medium' },
+          { class: 'text-ink mt-1.5 text-sm font-medium' },
           props.value,
         ),
       ]),
       h(IconExternalLink, {
         class:
-          'text-muted-foreground group-hover:text-primary h-4 w-4 shrink-0 transition-colors',
+          'text-muted-foreground group-hover:text-accent h-4 w-4 shrink-0 transition-colors',
       }),
     ],
   );
 </script>
 
 <template>
-  <div class="privacy-page bg-background min-h-dvh pb-24">
+  <div class="privacy-page bg-paper min-h-dvh pb-24">
     <!-- 顶部阅读进度条 -->
     <div
       class="bg-border sticky top-0 right-0 left-0 z-40 h-[2px] overflow-hidden"
       aria-hidden="true"
     >
       <div
-        class="bg-primary h-full transition-[width] duration-150 ease-out"
+        class="bg-accent h-full transition-[width] duration-150 ease-out"
         :style="{ width: `${scrollProgress * 100}%` }"
       ></div>
     </div>
@@ -313,15 +313,15 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
       <div
         class="text-muted-foreground mb-5 flex items-center gap-2 text-[10px] tracking-[0.32em] uppercase"
       >
-        <span class="bg-primary/60 inline-block h-px w-6"></span>
+        <span class="bg-accent/60 inline-block h-px w-6"></span>
         <span class="font-mono">kanocifer · legal</span>
-        <span class="bg-primary/60 inline-block h-px w-6"></span>
+        <span class="bg-accent/60 inline-block h-px w-6"></span>
       </div>
 
       <!-- Title -->
       <h1
         id="privacy-title"
-        class="text-foreground max-w-3xl text-center font-serif text-5xl font-medium tracking-tight text-balance sm:text-6xl md:text-7xl"
+        class="text-ink max-w-3xl text-center font-serif text-5xl font-medium tracking-tight text-balance sm:text-6xl md:text-7xl"
       >
         <span
           v-for="(ch, i) in '隐私政策'.split('')"
@@ -345,7 +345,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
       >
         <span class="inline-flex items-center gap-1.5">
           <span
-            class="bg-primary/70 inline-block h-1.5 w-1.5 rounded-full"
+            class="bg-accent/70 inline-block h-1.5 w-1.5 rounded-full"
             aria-hidden="true"
           ></span>
           <span class="font-mono tabular-nums">更新 · 2026.06.21</span>
@@ -367,14 +367,14 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
     >
       <!-- ============= Article ============= -->
       <article
-        class="text-foreground max-w-2xl text-[15.5px] leading-[1.85] sm:text-base"
+        class="text-ink max-w-2xl text-[15.5px] leading-[1.85] sm:text-base"
       >
         <!-- ----- 引言 ----- -->
         <p
-          class="text-muted-foreground first-letter:text-foreground first-letter:float-left first-letter:mr-2 first-letter:font-serif first-letter:text-3xl first-letter:leading-none"
+          class="text-muted-foreground first-letter:text-ink first-letter:float-left first-letter:mr-2 first-letter:font-serif first-letter:text-3xl first-letter:leading-none"
         >
           欢迎来到
-          <strong class="text-foreground font-semibold">Kuroome's Blog</strong>
+          <strong class="text-ink font-semibold">Kuroome's Blog</strong>
           （以下简称"本站"）。本站非常重视你的隐私与个人信息保护。你在使用网站时，
           我们仅会收集提供服务所必需的最少信息 ——
           通过这一页向你说明收集什么、为什么收集，以及你可以如何掌控它。
@@ -430,7 +430,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
           <div
             class="bg-muted/40 border-border/70 mt-5 rounded-2xl border p-5 sm:p-6"
           >
-            <p class="text-foreground/90">
+            <p class="text-ink/90">
               本站不会使用任何跨站跟踪 Cookie。
               所有写入都用于本站自身功能：身份认证、深色 / 浅色模式、用户偏好。
             </p>
@@ -442,7 +442,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
               href="https://support.google.com/chrome/answer/95647"
               target="_blank"
               rel="noopener noreferrer"
-              class="text-primary mt-4 inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
+              class="text-accent mt-4 inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
             >
               在 Chrome 中管理 Cookie
               <IconExternalLink class="h-3.5 w-3.5" />
@@ -461,28 +461,28 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
           <ul class="text-muted-foreground mt-4 space-y-2.5">
             <li class="flex gap-3">
               <span
-                class="bg-foreground/60 mt-2.5 inline-block h-1 w-1 shrink-0 rounded-full"
+                class="bg-ink/60 mt-2.5 inline-block h-1 w-1 shrink-0 rounded-full"
                 aria-hidden="true"
               ></span>
               <span>得到你本人的明确同意</span>
             </li>
             <li class="flex gap-3">
               <span
-                class="bg-foreground/60 mt-2.5 inline-block h-1 w-1 shrink-0 rounded-full"
+                class="bg-ink/60 mt-2.5 inline-block h-1 w-1 shrink-0 rounded-full"
                 aria-hidden="true"
               ></span>
               <span>依据法律法规、政府主管部门的强制性要求</span>
             </li>
             <li class="flex gap-3">
               <span
-                class="bg-foreground/60 mt-2.5 inline-block h-1 w-1 shrink-0 rounded-full"
+                class="bg-ink/60 mt-2.5 inline-block h-1 w-1 shrink-0 rounded-full"
                 aria-hidden="true"
               ></span>
               <span>为维护本站的合法权益、财产或安全</span>
             </li>
             <li class="flex gap-3">
               <span
-                class="bg-foreground/60 mt-2.5 inline-block h-1 w-1 shrink-0 rounded-full"
+                class="bg-ink/60 mt-2.5 inline-block h-1 w-1 shrink-0 rounded-full"
                 aria-hidden="true"
               ></span>
               <span>在紧急情况下为保护你或他人的生命安全</span>
@@ -620,7 +620,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
           <SectionHeader number="06" title="你的权利" />
           <p class="text-muted-foreground mt-5">
             你对自己的数据享有以下权利。任一项都可以通过页脚的联系方式发起，我会在
-            <strong class="text-foreground/90 font-medium">7 个自然日内</strong>
+            <strong class="text-ink/90 font-medium">7 个自然日内</strong>
             给出首次回复。
           </p>
 
@@ -658,7 +658,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
           </p>
 
           <div
-            class="bg-foreground/[0.025] border-border/60 mt-6 rounded-2xl border p-5 sm:p-6"
+            class="bg-ink/[0.025] border-border/60 mt-6 rounded-2xl border p-5 sm:p-6"
           >
             <dl class="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
               <SecurityItem
@@ -688,18 +688,18 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
           <SectionHeader number="08" title="自动化处理" />
           <p class="text-muted-foreground mt-5">
             本站存在以下自动化处理逻辑，用于辅助阅读与决策；它们
-            <strong class="text-foreground/90 font-medium"
+            <strong class="text-ink/90 font-medium"
               >不会单独对你产生法律或经济上的约束</strong
             >：
           </p>
           <ul class="text-muted-foreground mt-5 space-y-3">
             <li class="flex gap-3">
               <span
-                class="bg-foreground/60 mt-2.5 inline-block h-1 w-1 shrink-0 rounded-full"
+                class="bg-ink/60 mt-2.5 inline-block h-1 w-1 shrink-0 rounded-full"
                 aria-hidden="true"
               ></span>
               <span>
-                <strong class="text-foreground/90 font-medium"
+                <strong class="text-ink/90 font-medium"
                   >AI 文章摘要</strong
                 >
                 — 把你提交的文章正文发给阿里云 Tbox
@@ -712,11 +712,11 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
             </li>
             <li class="flex gap-3">
               <span
-                class="bg-foreground/60 mt-2.5 inline-block h-1 w-1 shrink-0 rounded-full"
+                class="bg-ink/60 mt-2.5 inline-block h-1 w-1 shrink-0 rounded-full"
                 aria-hidden="true"
               ></span>
               <span>
-                <strong class="text-foreground/90 font-medium"
+                <strong class="text-ink/90 font-medium"
                   >AI 钓鱼天气分析</strong
                 >
                 — 把当前地理位置的实时气象数据 + 钓鱼指标历史喂给同一个
@@ -726,11 +726,11 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
             </li>
             <li class="flex gap-3">
               <span
-                class="bg-foreground/60 mt-2.5 inline-block h-1 w-1 shrink-0 rounded-full"
+                class="bg-ink/60 mt-2.5 inline-block h-1 w-1 shrink-0 rounded-full"
                 aria-hidden="true"
               ></span>
               <span>
-                <strong class="text-foreground/90 font-medium"
+                <strong class="text-ink/90 font-medium"
                   >反垃圾评论识别</strong
                 >
                 — 提交评论时根据
@@ -751,7 +751,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
           <SectionHeader number="09" title="未成年人" />
           <p class="text-muted-foreground mt-5">
             本站是个人作品集与工具，不面向 14 岁以下未成年人设计。
-            <strong class="text-foreground/90 font-medium">14 岁以下</strong>
+            <strong class="text-ink/90 font-medium">14 岁以下</strong>
             请在监护人同意下使用；如果发现未成年人在未经监护人同意下提交了个人信息，请通过页脚联系方式告知，我会尽快删除。
           </p>
         </section>
@@ -788,7 +788,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
                 </svg>
               </span>
               <div class="space-y-2">
-                <p class="text-foreground font-medium">反滥用黑名单</p>
+                <p class="text-ink font-medium">反滥用黑名单</p>
                 <p class="text-muted-foreground text-sm leading-relaxed">
                   当本站监测到存在恶意访问、恶意请求、攻击行为或恶意评论时，
                   为了防止损害扩大，可能会临时将相关 IP
@@ -867,8 +867,8 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
                 :class="[
                   'group flex w-full items-baseline gap-3 rounded-lg px-2 py-1.5 text-left text-sm transition-colors',
                   activeId === item.id
-                    ? 'text-foreground'
-                    : 'text-muted-foreground hover:text-foreground',
+                    ? 'text-ink'
+                    : 'text-muted-foreground hover:text-ink',
                 ]"
                 @click="scrollTo(item.id)"
               >
@@ -876,7 +876,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
                   class="font-mono text-[10px] tabular-nums"
                   :class="
                     activeId === item.id
-                      ? 'text-primary'
+                      ? 'text-accent'
                       : 'text-muted-foreground/60'
                   "
                 >
@@ -886,8 +886,8 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
                   class="flex-1 border-l-2 pl-3 transition-colors"
                   :class="
                     activeId === item.id
-                      ? 'border-primary'
-                      : 'border-border/60 group-hover:border-foreground/40'
+                      ? 'border-accent'
+                      : 'border-border/60 group-hover:border-ink/40'
                   "
                 >
                   {{ item.label }}

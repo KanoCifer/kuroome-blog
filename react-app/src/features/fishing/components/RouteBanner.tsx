@@ -67,7 +67,7 @@ export function RouteBanner({ onClearRoute }: RouteBannerProps) {
             <p className="text-muted-foreground text-[11px] font-medium">
               路线信息
             </p>
-            <p className="text-foreground font-family-averia mt-0.5 text-lg leading-none tabular-nums">
+            <p className="text-ink font-family-averia mt-0.5 text-lg leading-none tabular-nums">
               <span>{formatDistance(routeInfo.distance)}</span>
               <span className="text-muted-foreground mx-1.5 text-sm">·</span>
               <span>{formatDuration(routeInfo.time)}</span>

@@ -12,10 +12,11 @@ import type { DevTaskPriority } from '@/features/todos/api';
 
 const props = defineProps<{ priority: DevTaskPriority }>();
 
+// P0 是页面唯一的 destructive 强调位；P1 走 warning；P2/P3 走中性色阶。
+// 不引入新颜色，遵守 One-Voice Rule：accent 只留给最重要的一处。
 const PRIORITY_CLASS: Record<DevTaskPriority, string> = {
   'P0 紧急': 'border-destructive/40 bg-destructive/10 text-destructive',
-  'P1 高':
-    'border-orange-200 bg-orange-50/60 text-orange-700 dark:border-orange-800/60 dark:bg-orange-950/30 dark:text-orange-400',
+  'P1 高': 'border-warning/40 bg-warning/10 text-warning',
   'P2 中': 'border-border text-muted-foreground',
   'P3 低': 'border-border text-muted-foreground/70',
 };

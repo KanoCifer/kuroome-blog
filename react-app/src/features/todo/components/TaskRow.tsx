@@ -17,14 +17,14 @@ export function TaskRow({
   onDelete,
 }: TaskRowProps) {
   return (
-    <div className="bg-background border-border group flex items-center gap-3 rounded-xl border px-4 py-2.5 transition-[box-shadow] duration-200 hover:shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent)]">
+    <div className="bg-paper border-border group flex items-center gap-3 rounded-xl border px-4 py-2.5 transition-[box-shadow] duration-200 hover:shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent)]">
       <button
         type="button"
         onClick={() => onOpen(task.slug)}
         className="focus-visible:ring-ring flex min-w-0 flex-1 cursor-pointer items-center gap-3 text-left focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
       >
         <span
-          className={`text-foreground min-w-0 flex-1 truncate text-sm font-medium ${
+          className={`text-ink min-w-0 flex-1 truncate text-sm font-medium ${
             done ? 'text-muted-foreground line-through opacity-70' : ''
           }`}
         >
@@ -49,7 +49,7 @@ export function TaskRow({
           <button
             type="button"
             onClick={() => onCycle(task.slug)}
-            className="text-muted-foreground hover:bg-muted hover:text-primary focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96]"
+            className="text-muted-foreground hover:bg-muted hover:text-accent focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96]"
             title="推进状态"
             aria-label="推进状态"
           >

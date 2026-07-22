@@ -71,8 +71,8 @@ defineOptions({
     data-slot="slider"
     :class="[
       'border-input bg-muted/30 ring-ring/30 focus-visible:ring-ring/40 h-1.5 w-full cursor-pointer appearance-none rounded-full outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50',
-      '[&::-webkit-slider-thumb]:border-primary [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-sm [&::-webkit-slider-thumb]:transition-[color,box-shadow] [&::-webkit-slider-thumb]:hover:ring-4 [&::-webkit-slider-thumb]:focus-visible:ring-4',
-      '[&::-moz-range-thumb]:border-primary [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-sm',
+      '[&::-webkit-slider-thumb]:border-accent [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-sm [&::-webkit-slider-thumb]:transition-[color,box-shadow] [&::-webkit-slider-thumb]:hover:ring-4 [&::-webkit-slider-thumb]:focus-visible:ring-4',
+      '[&::-moz-range-thumb]:border-accent [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-sm',
       props.class,
     ]"
     @input="onInput"

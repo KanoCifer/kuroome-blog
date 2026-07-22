@@ -4,11 +4,11 @@
     :animate="{ scale: 1 }"
     :whileHover="HOVER_SCALE_UP"
     :whilePress="{ scale: 0.9 }"
-    class="bg-background/55 ring-border/30 relative cursor-pointer rounded-full ring"
+    class="bg-paper/55 ring-border/30 relative cursor-pointer rounded-full ring"
     @click="playAnimation"
   >
     <span
-      class="bg-primary text-primary-foreground absolute top-2 right-0 z-10 flex translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full px-1 py-0.5 text-[10px]"
+      class="bg-accent text-accent absolute top-2 right-0 z-10 flex translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full px-1 py-0.5 text-[10px]"
       >{{ likesCount }}</span
     >
     <div ref="containerRef" class="bento-like-animation h-12 w-12"></div>

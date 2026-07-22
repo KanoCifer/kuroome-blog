@@ -20,12 +20,12 @@
           :animate="{ opacity: 1, scale: 1, y: 0 }"
           :exit="{ opacity: 0, scale: 0.95, y: 10 }"
           :transition="{ type: 'spring', damping: 25, stiffness: 300 }"
-          class="bg-background/95 border-border/60 relative z-10 w-full max-w-md rounded-[2rem] border p-6 shadow-2xl backdrop-blur-2xl md:p-8"
+          class="bg-paper/95 border-border/60 relative z-10 w-full max-w-md rounded-[2rem] border p-6 shadow-2xl backdrop-blur-2xl md:p-8"
         >
           <!-- Close Button -->
           <button
             @click="$emit('close')"
-            class="text-muted-foreground hover:bg-muted hover:text-foreground absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+            class="text-muted-foreground hover:bg-muted hover:text-ink absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
           >
             <X class="h-5 w-5" />
           </button>
@@ -33,11 +33,11 @@
           <!-- Header -->
           <div class="mb-6 text-center">
             <div
-              class="bg-primary/10 text-primary mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full"
+              class="bg-accent/10 text-accent mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full"
             >
               <UploadCloud class="h-6 w-6" />
             </div>
-            <h3 class="text-foreground text-xl font-bold tracking-tight">
+            <h3 class="text-ink text-xl font-bold tracking-tight">
               上传新图片
             </h3>
             <p class="text-muted-foreground mt-1 text-sm">添加到你的照片墙</p>
@@ -51,7 +51,7 @@
             @dragleave.prevent="isDragging = false"
             @drop.prevent="handleDrop"
             :class="{
-              'border-foreground bg-muted scale-[0.98]': isDragging,
+              'border-ink bg-muted scale-[0.98]': isDragging,
             }"
           >
             <input
@@ -73,7 +73,7 @@
                 class="absolute inset-0 flex items-center justify-center rounded-xl bg-black/40 opacity-0 transition-opacity group-hover:opacity-100"
               >
                 <span
-                  class="bg-background/30 rounded-full px-3 py-1.5 text-sm font-medium text-white backdrop-blur-md"
+                  class="bg-paper/30 rounded-full px-3 py-1.5 text-sm font-medium text-white backdrop-blur-md"
                   >更换图片</span
                 >
               </div>
@@ -82,14 +82,14 @@
             <!-- Placeholder -->
             <div v-else class="flex flex-col items-center">
               <div
-                class="bg-background ring-border/5 mb-4 flex h-14 w-14 items-center justify-center rounded-full shadow-sm ring-1 transition-transform group-hover:scale-110"
+                class="bg-paper ring-border/5 mb-4 flex h-14 w-14 items-center justify-center rounded-full shadow-sm ring-1 transition-transform group-hover:scale-110"
               >
                 <ImagePlus
-                  class="text-muted-foreground group-hover:text-primary h-6 w-6 transition-colors"
+                  class="text-muted-foreground group-hover:text-accent h-6 w-6 transition-colors"
                   stroke-width="1.5"
                 />
               </div>
-              <p class="text-foreground text-sm font-medium">
+              <p class="text-ink text-sm font-medium">
                 点击或拖拽图片到此处
               </p>
               <p class="text-muted-foreground mt-2 text-xs">
@@ -109,7 +109,7 @@
               v-model="uploadDescription"
               type="text"
               placeholder="为这张图片添加描述..."
-              class="text-foreground placeholder:text-muted-foreground focus:border-foreground focus:ring-foreground border-border/80 bg-background mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
+              class="text-ink placeholder:text-muted-foreground focus:border-ink focus:ring-ink border-border/80 bg-paper mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
             />
           </div>
 
@@ -123,7 +123,7 @@
               取消
             </Button>
             <Button
-              class="bg-primary text-primary-foreground hover:bg-primary/90 flex-1 rounded-xl shadow-md"
+              class="bg-accent text-accent hover:bg-accent/90 flex-1 rounded-xl shadow-md"
               :disabled="!canSubmit"
               @click="onConfirm"
             >

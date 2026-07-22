@@ -176,7 +176,7 @@ export function TideCard() {
   return (
     <article className="px-1 pt-2 pb-6" aria-label="潮汐预报">
       <div className="mb-3">
-        <h3 className="text-foreground text-sm font-semibold">潮汐预报</h3>
+        <h3 className="text-ink text-sm font-semibold">潮汐预报</h3>
       </div>
 
       {/* Harbor — Apple HIG Segmented Control (5 项, 一行) */}
@@ -192,8 +192,8 @@ export function TideCard() {
               onClick={() => setSelectedHarbor(opt.code)}
               className={`min-h-8 flex-1 shrink-0 rounded-md px-3 text-xs font-medium transition-all duration-200 ease-out ${
                 isActive
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-paper text-ink shadow-sm'
+                  : 'text-muted-foreground hover:text-ink'
               }`}
             >
               {opt.name}
@@ -213,8 +213,8 @@ export function TideCard() {
               onClick={() => setSelectedDate(opt.value)}
               className={`min-h-9 shrink-0 rounded-full px-3 text-xs font-medium transition-colors ${
                 isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-foreground hover:bg-muted/70'
+                  ? 'bg-accent text-accent'
+                  : 'bg-muted text-ink hover:bg-muted/70'
               }`}
             >
               {opt.label} {opt.weekday}
@@ -234,25 +234,25 @@ export function TideCard() {
           </div>
           {/* High / low tide — Apple HIG inset-grouped 双列 */}
           <div className="fm-grouped grid grid-cols-2 gap-px bg-border/40">
-            <div className="bg-background flex flex-col gap-1 px-4 py-3">
+            <div className="bg-paper flex flex-col gap-1 px-4 py-3">
               <span className="text-muted-foreground text-xs font-medium">
                 最高潮
-                <span className="text-foreground ml-1.5 tabular-nums">
+                <span className="text-ink ml-1.5 tabular-nums">
                   {highTide ? dayjs(highTide.fxTime).format('HH:mm') : '--'}
                 </span>
               </span>
-              <span className="text-foreground text-sm font-semibold tabular-nums">
+              <span className="text-ink text-sm font-semibold tabular-nums">
                 {highTide ? Number(highTide.height).toFixed(2) : '--'} m
               </span>
             </div>
-            <div className="bg-background flex flex-col gap-1 px-4 py-3">
+            <div className="bg-paper flex flex-col gap-1 px-4 py-3">
               <span className="text-muted-foreground text-xs font-medium">
                 最低潮
-                <span className="text-foreground ml-1.5 tabular-nums">
+                <span className="text-ink ml-1.5 tabular-nums">
                   {lowTide ? dayjs(lowTide.fxTime).format('HH:mm') : '--'}
                 </span>
               </span>
-              <span className="text-foreground text-sm font-semibold tabular-nums">
+              <span className="text-ink text-sm font-semibold tabular-nums">
                 {lowTide ? Number(lowTide.height).toFixed(2) : '--'} m
               </span>
             </div>

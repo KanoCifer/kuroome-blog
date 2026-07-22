@@ -1,19 +1,19 @@
 <template>
   <div
-    class="bg-background flex min-h-screen items-center justify-center px-4 py-16"
+    class="bg-paper flex min-h-screen items-center justify-center px-4 py-16"
   >
     <div class="w-full max-w-xl" style="animation: fadeInUp 0.6s ease-out">
       <!-- Header -->
       <div class="mb-10">
         <h1
-          class="text-foreground text-[clamp(2rem,5vw,3rem)] leading-tight font-bold tracking-tight"
+          class="text-ink text-[clamp(2rem,5vw,3rem)] leading-tight font-bold tracking-tight"
         >
           绑定微信读书<br />API Key
         </h1>
         <p class="text-muted-foreground mt-4 text-base leading-relaxed">
           在下方输入您的微信读书
           <code
-            class="bg-muted text-foreground rounded px-1.5 py-0.5 font-mono text-xs"
+            class="bg-muted text-ink rounded px-1.5 py-0.5 font-mono text-xs"
             >wrk-</code
           >
           开头的 API Key，服务端会保存它用于后续书架同步
@@ -54,7 +54,7 @@
         <div class="space-y-2">
           <label
             for="weread_api_key"
-            class="text-foreground block text-base font-medium"
+            class="text-ink block text-base font-medium"
           >
             WeRead API Key
           </label>
@@ -69,17 +69,17 @@
               :aria-describedby="
                 hasFieldError ? 'api-key-error' : 'api-key-hint'
               "
-              class="border-input bg-background text-foreground placeholder:text-muted-foreground/70 focus:ring-primary/20 w-full rounded-2xl border px-5 py-4 pr-14 font-mono text-base transition-all duration-200 focus:ring-2 focus:outline-none"
+              class="border-input bg-paper text-ink placeholder:text-muted-foreground/70 focus:ring-accent/20 w-full rounded-2xl border px-5 py-4 pr-14 font-mono text-base transition-all duration-200 focus:ring-2 focus:outline-none"
               :class="
                 hasFieldError
                   ? 'border-destructive focus:border-destructive focus:ring-destructive/20'
-                  : 'focus:border-primary'
+                  : 'focus:border-accent'
               "
               placeholder="wrk-xxxxxxxxxxxxxxxx"
             />
             <button
               type="button"
-              class="text-muted-foreground hover:text-foreground focus:ring-ring absolute inset-y-0 right-2 my-auto flex h-8 w-8 items-center justify-center rounded-lg transition-colors focus:ring-2 focus:outline-none"
+              class="text-muted-foreground hover:text-ink focus:ring-ring absolute inset-y-0 right-2 my-auto flex h-8 w-8 items-center justify-center rounded-lg transition-colors focus:ring-2 focus:outline-none"
               :aria-label="showKey ? '隐藏 API Key' : '显示 API Key'"
               :aria-pressed="showKey"
               @click="toggleKeyVisibility"
@@ -139,7 +139,7 @@
             href="https://weread.qq.com/r/weread-skills"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-primary hover:text-primary/80 mt-2 inline-flex items-center gap-1 text-xs font-medium transition-colors"
+            class="text-accent hover:text-accent/80 mt-2 inline-flex items-center gap-1 text-xs font-medium transition-colors"
           >
             还没有 API Key？
             <span class="underline underline-offset-2"
@@ -166,11 +166,11 @@
         <button
           type="submit"
           :disabled="loading"
-          class="bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary w-full rounded-2xl px-6 py-4 text-base font-medium shadow-lg transition-all duration-300 hover:scale-[1.02] focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+          class="bg-accent text-accent hover:bg-accent/90 focus:ring-accent w-full rounded-2xl px-6 py-4 text-base font-medium shadow-lg transition-all duration-300 hover:scale-[1.02] focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span v-if="loading" class="flex items-center justify-center gap-2">
             <span
-              class="border-primary-foreground/30 border-t-primary-foreground h-4 w-4 animate-spin rounded-full border-2"
+              class="border-accent/30 border-t-accent h-4 w-4 animate-spin rounded-full border-2"
             ></span>
             保存中...
           </span>

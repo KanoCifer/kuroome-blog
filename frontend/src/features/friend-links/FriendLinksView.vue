@@ -3,7 +3,7 @@
     <div class="col-span-full mx-auto w-full max-w-6xl">
       <!-- 每日推荐横幅 -->
       <div
-        class="border-border bg-background/30 group relative mb-6 cursor-pointer overflow-hidden rounded-4xl border p-6 shadow-sm transition-all duration-300 hover:shadow-lg sm:p-8"
+        class="border-border bg-paper/30 group relative mb-6 cursor-pointer overflow-hidden rounded-4xl border p-6 shadow-sm transition-all duration-300 hover:shadow-lg sm:p-8"
         @click="$router.push('/websites')"
       >
         <Transition name="pick-switch" mode="out-in">
@@ -31,12 +31,12 @@
                   >每日推荐</span
                 >
                 <span
-                  class="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                  class="bg-accent/10 text-accent rounded-full px-2 py-0.5 text-[10px] font-semibold"
                 >
                   {{ dailyPick?.category }}
                 </span>
               </div>
-              <h3 class="text-foreground text-lg font-bold">
+              <h3 class="text-ink text-lg font-bold">
                 {{ dailyPick?.name }}
               </h3>
               <p class="text-muted-foreground mt-1 line-clamp-2 text-sm">
@@ -58,14 +58,14 @@
 
             <div class="flex shrink-0 items-center gap-3 sm:flex-col sm:gap-4">
               <button
-                class="bg-primary text-primary-foreground hover:bg-primary/90 flex cursor-pointer items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold shadow-sm transition-all duration-200 hover:shadow-md active:scale-95"
+                class="bg-accent text-accent hover:bg-accent/90 flex cursor-pointer items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold shadow-sm transition-all duration-200 hover:shadow-md active:scale-95"
                 @click.stop="$router.push('/websites')"
               >
                 <IconExternalLink class="h-3.5 w-3.5" />
                 <span class="hidden sm:inline">看更多</span>
               </button>
               <button
-                class="bg-muted hover:bg-secondary text-muted-foreground hover:text-foreground flex cursor-pointer items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all duration-200 active:scale-95"
+                class="bg-muted hover:bg-secondary text-muted-foreground hover:text-ink flex cursor-pointer items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all duration-200 active:scale-95"
                 @click.stop="refreshDailyPick"
               >
                 <IconRefresh class="h-3.5 w-3.5" />
@@ -85,7 +85,7 @@
         <div class="space-y-6 lg:col-span-2">
           <!-- 本站信息面板 -->
           <div
-            class="border-primary/20 bg-primary/5 ring-primary/10 overflow-hidden rounded-4xl border p-8 ring-1"
+            class="border-accent/20 bg-accent/5 ring-accent/10 overflow-hidden rounded-4xl border p-8 ring-1"
           >
             <div class="mb-6 flex items-start gap-5">
               <div
@@ -100,11 +100,11 @@
               </div>
               <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-3">
-                  <h3 class="text-foreground text-2xl font-bold">
+                  <h3 class="text-ink text-2xl font-bold">
                     {{ selfInfo.name }}
                   </h3>
                   <span
-                    class="bg-primary/15 text-primary inline-block shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                    class="bg-accent/15 text-accent inline-block shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold"
                   >
                     本站
                   </span>
@@ -116,7 +116,7 @@
 
               <!-- 一键复制 -->
               <button
-                class="group bg-primary text-primary-foreground hover:bg-primary/90 flex shrink-0 cursor-pointer items-center rounded-xl px-4 py-2 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-md active:scale-95"
+                class="group bg-accent text-accent hover:bg-accent/90 flex shrink-0 cursor-pointer items-center rounded-xl px-4 py-2 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-md active:scale-95"
                 @click="copySelfInfo"
               >
                 <IconCopy class="h-4 w-4" />
@@ -128,18 +128,18 @@
             </div>
 
             <!-- 信息行 -->
-            <div class="bg-background/60 space-y-2 rounded-xl p-4">
+            <div class="bg-paper/60 space-y-2 rounded-xl p-4">
               <div class="flex items-center gap-3 text-sm">
                 <span class="text-muted-foreground w-16 shrink-0 font-medium"
                   >URL</span
                 >
-                <code class="text-foreground truncate">{{ selfInfo.url }}</code>
+                <code class="text-ink truncate">{{ selfInfo.url }}</code>
               </div>
               <div class="flex items-center gap-3 text-sm">
                 <span class="text-muted-foreground w-16 shrink-0 font-medium"
                   >Favicon</span
                 >
-                <code class="text-foreground truncate">{{
+                <code class="text-ink truncate">{{
                   selfInfo.icon
                 }}</code>
               </div>
@@ -162,7 +162,7 @@
             :href="link.url"
             target="_blank"
             rel="noopener noreferrer"
-            class="group border-border bg-background/30 hover:bg-primary block cursor-pointer overflow-hidden rounded-4xl border p-8 shadow-sm transition-all duration-300 hover:shadow-xl"
+            class="group border-border bg-paper/30 hover:bg-accent block cursor-pointer overflow-hidden rounded-4xl border p-8 shadow-sm transition-all duration-300 hover:shadow-xl"
           >
             <div class="flex items-start gap-5">
               <div
@@ -182,12 +182,12 @@
               </div>
               <div class="min-w-0 flex-1">
                 <h3
-                  class="text-foreground group-hover:text-primary-foreground text-xl font-bold transition-colors duration-300"
+                  class="text-ink group-hover:text-accent text-xl font-bold transition-colors duration-300"
                 >
                   {{ link.name }}
                 </h3>
                 <p
-                  class="text-muted-foreground group-hover:text-primary-foreground mt-2.5 leading-relaxed transition-colors duration-300"
+                  class="text-muted-foreground group-hover:text-accent mt-2.5 leading-relaxed transition-colors duration-300"
                 >
                   {{ link.description }}
                 </p>
@@ -210,7 +210,7 @@
           <!-- 空状态 -->
           <div
             v-if="links.length === 0"
-            class="border-border bg-background/30 flex flex-col items-center justify-center rounded-4xl border py-16"
+            class="border-border bg-paper/30 flex flex-col items-center justify-center rounded-4xl border py-16"
           >
             <IconUsersGroup class="text-muted-foreground mb-4 h-16 w-16" />
             <p class="text-muted-foreground text-lg">暂无友链</p>
@@ -223,14 +223,14 @@
         <!-- ======== 右列：申请须知 + GitHub Issue ======== -->
         <div class="space-y-6 lg:col-span-1">
           <div
-            class="border-border bg-background/30 overflow-hidden rounded-4xl border p-8 shadow-sm"
+            class="border-border bg-paper/30 overflow-hidden rounded-4xl border p-8 shadow-sm"
           >
             <!-- Header -->
             <div class="mb-6">
               <h3
-                class="text-foreground flex items-center gap-2 font-serif text-xl font-bold"
+                class="text-ink flex items-center gap-2 font-serif text-xl font-bold"
               >
-                <IconLinkChain class="text-primary h-5 w-5" />
+                <IconLinkChain class="text-accent h-5 w-5" />
                 申请友链
               </h3>
               <p class="text-muted-foreground mt-1.5 text-sm">
@@ -240,36 +240,36 @@
 
             <!-- 接入须知 -->
             <div
-              class="border-primary/15 bg-primary/5 mb-6 rounded-2xl border p-5"
+              class="border-accent/15 bg-accent/5 mb-6 rounded-2xl border p-5"
             >
               <h4
-                class="text-foreground mb-3 flex items-center gap-2 text-sm font-bold"
+                class="text-ink mb-3 flex items-center gap-2 text-sm font-bold"
               >
-                <IconInfoCircle class="text-primary h-4 w-4" />
+                <IconInfoCircle class="text-accent h-4 w-4" />
                 接入须知
               </h4>
               <ul class="text-muted-foreground space-y-2 text-sm">
                 <li class="flex items-start gap-2">
-                  <span class="text-primary mt-0.5 shrink-0 text-xs">●</span>
+                  <span class="text-accent mt-0.5 shrink-0 text-xs">●</span>
                   <span>网站需符合中国大陆相关法律法规</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <span class="text-primary mt-0.5 shrink-0 text-xs">●</span>
+                  <span class="text-accent mt-0.5 shrink-0 text-xs">●</span>
                   <span>网站内容原创、非商业推广</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <span class="text-primary mt-0.5 shrink-0 text-xs">●</span>
+                  <span class="text-accent mt-0.5 shrink-0 text-xs">●</span>
                   <span
                     >已在您的网站添加本站友链（<a
                       href="https://kanocifer.chat"
                       target="_blank"
-                      class="text-primary underline"
+                      class="text-accent underline"
                       >kanocifer.chat</a
                     >）</span
                   >
                 </li>
                 <li class="flex items-start gap-2">
-                  <span class="text-primary mt-0.5 shrink-0 text-xs">●</span>
+                  <span class="text-accent mt-0.5 shrink-0 text-xs">●</span>
                   <span>网站可正常访问</span>
                 </li>
               </ul>
@@ -278,9 +278,9 @@
             <!-- 申请格式 -->
             <div class="mb-6">
               <h4
-                class="text-foreground mb-3 flex items-center gap-2 text-sm font-bold"
+                class="text-ink mb-3 flex items-center gap-2 text-sm font-bold"
               >
-                <IconDocumentText class="text-primary h-4 w-4" />
+                <IconDocumentText class="text-accent h-4 w-4" />
                 申请格式
               </h4>
               <pre
@@ -298,7 +298,7 @@
               href="https://github.com/KanoCifer/kuroome-blog/issues/1"
               target="_blank"
               rel="noopener noreferrer"
-              class="bg-primary text-primary-foreground hover:bg-primary/90 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-md active:scale-95"
+              class="bg-accent text-accent hover:bg-accent/90 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-md active:scale-95"
             >
               <IconExternalLink class="h-4 w-4" />
               前往 GitHub Issue 提交申请
@@ -320,7 +320,17 @@ import { BasicDetail, TagPill } from '@/components';
 import { useFriendLinks } from '@/features/friend-links/composables';
 import { motion } from 'motion-v';
 import { SPRING_REVEAL, WHILE_IN_VIEW_FADE_UP, HOVER_LIFT } from '@/constants';
-import { IconCopy, IconDocumentText, IconExternalLink, IconGlobeOutline, IconInfoCircle, IconLinkChain, IconRefresh, IconUsersGroup, TwikooComments } from '@/components';
+import {
+  IconCopy,
+  IconDocumentText,
+  IconExternalLink,
+  IconGlobeOutline,
+  IconInfoCircle,
+  IconLinkChain,
+  IconRefresh,
+  IconUsersGroup,
+  TwikooComments,
+} from '@/components';
 
 const {
   dailyPick,
@@ -388,7 +398,7 @@ const {
 #tcomment .el-button--primary {
   background: var(--accent);
   border-color: var(--accent);
-  color: var(--accent-contrast);
+  color: var(--accent);
 }
 #tcomment .el-button--primary:hover {
   opacity: 0.88;
@@ -467,7 +477,7 @@ const {
 }
 #tcomment .el-pager li.active {
   background: var(--accent);
-  color: var(--accent-contrast);
+  color: var(--accent);
 }
 
 #tcomment .OwO {

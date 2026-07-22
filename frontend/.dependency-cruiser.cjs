@@ -30,6 +30,7 @@ const PACKAGES = [
   'features/blog',
   'features/books',
   'features/changelog',
+  'features/color',
   'features/device',
   'features/entry',
   'features/fishing',

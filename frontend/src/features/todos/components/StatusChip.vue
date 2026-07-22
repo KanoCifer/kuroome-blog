@@ -16,7 +16,7 @@ const props = defineProps<{ status: DevTaskStatus }>();
 const STATUS_CLASS: Record<DevTaskStatus, string> = {
   待评估: 'border-border text-muted-foreground',
   待排期: 'border-chart-3/40 bg-chart-3/10 text-chart-3',
-  进行中: 'border-primary/40 bg-primary/10 text-primary',
+  进行中: 'border-accent/40 bg-accent/10 text-accent',
   已搁置:
     'border-amber-300/50 bg-amber-50/60 text-amber-700 dark:border-amber-700/50 dark:bg-amber-950/20 dark:text-amber-400',
   已完成:
@@ -26,7 +26,7 @@ const STATUS_CLASS: Record<DevTaskStatus, string> = {
 const STATUS_DOT: Record<DevTaskStatus, string> = {
   待评估: 'bg-muted-foreground',
   待排期: 'bg-chart-3',
-  进行中: 'bg-primary',
+  进行中: 'bg-accent',
   已搁置: 'bg-amber-500',
   已完成: 'bg-emerald-500',
 };

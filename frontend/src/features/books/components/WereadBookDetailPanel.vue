@@ -118,12 +118,12 @@ const coverGradient = computed(() =>
           :animate="{ scale: 1, y: 0, opacity: 1 }"
           :exit="{ scale: 0.97, y: 8, opacity: 0 }"
           :transition="SPRING_SNUG"
-          class="bg-background border-border/60 relative w-full max-w-4xl overflow-hidden rounded-3xl border shadow-2xl"
+          class="bg-paper border-border/60 relative w-full max-w-4xl overflow-hidden rounded-3xl border shadow-2xl"
         >
           <!-- 关闭按钮 -->
           <button
             type="button"
-            class="bg-background/80 text-foreground hover:bg-background border-border/40 absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
+            class="bg-paper/80 text-ink hover:bg-paper border-border/40 absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
             aria-label="关闭"
             @click="emit('close')"
           >
@@ -169,7 +169,7 @@ const coverGradient = computed(() =>
               <!-- 标题 + 作者 -->
               <div class="space-y-2 pr-10">
                 <h2
-                  class="text-foreground font-serif text-2xl leading-tight font-semibold sm:text-3xl"
+                  class="text-ink font-serif text-2xl leading-tight font-semibold sm:text-3xl"
                 >
                   {{ book.title }}
                 </h2>
@@ -186,12 +186,12 @@ const coverGradient = computed(() =>
                 class="space-y-3"
               >
                 <div class="flex items-baseline justify-between">
-                  <span class="text-foreground text-3xl font-bold tabular-nums">
+                  <span class="text-ink text-3xl font-bold tabular-nums">
                     {{ formatProgressPercent(livePercent) }}
                   </span>
                   <button
                     type="button"
-                    class="text-muted-foreground hover:text-foreground flex items-center gap-1.5 text-xs transition-colors"
+                    class="text-muted-foreground hover:text-ink flex items-center gap-1.5 text-xs transition-colors"
                     :disabled="progressLoading"
                     @click="handleRefresh"
                   >
@@ -213,7 +213,7 @@ const coverGradient = computed(() =>
                     :initial="{ width: '0%' }"
                     :animate="{ width: `${livePercent}%` }"
                     :transition="{ ...EASE_SLOW, delay: 0.28, duration: 0.6 }"
-                    class="bg-primary absolute inset-y-0 left-0 rounded-full"
+                    class="bg-accent absolute inset-y-0 left-0 rounded-full"
                   />
                 </div>
 
@@ -238,7 +238,7 @@ const coverGradient = computed(() =>
                 <div>
                   <p class="text-muted-foreground text-xs">累计阅读</p>
                   <p
-                    class="text-foreground mt-1 text-lg font-semibold tabular-nums"
+                    class="text-ink mt-1 text-lg font-semibold tabular-nums"
                   >
                     {{ formatDuration(liveProgress?.readingTime) }}
                   </p>
@@ -246,7 +246,7 @@ const coverGradient = computed(() =>
                 <div>
                   <p class="text-muted-foreground text-xs">最近阅读</p>
                   <p
-                    class="text-foreground mt-1 text-lg font-semibold tabular-nums"
+                    class="text-ink mt-1 text-lg font-semibold tabular-nums"
                   >
                     {{ formatRelative(liveProgress?.updateTime ?? null) }}
                   </p>
@@ -254,7 +254,7 @@ const coverGradient = computed(() =>
                 <div>
                   <p class="text-muted-foreground text-xs">状态</p>
                   <p
-                    class="text-foreground mt-1 text-lg font-semibold tabular-nums"
+                    class="text-ink mt-1 text-lg font-semibold tabular-nums"
                   >
                     {{
                       book.finishReading
@@ -276,21 +276,21 @@ const coverGradient = computed(() =>
               >
                 <a
                   :href="`weread://reading?bId=${book.bookId}`"
-                  class="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-colors"
+                  class="bg-accent text-accent hover:bg-accent/90 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-colors"
                 >
                   <BookOpen class="h-4 w-4" />
                   继续阅读
                 </a>
                 <button
                   type="button"
-                  class="border-border text-foreground hover:bg-muted inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm transition-colors"
+                  class="border-border text-ink hover:bg-muted inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm transition-colors"
                 >
                   <Eye class="h-4 w-4" />
                   标记读完
                 </button>
                 <button
                   type="button"
-                  class="text-muted-foreground hover:text-foreground inline-flex items-center gap-2 rounded-full px-3 py-2.5 text-sm transition-colors"
+                  class="text-muted-foreground hover:text-ink inline-flex items-center gap-2 rounded-full px-3 py-2.5 text-sm transition-colors"
                   :title="book.secret ? '取消隐藏' : '隐藏'"
                 >
                   <component :is="book.secret ? Eye : EyeOff" class="h-4 w-4" />

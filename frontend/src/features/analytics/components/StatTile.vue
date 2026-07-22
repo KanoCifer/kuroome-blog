@@ -1,6 +1,6 @@
 <template>
   <div
-    class="border-border/60 bg-background flex flex-col gap-2 rounded-2xl border p-4"
+    class="border-border/60 bg-paper flex flex-col gap-2 rounded-2xl border p-4"
   >
     <div class="flex items-center justify-between">
       <span
@@ -15,7 +15,7 @@
       </div>
     </div>
     <span
-      class="text-foreground block text-2xl leading-tight font-medium tabular-nums"
+      class="text-ink block text-2xl leading-tight font-medium tabular-nums"
     >
       {{ formattedValue }}
     </span>

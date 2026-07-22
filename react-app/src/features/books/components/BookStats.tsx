@@ -103,17 +103,17 @@ function RecommendSection({
 }: RecommendSectionProps) {
   const showSkeleton = loading && books.length === 0;
   return (
-    <div className="bg-background mb-6 rounded-xl p-4 sm:p-6">
+    <div className="bg-paper mb-6 rounded-xl p-4 sm:p-6">
       <div className="mb-4 flex items-end justify-between gap-4">
         <div>
           <p className="text-muted-foreground mb-1 text-xs">读完这些之后</p>
-          <h3 className="text-foreground font-serif text-lg font-semibold tracking-tight sm:text-xl">
+          <h3 className="text-ink font-serif text-lg font-semibold tracking-tight sm:text-xl">
             接下来读什么
           </h3>
         </div>
         <button
           type="button"
-          className="text-muted-foreground hover:text-foreground hover:bg-muted inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          className="text-muted-foreground hover:text-ink hover:bg-muted inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40"
           disabled={loading}
           onClick={onRefresh}
           aria-label="换一批"
@@ -164,7 +164,7 @@ function RecommendSection({
               href={`https://weread.qq.com/web/reader/${book.bookId}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="group bg-background hover:border-primary/40 flex w-40 flex-shrink-0 snap-start flex-col gap-2 rounded-xl border border-transparent p-2 transition-colors"
+              className="group bg-paper hover:border-accent/40 flex w-40 flex-shrink-0 snap-start flex-col gap-2 rounded-xl border border-transparent p-2 transition-colors"
             >
               <div className="bg-muted relative aspect-[2/3] w-full overflow-hidden rounded-md shadow-sm">
                 {book.cover && (
@@ -176,13 +176,13 @@ function RecommendSection({
                   />
                 )}
                 {book.newRating > 0 && (
-                  <span className="bg-background/80 text-foreground absolute top-1.5 right-1.5 inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium tabular-nums backdrop-blur-md">
-                    <Star className="text-primary h-2.5 w-2.5 fill-current" />
+                  <span className="bg-paper/80 text-ink absolute top-1.5 right-1.5 inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium tabular-nums backdrop-blur-md">
+                    <Star className="text-accent h-2.5 w-2.5 fill-current" />
                     {ratingScore(book.newRating)}
                   </span>
                 )}
               </div>
-              <p className="text-foreground line-clamp-2 font-serif text-sm leading-tight">
+              <p className="text-ink line-clamp-2 font-serif text-sm leading-tight">
                 {book.title}
               </p>
               {book.author && (
@@ -206,7 +206,7 @@ function RecommendSection({
           {hasMore && (
             <button
               type="button"
-              className="text-muted-foreground hover:text-foreground hover:border-primary/40 flex w-28 flex-shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-xl border border-dashed text-xs transition-colors disabled:opacity-50"
+              className="text-muted-foreground hover:text-ink hover:border-accent/40 flex w-28 flex-shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-xl border border-dashed text-xs transition-colors disabled:opacity-50"
               disabled={loading}
               onClick={onLoadMore}
             >
@@ -631,7 +631,7 @@ export default function BookStats() {
     Object.keys(currentHeatmap).length > 0;
 
   return (
-    <div className="bg-background flex min-h-[calc(100dvh-4rem)] flex-col">
+    <div className="bg-paper flex min-h-[calc(100dvh-4rem)] flex-col">
       {/* Hero Image Section */}
       <div className="relative h-[30vh] flex-shrink-0 overflow-hidden md:h-[35vh]">
         <img
@@ -639,17 +639,17 @@ export default function BookStats() {
           alt=""
           className="h-full w-full object-cover"
         />
-        <div className="from-background/40 via-background/5 to-background pointer-events-none absolute inset-0 bg-gradient-to-b" />
+        <div className="from-paper/40 via-paper/5 to-paper pointer-events-none absolute inset-0 bg-gradient-to-b" />
 
         {/* Back Button */}
         <div className="absolute top-0 right-0 left-0 z-10 flex items-center px-4 py-4 md:px-6">
           <button
             type="button"
-            className="border-border bg-background/60 hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
+            className="border-border bg-paper/60 hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
             onClick={handleBack}
             aria-label="返回"
           >
-            <ArrowLeft className="text-foreground h-5 w-5" />
+            <ArrowLeft className="text-ink h-5 w-5" />
           </button>
         </div>
 
@@ -657,12 +657,12 @@ export default function BookStats() {
         <div className="absolute top-0 right-0 z-10 flex items-center px-4 py-4 md:px-6">
           <button
             type="button"
-            className="border-border bg-background/60 hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
+            className="border-border bg-paper/60 hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
             onClick={handleRefresh}
             aria-label="刷新统计"
           >
             <RefreshCw
-              className={`text-foreground h-5 w-5 ${isLoading ? 'animate-spin' : ''}`}
+              className={`text-ink h-5 w-5 ${isLoading ? 'animate-spin' : ''}`}
             />
           </button>
         </div>
@@ -718,15 +718,15 @@ export default function BookStats() {
           {activeSnapshot && (
             <>
               {/* Mode Tabs */}
-              <div className="bg-background mb-6 flex gap-1 rounded-xl p-1">
+              <div className="bg-paper mb-6 flex gap-1 rounded-xl p-1">
                 {MODES.map((mode) => (
                   <button
                     key={mode.key}
                     type="button"
                     className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
                       activeMode === mode.key
-                        ? 'bg-primary text-primary-foreground shadow-sm'
-                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                        ? 'bg-accent text-accent shadow-sm'
+                        : 'text-muted-foreground hover:bg-muted hover:text-ink'
                     }`}
                     onClick={() => setActiveMode(mode.key)}
                   >
@@ -737,30 +737,30 @@ export default function BookStats() {
 
               {/* Summary Cards */}
               <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-                <div className="bg-background rounded-xl p-4">
+                <div className="bg-paper rounded-xl p-4">
                   <p className="text-muted-foreground mb-1 text-xs">
                     总阅读时长
                   </p>
-                  <p className="text-foreground text-2xl font-bold">
+                  <p className="text-ink text-2xl font-bold">
                     {formatDuration(activeSnapshot.totalReadTime)}
                   </p>
                 </div>
-                <div className="bg-background rounded-xl p-4">
+                <div className="bg-paper rounded-xl p-4">
                   <p className="text-muted-foreground mb-1 text-xs">阅读天数</p>
-                  <p className="text-foreground text-2xl font-bold">
+                  <p className="text-ink text-2xl font-bold">
                     {activeSnapshot.readDays ?? 0}
                     <span className="text-muted-foreground text-sm font-normal">
                       天
                     </span>
                   </p>
                 </div>
-                <div className="bg-background rounded-xl p-4">
+                <div className="bg-paper rounded-xl p-4">
                   <p className="text-muted-foreground mb-1 text-xs">日均时长</p>
-                  <p className="text-foreground text-2xl font-bold">
+                  <p className="text-ink text-2xl font-bold">
                     {formatDuration(activeSnapshot.dayAverageReadTime)}
                   </p>
                 </div>
-                <div className="bg-background rounded-xl p-4">
+                <div className="bg-paper rounded-xl p-4">
                   <p className="text-muted-foreground mb-1 text-xs">环比变化</p>
                   <p
                     className={`text-2xl font-bold ${
@@ -776,8 +776,8 @@ export default function BookStats() {
 
               {/* Trend Chart */}
               {activeSnapshot.readTimes && (
-                <div className="bg-background mb-6 rounded-xl p-4 sm:p-6">
-                  <h3 className="text-foreground mb-4 text-sm font-medium">
+                <div className="bg-paper mb-6 rounded-xl p-4 sm:p-6">
+                  <h3 className="text-ink mb-4 text-sm font-medium">
                     阅读趋势
                   </h3>
                   <div className="h-64 sm:h-80">
@@ -793,8 +793,8 @@ export default function BookStats() {
 
               {/* Year Heatmap (annually only) */}
               {hasYearHeatmap && (
-                <div className="bg-background mb-6 rounded-xl p-4 sm:p-6">
-                  <h3 className="text-foreground mb-1 text-sm font-medium">
+                <div className="bg-paper mb-6 rounded-xl p-4 sm:p-6">
+                  <h3 className="text-ink mb-1 text-sm font-medium">
                     本年的阅读足迹
                   </h3>
                   <p className="text-muted-foreground mb-4 text-xs">
@@ -814,8 +814,8 @@ export default function BookStats() {
               {/* Read Longest Chart */}
               {activeSnapshot.readLongest &&
                 activeSnapshot.readLongest.length > 0 && (
-                  <div className="bg-background mb-6 rounded-xl p-4 sm:p-6">
-                    <h3 className="text-foreground mb-4 text-sm font-medium">
+                  <div className="bg-paper mb-6 rounded-xl p-4 sm:p-6">
+                    <h3 className="text-ink mb-4 text-sm font-medium">
                       阅读排行
                     </h3>
                     <div className="h-64 sm:h-80">
@@ -834,8 +834,8 @@ export default function BookStats() {
                 {/* Prefer Category */}
                 {activeSnapshot.preferCategory &&
                   activeSnapshot.preferCategory.length > 0 && (
-                    <div className="bg-background rounded-xl p-4 sm:p-6">
-                      <h3 className="text-foreground mb-4 text-sm font-medium">
+                    <div className="bg-paper rounded-xl p-4 sm:p-6">
+                      <h3 className="text-ink mb-4 text-sm font-medium">
                         分类偏好
                       </h3>
                       <div className="h-64 sm:h-72">
@@ -851,8 +851,8 @@ export default function BookStats() {
 
                 {/* Prefer Time */}
                 {activeSnapshot.preferTime && (
-                  <div className="bg-background rounded-xl p-4 sm:p-6">
-                    <h3 className="text-foreground mb-4 text-sm font-medium">
+                  <div className="bg-paper rounded-xl p-4 sm:p-6">
+                    <h3 className="text-ink mb-4 text-sm font-medium">
                       时段分布
                     </h3>
                     <div className="h-64 sm:h-72">
@@ -869,8 +869,8 @@ export default function BookStats() {
 
               {/* Read/Listen Ratio */}
               {hasReadListenData && (
-                <div className="bg-background mb-6 rounded-xl p-4 sm:p-6">
-                  <h3 className="text-foreground mb-4 text-sm font-medium">
+                <div className="bg-paper mb-6 rounded-xl p-4 sm:p-6">
+                  <h3 className="text-ink mb-4 text-sm font-medium">
                     阅读方式
                   </h3>
                   <div className="flex items-center gap-6">
@@ -879,13 +879,13 @@ export default function BookStats() {
                         <span className="text-muted-foreground text-xs">
                           文字阅读
                         </span>
-                        <span className="text-foreground text-sm font-medium">
+                        <span className="text-ink text-sm font-medium">
                           {formatDuration(activeSnapshot!.wrReadTime)}
                         </span>
                       </div>
                       <div className="bg-muted h-2 overflow-hidden rounded-full">
                         <div
-                          className="bg-primary h-full rounded-full transition-all"
+                          className="bg-accent h-full rounded-full transition-all"
                           style={{ width: `${readPercent}%` }}
                         />
                       </div>
@@ -895,7 +895,7 @@ export default function BookStats() {
                         <span className="text-muted-foreground text-xs">
                           听书
                         </span>
-                        <span className="text-foreground text-sm font-medium">
+                        <span className="text-ink text-sm font-medium">
                           {formatDuration(activeSnapshot!.wrListenTime)}
                         </span>
                       </div>
@@ -913,14 +913,14 @@ export default function BookStats() {
               {/* Read Stat Summary */}
               {activeSnapshot.readStat &&
                 activeSnapshot.readStat.length > 0 && (
-                  <div className="bg-background mb-6 rounded-xl p-4 sm:p-6">
-                    <h3 className="text-foreground mb-4 text-sm font-medium">
+                  <div className="bg-paper mb-6 rounded-xl p-4 sm:p-6">
+                    <h3 className="text-ink mb-4 text-sm font-medium">
                       阅读概览
                     </h3>
                     <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                       {activeSnapshot.readStat.map((stat) => (
                         <div key={stat.stat} className="text-center">
-                          <p className="text-foreground text-2xl font-bold">
+                          <p className="text-ink text-2xl font-bold">
                             {stat.counts}
                           </p>
                           <p className="text-muted-foreground text-xs">
@@ -935,8 +935,8 @@ export default function BookStats() {
               {/* Prefer Authors */}
               {activeSnapshot.preferAuthor &&
                 activeSnapshot.preferAuthor.length > 0 && (
-                  <div className="bg-background mb-6 rounded-xl p-4 sm:p-6">
-                    <h3 className="text-foreground mb-4 text-sm font-medium">
+                  <div className="bg-paper mb-6 rounded-xl p-4 sm:p-6">
+                    <h3 className="text-ink mb-4 text-sm font-medium">
                       偏好作者
                     </h3>
                     <div className="space-y-3">
@@ -951,7 +951,7 @@ export default function BookStats() {
                               <span className="bg-muted text-muted-foreground flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium">
                                 {index + 1}
                               </span>
-                              <span className="text-foreground text-sm font-medium">
+                              <span className="text-ink text-sm font-medium">
                                 {author.name ?? '未知作者'}
                               </span>
                             </div>
@@ -967,8 +967,8 @@ export default function BookStats() {
               {/* Prefer Publishers */}
               {activeSnapshot.preferPublisher &&
                 activeSnapshot.preferPublisher.length > 0 && (
-                  <div className="bg-background mb-6 rounded-xl p-4 sm:p-6">
-                    <h3 className="text-foreground mb-4 text-sm font-medium">
+                  <div className="bg-paper mb-6 rounded-xl p-4 sm:p-6">
+                    <h3 className="text-ink mb-4 text-sm font-medium">
                       偏好出版社
                     </h3>
                     <div className="space-y-3">
@@ -983,7 +983,7 @@ export default function BookStats() {
                               <span className="bg-muted text-muted-foreground flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium">
                                 {index + 1}
                               </span>
-                              <span className="text-foreground text-sm font-medium">
+                              <span className="text-ink text-sm font-medium">
                                 {pub.name ?? '未知出版社'}
                               </span>
                             </div>

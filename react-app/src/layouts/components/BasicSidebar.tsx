@@ -198,14 +198,14 @@ export const BentoNavSidebar: React.FC = () => {
           onClick={() => setIsOpen(true)}
           className="bg-secondary/50 pointer-events-auto rounded-full p-2 shadow-lg backdrop-blur-sm transition-transform active:scale-95"
         >
-          <TextAlignJustify className="text-foreground h-6 w-6" />
+          <TextAlignJustify className="text-ink h-6 w-6" />
         </button>
       </div>
 
       {/* 背景层 */}
       {isOpen && (
         <motion.div
-          className="bg-background/50 fixed inset-0 z-90 backdrop-blur-sm"
+          className="bg-paper/50 fixed inset-0 z-90 backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -221,7 +221,7 @@ export const BentoNavSidebar: React.FC = () => {
           duration: 0.3,
           ease: 'easeInOut',
         }}
-        className="bg-background/90 fixed top-0 left-0 z-100 flex h-screen w-80 flex-col gap-6 rounded-r-4xl p-6 backdrop-blur-sm"
+        className="bg-paper/90 fixed top-0 left-0 z-100 flex h-screen w-80 flex-col gap-6 rounded-r-4xl p-6 backdrop-blur-sm"
       >
         {/* 下拉菜单 */}
         <div ref={dropdownRef} className="relative">
@@ -259,7 +259,7 @@ export const BentoNavSidebar: React.FC = () => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="selection-none bg-background absolute top-full left-0 z-50 mt-4 flex w-60 flex-col gap-1 rounded-2xl p-2 shadow-xl"
+              className="selection-none bg-paper absolute top-full left-0 z-50 mt-4 flex w-60 flex-col gap-1 rounded-2xl p-2 shadow-xl"
             >
               <DropDownItems />
             </motion.div>
@@ -274,7 +274,7 @@ export const BentoNavSidebar: React.FC = () => {
         <ul className="relative flex grow flex-col gap-1">
           {/* Active indicator */}
           <motion.div
-            className="bg-primary/30 pointer-events-none absolute left-0 h-12 w-full rounded-2xl shadow-md"
+            className="bg-accent/30 pointer-events-none absolute left-0 h-12 w-full rounded-2xl shadow-md"
             animate={{ y: hoverNavIndex * 52 }} // 52 = item height (48) + gap (4)
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             style={{ zIndex: 0 }}
@@ -294,7 +294,7 @@ export const BentoNavSidebar: React.FC = () => {
                 }}
                 className={`flex h-full w-full items-center gap-4 rounded-2xl px-4 font-medium transition-colors ${
                   hoverNavIndex === index
-                    ? 'text-primary'
+                    ? 'text-accent'
                     : 'text-base-content/70 hover:text-base-content'
                 }`}
               >

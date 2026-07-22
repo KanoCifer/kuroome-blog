@@ -35,7 +35,7 @@ export function SkeletonCard({
           {Array.from({ length: 3 }).map((_, i) => (
             <div
               key={i}
-              className="bg-background flex flex-col items-center gap-1.5 px-2 py-2.5"
+              className="bg-paper flex flex-col items-center gap-1.5 px-2 py-2.5"
             >
               <div className="bg-muted-foreground/10 skeleton-pulse h-2.5 w-8 rounded" />
               <div className="bg-muted-foreground/15 skeleton-pulse h-3 w-10 rounded" />
@@ -56,7 +56,7 @@ export function SkeletonCard({
             {Array.from({ length: 2 }).map((_, i) => (
               <div
                 key={i}
-                className="bg-background flex flex-col gap-1.5 px-3 py-2.5"
+                className="bg-paper flex flex-col gap-1.5 px-3 py-2.5"
               >
                 <div className="bg-muted-foreground/10 skeleton-pulse h-2 w-10 rounded" />
                 <div className="bg-muted-foreground/15 skeleton-pulse h-3.5 w-14 rounded" />

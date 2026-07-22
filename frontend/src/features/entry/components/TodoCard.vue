@@ -9,11 +9,11 @@
       class="relative flex h-full items-center gap-3 px-4 py-2"
     >
       <div
-        class="bg-primary-500/15 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110"
+        class="bg-accent-500/15 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110"
       >
-        <CircleCheckBig class="text-primary-600 size-4.5" />
+        <CircleCheckBig class="text-accent-600 size-4.5" />
       </div>
-      <span class="text-foreground text-sm font-medium">开发任务</span>
+      <span class="text-ink text-sm font-medium">开发任务</span>
       <svg
         class="text-muted-foreground ml-auto size-4 transition-transform duration-300 group-hover:translate-x-0.5"
         fill="none"

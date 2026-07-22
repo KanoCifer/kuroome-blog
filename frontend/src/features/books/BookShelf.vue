@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-background flex min-h-[calc(100dvh-4rem)] flex-col">
+  <div class="bg-paper flex min-h-[calc(100dvh-4rem)] flex-col">
     <BookShelfHero
       :book-count="isLoading ? null : displayedBooks.length"
       :is-syncing="isSyncing"
@@ -55,7 +55,7 @@
             class="mt-2 mb-3 flex items-baseline justify-between"
           >
             <h2
-              class="text-foreground font-serif text-xl font-bold md:text-2xl"
+              class="text-ink font-serif text-xl font-bold md:text-2xl"
             >
               全部书架
             </h2>

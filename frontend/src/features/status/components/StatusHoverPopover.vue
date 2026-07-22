@@ -96,7 +96,7 @@ onBeforeUnmount(() => clearTimers());
       @mouseleave="scheduleClose"
     >
       <div
-        class="bg-background/95 supports-[backdrop-filter]:bg-background/80 border-border/60 overflow-hidden rounded-lg border shadow-xl backdrop-blur-md"
+        class="bg-paper/95 supports-[backdrop-filter]:bg-paper/80 border-border/60 overflow-hidden rounded-lg border shadow-xl backdrop-blur-md"
       >
         <header
           class="border-border/40 bg-muted/30 flex items-center gap-2.5 border-b px-3 py-2"
@@ -107,7 +107,7 @@ onBeforeUnmount(() => clearTimers());
             <span class="h-2 w-2 rounded-full bg-emerald-400/70" />
           </div>
           <span
-            class="text-foreground/80 font-serif text-[12px] tracking-wide italic"
+            class="text-ink/80 font-serif text-[12px] tracking-wide italic"
             >Service Status</span
           >
           <span

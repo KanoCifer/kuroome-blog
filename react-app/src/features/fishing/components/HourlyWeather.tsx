@@ -15,7 +15,7 @@ export function HourlyWeather() {
   return (
     <section className="px-1 pt-2 pb-6" aria-label="逐时预报">
       <div className="mb-3 flex items-baseline justify-between">
-        <h3 className="text-foreground text-sm font-semibold">逐时预报</h3>
+        <h3 className="text-ink text-sm font-semibold">逐时预报</h3>
         <span className="text-muted-foreground text-xs">未来 24 小时</span>
       </div>
 
@@ -28,18 +28,18 @@ export function HourlyWeather() {
               <div
                 key={h.fxTime}
                 className={`flex w-[54px] shrink-0 snap-start flex-col items-center gap-1.5 py-2 ${
-                  isNow ? 'text-foreground' : 'text-muted-foreground'
+                  isNow ? 'text-ink' : 'text-muted-foreground'
                 }`}
               >
                 <span
                   className={`text-xs font-medium ${
-                    isNow ? 'text-primary' : ''
+                    isNow ? 'text-accent' : ''
                   }`}
                 >
                   {isNow ? '现在' : dayjs(h.fxTime).format('HH:mm')}
                 </span>
                 <i
-                  className={`qi-${h.icon} text-foreground/85 text-xl`}
+                  className={`qi-${h.icon} text-ink/85 text-xl`}
                   aria-hidden
                 />
                 <span className="text-muted-foreground/80 flex h-3 items-center gap-0.5 text-[10px] tabular-nums">
@@ -50,7 +50,7 @@ export function HourlyWeather() {
                     </>
                   )}
                 </span>
-                <span className="text-foreground text-sm font-semibold tabular-nums">
+                <span className="text-ink text-sm font-semibold tabular-nums">
                   {h.temp}°
                 </span>
               </div>

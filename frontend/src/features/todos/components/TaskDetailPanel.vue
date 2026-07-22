@@ -19,7 +19,7 @@
         :animate="{ x: 0 }"
         :exit="{ x: '100%' }"
         :transition="SPRING_SNUG"
-        class="bg-background border-border fixed top-0 right-0 z-[9999] flex h-full w-full max-w-[min(640px,52vw)] flex-col border-l shadow-[0_12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)] max-sm:max-w-full"
+        class="bg-paper border-border fixed top-0 right-0 z-[9999] flex h-full w-full max-w-[min(640px,52vw)] flex-col border-l shadow-[0_12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)] max-sm:max-w-full"
         role="dialog"
         aria-modal="true"
         aria-labelledby="detail-title"
@@ -30,13 +30,13 @@
         >
           <h2
             id="detail-title"
-            class="text-foreground min-w-0 flex-1 truncate pr-2 font-serif text-lg leading-tight font-medium"
+            class="text-ink min-w-0 flex-1 truncate pr-2 font-serif text-lg leading-tight font-medium"
           >
             {{ task?.title || '任务详情' }}
           </h2>
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
+            class="text-muted-foreground hover:bg-muted hover:text-ink focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
             aria-label="关闭"
             @click="$emit('close')"
           >
@@ -76,7 +76,7 @@
                 d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <p class="text-foreground text-sm font-medium">找不到这个任务</p>
+            <p class="text-ink text-sm font-medium">找不到这个任务</p>
             <p
               class="text-muted-foreground max-w-[260px] text-xs leading-relaxed"
             >
@@ -110,7 +110,7 @@
                       i < statusIndex
                         ? 'border-success bg-success/10 text-success'
                         : i === statusIndex
-                          ? 'border-primary/40 bg-primary/10 text-primary'
+                          ? 'border-accent/40 bg-accent/10 text-accent'
                           : 'border-border text-muted-foreground opacity-60'
                     "
                     :aria-pressed="task.status === s"
@@ -135,7 +135,7 @@
                     <span
                       v-else
                       class="h-1.5 w-1.5 rounded-full"
-                      :class="i === statusIndex ? 'bg-primary' : 'bg-border'"
+                      :class="i === statusIndex ? 'bg-accent' : 'bg-border'"
                     />
                     {{ s }}
                   </button>
@@ -145,7 +145,7 @@
               <button
                 v-if="task.status !== '已完成' && task.status !== '已搁置'"
                 type="button"
-                class="text-muted-foreground hover:bg-muted focus-visible:ring-ring hover:text-foreground mx-auto mt-2 block max-w-xs cursor-pointer rounded-md px-2 py-2 text-center text-[11px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
+                class="text-muted-foreground hover:bg-muted focus-visible:ring-ring hover:text-ink mx-auto mt-2 block max-w-xs cursor-pointer rounded-md px-2 py-2 text-center text-[11px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
                 @click="$emit('set-status', task.slug, '已搁置')"
               >
                 搁置此任务
@@ -173,7 +173,7 @@
                 </span>
                 <span
                   v-if="task.slug"
-                  class="bg-primary/10 text-primary rounded-full px-1.5 py-px text-[10px] font-medium"
+                  class="bg-accent/10 text-accent rounded-full px-1.5 py-px text-[10px] font-medium"
                 >
                   {{ task.slug }}
                 </span>
@@ -190,7 +190,7 @@
               >
                 <span v-if="task.parent_slug" class="text-muted-foreground">
                   归属
-                  <span class="text-foreground font-mono font-medium">{{
+                  <span class="text-ink font-mono font-medium">{{
                     task.parent_slug
                   }}</span>
                 </span>
@@ -225,12 +225,12 @@
             <!-- ── 主区：描述 + 详情（无 label，高权重） ── -->
             <div
               v-if="task.description"
-              class="prose prose-sm text-foreground mb-5 max-w-none leading-relaxed"
+              class="prose prose-sm text-ink mb-5 max-w-none leading-relaxed"
               v-html="renderMarkdown(task.description)"
             />
             <div
               v-if="task.detail"
-              class="prose prose-sm text-foreground mb-5 max-w-none leading-relaxed"
+              class="prose prose-sm text-ink mb-5 max-w-none leading-relaxed"
               v-html="renderMarkdown(task.detail)"
             />
 
@@ -313,7 +313,7 @@
               关闭
             </button>
             <button
-              class="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+              class="bg-accent text-accent hover:bg-accent/90 focus-visible:ring-ring cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
               @click="$emit('edit', task!.slug)"
             >
               编辑

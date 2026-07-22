@@ -10,6 +10,7 @@ import {
   NotFound,
   PrivacyPolicyView,
 } from '@/features/pages/views';
+import { ColorShowcaseView } from '@/features/color/views';
 import {
   LoginView,
   RegisterView,
@@ -374,6 +375,17 @@ const router = createRouter({
         title: "碎碎念 - Kuroome's Blog",
         description: '日常的只言片语，汇成一卷散装活页。',
         keywords: '碎碎念,moments,日常,随笔',
+      },
+    },
+    {
+      path: '/color',
+      name: 'color-showcase',
+      component: ColorShowcaseView,
+      meta: {
+        title: "配色工坊 - Kuroome's Blog",
+        description:
+          '展示并切换博客的 4 套配色方案（paper / sage / mist / blush），所有色值源自 packages/brand/themes。',
+        keywords: '配色,主题,color,scheme,paper,sage,mist,blush',
       },
     },
     {

@@ -30,7 +30,7 @@ const LABELS: Record<string, string> = {
 // 分档 → 语义 token (无硬编码色、无装饰性 glow)
 function gaugeClass(p: number): string {
   if (p >= 85) return 'bg-success';
-  if (p >= 70) return 'bg-primary';
+  if (p >= 70) return 'bg-accent';
   if (p >= 50) return 'bg-warning';
   if (p <= 30) return 'bg-destructive';
   return 'bg-muted-foreground';
@@ -50,7 +50,7 @@ export function FishingIndexDetailSheet({ open, data, onClose }: Props) {
         <header className="shrink-0 px-5 pb-3">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-foreground text-base font-semibold">
+              <h2 className="text-ink text-base font-semibold">
                 特征详情
               </h2>
               {data && (
@@ -85,11 +85,11 @@ export function FishingIndexDetailSheet({ open, data, onClose }: Props) {
                     <span className="text-muted-foreground text-xs font-medium">
                       {label}
                     </span>
-                    <span className="text-foreground text-sm font-semibold tabular-nums">
+                    <span className="text-ink text-sm font-semibold tabular-nums">
                       {value}
                     </span>
                   </div>
-                  <div className="bg-foreground/10 relative h-1.5 w-full overflow-hidden rounded-full">
+                  <div className="bg-ink/10 relative h-1.5 w-full overflow-hidden rounded-full">
                     <div
                       className={`absolute inset-y-0 left-0 rounded-full ${gaugeClass(pct)}`}
                       style={{ width: `${pct}%` }}

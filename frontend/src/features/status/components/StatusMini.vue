@@ -40,14 +40,14 @@
           />
         </span>
         <span
-          class="text-foreground/80 font-mono text-[11px] tracking-[0.1em] uppercase"
+          class="text-ink/80 font-mono text-[11px] tracking-[0.1em] uppercase"
           >{{ row.label }}</span
         >
         <span class="text-muted-foreground/70 text-[11px]">{{
           row.status
         }}</span>
         <span
-          class="text-foreground ml-auto font-mono text-[12px] tabular-nums"
+          class="text-ink ml-auto font-mono text-[12px] tabular-nums"
           >{{ row.value }}</span
         >
       </li>

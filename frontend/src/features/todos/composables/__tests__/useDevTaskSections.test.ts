@@ -175,7 +175,7 @@ describe('useDevTaskSections · sections', () => {
     const tasks = ref<DevTask[]>([]);
     const { sections } = useDevTaskSections(tasks);
     expect(sections.value[0].title).toBe('开发中');
-    expect(sections.value[0].dotClass).toBe('bg-primary');
+    expect(sections.value[0].dotClass).toBe('bg-accent');
     expect(sections.value[0].emptyText).toBe('没有进行中的任务');
 
     expect(sections.value[1].title).toBe('待排期');

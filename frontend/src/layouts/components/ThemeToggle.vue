@@ -93,7 +93,7 @@ onUnmounted(() => {
     <div class="relative">
       <button
         @click.stop="isSchemeOpen = !isSchemeOpen"
-        class="text-secondary-foreground hover:bg-muted focus:ring-ring dark:text-foreground dark:hover:bg-muted flex cursor-pointer items-center gap-1 rounded-lg px-2 py-2 text-sm font-medium transition-all focus:ring-2 focus:outline-none"
+        class="text-secondary-foreground hover:bg-muted focus:ring-ring dark:text-ink dark:hover:bg-muted flex cursor-pointer items-center gap-1 rounded-lg px-2 py-2 text-sm font-medium transition-all focus:ring-2 focus:outline-none"
         aria-label="Select color scheme"
         title="Color Scheme"
       >
@@ -127,14 +127,14 @@ onUnmounted(() => {
       <DropdownTransition>
         <div
           v-if="isSchemeOpen"
-          class="border-border bg-background dark:border-border dark:bg-background absolute top-full right-0 z-9999 mt-2 w-40 rounded-lg shadow-lg"
+          class="border-border bg-paper dark:border-border dark:bg-paper absolute top-full right-0 z-9999 mt-2 w-40 rounded-lg shadow-lg"
           @click.stop
         >
           <button
             v-for="(schemeItem, index) in schemes"
             :key="schemeItem.value"
             @click="selectScheme(schemeItem.value)"
-            class="text-foreground hover:bg-muted dark:text-foreground dark:hover:bg-muted flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm transition-colors"
+            class="text-ink hover:bg-muted dark:text-ink dark:hover:bg-muted flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm transition-colors"
             :class="{
               'bg-muted dark:bg-muted': themeStore.scheme === schemeItem.value,
               'rounded-t-lg': index === 0,
@@ -161,7 +161,7 @@ onUnmounted(() => {
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="text-primary ml-auto"
+              class="text-accent ml-auto"
             >
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
@@ -178,7 +178,7 @@ onUnmounted(() => {
     >
       <button
         @click.stop="toggleDropdown"
-        class="text-secondary-foreground hover:bg-muted focus:ring-ring dark:text-foreground dark:hover:bg-muted flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all focus:ring-2 focus:outline-none"
+        class="text-secondary-foreground hover:bg-muted focus:ring-ring dark:text-ink dark:hover:bg-muted flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all focus:ring-2 focus:outline-none"
         aria-label="Toggle theme"
       >
         <span v-html="currentTheme.icon"></span>
@@ -203,14 +203,14 @@ onUnmounted(() => {
       <DropdownTransition>
         <div
           v-if="isOpen"
-          class="border-border bg-background dark:border-border dark:bg-background absolute top-full right-0 z-9999 mt-2 w-36 rounded-lg shadow-lg"
+          class="border-border bg-paper dark:border-border dark:bg-paper absolute top-full right-0 z-9999 mt-2 w-36 rounded-lg shadow-lg"
           @click.stop
         >
           <button
             v-for="(theme, index) in themes"
             :key="theme.value"
             @click="selectTheme(theme.value, $event)"
-            class="text-foreground hover:bg-muted dark:text-foreground dark:hover:bg-muted flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm transition-colors"
+            class="text-ink hover:bg-muted dark:text-ink dark:hover:bg-muted flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm transition-colors"
             :class="{
               'bg-muted dark:bg-muted': themeStore.theme === theme.value,
               'rounded-t-lg': index === 0,
@@ -230,7 +230,7 @@ onUnmounted(() => {
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="text-primary ml-auto"
+              class="text-accent ml-auto"
             >
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>

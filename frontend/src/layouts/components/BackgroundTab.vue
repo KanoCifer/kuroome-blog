@@ -86,29 +86,29 @@ const autoSwitchOptions = [
  */
 const smallCardBase =
   'flex flex-col items-center gap-2 rounded-xl border p-4 transition-colors';
-const smallCardDefault = 'border-border bg-background hover:border-primary';
-const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
+const smallCardDefault = 'border-border bg-paper hover:border-accent';
+const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
 </script>
 
 <template>
   <div class="space-y-6">
     <!-- 滑块组 — 统一卡式外观，跟随切换 -->
     <div>
-      <h2 class="text-foreground mb-1 font-serif text-lg font-semibold">
+      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">
         背景调整
       </h2>
       <p class="text-muted-foreground mb-4 text-xs italic">
         Adjust background appearance
       </p>
 
-      <div class="border-border/60 bg-background rounded-xl border p-5">
+      <div class="border-border/60 bg-paper rounded-xl border p-5">
         <!-- 滑块行 -->
         <div class="relative space-y-5">
           <!-- 背景模糊 -->
           <div>
             <div class="mb-2 flex items-center justify-between">
               <span
-                class="text-foreground flex items-center gap-1.5 text-sm font-medium"
+                class="text-ink flex items-center gap-1.5 text-sm font-medium"
               >
                 <!-- 模糊图标 -->
                 <svg
@@ -127,7 +127,7 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
                 背景模糊
               </span>
               <span
-                class="bg-muted text-foreground rounded-full px-2 py-0.5 font-mono text-xs font-medium tabular-nums"
+                class="bg-muted text-ink rounded-full px-2 py-0.5 font-mono text-xs font-medium tabular-nums"
               >
                 {{ themeStore.bgBlur }} px
               </span>
@@ -148,7 +148,7 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
           <div>
             <div class="mb-2 flex items-center justify-between">
               <span
-                class="text-foreground flex items-center gap-1.5 text-sm font-medium"
+                class="text-ink flex items-center gap-1.5 text-sm font-medium"
               >
                 <!-- 亮度图标 -->
                 <svg
@@ -168,7 +168,7 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
                 背景亮度
               </span>
               <span
-                class="bg-muted text-foreground rounded-full px-2 py-0.5 font-mono text-xs font-medium tabular-nums"
+                class="bg-muted text-ink rounded-full px-2 py-0.5 font-mono text-xs font-medium tabular-nums"
               >
                 {{ Math.round(themeStore.bgBrightness * 100) }} %
               </span>
@@ -189,7 +189,7 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
           <div>
             <div class="mb-2 flex items-center justify-between">
               <span
-                class="text-foreground flex items-center gap-1.5 text-sm font-medium"
+                class="text-ink flex items-center gap-1.5 text-sm font-medium"
               >
                 <!-- 缩放图标 -->
                 <svg
@@ -206,7 +206,7 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
                 背景缩放
               </span>
               <span
-                class="bg-muted text-foreground rounded-full px-2 py-0.5 font-mono text-xs font-medium tabular-nums"
+                class="bg-muted text-ink rounded-full px-2 py-0.5 font-mono text-xs font-medium tabular-nums"
               >
                 {{ Math.round(themeStore.bgScale * 100) }} %
               </span>
@@ -228,7 +228,7 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
       <!-- 重置为默认 -->
       <button
         @click="resetBackground"
-        class="text-muted-foreground hover:text-foreground hover:bg-muted mt-3 flex w-full items-center justify-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+        class="text-muted-foreground hover:text-ink hover:bg-muted mt-3 flex w-full items-center justify-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
       >
         <svg
           class="h-3.5 w-3.5"
@@ -248,7 +248,7 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
 
     <!-- 背景模式 -->
     <div>
-      <h2 class="text-foreground mb-1 font-serif text-lg font-semibold">
+      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">
         背景模式
       </h2>
       <p class="text-muted-foreground mb-4 text-xs italic">Background mode</p>
@@ -273,8 +273,8 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
             stroke-linecap="round"
             :class="
               backgroundStore.mode === 'random'
-                ? 'text-primary'
-                : 'text-foreground'
+                ? 'text-accent'
+                : 'text-ink'
             "
           >
             <polyline points="16 3 21 3 21 8" />
@@ -287,8 +287,8 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
             class="text-sm font-medium"
             :class="
               backgroundStore.mode === 'random'
-                ? 'text-primary'
-                : 'text-foreground'
+                ? 'text-accent'
+                : 'text-ink'
             "
           >
             随机切换
@@ -313,8 +313,8 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
             stroke-linecap="round"
             :class="
               backgroundStore.mode === 'fixed'
-                ? 'text-primary'
-                : 'text-foreground'
+                ? 'text-accent'
+                : 'text-ink'
             "
           >
             <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -325,8 +325,8 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
             class="text-sm font-medium"
             :class="
               backgroundStore.mode === 'fixed'
-                ? 'text-primary'
-                : 'text-foreground'
+                ? 'text-accent'
+                : 'text-ink'
             "
           >
             固定背景
@@ -337,7 +337,7 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
 
     <!-- 自动切换间隔（仅 random 模式） -->
     <div v-if="backgroundStore.mode === 'random'">
-      <h2 class="text-foreground mb-1 font-serif text-lg font-semibold">
+      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">
         自动切换
       </h2>
       <p class="text-muted-foreground mb-4 text-xs italic">
@@ -351,8 +351,8 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
           class="rounded-lg border px-3.5 py-1.5 text-sm transition-colors"
           :class="
             backgroundStore.autoSwitchInterval === opt.value
-              ? 'border-primary bg-primary/5 text-primary font-medium !shadow-sm'
-              : 'border-border bg-background text-foreground hover:border-primary'
+              ? 'border-accent bg-accent/5 text-accent font-medium !shadow-sm'
+              : 'border-border bg-paper text-ink hover:border-accent'
           "
         >
           {{ opt.label }}
@@ -362,7 +362,7 @@ const smallCardActive = 'border-primary bg-primary/5 !shadow-sm';
 
     <!-- 固定背景选择（仅 fixed 模式） -->
     <div v-if="backgroundStore.mode === 'fixed'">
-      <h2 class="text-foreground mb-1 font-serif text-lg font-semibold">
+      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">
         选择背景
       </h2>
       <p class="text-muted-foreground mb-4 text-xs italic">

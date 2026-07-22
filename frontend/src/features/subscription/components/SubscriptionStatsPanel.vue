@@ -18,7 +18,7 @@ const emit = defineEmits<{
 
 <template>
   <section
-    class="border-border/80 bg-background rounded-[28px] border p-7 shadow-[0_24px_70px_-34px_rgba(15,23,42,0.45)] backdrop-blur"
+    class="border-border/80 bg-paper rounded-[28px] border p-7 shadow-[0_24px_70px_-34px_rgba(15,23,42,0.45)] backdrop-blur"
   >
     <div class="flex flex-wrap items-start justify-between gap-5">
       <div class="max-w-3xl">
@@ -27,7 +27,7 @@ const emit = defineEmits<{
         >
           Subscription
         </p>
-        <h2 class="text-foreground font-serif text-3xl font-semibold">
+        <h2 class="text-ink font-serif text-3xl font-semibold">
           桌面订阅看板
         </h2>
         <p
@@ -41,21 +41,21 @@ const emit = defineEmits<{
         <button
           type="button"
           :disabled="isLoading || isRefreshing"
-          class="border-border bg-background text-foreground hover:bg-muted inline-flex items-center rounded-xl border px-4 py-2.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60"
+          class="border-border bg-paper text-ink hover:bg-muted inline-flex items-center rounded-xl border px-4 py-2.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60"
           @click="emit('refresh')"
         >
           {{ isRefreshing ? '刷新中...' : '刷新列表' }}
         </button>
         <button
           type="button"
-          class="from-brand-devices hover:from-brand-devices to-brand-devices text-primary-foreground shadow-brand-devices/30 hover:to-brand-devices/80 inline-flex items-center rounded-xl bg-linear-to-r px-4 py-2.5 text-sm font-semibold shadow-lg transition"
+          class="from-brand-devices hover:from-brand-devices to-brand-devices text-accent shadow-brand-devices/30 hover:to-brand-devices/80 inline-flex items-center rounded-xl bg-linear-to-r px-4 py-2.5 text-sm font-semibold shadow-lg transition"
           @click="emit('add')"
         >
           新增订阅
         </button>
         <RouterLink
           to="/device-tracker"
-          class="border-border bg-background text-foreground hover:bg-muted inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition"
+          class="border-border bg-paper text-ink hover:bg-muted inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -77,9 +77,9 @@ const emit = defineEmits<{
     </div>
 
     <div class="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-      <article class="border-border/80 bg-background/70 rounded-2xl border p-4">
+      <article class="border-border/80 bg-paper/70 rounded-2xl border p-4">
         <p class="text-muted-foreground text-xs">总订阅数</p>
-        <p class="text-foreground mt-2 text-2xl font-semibold">
+        <p class="text-ink mt-2 text-2xl font-semibold">
           {{ totalCount }}
         </p>
       </article>
@@ -89,9 +89,9 @@ const emit = defineEmits<{
           {{ activeCount }}
         </p>
       </article>
-      <article class="border-primary/30 bg-primary/20 rounded-2xl border p-4">
-        <p class="text-primary">月度估算</p>
-        <p class="text-primary mt-2 text-2xl font-semibold">
+      <article class="border-accent/30 bg-accent/20 rounded-2xl border p-4">
+        <p class="text-accent">月度估算</p>
+        <p class="text-accent mt-2 text-2xl font-semibold">
           ¥{{ monthlyEstimate.toFixed(2) }}
         </p>
       </article>

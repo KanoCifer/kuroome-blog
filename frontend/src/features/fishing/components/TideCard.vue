@@ -272,7 +272,7 @@ onMounted(() => {
     <!-- Header -->
     <div class="mb-4 flex items-start justify-between gap-2">
       <div class="min-w-0">
-        <h3 class="text-foreground text-lg font-semibold tracking-tight">
+        <h3 class="text-ink text-lg font-semibold tracking-tight">
           潮汐预报
         </h3>
         <p class="text-muted-foreground mt-0.5 truncate text-sm">
@@ -283,7 +283,7 @@ onMounted(() => {
         <select
           v-model="selectedHarbor"
           aria-label="选择港口"
-          class="border-border bg-background text-foreground focus:ring-primary cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
+          class="border-border bg-paper text-ink focus:ring-accent cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
         >
           <option
             v-for="opt in HARBOR_OPTIONS"
@@ -296,7 +296,7 @@ onMounted(() => {
         <select
           v-model="selectedDate"
           aria-label="选择日期"
-          class="border-border bg-background text-foreground focus:ring-primary cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
+          class="border-border bg-paper text-ink focus:ring-accent cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
         >
           <option
             v-for="opt in dateOptions"
@@ -315,7 +315,7 @@ onMounted(() => {
       class="flex flex-1 flex-col items-center justify-center py-12"
     >
       <div
-        class="border-border border-t-primary h-10 w-10 animate-spin rounded-full border-2"
+        class="border-border border-t-accent h-10 w-10 animate-spin rounded-full border-2"
       />
       <span class="text-muted-foreground mt-3 text-sm">获取潮汐数据...</span>
     </div>
@@ -336,19 +336,19 @@ onMounted(() => {
               {{ highTide?.time ?? '--:--' }}
             </p>
           </div>
-          <p class="text-foreground mt-1 text-base font-semibold tabular-nums">
+          <p class="text-ink mt-1 text-base font-semibold tabular-nums">
             {{ highTide ? highTide.height.toFixed(2) : '--' }} m
           </p>
         </div>
 
-        <div class="bg-primary/10 border-primary/20 rounded-xl border p-3">
+        <div class="bg-accent/10 border-accent/20 rounded-xl border p-3">
           <div class="flex items-baseline justify-between gap-2">
-            <p class="text-primary text-xs font-medium">最低潮</p>
+            <p class="text-accent text-xs font-medium">最低潮</p>
             <p class="text-muted-foreground text-xs tabular-nums">
               {{ lowTide?.time ?? '--:--' }}
             </p>
           </div>
-          <p class="text-foreground mt-1 text-base font-semibold tabular-nums">
+          <p class="text-ink mt-1 text-base font-semibold tabular-nums">
             {{ lowTide ? lowTide.height.toFixed(2) : '--' }} m
           </p>
         </div>

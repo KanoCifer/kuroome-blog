@@ -166,7 +166,7 @@ export default function Login() {
   };
 
   return (
-    <div className="font-body bg-background relative min-h-screen overflow-hidden">
+    <div className="font-body bg-paper relative min-h-screen overflow-hidden">
       {/* Main Content */}
       <main className="relative z-10 mt-4 flex flex-col items-center px-5 pt-8 pb-10">
         {/* Hero Section */}
@@ -176,12 +176,12 @@ export default function Login() {
           transition={{ duration: 0.7, ease: 'easeOut', delay: 0.05 }}
           className={`mb-8 flex flex-col items-center justify-center`}
         >
-          <div className="bg-primary text-primary-foreground mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)]">
+          <div className="bg-accent text-accent mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)]">
             <IconCloud className="size-8" />
           </div>
-          <h2 className="font-headline text-foreground text-center text-[28px] font-extrabold tracking-tight">
+          <h2 className="font-headline text-ink text-center text-[28px] font-extrabold tracking-tight">
             kanocifer
-            <span className="text-primary">.chat</span>
+            <span className="text-accent">.chat</span>
           </h2>
           <p className="text-muted-foreground mt-1 text-center text-[15px] font-medium">
             Welcome back to the reading space.
@@ -193,7 +193,7 @@ export default function Login() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
-          className={`} border-border/50 bg-background/70 w-full max-w-100 rounded-4xl border p-6 shadow-xl`}
+          className={`} border-border/50 bg-paper/70 w-full max-w-100 rounded-4xl border p-6 shadow-xl`}
         >
           <form className="flex flex-col" onSubmit={handleSubmit}>
             {/* Username Field */}
@@ -213,7 +213,7 @@ export default function Login() {
                   onChange={(e) =>
                     setLoginForm({ ...loginForm, username: e.target.value })
                   }
-                  className="bg-secondary text-foreground placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
+                  className="bg-secondary text-ink placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
                 />
               </div>
               {errors.username && (
@@ -240,11 +240,11 @@ export default function Login() {
                   onChange={(e) =>
                     setLoginForm({ ...loginForm, password: e.target.value })
                   }
-                  className="bg-secondary text-foreground placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-12 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
+                  className="bg-secondary text-ink placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-12 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
                 />
                 <button
                   type="button"
-                  className="text-muted-foreground hover:text-primary absolute inset-y-0 right-0 flex items-center pr-4 transition-all duration-200"
+                  className="text-muted-foreground hover:text-accent absolute inset-y-0 right-0 flex items-center pr-4 transition-all duration-200"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -265,7 +265,7 @@ export default function Login() {
             <div className="mb-6 flex items-center justify-end px-1">
               <a
                 href="#"
-                className="text-primary text-[14px] font-bold hover:underline"
+                className="text-accent text-[14px] font-bold hover:underline"
               >
                 {' '}
                 Forgot?{' '}
@@ -276,7 +276,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 mb-4 w-full rounded-full py-4 text-[15px] font-bold shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all active:scale-[0.98] disabled:opacity-70"
+              className="bg-accent text-accent hover:bg-accent/90 mb-4 w-full rounded-full py-4 text-[15px] font-bold shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all active:scale-[0.98] disabled:opacity-70"
             >
               {isSubmitting ? 'Logging in...' : 'Login'}
             </button>
@@ -285,12 +285,12 @@ export default function Login() {
             <button
               type="button"
               disabled={isPasskeySubmitting}
-              className="bg-background text-foreground disabled:bg-muted flex w-full items-center justify-center space-x-2 rounded-full py-4 text-[15px] font-bold shadow-lg transition-all active:scale-[0.98] disabled:opacity-70"
+              className="bg-paper text-ink disabled:bg-muted flex w-full items-center justify-center space-x-2 rounded-full py-4 text-[15px] font-bold shadow-lg transition-all active:scale-[0.98] disabled:opacity-70"
               onClick={handlePasskeyLogin}
             >
               <IconKey className="size-5" />
               {isPasskeySubmitting ? (
-                <span className="border-foreground h-4.5 w-4.5 animate-spin rounded-full border-2 border-t-transparent"></span>
+                <span className="border-ink h-4.5 w-4.5 animate-spin rounded-full border-2 border-t-transparent"></span>
               ) : (
                 <span>Login with Passkey</span>
               )}
@@ -308,7 +308,7 @@ export default function Login() {
 
           {/* GitHub Button */}
           <button
-            className="bg-foreground text-background hover:bg-foreground/90 flex w-full items-center justify-center space-x-2.5 rounded-full py-4 text-[15px] font-bold shadow-md transition-all active:scale-[0.98]"
+            className="bg-ink text-paper hover:bg-ink/90 flex w-full items-center justify-center space-x-2.5 rounded-full py-4 text-[15px] font-bold shadow-md transition-all active:scale-[0.98]"
             onClick={handleGitHubLogin}
           >
             <IconGitHub />
@@ -328,7 +328,7 @@ export default function Login() {
               Don't have an account?
               <Link
                 to="/register"
-                className="text-primary ml-1 font-bold hover:underline"
+                className="text-accent ml-1 font-bold hover:underline"
               >
                 Register here
               </Link>

@@ -1,18 +1,18 @@
 <template>
   <section
     id="rss-articles"
-    class="border-border bg-background rounded-2xl border p-6"
+    class="border-border bg-paper rounded-2xl border p-6"
   >
     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
       <div>
-        <h2 class="text-primary text-xl font-bold">文章列表</h2>
+        <h2 class="text-accent text-xl font-bold">文章列表</h2>
         <p class="text-muted-foreground mt-1 text-sm">
           搜索与分页阅读已保存文章
         </p>
       </div>
       <button
         type="button"
-        class="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+        class="bg-accent text-accent hover:bg-accent/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
         :disabled="articlesLoading"
         @click="$emit('refresh')"
       >
@@ -26,7 +26,7 @@
           :value="searchQuery"
           type="search"
           placeholder="搜索文章标题和内容..."
-          class="border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border py-3 pr-24 pl-4 text-sm focus:ring-2 focus:outline-none"
+          class="border-border bg-paper text-ink placeholder:text-muted-foreground focus:border-accent focus:ring-accent/20 w-full rounded-xl border py-3 pr-24 pl-4 text-sm focus:ring-2 focus:outline-none"
           @input="
             $emit(
               'update:searchQuery',
@@ -38,7 +38,7 @@
         <div class="absolute inset-y-0 right-2 flex items-center gap-1">
           <button
             type="button"
-            class="text-primary hover:bg-muted rounded-md px-2 py-1 text-xs font-medium transition-colors"
+            class="text-accent hover:bg-muted rounded-md px-2 py-1 text-xs font-medium transition-colors"
             @click="$emit('search')"
           >
             搜索
@@ -46,7 +46,7 @@
           <button
             v-if="searchQuery"
             type="button"
-            class="text-primary hover:bg-muted rounded-md px-2 py-1 text-xs font-medium transition-colors"
+            class="text-accent hover:bg-muted rounded-md px-2 py-1 text-xs font-medium transition-colors"
             @click="$emit('clearSearch')"
           >
             清空
@@ -57,13 +57,13 @@
 
     <div v-if="selectedFeedUrl" class="mb-4 flex items-center gap-2">
       <span
-        class="bg-primary/15 text-primary rounded-full px-3 py-1 text-xs font-medium"
+        class="bg-accent/15 text-accent rounded-full px-3 py-1 text-xs font-medium"
       >
         当前来源: {{ selectedFeedUrl }}
       </span>
       <button
         type="button"
-        class="border-primary/30 text-primary hover:bg-muted rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors"
+        class="border-accent/30 text-accent hover:bg-muted rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors"
         @click="$emit('clearFeedFilter')"
       >
         清除筛选
@@ -97,13 +97,13 @@
         <li
           v-for="article in articles"
           :key="article.id"
-          class="border-border bg-background hover:border-primary/30 rounded-xl border p-4 transition-all"
+          class="border-border bg-paper hover:border-accent/30 rounded-xl border p-4 transition-all"
         >
           <div class="flex flex-col gap-3">
             <div class="flex flex-wrap items-start justify-between gap-2">
               <router-link
                 :to="`/rss/articles/${article.id}`"
-                class="text-primary hover:text-primary text-base font-semibold transition-colors"
+                class="text-accent hover:text-accent text-base font-semibold transition-colors"
               >
                 {{ article.title || '无标题' }}
               </router-link>
@@ -112,7 +112,7 @@
                 :class="
                   article.is_read
                     ? 'bg-success/20 text-success'
-                    : 'bg-primary/15 text-primary'
+                    : 'bg-accent/15 text-accent'
                 "
               >
                 {{ article.is_read ? '已读' : '未读' }}
@@ -134,7 +134,7 @@
                 :href="article.link"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-primary hover:text-primary font-medium"
+                class="text-accent hover:text-accent font-medium"
               >
                 阅读原文
               </a>
@@ -153,14 +153,14 @@
           class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
           :class="
             currentPage > 1
-              ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+              ? 'bg-accent text-accent hover:bg-accent/90'
               : 'bg-muted text-muted-foreground cursor-not-allowed'
           "
           @click="$emit('goToPage', currentPage - 1)"
         >
           上一页
         </button>
-        <span class="text-foreground text-sm font-medium">
+        <span class="text-ink text-sm font-medium">
           第 {{ currentPage }} 页 / 共 {{ totalPages }} 页
         </span>
         <button
@@ -169,7 +169,7 @@
           class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
           :class="
             currentPage < totalPages
-              ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+              ? 'bg-accent text-accent hover:bg-accent/90'
               : 'bg-muted text-muted-foreground cursor-not-allowed'
           "
           @click="$emit('goToPage', currentPage + 1)"

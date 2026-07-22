@@ -9,7 +9,7 @@
         <!-- Header -->
         <div class="flex items-center justify-between">
           <h2
-            class="text-foreground flex items-center gap-2 text-lg font-bold tracking-tight"
+            class="text-ink flex items-center gap-2 text-lg font-bold tracking-tight"
           >
             <svg
               class="h-5 w-5"
@@ -30,7 +30,7 @@
             <button
               type="button"
               @click="toggleCollapsed"
-              class="bg-muted text-foreground hover:bg-muted/80 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors"
+              class="bg-muted text-ink hover:bg-muted/80 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors"
               :aria-expanded="!collapsed"
               aria-controls="server-monitor-detail"
             >
@@ -39,7 +39,7 @@
             <button
               type="button"
               @click="toggleAutoRefresh"
-              class="bg-muted text-foreground hover:bg-muted/80 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors"
+              class="bg-muted text-ink hover:bg-muted/80 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors"
             >
               {{ isSSEConnected ? '暂停' : '开始' }} 自动刷新
             </button>
@@ -48,7 +48,7 @@
 
         <!-- Server Status — single card, three cells -->
         <div
-          class="border-border/60 bg-background mt-4 overflow-hidden rounded-2xl border p-6"
+          class="border-border/60 bg-paper mt-4 overflow-hidden rounded-2xl border p-6"
         >
           <div
             class="grid grid-cols-1 divide-y lg:grid-cols-3 lg:divide-x lg:divide-y-0"
@@ -56,7 +56,7 @@
             <!-- CPU Gauge -->
             <div class="lg:px-6 lg:first:pl-0 lg:last:pr-0">
               <div class="mb-4 flex items-center justify-between">
-                <h3 class="text-foreground text-sm font-medium">
+                <h3 class="text-ink text-sm font-medium">
                   <span class="flex items-center gap-2">
                     <svg
                       class="h-4 w-4"
@@ -98,7 +98,7 @@
             <!-- Memory Gauge -->
             <div class="lg:px-6">
               <div class="mb-4 flex items-center justify-between">
-                <h3 class="text-foreground text-sm font-medium">
+                <h3 class="text-ink text-sm font-medium">
                   <span class="flex items-center gap-2">
                     <svg
                       class="h-4 w-4"
@@ -143,10 +143,10 @@
             <!-- Disk Usage -->
             <div class="lg:px-6">
               <div class="mb-4 flex items-center justify-between">
-                <h3 class="text-foreground text-sm font-medium">
+                <h3 class="text-ink text-sm font-medium">
                   <span class="flex items-center gap-2">
                     <svg
-                      class="text-foreground h-4 w-4"
+                      class="text-ink h-4 w-4"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -174,13 +174,13 @@
                 <div class="space-y-2">
                   <div class="flex justify-between text-sm">
                     <span class="text-muted-foreground">已用</span>
-                    <span class="text-foreground font-medium tabular-nums">
+                    <span class="text-ink font-medium tabular-nums">
                       {{ serverStatus?.disk_used.toFixed(2) ?? '—' }} GB
                     </span>
                   </div>
                   <div class="flex justify-between text-sm">
                     <span class="text-muted-foreground">总计</span>
-                    <span class="text-foreground font-medium tabular-nums">
+                    <span class="text-ink font-medium tabular-nums">
                       {{ serverStatus?.disk_total.toFixed(2) ?? '—' }} GB
                     </span>
                   </div>
@@ -203,10 +203,10 @@
 
         <!-- Server History Chart -->
         <div
-          class="border-border/60 bg-background mt-4 overflow-hidden rounded-2xl border p-6"
+          class="border-border/60 bg-paper mt-4 overflow-hidden rounded-2xl border p-6"
         >
           <h3
-            class="text-foreground mb-4 flex items-center gap-2 text-sm font-medium"
+            class="text-ink mb-4 flex items-center gap-2 text-sm font-medium"
           >
             <svg
               class="h-4 w-4"
@@ -243,7 +243,7 @@
       class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
     >
       <div class="flex items-center gap-4">
-        <h2 class="text-foreground flex items-center gap-2 text-sm font-medium">
+        <h2 class="text-ink flex items-center gap-2 text-sm font-medium">
           <svg
             class="h-4 w-4"
             fill="none"
@@ -267,7 +267,7 @@
               :style="{ backgroundColor: chartColors.cpu }"
             ></span>
             <span class="text-muted-foreground text-xs">CPU</span>
-            <span class="text-foreground text-xs font-medium tabular-nums">
+            <span class="text-ink text-xs font-medium tabular-nums">
               {{ serverStatus ? serverStatus.cpu_percent.toFixed(0) : '—' }}%
             </span>
           </div>
@@ -278,7 +278,7 @@
               :style="{ backgroundColor: chartColors.mem }"
             ></span>
             <span class="text-muted-foreground text-xs">内存</span>
-            <span class="text-foreground text-xs font-medium tabular-nums">
+            <span class="text-ink text-xs font-medium tabular-nums">
               {{ serverStatus ? serverStatus.mem_usage.toFixed(0) : '—' }}%
             </span>
           </div>
@@ -291,7 +291,7 @@
               }"
             ></span>
             <span class="text-muted-foreground text-xs">磁盘</span>
-            <span class="text-foreground text-xs font-medium tabular-nums">
+            <span class="text-ink text-xs font-medium tabular-nums">
               {{ serverStatus ? serverStatus.disk_usage.toFixed(0) : '—' }}%
             </span>
           </div>
@@ -318,7 +318,7 @@
         <button
           type="button"
           @click="toggleCollapsed"
-          class="bg-muted text-foreground hover:bg-muted/80 rounded-full px-3 py-1 text-xs font-medium transition-colors"
+          class="bg-muted text-ink hover:bg-muted/80 rounded-full px-3 py-1 text-xs font-medium transition-colors"
           :aria-expanded="!collapsed"
           aria-controls="server-monitor-detail"
         >
@@ -426,7 +426,7 @@ const chartColors = computed(() => {
 
   const dark = isDark.value;
   return {
-    text: readToken('--color-foreground', dark ? '#f3f4f6' : '#1f2937'),
+    text: readToken('--color-ink', dark ? '#f3f4f6' : '#1f2937'),
     muted: readToken('--color-muted-foreground', dark ? '#9ca3af' : '#6b7280'),
     border: readToken('--color-border', dark ? '#374151' : '#e5e7eb'),
     splitLine: readToken('--color-border', dark ? '#3f4651' : '#eef0f3'),
@@ -454,7 +454,7 @@ const getStatusColor = (percent: number): string => {
 // ---- layout helpers ----------------------------------------------------
 const cardClass = computed(() =>
   [
-    'border-border/60 bg-background border p-5 rounded-3xl',
+    'border-border/60 bg-paper border p-5 rounded-3xl',
     props.customClass || '',
   ]
     .filter(Boolean)

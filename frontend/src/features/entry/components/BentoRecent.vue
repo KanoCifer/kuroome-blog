@@ -11,11 +11,11 @@
         ></div>
       </div>
       <div>
-        <div class="text-primary mb-1 text-xs font-semibold">
+        <div class="text-accent mb-1 text-xs font-semibold">
           {{ post.date }}
         </div>
         <h3
-          class="text-foreground group-hover:text-primary mb-2 text-lg leading-tight font-bold transition-colors"
+          class="text-ink group-hover:text-accent mb-2 text-lg leading-tight font-bold transition-colors"
         >
           {{ post.title }}
         </h3>

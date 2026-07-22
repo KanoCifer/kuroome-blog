@@ -10,7 +10,7 @@
     ></div>
 
     <div
-      class="bg-background/20 hover:bg-background/30 relative flex h-full min-h-30 w-full items-center justify-center rounded-2xl border-2 border-dashed border-white/50 transition-colors"
+      class="bg-paper/20 hover:bg-paper/30 relative flex h-full min-h-30 w-full items-center justify-center rounded-2xl border-2 border-dashed border-white/50 transition-colors"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

@@ -126,8 +126,8 @@ const handleSubmit = async () => {
   <AuthLayout brand-width="w-1/2" form-width="lg:w-1/2">
     <template #branding>
       <div class="flex items-center gap-2 text-xl font-bold tracking-tight">
-        <IconCloud class="text-primary size-8" />
-        <span>Kanocifer<span class="text-primary">.chat</span></span>
+        <IconCloud class="text-accent size-8" />
+        <span>Kanocifer<span class="text-accent">.chat</span></span>
       </div>
       <div class="z-10 my-auto">
         <div class="flex flex-col">
@@ -147,12 +147,12 @@ const handleSubmit = async () => {
     <template #header>
       <div class="mb-8 flex flex-col items-center lg:items-start">
         <div
-          class="bg-primary text-primary-foreground mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)] lg:hidden"
+          class="bg-accent text-accent mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)] lg:hidden"
         >
           <IconCloud class="size-8" />
         </div>
         <h2
-          class="font-headline text-foreground text-center text-3xl text-[28px] font-extrabold tracking-tight lg:text-left"
+          class="font-headline text-ink text-center text-3xl text-[28px] font-extrabold tracking-tight lg:text-left"
         >
           Create your account
         </h2>
@@ -179,7 +179,7 @@ const handleSubmit = async () => {
             type="text"
             autocomplete="off"
             placeholder="username"
-            class="form-control border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="form-control border-border bg-muted text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.username,
@@ -219,7 +219,7 @@ const handleSubmit = async () => {
             type="email"
             autocomplete="off"
             placeholder="email"
-            class="form-control border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="form-control border-border bg-muted text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.email,
@@ -259,7 +259,7 @@ const handleSubmit = async () => {
             type="password"
             autocomplete="off"
             placeholder="password"
-            class="form-control border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="form-control border-border bg-muted text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.password,
@@ -299,7 +299,7 @@ const handleSubmit = async () => {
             type="password"
             autocomplete="off"
             placeholder="confirm password"
-            class="form-control border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="form-control border-border bg-muted text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.confirmPassword,
@@ -339,7 +339,7 @@ const handleSubmit = async () => {
             type="text"
             autocomplete="off"
             placeholder="email code"
-            class="form-control border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-24 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="form-control border-border bg-muted text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-24 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.emailCode,
@@ -348,7 +348,7 @@ const handleSubmit = async () => {
           />
           <button
             type="button"
-            class="bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary/30 disabled:bg-primary/50 absolute top-1/2 right-2 z-10 -translate-y-1/2 rounded-lg px-4 py-1.5 text-sm font-bold transition-colors focus:ring-2 focus:outline-none disabled:cursor-progress"
+            class="bg-accent text-accent hover:bg-accent/90 focus:ring-accent/30 disabled:bg-accent/50 absolute top-1/2 right-2 z-10 -translate-y-1/2 rounded-lg px-4 py-1.5 text-sm font-bold transition-colors focus:ring-2 focus:outline-none disabled:cursor-progress"
             :disabled="isSendingCode || isSent"
             @click="sendEmailCode"
           >
@@ -378,7 +378,7 @@ const handleSubmit = async () => {
       <div class="mt-6">
         <button
           type="submit"
-          class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-primary/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          class="bg-accent text-accent shadow-accent/30 hover:bg-accent/90 focus:ring-accent/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           :disabled="isSubmitting"
         >
           <Loader2 v-if="isSubmitting" class="h-5 w-5 animate-spin" />
@@ -411,7 +411,7 @@ const handleSubmit = async () => {
         已有账号？
         <RouterLink
           to="/login"
-          class="text-primary font-medium hover:underline"
+          class="text-accent font-medium hover:underline"
         >
           立即登录
         </RouterLink>

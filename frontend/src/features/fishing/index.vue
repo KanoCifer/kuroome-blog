@@ -25,7 +25,7 @@ onMounted(dash.init);
 </script>
 
 <template>
-  <div class="bg-background min-h-screen">
+  <div class="bg-paper min-h-screen">
     <DashboardHeader
       :analysis-open="dash.analysisOpen.value"
       :analysis-has-data="dash.analysisHasData.value"

@@ -17,7 +17,7 @@
         ease: 'easeOut',
       },
     }"
-    class="card group border-border squircle bg-background/95 relative overflow-hidden border p-6"
+    class="card group border-border squircle bg-paper/95 relative overflow-hidden border p-6"
   >
     <slot></slot>
   </motion.div>

@@ -104,15 +104,15 @@ watch(
         <button
           type="button"
           aria-label="关闭弹窗"
-          class="bg-background/60 absolute inset-0 backdrop-blur-sm"
+          class="bg-paper/60 absolute inset-0 backdrop-blur-sm"
           @click="emit('close')"
         />
         <section
-          class="border-border bg-background relative z-10 w-full max-w-2xl rounded-2xl border p-5 shadow-2xl"
+          class="border-border bg-paper relative z-10 w-full max-w-2xl rounded-2xl border p-5 shadow-2xl"
         >
           <header class="mb-4 flex items-start justify-between gap-4">
             <div>
-              <h3 class="text-foreground text-lg font-semibold">
+              <h3 class="text-ink text-lg font-semibold">
                 通知渠道配置
               </h3>
               <p class="text-muted-foreground mt-1 text-sm">
@@ -143,8 +143,8 @@ watch(
                   class="rounded-xl border px-3 py-2 text-sm transition"
                   :class="
                     localForm.channels.includes(channel.value)
-                      ? 'border-primary/30 bg-primary/15 text-primary'
-                      : 'border-border bg-background text-foreground hover:bg-muted'
+                      ? 'border-accent/30 bg-accent/15 text-accent'
+                      : 'border-border bg-paper text-ink hover:bg-muted'
                   "
                   @click="toggleChannel(channel.value)"
                 >
@@ -163,12 +163,12 @@ watch(
                 <label
                   v-for="point in reminderPointOptions"
                   :key="point.key"
-                  class="border-border bg-background text-foreground flex items-center gap-2 rounded-xl border px-3 py-2 text-sm"
+                  class="border-border bg-paper text-ink flex items-center gap-2 rounded-xl border px-3 py-2 text-sm"
                 >
                   <input
                     v-model="localForm[point.key]"
                     type="checkbox"
-                    class="text-primary focus:ring-primary/30 border-border h-4 w-4 rounded"
+                    class="text-accent focus:ring-accent/30 border-border h-4 w-4 rounded"
                   />
                   {{ point.label }}
                 </label>
@@ -187,7 +187,7 @@ watch(
                   v-model="localForm.email"
                   type="email"
                   placeholder="name@example.com"
-                  class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
               <label
@@ -201,7 +201,7 @@ watch(
                   v-model="localForm.feishu_webhook_url"
                   type="text"
                   placeholder="https://open.feishu.cn/open-apis/bot/v2/hook/..."
-                  class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
               <label
@@ -215,14 +215,14 @@ watch(
                   v-model="localForm.bark_device_key"
                   type="text"
                   placeholder="请输入 Bark 设备 Key"
-                  class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
             </section>
 
             <div
               v-if="testResult"
-              class="border-border bg-muted/50 text-foreground rounded-xl border px-3 py-2 text-xs"
+              class="border-border bg-muted/50 text-ink rounded-xl border px-3 py-2 text-xs"
             >
               <p class="mb-2 font-medium">测试结果</p>
               <div class="flex flex-wrap gap-2">
@@ -259,7 +259,7 @@ watch(
               <button
                 type="button"
                 :disabled="isTesting"
-                class="border-primary/30 bg-primary/15 text-primary hover:bg-muted rounded-xl border px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60"
+                class="border-accent/30 bg-accent/15 text-accent hover:bg-muted rounded-xl border px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60"
                 @click="emitTest"
               >
                 {{ isTesting ? '测试中...' : '发送测试通知' }}
@@ -267,7 +267,7 @@ watch(
               <button
                 type="button"
                 :disabled="isSaving"
-                class="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60"
+                class="bg-accent text-accent hover:bg-accent/90 rounded-xl px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60"
                 @click="emitSave"
               >
                 {{ isSaving ? '保存中...' : '保存配置' }}

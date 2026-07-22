@@ -4,7 +4,7 @@
   >
     <!-- 背景水波纹效果 -->
     <div
-      class="from-primary/30 via-secondary/30 to-secondary/30 absolute inset-0 bg-linear-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+      class="from-accent/30 via-secondary/30 to-secondary/30 absolute inset-0 bg-linear-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-100"
     />
 
     <!-- 顶部：图标和标题 -->
@@ -13,11 +13,11 @@
       <div
         class="flex h-10 w-10 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110 group-hover:rounded-xl"
       >
-        <CalendarDays class="text-foreground size-6" />
+        <CalendarDays class="text-ink size-6" />
       </div>
 
       <div class="mb-3 flex items-center justify-end-safe gap-3">
-        <h3 class="text-foreground text-lg font-semibold">
+        <h3 class="text-ink text-lg font-semibold">
           {{ monthLabel }}
         </h3>
         <span class="text-muted-foreground text-sm">{{ yearLabel }}</span>
@@ -33,7 +33,7 @@
         v-for="(label, idx) in weekdays"
         :key="idx"
         class="py-1 text-xs font-medium"
-        :class="idx === weekdayToday ? 'text-primary' : 'text-muted-foreground'"
+        :class="idx === weekdayToday ? 'text-accent' : 'text-muted-foreground'"
       >
         {{ label }}
       </span>
@@ -54,8 +54,8 @@
         class="mx-auto flex aspect-square w-full max-w-8 items-center justify-center rounded-lg text-sm transition-colors"
         :class="
           day === today
-            ? 'bg-primary text-primary-foreground font-bold'
-            : 'text-muted-foreground hover:bg-primary/10'
+            ? 'bg-accent text-accent font-bold'
+            : 'text-muted-foreground hover:bg-accent/10'
         "
       >
         {{ day }}

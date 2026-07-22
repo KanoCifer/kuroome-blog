@@ -17,10 +17,10 @@ interface ConfirmDialogProps {
 
 const VARIANT_STYLE = {
   default: {
-    iconBg: 'bg-primary/10',
-    iconColor: 'text-primary',
+    iconBg: 'bg-accent/10',
+    iconColor: 'text-accent',
     iconPath: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-    confirmClass: 'bg-primary text-primary-foreground hover:bg-primary/90',
+    confirmClass: 'bg-accent text-accent hover:bg-accent/90',
   },
   destructive: {
     iconBg: 'bg-destructive/10',
@@ -76,7 +76,7 @@ export function ConfirmDialog({
               mass: 0.8,
             }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-background border-border/60 w-full max-w-[420px] rounded-2xl border p-6 shadow-2xl"
+            className="bg-paper border-border/60 w-full max-w-[420px] rounded-2xl border p-6 shadow-2xl"
             role="alertdialog"
             aria-modal="true"
           >
@@ -99,7 +99,7 @@ export function ConfirmDialog({
                 </svg>
               </span>
               <div className="min-w-0 flex-1">
-                <h2 className="text-foreground text-base font-semibold">
+                <h2 className="text-ink text-base font-semibold">
                   {title}
                 </h2>
                 <p className="text-muted-foreground mt-1 text-sm leading-relaxed">

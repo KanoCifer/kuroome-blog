@@ -10,14 +10,14 @@
     >
       <article
         :class="[
-          'border-border/40 bg-background group-hover:border-primary/30 relative overflow-hidden rounded-2xl border p-5 shadow-sm transition-all duration-500 ease-out',
+          'border-border/40 bg-paper group-hover:border-accent/30 relative overflow-hidden rounded-2xl border p-5 shadow-sm transition-all duration-500 ease-out',
           'group-hover:-translate-y-0.5',
           isFeatured ? 'sm:p-7' : '',
         ]"
       >
         <!-- Left book-spine accent — scales up on hover -->
         <div
-          class="bg-primary absolute top-0 left-0 h-full w-[3px] origin-top scale-y-0 transition-transform duration-500 ease-out group-hover:scale-y-100"
+          class="bg-accent absolute top-0 left-0 h-full w-[3px] origin-top scale-y-0 transition-transform duration-500 ease-out group-hover:scale-y-100"
           aria-hidden="true"
         />
 
@@ -46,7 +46,7 @@
             >
               <span
                 v-if="post.is_pinned"
-                class="bg-primary/15 text-primary inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold"
+                class="bg-accent/15 text-accent inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -63,9 +63,9 @@
               </span>
               <span
                 v-if="post.tags?.length"
-                class="text-foreground/70 inline-flex items-center gap-1 font-medium"
+                class="text-ink/70 inline-flex items-center gap-1 font-medium"
               >
-                <span class="text-primary/70 font-serif">#</span>
+                <span class="text-accent/70 font-serif">#</span>
                 {{ post.tags![0] }}
               </span>
               <span aria-hidden="true" class="text-border">·</span>
@@ -77,7 +77,7 @@
             <!-- 标题：衬线大字，featured 用 text-3xl -->
             <h2
               :class="[
-                'text-foreground group-hover:text-primary font-serif leading-snug font-semibold transition-colors duration-300 ease-out',
+                'text-ink group-hover:text-accent font-serif leading-snug font-semibold transition-colors duration-300 ease-out',
                 isFeatured ? 'text-2xl sm:text-3xl' : 'text-lg sm:text-xl',
               ]"
               style="text-wrap: balance"
@@ -87,16 +87,16 @@
 
             <!-- 装饰小线：featured 走「— 篇 —」章回标，普通细线 -->
             <div v-if="isFeatured" class="mt-3 flex items-center gap-2">
-              <div class="bg-primary/40 h-px w-8" />
+              <div class="bg-accent/40 h-px w-8" />
               <span
                 class="text-muted-foreground font-serif text-[11px] tracking-[0.2em] italic"
                 >篇</span
               >
-              <div class="bg-primary/40 h-px w-8" />
+              <div class="bg-accent/40 h-px w-8" />
             </div>
             <div
               v-else
-              class="bg-border group-hover:bg-primary/30 my-2.5 h-px w-10 transition-all duration-500 ease-out group-hover:w-16"
+              class="bg-border group-hover:bg-accent/30 my-2.5 h-px w-10 transition-all duration-500 ease-out group-hover:w-16"
               aria-hidden="true"
             />
 
@@ -104,7 +104,7 @@
             <p
               v-if="post.summary"
               :class="[
-                'text-foreground/75 leading-relaxed',
+                'text-ink/75 leading-relaxed',
                 isFeatured
                   ? 'mt-1 line-clamp-3 text-sm sm:line-clamp-4 sm:text-[15px]'
                   : 'line-clamp-2 text-sm',
@@ -115,7 +115,7 @@
             <p
               v-else
               :class="[
-                'text-foreground/35 italic',
+                'text-ink/35 italic',
                 isFeatured ? 'mt-1 text-sm' : 'text-xs',
               ]"
             >
@@ -124,7 +124,7 @@
 
             <!-- Footer meta: 阅读时长 / 字数 / 浏览量 -->
             <footer
-              class="text-foreground/55 mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-4 text-xs"
+              class="text-ink/55 mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-4 text-xs"
             >
               <span class="inline-flex items-center gap-1">
                 <svg

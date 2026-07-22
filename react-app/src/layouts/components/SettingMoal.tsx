@@ -94,12 +94,12 @@ export function SettingModal({
         <header className="shrink-0 px-5 pt-3 pb-4">
           <div className="bg-muted mx-auto mb-4 h-1.5 w-10 rounded-full" />
           <div className="flex items-center justify-between">
-            <h1 className="text-foreground font-serif text-lg font-semibold">
+            <h1 className="text-ink font-serif text-lg font-semibold">
               偏好设置
             </h1>
             <button
               onClick={onClose}
-              className="text-muted-foreground hover:bg-muted hover:text-foreground flex h-9 w-9 items-center justify-center rounded-full transition-colors active:scale-[0.96]"
+              className="text-muted-foreground hover:bg-muted hover:text-ink flex h-9 w-9 items-center justify-center rounded-full transition-colors active:scale-[0.96]"
               aria-label="关闭"
             >
               <X className="h-5 w-5" />
@@ -112,7 +112,7 @@ export function SettingModal({
         <div className="space-y-8">
           {/* 主题模式 */}
           <section>
-            <h2 className="text-foreground mb-3 font-serif text-base font-semibold">
+            <h2 className="text-ink mb-3 font-serif text-base font-semibold">
               主题模式
             </h2>
             <div className="grid grid-cols-3 gap-3">
@@ -125,15 +125,15 @@ export function SettingModal({
                   }}
                   className={`flex flex-col items-center gap-2 rounded-xl border p-3 transition-colors ${
                     theme === value
-                      ? 'border-primary bg-primary/5 shadow-sm'
-                      : 'border-border hover:border-primary bg-background'
+                      ? 'border-accent bg-accent/5 shadow-sm'
+                      : 'border-border hover:border-accent bg-paper'
                   }`}
                 >
                   <Icon
-                    className={`h-5 w-5 ${theme === value ? 'text-primary' : 'text-foreground'}`}
+                    className={`h-5 w-5 ${theme === value ? 'text-accent' : 'text-ink'}`}
                   />
                   <span
-                    className={`text-xs ${theme === value ? 'text-primary font-semibold' : 'text-foreground'}`}
+                    className={`text-xs ${theme === value ? 'text-accent font-semibold' : 'text-ink'}`}
                   >
                     {label}
                   </span>
@@ -144,7 +144,7 @@ export function SettingModal({
 
           {/* 字体 */}
           <section>
-            <h2 className="text-foreground mb-3 font-serif text-base font-semibold">
+            <h2 className="text-ink mb-3 font-serif text-base font-semibold">
               字体
             </h2>
             <div className="grid grid-cols-2 gap-3">
@@ -165,12 +165,12 @@ export function SettingModal({
                   onClick={() => setFont(o.value)}
                   className={`flex flex-col items-center gap-1 rounded-xl border p-3 transition-colors ${
                     font === o.value
-                      ? 'border-primary bg-primary/5 !shadow-sm'
-                      : 'border-border bg-background hover:border-primary'
+                      ? 'border-accent bg-accent/5 !shadow-sm'
+                      : 'border-border bg-paper hover:border-accent'
                   }`}
                 >
                   <span
-                    className={`text-sm font-semibold ${font === o.value ? 'text-primary' : 'text-foreground'}`}
+                    className={`text-sm font-semibold ${font === o.value ? 'text-accent' : 'text-ink'}`}
                     style={
                       o.value === 'harmonyos'
                         ? {
@@ -192,7 +192,7 @@ export function SettingModal({
 
           {/* 配色方案 */}
           <section>
-            <h2 className="text-foreground mb-3 font-serif text-base font-semibold">
+            <h2 className="text-ink mb-3 font-serif text-base font-semibold">
               配色方案
             </h2>
             <div className="space-y-2">
@@ -202,8 +202,8 @@ export function SettingModal({
                   onClick={() => setScheme(s.value)}
                   className={`flex w-full items-stretch overflow-hidden rounded-xl border transition-colors ${
                     scheme === s.value
-                      ? 'border-primary bg-primary/5 !shadow-sm'
-                      : 'border-border bg-background hover:border-primary'
+                      ? 'border-accent bg-accent/5 !shadow-sm'
+                      : 'border-border bg-paper hover:border-accent'
                   }`}
                 >
                   <div className="flex w-[72px] flex-col">
@@ -216,7 +216,7 @@ export function SettingModal({
                     ))}
                   </div>
                   <div className="flex-1 px-4 py-3 text-left">
-                    <div className="text-foreground text-sm font-semibold">
+                    <div className="text-ink text-sm font-semibold">
                       {s.label}
                     </div>
                     <div className="text-muted-foreground mt-0.5 text-[11px] italic">

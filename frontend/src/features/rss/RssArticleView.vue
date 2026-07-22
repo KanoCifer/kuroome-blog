@@ -172,7 +172,7 @@ watch(
       <!-- Loading State -->
       <div v-if="isLoading" class="py-12 text-center">
         <div
-          class="border-border border-t-primary mx-auto h-8 w-8 animate-spin rounded-full border-2"
+          class="border-border border-t-accent mx-auto h-8 w-8 animate-spin rounded-full border-2"
         ></div>
         <p class="text-muted-foreground mt-2">Loading...</p>
       </div>
@@ -185,7 +185,7 @@ watch(
         <p class="text-destructive">{{ errorMessage }}</p>
         <button
           @click="handleRetry"
-          class="bg-primary text-primary-foreground hover:bg-primary/90 mt-4 rounded-full px-6 py-2 text-sm font-medium"
+          class="bg-accent text-accent hover:bg-accent/90 mt-4 rounded-full px-6 py-2 text-sm font-medium"
         >
           Retry
         </button>
@@ -201,8 +201,8 @@ watch(
             class="inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors"
             :class="
               article.is_read
-                ? 'bg-muted text-foreground hover:bg-muted'
-                : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                ? 'bg-muted text-ink hover:bg-muted'
+                : 'bg-accent text-accent hover:bg-accent/90'
             "
           >
             <svg
@@ -253,14 +253,14 @@ watch(
 
         <!-- Article Body -->
         <div
-          class="border-border bg-background overflow-hidden rounded-2xl border shadow-sm"
+          class="border-border bg-paper overflow-hidden rounded-2xl border shadow-sm"
         >
           <div class="border-border border-border border-b p-8">
-            <h1 class="text-primary mb-4 text-3xl leading-tight font-bold">
+            <h1 class="text-accent mb-4 text-3xl leading-tight font-bold">
               {{ article.title }}
             </h1>
 
-            <div class="text-primary flex flex-wrap gap-x-6 gap-y-3 text-sm">
+            <div class="text-accent flex flex-wrap gap-x-6 gap-y-3 text-sm">
               <div
                 v-if="article.author"
                 class="flex items-center gap-1.5 font-medium"
@@ -325,7 +325,7 @@ watch(
                 :href="article.link"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-primary hover:text-primary flex items-center gap-1.5 hover:underline"
+                class="text-accent hover:text-accent flex items-center gap-1.5 hover:underline"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -363,7 +363,7 @@ watch(
       :initial="{ opacity: 0, y: 20 }"
       :animate="{ opacity: 1, y: 0 }"
       :transition="SPRING"
-      class="bg-primary/15 text-foreground fixed right-4 bottom-4 w-2xs rounded-lg px-4 py-2 text-sm opacity-90 shadow-lg"
+      class="bg-accent/15 text-ink fixed right-4 bottom-4 w-2xs rounded-lg px-4 py-2 text-sm opacity-90 shadow-lg"
     >
       {{ percent }}% 阅读进度
       <a-flex vertical gap="small">

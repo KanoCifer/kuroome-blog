@@ -14,14 +14,14 @@
         <div>
           <p class="text-muted-foreground mb-1 text-sm">读完这些之后</p>
           <h2
-            class="text-foreground font-serif text-2xl font-semibold tracking-tight sm:text-3xl"
+            class="text-ink font-serif text-2xl font-semibold tracking-tight sm:text-3xl"
           >
             接下来读什么
           </h2>
         </div>
         <button
           type="button"
-          class="text-muted-foreground hover:text-foreground hover:bg-muted inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          class="text-muted-foreground hover:text-ink hover:bg-muted inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
           :disabled="isLoading"
           @click="onRefresh"
           aria-label="换一批"
@@ -53,7 +53,7 @@
         <div
           v-for="i in count"
           :key="i"
-          class="bg-background flex w-56 flex-shrink-0 animate-pulse flex-col gap-3 rounded-2xl p-4"
+          class="bg-paper flex w-56 flex-shrink-0 animate-pulse flex-col gap-3 rounded-2xl p-4"
         >
           <div class="bg-muted aspect-[2/3] w-full rounded-md" />
           <div class="bg-muted h-4 w-3/4 rounded" />
@@ -66,7 +66,7 @@
     <template #card="{ book, open, ratingScore }">
       <button
         type="button"
-        class="group bg-background hover:border-primary/40 flex w-56 flex-shrink-0 snap-start flex-col gap-3 rounded-2xl border border-transparent p-4 text-left transition-colors sm:w-60"
+        class="group bg-paper hover:border-accent/40 flex w-56 flex-shrink-0 snap-start flex-col gap-3 rounded-2xl border border-transparent p-4 text-left transition-colors sm:w-60"
         @click="open(book)"
       >
         <Motion
@@ -82,13 +82,13 @@
           />
           <span
             v-if="book.newRating > 0"
-            class="bg-background/80 text-foreground absolute top-2 right-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium tabular-nums backdrop-blur-md"
+            class="bg-paper/80 text-ink absolute top-2 right-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium tabular-nums backdrop-blur-md"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="currentColor"
-              class="text-primary h-3 w-3"
+              class="text-accent h-3 w-3"
               aria-hidden="true"
             >
               <path
@@ -102,7 +102,7 @@
         </Motion>
         <div class="min-w-0">
           <p
-            class="text-foreground line-clamp-2 font-serif text-base leading-tight"
+            class="text-ink line-clamp-2 font-serif text-base leading-tight"
           >
             {{ book.title }}
           </p>
@@ -131,7 +131,7 @@
     <template #load-more="{ loading: isLoading, onLoadMore }">
       <button
         type="button"
-        class="text-muted-foreground hover:text-foreground hover:border-primary/40 flex w-40 flex-shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-2xl border border-dashed text-sm transition-colors disabled:opacity-50 sm:w-44"
+        class="text-muted-foreground hover:text-ink hover:border-accent/40 flex w-40 flex-shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-2xl border border-dashed text-sm transition-colors disabled:opacity-50 sm:w-44"
         :disabled="isLoading"
         @click="onLoadMore"
       >

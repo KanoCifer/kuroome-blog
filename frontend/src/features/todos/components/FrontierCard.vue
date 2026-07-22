@@ -1,6 +1,6 @@
 <template>
   <article
-    class="bg-background border-border group flex flex-col rounded-3xl border p-4 shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent),0_18px_32px_color-mix(in_oklch,var(--ink)_8%,transparent)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_2px_2px_color-mix(in_oklch,var(--ink)_7%,transparent),0_10px_22px_color-mix(in_oklch,var(--ink)_12%,transparent),0_24px_40px_color-mix(in_oklch,var(--ink)_10%,transparent)]"
+    class="bg-paper border-border group flex flex-col rounded-3xl border p-4 shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent),0_18px_32px_color-mix(in_oklch,var(--ink)_8%,transparent)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_2px_2px_color-mix(in_oklch,var(--ink)_7%,transparent),0_10px_22px_color-mix(in_oklch,var(--ink)_12%,transparent),0_24px_40px_color-mix(in_oklch,var(--ink)_10%,transparent)]"
   >
     <!-- open affordance: a real button wrapping the content area (no nested interactives) -->
     <button
@@ -10,7 +10,7 @@
     >
       <!-- badges -->
       <span class="mb-2 flex flex-wrap items-center gap-1">
-        <CircleCheckBig class="text-primary size-5" />
+        <CircleCheckBig class="text-accent size-5" />
         <TypeBadge :type="task.type" />
         <PriorityBadge :priority="task.priority" />
         <KindBadge :kind="task.kind" />
@@ -22,14 +22,14 @@
         </span>
         <span
           v-if="task.slug"
-          class="bg-primary/10 text-primary rounded-full px-1.5 py-px text-[10px] font-medium"
+          class="bg-accent/10 text-accent rounded-full px-1.5 py-px text-[10px] font-medium"
         >
           {{ task.slug }}
         </span>
       </span>
 
       <!-- title -->
-      <span class="text-foreground text-sm font-medium">{{ task.title }}</span>
+      <span class="text-ink text-sm font-medium">{{ task.title }}</span>
 
       <!-- description -->
       <span
@@ -65,7 +65,7 @@
       >
         <button
           type="button"
-          class="text-muted-foreground hover:bg-muted hover:text-primary focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
+          class="text-muted-foreground hover:bg-muted hover:text-accent focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
           title="推进状态"
           aria-label="推进状态"
           @click="$emit('cycle', task.slug)"

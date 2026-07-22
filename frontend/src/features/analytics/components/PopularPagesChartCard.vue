@@ -1,9 +1,9 @@
 <template>
   <div
-    class="border-border/60 bg-background h-full rounded-3xl border p-6 shadow-sm"
+    class="border-border/60 bg-paper h-full rounded-3xl border p-6 shadow-sm"
   >
     <h2
-      class="text-foreground mb-2 flex items-center gap-2 text-sm font-medium"
+      class="text-ink mb-2 flex items-center gap-2 text-sm font-medium"
     >
       <icon-popular class="size-5" /> 热门页面
     </h2>
@@ -20,7 +20,7 @@
       class="flex min-h-[14rem] flex-col items-center justify-center gap-2 px-6 text-center"
     >
       <icon-popular class="text-muted-foreground/50 size-8" />
-      <p class="text-foreground text-sm font-medium">暂无页面浏览数据</p>
+      <p class="text-ink text-sm font-medium">暂无页面浏览数据</p>
       <p class="text-muted-foreground max-w-xs text-xs">
         开始接收流量后，热门页面将显示在这里。
       </p>

@@ -51,20 +51,20 @@ watch(
     <div class="fixed inset-0 z-[60] flex items-center justify-center">
       <!-- 遮罩 -->
       <div
-        class="bg-foreground/80 absolute inset-0 backdrop-blur-sm"
+        class="bg-ink/80 absolute inset-0 backdrop-blur-sm"
         @click="emit('close')"
       />
 
       <!-- 顶部工具条 -->
       <div
-        class="text-background absolute top-0 right-0 left-0 z-10 flex items-center justify-between px-5 py-4"
+        class="text-paper absolute top-0 right-0 left-0 z-10 flex items-center justify-between px-5 py-4"
       >
         <span class="text-sm font-medium tabular-nums">
           {{ index + 1 }} / {{ images.length }}
         </span>
         <button
           type="button"
-          class="hover:bg-background/20 inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+          class="hover:bg-paper/20 inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
           aria-label="关闭"
           @click="emit('close')"
         >
@@ -76,7 +76,7 @@ watch(
       <button
         v-if="images.length > 1"
         type="button"
-        class="text-background hover:bg-background/20 absolute left-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
+        class="text-paper hover:bg-paper/20 absolute left-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
         aria-label="上一张"
         @click="prev"
       >
@@ -94,7 +94,7 @@ watch(
       <button
         v-if="images.length > 1"
         type="button"
-        class="text-background hover:bg-background/20 absolute right-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
+        class="text-paper hover:bg-paper/20 absolute right-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
         aria-label="下一张"
         @click="next"
       >

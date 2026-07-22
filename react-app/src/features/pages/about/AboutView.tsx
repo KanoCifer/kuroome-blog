@@ -23,7 +23,7 @@ export default function AboutView() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="bg-background/95 mb-20 flex h-full w-full flex-col items-center px-4 py-8"
+      className="bg-paper/95 mb-20 flex h-full w-full flex-col items-center px-4 py-8"
     >
       {/* Hero Section */}
       <motion.div
@@ -43,7 +43,7 @@ export default function AboutView() {
         </div>
 
         {/* Name & Tagline */}
-        <h1 className="text-foreground mb-2 text-2xl font-bold">Kuroome</h1>
+        <h1 className="text-ink mb-2 text-2xl font-bold">Kuroome</h1>
         <p className="text-muted-foreground text-sm">全栈开发者 · 读书爱好者</p>
       </motion.div>
 
@@ -52,7 +52,7 @@ export default function AboutView() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.5, ease: 'easeOut' }}
-        className="border-border/60 bg-background/80 mb-6 w-full max-w-md rounded-2xl border p-5 shadow-sm backdrop-blur-sm"
+        className="border-border/60 bg-paper/80 mb-6 w-full max-w-md rounded-2xl border p-5 shadow-sm backdrop-blur-sm"
       >
         <p className="text-card-foreground text-sm leading-relaxed">
           你好！欢迎来到我的博客。这个网站是我的第一个 Web
@@ -77,7 +77,7 @@ export default function AboutView() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.15 + i * 0.03, duration: 0.3 }}
-              className="bg-primary/10 text-primary hover:bg-primary/20 cursor-default rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
+              className="bg-accent/10 text-accent hover:bg-accent/20 cursor-default rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
             >
               {tech}
             </motion.span>
@@ -115,7 +115,7 @@ export default function AboutView() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.25, duration: 0.5, ease: 'easeOut' }}
-        className="border-border/60 bg-background/80 mb-8 w-full max-w-md rounded-2xl border p-4 shadow-sm backdrop-blur-sm"
+        className="border-border/60 bg-paper/80 mb-8 w-full max-w-md rounded-2xl border p-4 shadow-sm backdrop-blur-sm"
       >
         <h2 className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">
           兴趣爱好

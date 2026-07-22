@@ -4,7 +4,7 @@
     <section>
       <div class="mb-3 flex items-baseline justify-between">
         <h2
-          class="text-foreground font-serif text-lg font-medium tracking-tight"
+          class="text-ink font-serif text-lg font-medium tracking-tight"
         >
           本周复盘
         </h2>
@@ -13,14 +13,14 @@
         }}</span>
       </div>
 
-      <div class="border-border bg-background rounded-3xl border px-6 py-5">
+      <div class="border-border bg-surface rounded-3xl border px-6 py-5">
         <!-- 主图：本周完成数 + 真实同比 -->
         <div class="text-muted-foreground font-serif text-xs tracking-widest">
           本周完成
         </div>
         <div class="mt-1.5 flex items-baseline gap-3">
           <span
-            class="text-foreground font-family-averia text-5xl leading-none font-normal tracking-tight tabular-nums"
+            class="text-ink font-family-averia text-5xl leading-none font-normal tracking-tight tabular-nums"
           >
             {{ displayValue }}
           </span>
@@ -69,7 +69,7 @@
     <section>
       <div class="mb-3 flex items-baseline justify-between">
         <h2
-          class="text-foreground font-serif text-lg font-medium tracking-tight"
+          class="text-ink font-serif text-lg font-medium tracking-tight"
         >
           类型分布
         </h2>
@@ -81,7 +81,7 @@
           :key="row.type"
           class="flex items-center gap-3"
         >
-          <span class="text-foreground w-16 shrink-0 text-sm">{{
+          <span class="text-ink w-16 shrink-0 text-sm">{{
             row.type
           }}</span>
           <div class="bg-muted h-2 flex-1 overflow-hidden rounded-full">
@@ -108,7 +108,7 @@
       <div class="mb-3 flex items-baseline justify-between">
         <div class="flex items-center gap-2">
           <h2
-            class="text-foreground font-serif text-lg font-medium tracking-tight"
+            class="text-ink font-serif text-lg font-medium tracking-tight"
           >
             最近完成
           </h2>
@@ -264,22 +264,22 @@ const supporting = computed(() => {
     {
       label: '新建',
       value: createdThisWeek.value,
-      valueClass: 'text-foreground',
+      valueClass: 'text-ink',
     },
     {
       label: '进行中',
       value: inProgress(store.tasks).length,
-      valueClass: 'text-foreground',
+      valueClass: 'text-ink',
     },
     {
       label: '逾期',
       value: overdueCount,
-      valueClass: overdueCount ? 'text-destructive' : 'text-foreground',
+      valueClass: overdueCount ? 'text-destructive' : 'text-ink',
     },
     {
       label: 'P0',
       value: p0,
-      valueClass: p0 ? 'text-warning' : 'text-foreground',
+      valueClass: p0 ? 'text-warning' : 'text-ink',
     },
   ];
 });

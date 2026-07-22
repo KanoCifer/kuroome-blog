@@ -34,14 +34,14 @@
             type="search"
             placeholder="在字里行间，寻一句心动…"
             aria-label="搜索文章"
-            class="text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:ring-primary/20 border-border bg-background w-full rounded-xl border py-3 pr-10 pl-10 font-serif text-sm placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="text-ink placeholder:text-muted-foreground/70 focus:border-accent focus:ring-accent/20 border-border bg-paper w-full rounded-xl border py-3 pr-10 pl-10 font-serif text-sm placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             @keyup.enter="handleSearch"
           />
           <button
             v-if="searchQuery"
             type="button"
             aria-label="清空搜索"
-            class="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center pr-3"
+            class="text-muted-foreground hover:text-ink absolute inset-y-0 right-0 flex items-center pr-3"
             @click="clearSearch"
           >
             <svg
@@ -67,10 +67,10 @@
           <button
             v-if="activeTag"
             type="button"
-            class="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+            class="border-border bg-paper text-muted-foreground hover:bg-muted hover:text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
             @click="handleResetFilter"
           >
-            <span class="text-primary/70 font-serif italic">#</span>
+            <span class="text-accent/70 font-serif italic">#</span>
             <span class="font-serif">{{ activeTag }}</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -92,7 +92,7 @@
           <router-link
             v-if="user.isAuthenticated"
             to="/blog/new"
-            class="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring inline-flex w-fit items-center rounded-lg px-4 py-2 text-sm font-semibold shadow-sm focus-visible:ring-2 focus-visible:ring-offset-2"
+            class="bg-accent text-accent hover:bg-accent/90 focus-visible:ring-ring inline-flex w-fit items-center rounded-lg px-4 py-2 text-sm font-semibold shadow-sm focus-visible:ring-2 focus-visible:ring-offset-2"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -131,13 +131,13 @@
                 >Volume · 壹</span
               >
               <h2
-                class="text-foreground font-serif text-base font-semibold sm:text-lg"
+                class="text-ink font-serif text-base font-semibold sm:text-lg"
               >
                 近期文章
               </h2>
             </div>
             <div class="text-muted-foreground/70 flex items-center gap-1.5">
-              <div class="bg-primary/40 h-px w-6" />
+              <div class="bg-accent/40 h-px w-6" />
               <span class="font-mono text-[10px] tracking-[0.2em] uppercase"
                 >Recent</span
               >
@@ -154,13 +154,13 @@
                 >Volume · 壹</span
               >
               <h2
-                class="text-foreground font-serif text-base font-semibold sm:text-lg"
+                class="text-ink font-serif text-base font-semibold sm:text-lg"
               >
-                <span class="text-primary/70 mr-1">#</span>{{ activeTag }}
+                <span class="text-accent/70 mr-1">#</span>{{ activeTag }}
               </h2>
             </div>
             <div class="text-muted-foreground/70 flex items-center gap-1.5">
-              <div class="bg-primary/40 h-px w-6" />
+              <div class="bg-accent/40 h-px w-6" />
               <span class="font-mono text-[10px] tracking-[0.2em] uppercase"
                 >Category</span
               >
@@ -172,12 +172,12 @@
             v-if="isLoading"
             role="status"
             aria-live="polite"
-            class="border-border bg-background/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center"
+            class="border-border bg-paper/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center"
           >
             <div
-              class="border-primary/20 border-t-primary mb-5 h-12 w-12 animate-spin rounded-full border-4"
+              class="border-accent/20 border-t-accent mb-5 h-12 w-12 animate-spin rounded-full border-4"
             ></div>
-            <h3 class="text-foreground text-base font-semibold">
+            <h3 class="text-ink text-base font-semibold">
               正在翻开新的一页…
             </h3>
             <p class="text-muted-foreground mt-2 font-serif text-sm italic">
@@ -220,7 +220,7 @@
 
           <div
             v-else-if="posts.length === 0"
-            class="border-border bg-background/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center"
+            class="border-border bg-paper/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -237,7 +237,7 @@
                 d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25M16.5 7.5V18a2.25 2.25 0 0 0 2.25 2.25M16.5 7.5V4.875c0-.621-.504-1.125-1.125-1.125H4.125C3.504 3.75 3 4.254 3 4.875V18a2.25 2.25 0 0 0 2.25 2.25h13.5M6 7.5h3v3H6v-3Z"
               />
             </svg>
-            <h3 class="text-foreground font-serif text-base font-semibold">
+            <h3 class="text-ink font-serif text-base font-semibold">
               {{ activeTag ? '此卷尚是空白' : '书页尚待落墨' }}
             </h3>
             <p
@@ -253,7 +253,7 @@
               <button
                 v-if="activeTag"
                 type="button"
-                class="border-border text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg border px-4 py-2 text-sm font-medium"
+                class="border-border text-muted-foreground hover:bg-muted hover:text-ink rounded-lg border px-4 py-2 text-sm font-medium"
                 @click="handleResetFilter"
               >
                 翻看全卷
@@ -261,7 +261,7 @@
               <router-link
                 v-if="user.isAuthenticated"
                 to="/blog/new"
-                class="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 text-sm font-semibold"
+                class="bg-accent text-accent hover:bg-accent/90 rounded-lg px-4 py-2 text-sm font-semibold"
               >
                 落笔第一篇
               </router-link>
@@ -294,7 +294,7 @@
             aria-label="博客分页"
           >
             <ul
-              class="border-border/80 bg-background/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2"
+              class="border-border/80 bg-paper/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2"
             >
               <li>
                 <button
@@ -304,7 +304,7 @@
                   class="focus-visible:ring-ring inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                   :class="
                     pagination?.has_prev
-                      ? 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                      ? 'text-muted-foreground hover:bg-muted hover:text-ink'
                       : 'text-muted-foreground/50 cursor-not-allowed'
                   "
                   @click="goToPage(pagination!.prev_num!)"
@@ -345,8 +345,8 @@
                     class="focus-visible:ring-ring inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                     :class="
                       item === pagination?.page
-                        ? 'bg-primary text-primary-foreground'
-                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                        ? 'bg-accent text-accent'
+                        : 'text-muted-foreground hover:bg-muted hover:text-ink'
                     "
                     @click="goToPage(item)"
                   >
@@ -363,7 +363,7 @@
                   class="focus-visible:ring-ring inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                   :class="
                     pagination?.has_next
-                      ? 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                      ? 'text-muted-foreground hover:bg-muted hover:text-ink'
                       : 'text-muted-foreground/50 cursor-not-allowed'
                   "
                   @click="goToPage(pagination!.next_num!)"

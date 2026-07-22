@@ -124,7 +124,7 @@ const handleSubmit = async () => {
       @click.self="handleCancel"
     >
       <div class="t-modal" :class="{ 'is-open': isOpen }">
-        <h3 class="text-foreground mb-4 text-lg font-semibold">
+        <h3 class="text-ink mb-4 text-lg font-semibold">
           钓鱼反馈
           <span class="text-muted-foreground ml-2 text-sm font-normal"
             >你的反馈会帮助我们改进</span
@@ -140,7 +140,7 @@ const handleSubmit = async () => {
 
         <div class="space-y-4">
           <div>
-            <label class="text-foreground mb-2 block text-sm font-medium"
+            <label class="text-ink mb-2 block text-sm font-medium"
               >您的钓鱼体验</label
             >
             <div class="grid grid-cols-3 gap-2">
@@ -151,8 +151,8 @@ const handleSubmit = async () => {
                 class="rounded-lg px-3 py-2 text-sm font-medium transition-colors"
                 :class="
                   selectedFeedback === option.value
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted text-foreground hover:bg-muted'
+                    ? 'bg-accent text-accent'
+                    : 'bg-muted text-ink hover:bg-muted'
                 "
                 @click="selectedFeedback = option.value"
               >
@@ -164,7 +164,7 @@ const handleSubmit = async () => {
           <div class="flex gap-3 pt-2">
             <button
               type="button"
-              class="border-border text-foreground hover:bg-muted flex-1 rounded-lg border px-4 py-2 text-sm font-medium"
+              class="border-border text-ink hover:bg-muted flex-1 rounded-lg border px-4 py-2 text-sm font-medium"
               :disabled="loading"
               @click="$emit('cancel')"
             >
@@ -172,7 +172,7 @@ const handleSubmit = async () => {
             </button>
             <button
               type="button"
-              class="bg-primary text-primary-foreground hover:bg-primary/90 flex-1 rounded-lg px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+              class="bg-accent text-accent hover:bg-accent/90 flex-1 rounded-lg px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
               :disabled="!selectedFeedback || loading"
               @click="handleSubmit"
             >
@@ -227,7 +227,7 @@ const handleSubmit = async () => {
   max-width: 28rem;
   margin: 0 1rem;
   border-radius: var(--radius-2xl, 1rem);
-  background: var(--color-background, #fff);
+  @apply bg-paper;
   padding: 1.5rem;
   box-shadow: 0 20px 60px -10px oklch(0% 0 0 / 0.25);
   transition:

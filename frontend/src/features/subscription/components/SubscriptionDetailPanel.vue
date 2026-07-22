@@ -31,16 +31,16 @@ const emit = defineEmits<{
 <template>
   <aside class="xl:sticky xl:top-24 xl:h-fit">
     <section
-      class="border-border/80 bg-background rounded-3xl border p-5 shadow-sm"
+      class="border-border/80 bg-paper rounded-3xl border p-5 shadow-sm"
     >
-      <h3 class="text-foreground text-sm font-semibold tracking-wide uppercase">
+      <h3 class="text-ink text-sm font-semibold tracking-wide uppercase">
         详情面板
       </h3>
 
       <div v-if="selectedSubscription" class="mt-4 space-y-4">
         <div class="flex items-start justify-between gap-3">
           <div>
-            <h4 class="text-foreground text-xl font-semibold">
+            <h4 class="text-ink text-xl font-semibold">
               {{ selectedSubscription.name }}
             </h4>
             <p class="text-muted-foreground mt-1 text-sm">
@@ -62,7 +62,7 @@ const emit = defineEmits<{
         <div class="grid grid-cols-2 gap-3 text-sm">
           <div class="bg-muted/80 rounded-xl px-3 py-2">
             <p class="text-muted-foreground text-xs">价格</p>
-            <p class="text-foreground mt-1 font-medium">
+            <p class="text-ink mt-1 font-medium">
               {{
                 formatPrice(
                   selectedSubscription.price,
@@ -73,19 +73,19 @@ const emit = defineEmits<{
           </div>
           <div class="bg-muted/80 rounded-xl px-3 py-2">
             <p class="text-muted-foreground text-xs">周期</p>
-            <p class="text-foreground mt-1 font-medium">
+            <p class="text-ink mt-1 font-medium">
               {{ getCycleLabel(selectedSubscription.billing_cycle) }}
             </p>
           </div>
           <div class="bg-muted/80 rounded-xl px-3 py-2">
             <p class="text-muted-foreground text-xs">下次扣费</p>
-            <p class="text-foreground mt-1 font-medium">
+            <p class="text-ink mt-1 font-medium">
               {{ toDateInputValue(selectedSubscription.next_billing_date) }}
             </p>
           </div>
           <div class="bg-muted/80 rounded-xl px-3 py-2">
             <p class="text-muted-foreground text-xs">更新时间</p>
-            <p class="text-foreground mt-1 font-medium">
+            <p class="text-ink mt-1 font-medium">
               {{ formatDate(selectedSubscription.updated_at) }}
             </p>
           </div>
@@ -93,12 +93,12 @@ const emit = defineEmits<{
 
         <div class="border-border rounded-xl border px-3 py-2">
           <p class="text-muted-foreground text-xs">提醒配置</p>
-          <p class="text-foreground mt-1 text-sm">
+          <p class="text-ink mt-1 text-sm">
             渠道：{{
               getReminderChannelsText(selectedSubscription.reminder_config)
             }}
           </p>
-          <p class="text-foreground mt-1 text-sm">
+          <p class="text-ink mt-1 text-sm">
             节点：{{
               getReminderPointsText(selectedSubscription.reminder_config)
             }}
@@ -106,7 +106,7 @@ const emit = defineEmits<{
         </div>
 
         <div
-          class="border-border bg-muted/70 text-foreground rounded-xl border px-3 py-2 text-sm"
+          class="border-border bg-muted/70 text-ink rounded-xl border px-3 py-2 text-sm"
         >
           {{ selectedSubscription.notes?.trim() || '暂无备注' }}
         </div>
@@ -114,21 +114,21 @@ const emit = defineEmits<{
         <div class="grid grid-cols-2 gap-2">
           <button
             type="button"
-            class="border-border bg-background text-foreground hover:bg-muted rounded-xl border px-3 py-2 text-sm font-medium transition"
+            class="border-border bg-paper text-ink hover:bg-muted rounded-xl border px-3 py-2 text-sm font-medium transition"
             @click="emit('edit', selectedSubscription)"
           >
             编辑订阅
           </button>
           <button
             type="button"
-            class="border-primary/30 bg-primary/15 text-primary hover:bg-muted rounded-xl border px-3 py-2 text-sm font-medium transition"
+            class="border-accent/30 bg-accent/15 text-accent hover:bg-muted rounded-xl border px-3 py-2 text-sm font-medium transition"
             @click="emit('reminder', selectedSubscription)"
           >
             通知配置
           </button>
           <button
             type="button"
-            class="border-border bg-background text-foreground hover:bg-muted rounded-xl border px-3 py-2 text-sm font-medium transition disabled:opacity-60"
+            class="border-border bg-paper text-ink hover:bg-muted rounded-xl border px-3 py-2 text-sm font-medium transition disabled:opacity-60"
             :disabled="pendingStatusId === selectedSubscription.id"
             @click="emit('toggleStatus', selectedSubscription)"
           >

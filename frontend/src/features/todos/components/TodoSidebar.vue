@@ -24,7 +24,7 @@
         :aria-label="collapsed ? '展开工作台' : '收起工作台'"
         :aria-expanded="!collapsed"
         aria-controls="todo-sidebar-nav"
-        class="text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring rounded-md p-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+        class="text-muted-foreground hover:bg-muted hover:text-ink focus-visible:ring-ring rounded-md p-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         @click="collapsed = !collapsed"
       >
         <ChevronLeft v-if="!collapsed" class="h-4 w-4" aria-hidden="true" />
@@ -40,7 +40,7 @@
       <!-- 滑动指示器 -->
       <span
         :class="[
-          'tab-indicator bg-primary/10 absolute top-0 left-0 z-0 w-full rounded-lg shadow-[inset_0_1px_0_0_oklch(from_var(--paper)_l_c_h_/_0.5),inset_0_-1px_1px_oklch(0_0_0_/_0.04)]',
+          'tab-indicator bg-accent/10 absolute top-0 left-0 z-0 w-full rounded-lg shadow-[inset_0_1px_0_0_oklch(from_var(--paper)_l_c_h_/_0.5),inset_0_-1px_1px_oklch(0_0_0_/_0.04)]',
           collapsed ? 'h-8' : 'h-9',
         ]"
         :style="{ transform: `translateY(${indicatorY}px)` }"
@@ -54,8 +54,8 @@
         class="focus-visible:ring-ring relative z-10 flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-[color,transform] duration-150 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.96]"
         :class="[
           activeTab === tab.id
-            ? 'text-foreground'
-            : 'text-muted-foreground hover:text-foreground',
+            ? 'text-ink'
+            : 'text-muted-foreground hover:text-ink',
           collapsed ? 'justify-center' : '',
         ]"
         @click="activeTab = tab.id"
@@ -67,7 +67,7 @@
           :class="[
             'inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[10px] font-medium tabular-nums transition-[background-color,color] duration-150',
             index === activeTabIndex
-              ? 'bg-primary/15 text-foreground'
+              ? 'bg-accent/15 text-ink'
               : 'bg-muted-foreground/10 text-muted-foreground',
           ]"
         >

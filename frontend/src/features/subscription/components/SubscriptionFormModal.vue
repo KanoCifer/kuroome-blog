@@ -86,15 +86,15 @@ watch(
         <button
           type="button"
           aria-label="关闭弹窗"
-          class="bg-background/60 absolute inset-0 backdrop-blur-sm"
+          class="bg-paper/60 absolute inset-0 backdrop-blur-sm"
           @click="emit('close')"
         />
         <section
-          class="border-border bg-background relative z-10 w-full max-w-2xl rounded-2xl border p-5 shadow-2xl"
+          class="border-border bg-paper relative z-10 w-full max-w-2xl rounded-2xl border p-5 shadow-2xl"
         >
           <header class="mb-4 flex items-start justify-between gap-4">
             <div>
-              <h3 class="text-foreground text-lg font-semibold">
+              <h3 class="text-ink text-lg font-semibold">
                 {{ title }}
               </h3>
               <p class="text-muted-foreground mt-1 text-sm">
@@ -120,7 +120,7 @@ watch(
                   v-model="localForm.name"
                   type="text"
                   placeholder="例如：Spotify Premium"
-                  class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
               <label class="space-y-1">
@@ -131,7 +131,7 @@ watch(
                   v-model="localForm.provider"
                   type="text"
                   placeholder="例如：Spotify"
-                  class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
             </div>
@@ -147,7 +147,7 @@ watch(
                   min="0"
                   step="0.01"
                   placeholder="0.00"
-                  class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
               <label class="space-y-1">
@@ -160,7 +160,7 @@ watch(
                   :list="`subscription-currency-options-${mode}`"
                   maxlength="10"
                   placeholder="例如：USD / CNY / 元"
-                  class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
                 <datalist :id="`subscription-currency-options-${mode}`">
                   <option
@@ -176,7 +176,7 @@ watch(
                 >
                 <select
                   v-model="localForm.billing_cycle"
-                  class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 >
                   <option
                     v-for="cycle in cycleOptions"
@@ -200,7 +200,7 @@ watch(
                 <input
                   v-model="localForm.next_billing_date"
                   type="date"
-                  class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
               <label v-if="includeStatus" class="space-y-1">
@@ -209,7 +209,7 @@ watch(
                 >
                 <select
                   v-model="localForm.status"
-                  class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 >
                   <option
                     v-for="status in statusOptions"
@@ -230,7 +230,7 @@ watch(
                 v-model="localForm.notes"
                 rows="3"
                 placeholder="可选备注，例如套餐人数、自动续费规则等。"
-                class="border-border bg-background text-foreground focus:border-primary focus:ring-primary/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
               />
             </label>
 
@@ -252,7 +252,7 @@ watch(
               <button
                 type="submit"
                 :disabled="isSubmitting"
-                class="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60"
+                class="bg-accent text-accent hover:bg-accent/90 rounded-xl px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {{ isSubmitting ? loadingText : submitText }}
               </button>

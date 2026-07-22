@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col">
     <h3
-      class="text-foreground mb-2 flex items-center gap-2 text-sm font-medium"
+      class="text-ink mb-2 flex items-center gap-2 text-sm font-medium"
     >
       <icon-analytics class="size-4" /> 浏览器分布
     </h3>

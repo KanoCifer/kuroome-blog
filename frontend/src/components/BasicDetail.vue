@@ -10,20 +10,20 @@
       <!-- 极淡主题色光晕，10 套主题共用语义 token -->
       <!-- <div
         aria-hidden="true"
-        class="from-primary/8 via-primary/0 to-primary/0 pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b"
+        class="from-accent/8 via-accent/0 to-accent/0 pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b"
       ></div> -->
 
       <div
-        class="text-foreground/80 mb-3 flex items-center gap-2 text-xs tracking-[0.3em] uppercase mix-blend-multiply"
+        class="text-ink/80 mb-3 flex items-center gap-2 text-xs tracking-[0.3em] uppercase mix-blend-multiply"
       >
-        <span class="bg-primary/60 inline-block h-px w-6"></span>
+        <span class="bg-accent/60 inline-block h-px w-6"></span>
         <span>kanocifer</span>
-        <span class="bg-primary/60 inline-block h-px w-6"></span>
+        <span class="bg-accent/60 inline-block h-px w-6"></span>
       </div>
 
       <h1
         id="basic-detail-title"
-        class="text-foreground max-w-6xl px-6 text-center font-serif font-medium tracking-tight text-balance sm:text-5xl md:text-6xl lg:text-7xl"
+        class="text-ink max-w-6xl px-6 text-center font-serif font-medium tracking-tight text-balance sm:text-5xl md:text-6xl lg:text-7xl"
         :aria-label="title"
       >
         <span
@@ -41,10 +41,10 @@
         class="text-muted-foreground mt-6 flex flex-wrap items-center justify-center gap-3 text-sm"
       >
         <span
-          class="bg-background text-secondary-foreground border-border inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium tracking-wide"
+          class="bg-paper text-secondary-foreground border-border inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium tracking-wide"
         >
           <span
-            class="bg-primary mr-2 inline-block h-1.5 w-1.5 rounded-full"
+            class="bg-accent mr-2 inline-block h-1.5 w-1.5 rounded-full"
           ></span>
           {{ subtitle }}
         </span>
@@ -54,7 +54,7 @@
       <a
         href="#main-content"
         :class="[
-          'scroll-indicator hover:text-foreground text-foreground/60 mt-12 inline-flex flex-col items-center gap-1 text-xs transition-opacity duration-500',
+          'scroll-indicator hover:text-ink text-ink/60 mt-12 inline-flex flex-col items-center gap-1 text-xs transition-opacity duration-500',
           indicatorVisible ? 'opacity-100' : 'pointer-events-none opacity-0',
         ]"
         @click.prevent="scrollToContent"
@@ -84,7 +84,7 @@
       <div
         aria-hidden="true"
         :style="sectionStyle"
-        class="bg-background/95 border-border absolute inset-0 rounded-t-[40px] border-x border-t shadow-[inset_0_0_20px_0px_color-mix(in_oklch,var(--foreground)_8%,transparent)]"
+        class="bg-paper/95 border-border absolute inset-0 rounded-t-[40px] border-x border-t shadow-[inset_0_0_20px_0px_color-mix(in_oklch,var(--foreground)_8%,transparent)]"
         style="contain: layout style"
       ></div>
 
@@ -103,7 +103,7 @@
         <button
           type="button"
           :aria-label="onBack ? '返回' : '返回上一页'"
-          class="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium shadow-sm transition-[background-color,transform,box-shadow] duration-300 hover:scale-[1.02] hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.96]"
+          class="bg-accent text-accent hover:bg-accent/90 focus-visible:ring-ring inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium shadow-sm transition-[background-color,transform,box-shadow] duration-300 hover:scale-[1.02] hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.96]"
           @click="onBack === undefined ? $router.back() : onBack()"
         >
           <svg

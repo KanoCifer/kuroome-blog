@@ -29,7 +29,7 @@
           · shadow-* 用 inline 覆盖全局 :where([class~='border']) 的硬阴影
         -->
         <div
-          class="bg-background border-border/60 relative z-10 mx-4 my-6 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
+          class="bg-paper border-border/60 relative z-10 mx-4 my-6 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
           :style="DRAWER_SHADOW"
           role="dialog"
           aria-modal="true"
@@ -40,14 +40,14 @@
             <!-- 关闭按钮 — 保留圆形 -->
             <button
               @click="close"
-              class="text-muted-foreground hover:bg-muted hover:text-foreground absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full transition-colors active:scale-[0.96]"
+              class="text-muted-foreground hover:bg-muted hover:text-ink absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full transition-colors active:scale-[0.96]"
               aria-label="关闭"
             >
               <IconClose class="h-5 w-5" />
             </button>
 
             <h1
-              class="text-foreground font-serif text-[28px] leading-tight font-semibold"
+              class="text-ink font-serif text-[28px] leading-tight font-semibold"
             >
               偏好设置
             </h1>
@@ -58,17 +58,17 @@
 
             <!-- 书签式装饰：两侧小色点 + 中间梯度短横 -->
             <div class="mt-5 flex items-center gap-2 px-16">
-              <span class="bg-primary/70 h-1 w-1 rounded-full" />
+              <span class="bg-accent/70 h-1 w-1 rounded-full" />
               <span
                 class="from-gradient-decorative-from to-gradient-decorative-to h-px flex-1 bg-gradient-to-r"
               />
-              <span class="bg-primary/70 h-1 w-1 rounded-full" />
+              <span class="bg-accent/70 h-1 w-1 rounded-full" />
             </div>
           </header>
 
           <!--
             章节 Tab — 横向胶囊分段控件
-            底托 bg-muted + 激活项 bg-background 给出"高度差"指示
+            底托 bg-muted + 激活项 bg-paper 给出"高度差"指示
           -->
           <nav
             ref="navRef"
@@ -84,8 +84,8 @@
               class="relative flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ease-out active:scale-[0.97]"
               :class="
                 activeTab === tab.key
-                  ? 'bg-background text-primary shadow-sm'
-                  : 'hover:text-foreground text-[color-mix(in_oklch,var(--ink)_55%,transparent)]'
+                  ? 'bg-paper text-accent shadow-sm'
+                  : 'hover:text-ink text-[color-mix(in_oklch,var(--ink)_55%,transparent)]'
               "
             >
               {{ tab.label }}

@@ -24,12 +24,12 @@ export function AlertDialog({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
-        className="bg-background/50 absolute inset-0"
+        className="bg-paper/50 absolute inset-0"
         onClick={() => onOpenChange(false)}
       />
-      <div className="border-border/50 bg-background/80 relative z-10 w-full max-w-md rounded-2xl border p-6 shadow-xl backdrop-blur-xl">
+      <div className="border-border/50 bg-paper/80 relative z-10 w-full max-w-md rounded-2xl border p-6 shadow-xl backdrop-blur-xl">
         <div className="mb-4">
-          <h2 className="text-foreground text-xl font-bold">{title}</h2>
+          <h2 className="text-ink text-xl font-bold">{title}</h2>
           <p className="text-muted-foreground mt-2 text-sm">{description}</p>
         </div>
         <div className="flex justify-end gap-3">
@@ -47,7 +47,7 @@ export function AlertDialog({
             className={`rounded-full px-5 py-2.5 text-sm font-medium transition-all ${
               destructive
                 ? 'bg-destructive hover:bg-destructive/90 text-white'
-                : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                : 'bg-accent text-accent hover:bg-accent/90'
             }`}
           >
             {confirmText}

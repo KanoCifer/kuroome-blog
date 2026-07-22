@@ -177,7 +177,7 @@ export function CookieConsent() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.95 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="group border-border bg-background/95 fixed bottom-6 left-1/2 z-9999 w-[340px] -translate-x-1/2 overflow-hidden rounded-2xl border shadow-2xl backdrop-blur-sm transition-all duration-300 sm:bottom-8 sm:w-[380px]"
+            className="group border-border bg-paper/95 fixed bottom-6 left-1/2 z-9999 w-[340px] -translate-x-1/2 overflow-hidden rounded-2xl border shadow-2xl backdrop-blur-sm transition-all duration-300 sm:bottom-8 sm:w-[380px]"
           >
             <div className="relative px-5 py-5">
               <div className="mb-3 flex items-center justify-between">
@@ -215,7 +215,7 @@ export function CookieConsent() {
                   拒绝
                 </button>
                 <button
-                  className="bg-warning text-foreground hover:bg-warning/90 flex-1 rounded-xl px-3 py-2 text-[12px] font-medium shadow-lg transition-all duration-200 active:scale-[0.97]"
+                  className="bg-warning text-ink hover:bg-warning/90 flex-1 rounded-xl px-3 py-2 text-[12px] font-medium shadow-lg transition-all duration-200 active:scale-[0.97]"
                   onClick={acceptAll}
                 >
                   全部接受
@@ -235,7 +235,7 @@ export function CookieConsent() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="border-border bg-background/95 relative w-full max-w-[500px] overflow-hidden rounded-2xl border p-6 shadow-2xl backdrop-blur-sm"
+              className="border-border bg-paper/95 relative w-full max-w-[500px] overflow-hidden rounded-2xl border p-6 shadow-2xl backdrop-blur-sm"
             >
               <h2 className="text-card-foreground relative text-[16px] font-medium">
                 隐私协议核心摘要
@@ -296,7 +296,7 @@ export function CookieConsent() {
                 <button
                   onClick={acceptAll}
                   disabled={!hasReadPrivacy}
-                  className="bg-warning text-foreground hover:bg-warning/90 h-9 rounded-xl px-4 text-[12px] font-medium shadow-lg transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="bg-warning text-ink hover:bg-warning/90 h-9 rounded-xl px-4 text-[12px] font-medium shadow-lg transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   我已阅读并同意
                 </button>
@@ -315,7 +315,7 @@ export function CookieConsent() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="border-border bg-background/95 relative w-full max-w-[400px] overflow-hidden rounded-2xl border p-6 shadow-2xl backdrop-blur-sm"
+              className="border-border bg-paper/95 relative w-full max-w-[400px] overflow-hidden rounded-2xl border p-6 shadow-2xl backdrop-blur-sm"
             >
               <h2 className="text-card-foreground relative text-[15px] font-medium">
                 Cookie 偏好设置
@@ -336,7 +336,7 @@ export function CookieConsent() {
                         checked={cat.required || (settings[cat.id] ?? false)}
                         disabled={cat.required}
                         onChange={() => toggleSetting(cat.id)}
-                        className="border-border bg-background checked:border-warning checked:bg-warning focus:ring-warning/30 h-3.5 w-3.5 appearance-none rounded-[3px] border transition-all duration-150 focus:ring-1 focus:ring-offset-0 disabled:opacity-60"
+                        className="border-border bg-paper checked:border-warning checked:bg-warning focus:ring-warning/30 h-3.5 w-3.5 appearance-none rounded-[3px] border transition-all duration-150 focus:ring-1 focus:ring-offset-0 disabled:opacity-60"
                       />
                     </div>
                     <label
@@ -367,7 +367,7 @@ export function CookieConsent() {
                 </button>
                 <button
                   onClick={saveSettings}
-                  className="bg-warning text-foreground hover:bg-warning/90 h-9 rounded-xl px-4 text-[12px] font-medium shadow-lg transition-all duration-200"
+                  className="bg-warning text-ink hover:bg-warning/90 h-9 rounded-xl px-4 text-[12px] font-medium shadow-lg transition-all duration-200"
                 >
                   保存设置
                 </button>
@@ -401,7 +401,7 @@ function DialogOverlay({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
-      className="bg-background/50 fixed inset-0 z-9999 flex items-center justify-center p-4"
+      className="bg-paper/50 fixed inset-0 z-9999 flex items-center justify-center p-4"
       onClick={onClose}
     >
       <div onClick={(e) => e.stopPropagation()}>{children}</div>

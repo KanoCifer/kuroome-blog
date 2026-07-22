@@ -65,7 +65,7 @@ export function BentoTodo() {
           className={`text-sm leading-tight transition-colors duration-200 select-none ${
             t.status === '已完成'
               ? 'text-muted-foreground line-through'
-              : 'text-foreground'
+              : 'text-ink'
           }`}
         >
           {t.title}
@@ -100,7 +100,7 @@ export function BentoTodo() {
             </span>
             <Link
               to="/todos"
-              className="text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer rounded-md p-2 outline-0 transition-colors"
+              className="text-muted-foreground hover:bg-muted hover:text-ink cursor-pointer rounded-md p-2 outline-0 transition-colors"
               title="查看详情"
             >
               <svg
@@ -123,7 +123,7 @@ export function BentoTodo() {
         {/* 进度条 */}
         <div className="bg-muted mb-4 h-1.5 overflow-hidden rounded-full">
           <motion.div
-            className="bg-primary h-full rounded-full"
+            className="bg-accent h-full rounded-full"
             initial={false}
             animate={{ width: `${progress}%` }}
             transition={SPRING.reveal}

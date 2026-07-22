@@ -212,7 +212,7 @@ watch(
       <aside
         v-if="open"
         ref="panelRef"
-        class="bg-background border-border/60 fixed top-6 right-6 bottom-6 z-50 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
+        class="bg-paper border-border/60 fixed top-6 right-6 bottom-6 z-50 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
         :style="CARD_SHADOW"
         role="dialog"
         aria-modal="true"
@@ -227,7 +227,7 @@ watch(
           <div class="min-w-0 space-y-1.5">
             <!-- 名称 -->
             <h2
-              class="text-foreground font-family-averia truncate text-2xl leading-snug"
+              class="text-ink font-family-averia truncate text-2xl leading-snug"
             >
               {{ spot?.name || '未命名钓点' }}
             </h2>
@@ -248,14 +248,14 @@ watch(
                   "
                 />
               </div>
-              <span class="text-foreground text-xs tabular-nums">
+              <span class="text-ink text-xs tabular-nums">
                 {{ spot!.rating.toFixed(1) }}
               </span>
             </div>
           </div>
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors"
+            class="text-muted-foreground hover:bg-muted hover:text-ink inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors"
             aria-label="关闭详情"
             @click="emit('close')"
           >
@@ -285,7 +285,7 @@ watch(
           <div v-if="editing" class="space-y-4">
             <div>
               <label
-                class="text-foreground mb-1.5 block text-sm font-medium"
+                class="text-ink mb-1.5 block text-sm font-medium"
                 for="edit-name"
                 >名称</label
               >
@@ -293,12 +293,12 @@ watch(
                 id="edit-name"
                 v-model="editName"
                 type="text"
-                class="bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl border-0 px-4 py-3 text-sm focus:ring-2 focus:outline-none"
+                class="bg-muted text-ink focus:ring-accent/30 w-full rounded-xl border-0 px-4 py-3 text-sm focus:ring-2 focus:outline-none"
               />
             </div>
             <div>
               <label
-                class="text-foreground mb-1.5 block text-sm font-medium"
+                class="text-ink mb-1.5 block text-sm font-medium"
                 for="edit-desc"
                 >描述</label
               >
@@ -306,12 +306,12 @@ watch(
                 id="edit-desc"
                 v-model="editDescription"
                 rows="4"
-                class="bg-muted text-foreground focus:ring-primary/30 w-full resize-none rounded-xl border-0 px-4 py-3 text-sm leading-relaxed focus:ring-2 focus:outline-none"
+                class="bg-muted text-ink focus:ring-accent/30 w-full resize-none rounded-xl border-0 px-4 py-3 text-sm leading-relaxed focus:ring-2 focus:outline-none"
               />
             </div>
             <div>
               <label
-                class="text-foreground mb-1.5 block text-sm font-medium"
+                class="text-ink mb-1.5 block text-sm font-medium"
                 for="edit-tags"
                 >标签(逗号分隔)</label
               >
@@ -319,11 +319,11 @@ watch(
                 id="edit-tags"
                 v-model="editTags"
                 type="text"
-                class="bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl border-0 px-4 py-3 text-sm focus:ring-2 focus:outline-none"
+                class="bg-muted text-ink focus:ring-accent/30 w-full rounded-xl border-0 px-4 py-3 text-sm focus:ring-2 focus:outline-none"
               />
             </div>
             <div>
-              <label class="text-foreground mb-1.5 block text-sm font-medium"
+              <label class="text-ink mb-1.5 block text-sm font-medium"
                 >评分</label
               >
               <div class="flex items-center gap-1">
@@ -360,7 +360,7 @@ watch(
               </button>
               <button
                 type="button"
-                class="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
+                class="bg-accent text-accent hover:bg-accent/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
                 :disabled="saving"
                 @click="saveEdit"
               >
@@ -373,7 +373,7 @@ watch(
           <div v-else>
             <p
               v-if="spot?.description"
-              class="text-foreground/85 font-serif text-[15px] leading-[1.7] text-pretty"
+              class="text-ink/85 font-serif text-[15px] leading-[1.7] text-pretty"
             >
               {{ spot.description }}
             </p>
@@ -418,7 +418,7 @@ watch(
           <!-- 主操作:规划路线 -->
           <button
             type="button"
-            class="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium shadow-sm transition-colors"
+            class="bg-accent text-accent hover:bg-accent/90 inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium shadow-sm transition-colors"
             @click="onRoute"
           >
             <Navigation class="h-4 w-4" />
@@ -429,7 +429,7 @@ watch(
             <button
               v-if="!editing"
               type="button"
-              class="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+              class="text-muted-foreground hover:bg-muted hover:text-ink inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
               @click="startEdit"
             >
               <Pencil class="h-3.5 w-3.5" />
@@ -474,9 +474,9 @@ watch(
     <!-- 删除 loading 遮罩 -->
     <div
       v-if="deleting"
-      class="bg-foreground/30 fixed inset-0 z-[70] flex items-center justify-center backdrop-blur-sm"
+      class="bg-ink/30 fixed inset-0 z-[70] flex items-center justify-center backdrop-blur-sm"
     >
-      <p class="text-background text-sm">删除中…</p>
+      <p class="text-paper text-sm">删除中…</p>
     </div>
   </Teleport>
 </template>

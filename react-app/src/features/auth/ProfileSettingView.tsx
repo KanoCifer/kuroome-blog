@@ -280,7 +280,7 @@ export default function ProfileSettingView() {
   };
 
   return (
-    <div className="font-body bg-background relative mb-24 h-full overflow-hidden">
+    <div className="font-body bg-paper relative mb-24 h-full overflow-hidden">
       {/* Main Content */}
       <main className="relative z-10 mt-4 flex flex-col items-center px-5 pt-8 pb-10">
         {/* Header Section */}
@@ -290,10 +290,10 @@ export default function ProfileSettingView() {
           transition={{ duration: 0.7, ease: 'easeOut', delay: 0.05 }}
           className="mb-8 flex flex-col items-center justify-center"
         >
-          <div className="bg-primary text-primary-foreground mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)]">
+          <div className="bg-accent text-accent mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)]">
             <User className="size-8" />
           </div>
-          <h2 className="font-headline text-foreground text-center text-[28px] font-extrabold tracking-tight">
+          <h2 className="font-headline text-ink text-center text-[28px] font-extrabold tracking-tight">
             Profile Settings
           </h2>
           <p className="text-muted-foreground mt-1 text-center text-[15px] font-medium">
@@ -306,7 +306,7 @@ export default function ProfileSettingView() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
-          className="border-border/50 bg-background/70 w-full max-w-100 rounded-4xl border p-6 shadow-xl"
+          className="border-border/50 bg-paper/70 w-full max-w-100 rounded-4xl border p-6 shadow-xl"
         >
           <form className="flex flex-col" onSubmit={handleSubmit}>
             {/* Avatar Upload */}
@@ -347,11 +347,11 @@ export default function ProfileSettingView() {
             <button
               type="submit"
               disabled={saving}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 w-full rounded-full py-4 text-[15px] font-bold shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all active:scale-[0.98] disabled:opacity-70"
+              className="bg-accent text-accent hover:bg-accent/90 w-full rounded-full py-4 text-[15px] font-bold shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all active:scale-[0.98] disabled:opacity-70"
             >
               {saving ? (
                 <span className="flex items-center justify-center gap-2">
-                  <span className="border-primary-foreground h-4 w-4 animate-spin rounded-full border-2 border-t-transparent"></span>
+                  <span className="border-accent h-4 w-4 animate-spin rounded-full border-2 border-t-transparent"></span>
                   Saving...
                 </span>
               ) : (

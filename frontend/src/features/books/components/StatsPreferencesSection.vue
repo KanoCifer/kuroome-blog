@@ -15,7 +15,7 @@ const { topCategories, topAuthors, topPublishers, hasData } =
 <template>
   <section v-if="hasData" class="mb-14">
     <h2
-      class="text-foreground mb-6 font-serif text-2xl font-semibold tracking-tight sm:text-3xl"
+      class="text-ink mb-6 font-serif text-2xl font-semibold tracking-tight sm:text-3xl"
     >
       你偏好的
     </h2>
@@ -29,7 +29,7 @@ const { topCategories, topAuthors, topPublishers, hasData } =
           <span
             v-for="cat in topCategories"
             :key="cat.categoryTitle"
-            class="text-foreground"
+            class="text-ink"
           >
             <span class="font-serif">{{ cat.categoryTitle }}</span>
             <span class="text-muted-foreground ml-1 text-xs tabular-nums">
@@ -48,7 +48,7 @@ const { topCategories, topAuthors, topPublishers, hasData } =
           <span
             v-for="(author, idx) in topAuthors"
             :key="author.name ?? idx"
-            class="text-foreground"
+            class="text-ink"
           >
             <span class="font-serif">
               {{ author.name ?? '未知' }}
@@ -72,7 +72,7 @@ const { topCategories, topAuthors, topPublishers, hasData } =
           <span
             v-for="(pub, idx) in topPublishers"
             :key="pub.name ?? idx"
-            class="text-foreground"
+            class="text-ink"
           >
             <span class="font-serif">{{ pub.name ?? '未知' }}</span>
             <span

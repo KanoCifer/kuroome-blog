@@ -1,6 +1,6 @@
 <template>
   <article
-    class="bg-background border-border group flex flex-col gap-2 rounded-xl border p-3 shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_4px_10px_color-mix(in_oklch,var(--ink)_8%,transparent)] transition-[box-shadow,transform,opacity] duration-200 hover:shadow-[0_2px_2px_color-mix(in_oklch,var(--ink)_7%,transparent),0_8px_18px_color-mix(in_oklch,var(--ink)_12%,transparent)]"
+    class="bg-muted/80 border-border group hover:bg-muted flex flex-col gap-2 rounded-xl border p-3 transition-[background-color,transform,opacity] duration-200"
     :class="[
       isDragging ? 'cursor-grabbing opacity-50' : 'cursor-grab',
       done ? 'opacity-70' : '',
@@ -30,7 +30,7 @@
         />
       </svg>
       <span
-        class="text-foreground line-clamp-2 flex-1 text-sm font-medium"
+        class="text-ink line-clamp-2 flex-1 text-sm font-medium"
         :class="{ 'text-muted-foreground line-through': done }"
         >{{ task.title }}</span
       >
@@ -49,7 +49,7 @@
       </span>
       <span
         v-if="task.slug"
-        class="bg-primary/10 text-primary rounded-full px-1.5 py-px text-[10px] font-medium tabular-nums"
+        class="bg-accent/10 text-accent rounded-full px-1.5 py-px text-[10px] font-medium tabular-nums"
       >
         {{ task.slug }}
       </span>
@@ -85,7 +85,7 @@
         <button
           v-if="!done"
           type="button"
-          class="text-muted-foreground hover:bg-muted hover:text-primary focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
+          class="text-muted-foreground hover:bg-muted hover:text-accent focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
           title="推进状态"
           aria-label="推进状态"
           @click="$emit('cycle', task.slug)"

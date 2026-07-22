@@ -29,8 +29,8 @@ const openQWeather = () => {
  */
 const forecastIconClass = (textDay: string): string => {
   if (textDay.includes('雷')) return 'text-warning';
-  if (textDay.includes('雨')) return 'text-primary';
-  return 'text-foreground';
+  if (textDay.includes('雨')) return 'text-accent';
+  return 'text-ink';
 };
 </script>
 
@@ -43,13 +43,13 @@ const forecastIconClass = (textDay: string): string => {
     <!-- Header -->
     <div class="relative z-10 mb-5 flex items-start justify-between gap-3">
       <div class="min-w-0">
-        <h3 class="text-foreground text-lg font-semibold tracking-tight">
+        <h3 class="text-ink text-lg font-semibold tracking-tight">
           {{ locationName || '钓鱼地点' }}
         </h3>
         <p class="text-muted-foreground mt-0.5 truncate text-sm">和风天气</p>
       </div>
       <div
-        class="bg-primary/90 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-white shadow-sm transition-all duration-300 group-hover:rounded-xl"
+        class="bg-accent/90 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-white shadow-sm transition-all duration-300 group-hover:rounded-xl"
       >
         <i
           v-if="liveWeather"
@@ -80,7 +80,7 @@ const forecastIconClass = (textDay: string): string => {
       class="relative z-10 flex flex-1 flex-col items-center justify-center py-8"
     >
       <div
-        class="border-border border-t-primary h-10 w-10 animate-spin rounded-full border-2"
+        class="border-border border-t-accent h-10 w-10 animate-spin rounded-full border-2"
       />
       <span class="text-muted-foreground mt-3 text-sm">获取天气数据...</span>
     </div>
@@ -118,7 +118,7 @@ const forecastIconClass = (textDay: string): string => {
             :initial="{ opacity: 0, y: 8 }"
             :animate="{ opacity: 1, y: 0 }"
             :transition="{ ...EASE, delay: 0 }"
-            class="text-foreground text-7xl leading-none font-bold tracking-tight tabular-nums"
+            class="text-ink text-7xl leading-none font-bold tracking-tight tabular-nums"
           >
             {{ liveWeather.temp }}
           </motion.span>
@@ -126,7 +126,7 @@ const forecastIconClass = (textDay: string): string => {
             :initial="{ opacity: 0, y: 8 }"
             :animate="{ opacity: 1, y: 0 }"
             :transition="{ ...EASE, delay: 0.06 }"
-            class="text-foreground/60 text-2xl font-light"
+            class="text-ink/60 text-2xl font-light"
           >
             °C
           </motion.span>
@@ -135,7 +135,7 @@ const forecastIconClass = (textDay: string): string => {
           :initial="{ opacity: 0, y: 8 }"
           :animate="{ opacity: 1, y: 0 }"
           :transition="{ ...EASE, delay: 0.12 }"
-          class="text-foreground mt-3 text-lg font-medium"
+          class="text-ink mt-3 text-lg font-medium"
         >
           {{ liveWeather.text }}
         </motion.p>
@@ -153,7 +153,7 @@ const forecastIconClass = (textDay: string): string => {
             class="text-muted-foreground text-[10px] tracking-[0.18em] uppercase"
             >风向</span
           >
-          <span class="text-foreground mt-1 text-sm font-semibold tabular-nums">
+          <span class="text-ink mt-1 text-sm font-semibold tabular-nums">
             {{ liveWeather.windDir }}
           </span>
         </div>
@@ -163,7 +163,7 @@ const forecastIconClass = (textDay: string): string => {
             class="text-muted-foreground text-[10px] tracking-[0.18em] uppercase"
             >风力</span
           >
-          <span class="text-foreground mt-1 text-sm font-semibold tabular-nums">
+          <span class="text-ink mt-1 text-sm font-semibold tabular-nums">
             {{ liveWeather.windScale }}级
           </span>
         </div>
@@ -173,7 +173,7 @@ const forecastIconClass = (textDay: string): string => {
             class="text-muted-foreground text-[10px] tracking-[0.18em] uppercase"
             >湿度</span
           >
-          <span class="text-foreground mt-1 text-sm font-semibold tabular-nums">
+          <span class="text-ink mt-1 text-sm font-semibold tabular-nums">
             {{ liveWeather.humidity }}%
           </span>
         </div>
@@ -206,7 +206,7 @@ const forecastIconClass = (textDay: string): string => {
               :class="[`qi-${day.iconDay}`, forecastIconClass(day.textDay)]"
               class="my-1.5 text-2xl leading-none"
             />
-            <span class="text-foreground text-xs font-semibold tabular-nums">
+            <span class="text-ink text-xs font-semibold tabular-nums">
               {{ day.tempMax }}°
             </span>
             <span class="text-muted-foreground text-[10px] tabular-nums">
@@ -265,8 +265,8 @@ const forecastIconClass = (textDay: string): string => {
   inset: 0;
   background: linear-gradient(
     160deg,
-    oklch(from var(--primary) l c h / 0.14) 0%,
-    oklch(from var(--primary) l c h / 0.05) 60%,
+    oklch(from var(--color-accent) l c h / 0.14) 0%,
+    oklch(from var(--color-accent) l c h / 0.05) 60%,
     transparent 100%
   );
   z-index: 0;

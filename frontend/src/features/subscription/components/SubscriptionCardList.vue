@@ -35,10 +35,10 @@ const emit = defineEmits<{
 
 <template>
   <section
-    class="border-border/80 bg-background rounded-3xl border p-5 shadow-sm"
+    class="border-border/80 bg-paper rounded-3xl border p-5 shadow-sm"
   >
     <header class="mb-4 flex items-center justify-between gap-3">
-      <h3 class="text-foreground text-sm font-semibold tracking-wide uppercase">
+      <h3 class="text-ink text-sm font-semibold tracking-wide uppercase">
         订阅列表
       </h3>
       <p class="text-muted-foreground text-xs">{{ subscriptions.length }} 项</p>
@@ -82,10 +82,10 @@ const emit = defineEmits<{
       <article
         v-for="subscription in subscriptions"
         :key="subscription.id"
-        class="bg-background border-border/10 cursor-pointer rounded-2xl border p-5 shadow-[0_12px_40px_rgb(0,0,0,0.04)] transition hover:shadow-[0_20px_50px_rgb(0,0,0,0.06)]"
+        class="bg-paper border-border/10 cursor-pointer rounded-2xl border p-5 shadow-[0_12px_40px_rgb(0,0,0,0.04)] transition hover:shadow-[0_20px_50px_rgb(0,0,0,0.06)]"
         :class="
           selectedSubId === subscription.id
-            ? 'border-primary/30 ring-primary/20 ring-2'
+            ? 'border-accent/30 ring-accent/20 ring-2'
             : ''
         "
         @click="emit('select', subscription.id)"
@@ -93,12 +93,12 @@ const emit = defineEmits<{
         <div class="flex items-start justify-between gap-4">
           <div class="flex min-w-0 items-center gap-4">
             <div
-              class="border-border bg-background text-muted-foreground flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border text-lg font-bold"
+              class="border-border bg-paper text-muted-foreground flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border text-lg font-bold"
             >
               {{ subscription.name.charAt(0).toUpperCase() }}
             </div>
             <div class="min-w-0">
-              <h4 class="text-foreground truncate text-lg font-bold">
+              <h4 class="text-ink truncate text-lg font-bold">
                 {{ subscription.name }}
               </h4>
               <p class="text-muted-foreground mt-0.5 text-xs">
@@ -124,7 +124,7 @@ const emit = defineEmits<{
           class="bg-muted/50 mt-4 flex items-center gap-2 rounded-2xl px-4 py-3"
         >
           <span class="text-muted-foreground text-sm">下次扣费:</span>
-          <span class="text-foreground text-sm font-bold">
+          <span class="text-ink text-sm font-bold">
             {{ toDateInputValue(subscription.next_billing_date) }}
           </span>
           <span class="text-muted-foreground text-xs">
@@ -145,20 +145,20 @@ const emit = defineEmits<{
         <div class="mt-4 grid grid-cols-2 gap-3 text-xs">
           <div class="border-border bg-muted/70 rounded-xl border px-3 py-2">
             <p class="text-muted-foreground">提醒渠道</p>
-            <p class="text-foreground mt-1 font-medium">
+            <p class="text-ink mt-1 font-medium">
               {{ getReminderChannelsText(subscription.reminder_config) }}
             </p>
           </div>
           <div class="border-border bg-muted/70 rounded-xl border px-3 py-2">
             <p class="text-muted-foreground">提醒节点</p>
-            <p class="text-foreground mt-1 font-medium">
+            <p class="text-ink mt-1 font-medium">
               {{ getReminderPointsText(subscription.reminder_config) }}
             </p>
           </div>
         </div>
 
         <p
-          class="border-border bg-muted/70 text-foreground mt-3 line-clamp-2 rounded-xl border px-3 py-2 text-sm"
+          class="border-border bg-muted/70 text-ink mt-3 line-clamp-2 rounded-xl border px-3 py-2 text-sm"
         >
           {{ subscription.notes?.trim() || '暂无备注' }}
         </p>
@@ -166,21 +166,21 @@ const emit = defineEmits<{
         <div class="mt-4 grid grid-cols-4 gap-2">
           <button
             type="button"
-            class="border-border bg-background text-foreground hover:bg-muted rounded-xl border px-3 py-2 text-xs font-medium transition"
+            class="border-border bg-paper text-ink hover:bg-muted rounded-xl border px-3 py-2 text-xs font-medium transition"
             @click.stop="emit('edit', subscription)"
           >
             编辑
           </button>
           <button
             type="button"
-            class="border-primary/30 bg-primary/15 text-primary hover:bg-muted rounded-xl border px-3 py-2 text-xs font-medium transition"
+            class="border-accent/30 bg-accent/15 text-accent hover:bg-muted rounded-xl border px-3 py-2 text-xs font-medium transition"
             @click.stop="emit('reminder', subscription)"
           >
             通知
           </button>
           <button
             type="button"
-            class="border-border bg-background text-foreground hover:bg-muted rounded-xl border px-3 py-2 text-xs font-medium transition disabled:opacity-60"
+            class="border-border bg-paper text-ink hover:bg-muted rounded-xl border px-3 py-2 text-xs font-medium transition disabled:opacity-60"
             :disabled="pendingStatusId === subscription.id"
             @click.stop="emit('toggleStatus', subscription)"
           >

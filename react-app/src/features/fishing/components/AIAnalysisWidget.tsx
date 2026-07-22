@@ -52,7 +52,7 @@ function renderMarkdown(content: string): string {
  *
  * 嵌入模式 (drawer / sheet 内): 流式布局, 顶部 status chip, 主体内容区, 底部 model select + 主按钮。
  * 浮层模式 (默认): 一个 flat solid FAB (没有 blob orbs / 没有渐变装饰),
- * 卡片表面 `bg-background border-border/40 shadow-sm`, 不使用 AI bento 的
+ * 卡片表面 `bg-paper border-border/40 shadow-sm`, 不使用 AI bento 的
  * `from-indigo-300/30 ... blur-2xl` 装饰光晕 (DESIGN.md §6 显式禁止)。
  */
 export function AIAnalysisWidget({
@@ -103,7 +103,7 @@ export function AIAnalysisWidget({
   })();
 
   const statusClass = (() => {
-    if (analysisLoading) return 'bg-primary/15 text-primary';
+    if (analysisLoading) return 'bg-accent/15 text-accent';
     if (analysisError) return 'bg-destructive/15 text-destructive';
     if (analysisResult) return 'bg-success/15 text-success';
     return 'bg-muted text-muted-foreground';
@@ -152,7 +152,7 @@ export function AIAnalysisWidget({
               <select
                 value={selectedModel}
                 onChange={(e) => setSelectedModel(e.target.value)}
-                className="bg-secondary text-foreground flex-1 rounded-xl px-3 py-2 text-xs"
+                className="bg-secondary text-ink flex-1 rounded-xl px-3 py-2 text-xs"
               >
                 {AI_MODELS.map((model) => (
                   <option key={model.id} value={model.id}>
@@ -168,7 +168,7 @@ export function AIAnalysisWidget({
               onClick={() => {
                 abortAnalysis();
               }}
-              className="bg-destructive text-primary-foreground hover:bg-destructive/90 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors"
+              className="bg-destructive text-accent hover:bg-destructive/90 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors"
             >
               <svg
                 className="h-3.5 w-3.5"
@@ -194,7 +194,7 @@ export function AIAnalysisWidget({
                 setAnalysisLoading(true);
               }}
               disabled={!analysisHasData}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors disabled:cursor-not-allowed"
+              className="bg-accent text-accent hover:bg-accent/90 disabled:bg-muted disabled:text-muted-foreground relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors disabled:cursor-not-allowed"
             >
               {analysisResult ? '重新分析' : '生成分析'}
             </button>
@@ -206,7 +206,7 @@ export function AIAnalysisWidget({
 
   // 浮层模式 (默认): flat surface 卡片 + solid FAB。
   // 不再有 `bg-linear-to-br from-indigo-300/30 to-sky-500/20 blur-2xl` 装饰光晕,
-  // 不再有 `from-primary/90 to-primary/85` FAB 渐变 (DESIGN.md §6 显式禁止)。
+  // 不再有 `from-accent/90 to-accent/85` FAB 渐变 (DESIGN.md §6 显式禁止)。
   return (
     <>
       {createPortal(
@@ -219,13 +219,13 @@ export function AIAnalysisWidget({
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.96, y: 12 }}
                 transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-                className="bg-background border-border/40 w-[90vw] max-w-sm overflow-hidden rounded-3xl border shadow-xl"
+                className="bg-paper border-border/40 w-[90vw] max-w-sm overflow-hidden rounded-3xl border shadow-xl"
                 role="dialog"
                 aria-label="AI 天气分析"
               >
                 <div className="border-border/60 flex items-start justify-between gap-3 border-b px-4 py-3">
                   <div>
-                    <h3 className="text-foreground text-sm font-semibold tracking-tight">
+                    <h3 className="text-ink text-sm font-semibold tracking-tight">
                       AI 天气分析
                     </h3>
                     <p className="text-muted-foreground mt-0.5 text-xs">
@@ -270,7 +270,7 @@ export function AIAnalysisWidget({
                       <select
                         value={selectedModel}
                         onChange={(e) => setSelectedModel(e.target.value)}
-                        className="bg-secondary text-foreground flex-1 rounded-xl px-3 py-2 text-xs"
+                        className="bg-secondary text-ink flex-1 rounded-xl px-3 py-2 text-xs"
                       >
                         {AI_MODELS.map((model) => (
                           <option key={model.id} value={model.id}>
@@ -286,7 +286,7 @@ export function AIAnalysisWidget({
                       onClick={() => {
                         abortAnalysis();
                       }}
-                      className="bg-destructive text-primary-foreground hover:bg-destructive/90 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors"
+                      className="bg-destructive text-accent hover:bg-destructive/90 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors"
                     >
                       <svg
                         className="h-3.5 w-3.5"
@@ -312,7 +312,7 @@ export function AIAnalysisWidget({
                         setAnalysisLoading(true);
                       }}
                       disabled={!analysisHasData}
-                      className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors disabled:cursor-not-allowed"
+                      className="bg-accent text-accent hover:bg-accent/90 disabled:bg-muted disabled:text-muted-foreground relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors disabled:cursor-not-allowed"
                     >
                       {analysisResult ? '重新分析' : '生成分析'}
                     </button>
@@ -328,12 +328,12 @@ export function AIAnalysisWidget({
       {!hideFab && !analysisOpen && (
         <button
           onClick={toggleAnalysis}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/85 fixed right-4 bottom-32 z-40 flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-transform hover:-translate-y-0.5 active:translate-y-0 sm:right-6 sm:bottom-28 sm:h-14 sm:w-14"
+          className="bg-accent text-accent hover:bg-accent/90 active:bg-accent/85 fixed right-4 bottom-32 z-40 flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-transform hover:-translate-y-0.5 active:translate-y-0 sm:right-6 sm:bottom-28 sm:h-14 sm:w-14"
           aria-label="打开 AI 分析"
           title="AI分析"
         >
           {analysisHasData && (
-            <span className="bg-success ring-background absolute top-0.5 right-0.5 inline-flex h-2.5 w-2.5 rounded-full ring-2 sm:top-0 sm:right-0 sm:h-3 sm:w-3" />
+            <span className="bg-success ring-paper absolute top-0.5 right-0.5 inline-flex h-2.5 w-2.5 rounded-full ring-2 sm:top-0 sm:right-0 sm:h-3 sm:w-3" />
           )}
           <Bot className="h-5 w-5 sm:h-6 sm:w-6" />
         </button>
@@ -386,7 +386,7 @@ function ErrorState({ message }: { message: string }) {
 function ResultState({ html }: { html: string }) {
   return (
     <div
-      className="prose prose-sm text-foreground max-h-[50vh] min-h-16 overflow-y-auto sm:max-h-[60vh]"
+      className="prose prose-sm text-ink max-h-[50vh] min-h-16 overflow-y-auto sm:max-h-[60vh]"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

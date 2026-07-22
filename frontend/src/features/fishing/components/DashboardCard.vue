@@ -3,7 +3,7 @@
  * 统一的卡片 chrome wrapper。
  *
  * Dashboard 中所有 tile (Index / Weather / Tide / Hourly / Map / banner) 共享:
- * - bg-background / border-border 语义 token (无 dark: 手写)
+ * - bg-paper / border-border 语义 token (无 dark: 手写)
  * - 圆角 + 阴影 + overflow hidden
  *
  * 区分:
@@ -53,7 +53,7 @@ const whileHover = computed(() => {
       y: -3,
       scale: 1.005,
       boxShadow:
-        '0 12px 32px -8px oklch(from var(--primary) l c h / 0.22), 0 4px 12px -4px oklch(0% 0 0 / 0.08)',
+        '0 12px 32px -8px oklch(from var(--color-accent) l c h / 0.22), 0 4px 12px -4px oklch(0% 0 0 / 0.08)',
     };
   }
   if (props.interactive) {
@@ -61,7 +61,7 @@ const whileHover = computed(() => {
       y: -3,
       scale: 1.005,
       boxShadow:
-        '0 10px 28px -8px oklch(from var(--primary) l c h / 0.18), 0 4px 10px -4px oklch(0% 0 0 / 0.08)',
+        '0 10px 28px -8px oklch(from var(--color-accent) l c h / 0.18), 0 4px 10px -4px oklch(0% 0 0 / 0.08)',
     };
   }
   return {
@@ -77,7 +77,7 @@ const whileHover = computed(() => {
     :is="motionMap[as]"
     :while-hover="whileHover"
     :transition="EASE"
-    class="group fishing-card bg-background border-border relative flex h-full flex-col overflow-hidden rounded-3xl border shadow-sm"
+    class="group fishing-card bg-paper border-border relative flex h-full flex-col overflow-hidden rounded-3xl border shadow-sm"
     :class="[
       tone === 'hero' && 'border-border shadow-md',
       interactive && 'fishing-card--interactive cursor-pointer',
@@ -112,7 +112,7 @@ const whileHover = computed(() => {
     135deg,
     transparent 0%,
     transparent 40%,
-    oklch(from var(--primary) l c h / 0.55) 100%
+    oklch(from var(--color-accent) l c h / 0.55) 100%
   );
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
@@ -137,7 +137,7 @@ const whileHover = computed(() => {
   background: linear-gradient(
     100deg,
     transparent,
-    oklch(from var(--primary-foreground) l c h / 0.18),
+    oklch(from var(--color-accent) l c h / 0.18),
     transparent
   );
   opacity: 0;

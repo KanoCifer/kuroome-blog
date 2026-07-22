@@ -49,7 +49,7 @@ export default function WebsiteView() {
             />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="text-foreground group-hover:text-card-foreground truncate text-lg font-bold transition-colors duration-300">
+            <h3 className="text-ink group-hover:text-card-foreground truncate text-lg font-bold transition-colors duration-300">
               {t.name}
             </h3>
             <span className="bg-secondary text-muted-foreground inline-block rounded-full px-2 py-0.5 text-xs font-medium">

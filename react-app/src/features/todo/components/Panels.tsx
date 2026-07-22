@@ -36,7 +36,7 @@ export function FrontierPanel({ onOpen, onCycle, onDelete }: PanelEmit) {
     <div className="space-y-8">
       <section>
         <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="text-foreground font-serif text-lg font-medium tracking-tight">
+          <h2 className="text-ink font-serif text-lg font-medium tracking-tight">
             现在能做什么
           </h2>
           <span className="text-muted-foreground text-xs">
@@ -79,7 +79,7 @@ export function FrontierPanel({ onOpen, onCycle, onDelete }: PanelEmit) {
 
       <section>
         <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="text-foreground font-serif text-lg font-medium tracking-tight">
+          <h2 className="text-ink font-serif text-lg font-medium tracking-tight">
             进行中
           </h2>
           <span className="text-muted-foreground text-xs">正在推进的任务</span>
@@ -105,7 +105,7 @@ export function FrontierPanel({ onOpen, onCycle, onDelete }: PanelEmit) {
 
       <section>
         <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="text-foreground font-serif text-lg font-medium tracking-tight">
+          <h2 className="text-ink font-serif text-lg font-medium tracking-tight">
             本周已完成
           </h2>
           <span className="text-muted-foreground text-xs">最近关闭的任务</span>
@@ -194,8 +194,8 @@ export function PlanningPanel({ onOpen, onDelete }: PanelEmit) {
             onClick={() => toggle('type', t)}
             className={`rounded-full border px-2.5 py-0.5 text-xs transition-colors ${
               filterType.has(t)
-                ? 'border-primary/40 bg-primary/10 text-primary'
-                : 'border-border text-muted-foreground hover:text-foreground'
+                ? 'border-accent/40 bg-accent/10 text-accent'
+                : 'border-border text-muted-foreground hover:text-ink'
             }`}
           >
             {t}
@@ -214,8 +214,8 @@ export function PlanningPanel({ onOpen, onDelete }: PanelEmit) {
             onClick={() => toggle('priority', p)}
             className={`rounded-full border px-2.5 py-0.5 text-xs transition-colors ${
               filterPriority.has(p)
-                ? 'border-primary/40 bg-primary/10 text-primary'
-                : 'border-border text-muted-foreground hover:text-foreground'
+                ? 'border-accent/40 bg-accent/10 text-accent'
+                : 'border-border text-muted-foreground hover:text-ink'
             }`}
           >
             {p}
@@ -249,7 +249,7 @@ export function PlanningPanel({ onOpen, onDelete }: PanelEmit) {
             }}
             className="hover:bg-muted/40 border-border grid cursor-pointer grid-cols-[1fr_80px_32px] items-center gap-4 border-t px-4 py-2.5 transition-colors sm:grid-cols-[2fr_1fr_1fr_1fr_100px_32px]"
           >
-            <span className="text-foreground truncate text-sm font-medium">
+            <span className="text-ink truncate text-sm font-medium">
               {task.title}
             </span>
             <span className="max-sm:hidden">
@@ -360,7 +360,7 @@ export function ReviewPanel({ onOpen }: Pick<PanelEmit, 'onOpen'>) {
     <div className="space-y-8">
       <section>
         <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="text-foreground font-serif text-lg font-medium tracking-tight">
+          <h2 className="text-ink font-serif text-lg font-medium tracking-tight">
             本周概览
           </h2>
           <span className="text-muted-foreground text-xs">
@@ -371,12 +371,12 @@ export function ReviewPanel({ onOpen }: Pick<PanelEmit, 'onOpen'>) {
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="border-border bg-background rounded-3xl border px-5 py-4 shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent),0_18px_32px_color-mix(in_oklch,var(--ink)_8%,transparent)]"
+              className="border-border bg-paper rounded-3xl border px-5 py-4 shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent),0_18px_32px_color-mix(in_oklch,var(--ink)_8%,transparent)]"
             >
               <div className="text-muted-foreground text-[10px] font-medium tracking-widest uppercase">
                 {stat.label}
               </div>
-              <div className="text-foreground font-family-averia mt-1 text-3xl leading-none font-normal tracking-tight">
+              <div className="text-ink font-family-averia mt-1 text-3xl leading-none font-normal tracking-tight">
                 {stat.value}
               </div>
               <div className={`mt-1 text-xs ${stat.deltaClass}`}>
@@ -389,7 +389,7 @@ export function ReviewPanel({ onOpen }: Pick<PanelEmit, 'onOpen'>) {
 
       <section>
         <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="text-foreground font-serif text-lg font-medium tracking-tight">
+          <h2 className="text-ink font-serif text-lg font-medium tracking-tight">
             类型分布
           </h2>
           <span className="text-muted-foreground text-xs">全部任务</span>
@@ -397,7 +397,7 @@ export function ReviewPanel({ onOpen }: Pick<PanelEmit, 'onOpen'>) {
         <div className="space-y-3">
           {distributionRows.map((row) => (
             <div key={row.type} className="flex items-center gap-3">
-              <span className="text-foreground w-16 shrink-0 text-sm">
+              <span className="text-ink w-16 shrink-0 text-sm">
                 {row.type}
               </span>
               <div className="bg-muted h-2 flex-1 overflow-hidden rounded-full">
@@ -421,7 +421,7 @@ export function ReviewPanel({ onOpen }: Pick<PanelEmit, 'onOpen'>) {
 
       <section>
         <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="text-foreground font-serif text-lg font-medium tracking-tight">
+          <h2 className="text-ink font-serif text-lg font-medium tracking-tight">
             最近完成
           </h2>
           <span className="text-muted-foreground text-xs">按完成时间倒序</span>

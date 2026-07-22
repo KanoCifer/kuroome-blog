@@ -4,7 +4,7 @@ export function BlogLoadingSkeleton() {
       {[1, 2, 3].map((i) => (
         <div
           key={i}
-          className="border-border bg-background animate-pulse rounded-3xl border p-6 shadow-sm"
+          className="border-border bg-paper animate-pulse rounded-3xl border p-6 shadow-sm"
         >
           <div className="bg-muted h-7 w-3/4 rounded-lg" />
           <div className="bg-muted mt-3 h-4 w-1/4 rounded" />

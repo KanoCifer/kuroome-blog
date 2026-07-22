@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-background flex min-h-[calc(100dvh-4rem)] flex-col">
+  <div class="bg-paper flex min-h-[calc(100dvh-4rem)] flex-col">
     <PageHero
       title="阅读统计"
       subtitle="微信读书 · 你的阅读时间记录"
@@ -10,7 +10,7 @@
     <div class="flex-1 pb-12">
       <div class="mx-auto max-w-3xl px-4 py-8 sm:px-6 md:px-10 md:py-10">
         <!-- ── Mode Tabs ─────────────────────────────────────────────── -->
-        <div class="bg-background mb-4 flex gap-1 rounded-xl p-1">
+        <div class="bg-paper mb-4 flex gap-1 rounded-xl p-1">
           <button
             v-for="m in MODES"
             :key="m.key"
@@ -18,8 +18,8 @@
             class="flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors"
             :class="
               activeMode === m.key
-                ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                ? 'bg-accent text-accent shadow-sm'
+                : 'text-muted-foreground hover:bg-muted hover:text-ink'
             "
             @click="switchMode(m.key)"
           >
@@ -34,7 +34,7 @@
         >
           <button
             type="button"
-            class="text-muted-foreground hover:text-foreground hover:bg-muted inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+            class="text-muted-foreground hover:text-ink hover:bg-muted inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
             :disabled="statsStore.isLoading"
             @click="goPrev"
             aria-label="上一周期"
@@ -56,13 +56,13 @@
             上{{ unitLabel }}
           </button>
           <span
-            class="text-foreground text-sm font-medium tabular-nums sm:text-base"
+            class="text-ink text-sm font-medium tabular-nums sm:text-base"
           >
             {{ periodLabel }}
           </span>
           <button
             type="button"
-            class="text-muted-foreground hover:text-foreground hover:bg-muted inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+            class="text-muted-foreground hover:text-ink hover:bg-muted inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
             :disabled="statsStore.isLoading || isAtCurrent"
             @click="goNext"
             aria-label="下一周期"
@@ -127,7 +127,7 @@
               {{ eyebrow }}
             </p>
             <p
-              class="text-foreground font-serif text-5xl leading-tight font-bold tracking-tight tabular-nums sm:text-6xl md:text-7xl"
+              class="text-ink font-serif text-5xl leading-tight font-bold tracking-tight tabular-nums sm:text-6xl md:text-7xl"
             >
               {{ formatDuration(activeSnapshot.totalReadTime) }}
             </p>
@@ -189,7 +189,7 @@
               class="text-left"
             >
               <p
-                class="text-foreground font-serif text-3xl font-bold tabular-nums sm:text-4xl"
+                class="text-ink font-serif text-3xl font-bold tabular-nums sm:text-4xl"
               >
                 {{ stat.counts }}
               </p>

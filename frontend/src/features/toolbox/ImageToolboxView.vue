@@ -2,7 +2,7 @@
   <BasicDetail title="图片工具箱" subtitle="本地压缩与格式转换">
     <div class="col-span-full">
       <div
-        class="squircle border-border/60 bg-background/50 overflow-hidden border shadow-sm"
+        class="squircle border-border/60 bg-paper/50 overflow-hidden border shadow-sm"
       >
         <div class="flex flex-col lg:flex-row lg:items-stretch">
           <!-- 左侧配置面板 -->
@@ -10,7 +10,7 @@
             class="border-border/60 w-full shrink-0 border-b p-6 lg:w-80 lg:border-r lg:border-b-0"
           >
             <header class="mb-8">
-              <h2 class="text-foreground text-xl font-bold">参数配置</h2>
+              <h2 class="text-ink text-xl font-bold">参数配置</h2>
               <p class="text-muted-foreground mt-1 text-xs">
                 本地处理，保护隐私安全
               </p>
@@ -22,7 +22,7 @@
                 <div class="flex items-center justify-between">
                   <label
                     for="max-width"
-                    class="text-foreground text-sm font-semibold"
+                    class="text-ink text-sm font-semibold"
                   >
                     最大宽度限制
                   </label>
@@ -60,7 +60,7 @@
                     type="number"
                     min="1"
                     :disabled="!enableMaxWidth"
-                    class="text-foreground placeholder:text-muted-foreground focus:border-foreground border-border bg-background disabled:bg-muted disabled:text-muted-foreground w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
+                    class="text-ink placeholder:text-muted-foreground focus:border-ink border-border bg-paper disabled:bg-muted disabled:text-muted-foreground w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
                   />
                   <span
                     class="text-muted-foreground absolute top-1/2 right-4 -translate-y-1/2 text-xs"
@@ -74,7 +74,7 @@
                 <div class="flex items-center justify-between">
                   <label
                     for="quality"
-                    class="text-foreground text-sm font-semibold"
+                    class="text-ink text-sm font-semibold"
                   >
                     压缩质量
                   </label>
@@ -101,7 +101,7 @@
 
               <!-- 输出格式 -->
               <div class="space-y-3">
-                <span class="text-foreground text-sm font-semibold"
+                <span class="text-ink text-sm font-semibold"
                   >输出格式</span
                 >
                 <div class="grid grid-cols-3 gap-2">
@@ -112,8 +112,8 @@
                     class="rounded-xl border py-2 text-xs font-medium transition-all"
                     :class="
                       outputType === option.value
-                        ? 'border-foreground bg-foreground text-background'
-                        : 'border-border bg-background text-muted-foreground hover:border-muted-foreground'
+                        ? 'border-ink bg-ink text-paper'
+                        : 'border-border bg-paper text-muted-foreground hover:border-muted-foreground'
                     "
                     @click="outputType = option.value"
                   >
@@ -127,7 +127,7 @@
                 <div class="flex items-center justify-between">
                   <label
                     for="file-name"
-                    class="text-foreground text-sm font-semibold"
+                    class="text-ink text-sm font-semibold"
                   >
                     导出文件名
                   </label>
@@ -143,7 +143,7 @@
                   type="text"
                   spellcheck="false"
                   placeholder="留空则使用原文件名"
-                  class="text-foreground placeholder:text-muted-foreground focus:border-foreground border-border bg-background w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
+                  class="text-ink placeholder:text-muted-foreground focus:border-ink border-border bg-paper w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
                 />
               </div>
 
@@ -152,7 +152,7 @@
                 <button
                   type="button"
                   :disabled="!originalFile || processing"
-                  class="bg-foreground text-background hover:bg-foreground/90 group relative overflow-hidden rounded-xl py-3 text-sm font-bold transition-all"
+                  class="bg-ink text-paper hover:bg-ink/90 group relative overflow-hidden rounded-xl py-3 text-sm font-bold transition-all"
                   @click="process"
                 >
                   <span
@@ -183,7 +183,7 @@
                 <button
                   type="button"
                   :disabled="!processedBlob"
-                  class="text-foreground hover:bg-muted border-border bg-background flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium shadow-md transition-all hover:scale-105 hover:shadow-lg disabled:opacity-50"
+                  class="text-ink hover:bg-muted border-border bg-paper flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium shadow-md transition-all hover:scale-105 hover:shadow-lg disabled:opacity-50"
                   @click="download"
                 >
                   <svg
@@ -204,7 +204,7 @@
 
                 <button
                   type="button"
-                  class="text-muted-foreground hover:text-foreground py-2 text-xs font-medium"
+                  class="text-muted-foreground hover:text-ink py-2 text-xs font-medium"
                   @click="resetAll"
                 >
                   清空并重置
@@ -222,17 +222,17 @@
                 class="group relative flex min-h-50 cursor-pointer items-center justify-center overflow-hidden rounded-3xl border-2 border-dashed transition-all duration-500"
                 :class="
                   isOverDropZone
-                    ? 'border-foreground bg-foreground/5'
+                    ? 'border-ink bg-ink/5'
                     : originalFile
-                      ? 'bg-background border-transparent shadow-sm'
-                      : 'border-border bg-background hover:border-muted-foreground'
+                      ? 'bg-paper border-transparent shadow-sm'
+                      : 'border-border bg-paper hover:border-muted-foreground'
                 "
                 @click="triggerFilePicker"
               >
                 <!-- 动态背景装饰 -->
                 <div
                   v-if="isOverDropZone"
-                  class="bg-foreground/5 absolute inset-0 animate-pulse"
+                  class="bg-ink/5 absolute inset-0 animate-pulse"
                 ></div>
 
                 <div class="relative z-10 p-8 text-center">
@@ -255,7 +255,7 @@
                       </svg>
                     </div>
                     <div>
-                      <p class="text-foreground text-base font-bold">
+                      <p class="text-ink text-base font-bold">
                         {{ isOverDropZone ? '即刻上传' : '点击或拖拽图片' }}
                       </p>
                       <p class="text-muted-foreground mt-1 text-xs">
@@ -279,7 +279,7 @@
                       </div>
                       <div class="text-left">
                         <p
-                          class="text-foreground max-w-50 truncate text-sm font-bold"
+                          class="text-ink max-w-50 truncate text-sm font-bold"
                         >
                           {{ originalFile.name }}
                         </p>
@@ -290,7 +290,7 @@
                     </div>
                     <button
                       type="button"
-                      class="text-foreground bg-background ring-border hover:bg-muted rounded-full px-4 py-1.5 text-xs font-bold shadow-sm ring-1 transition-all"
+                      class="text-ink bg-paper ring-border hover:bg-muted rounded-full px-4 py-1.5 text-xs font-bold shadow-sm ring-1 transition-all"
                       @click.stop="triggerFilePicker"
                     >
                       更换图片
@@ -314,7 +314,7 @@
               >
                 <!-- 原图预览 -->
                 <div
-                  class="group bg-background relative flex flex-col overflow-hidden rounded-3xl shadow-sm"
+                  class="group bg-paper relative flex flex-col overflow-hidden rounded-3xl shadow-sm"
                 >
                   <div
                     class="border-border/50 flex items-center justify-between border-b p-4"
@@ -330,7 +330,7 @@
                       >
                       <button
                         @click="originalPreviewZoom = 1"
-                        class="text-muted-foreground hover:text-foreground text-[10px]"
+                        class="text-muted-foreground hover:text-ink text-[10px]"
                       >
                         重置
                       </button>
@@ -371,7 +371,7 @@
 
                 <!-- 处理后预览 -->
                 <div
-                  class="group bg-background relative flex flex-col overflow-hidden rounded-3xl shadow-sm"
+                  class="group bg-paper relative flex flex-col overflow-hidden rounded-3xl shadow-sm"
                 >
                   <div
                     class="border-border/50 flex items-center justify-between border-b p-4"
@@ -397,7 +397,7 @@
                       >
                       <button
                         @click="processedPreviewZoom = 1"
-                        class="text-muted-foreground hover:text-foreground text-[10px]"
+                        class="text-muted-foreground hover:text-ink text-[10px]"
                       >
                         重置
                       </button>
@@ -411,7 +411,7 @@
                       class="flex flex-col items-center gap-3"
                     >
                       <div
-                        class="border-foreground h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
+                        class="border-ink h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
                       ></div>
                       <span class="text-muted-foreground text-xs"
                         >正在渲染...</span
@@ -598,8 +598,8 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
 }
 
 .switch--on {
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
 }
 
 /* 拇指用 ::after 伪元素实现，left 在 0.25rem / 1.5rem 之间切换 */
@@ -611,7 +611,7 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
   width: 1rem; /* 16px (w-4) */
   height: 1rem;
   border-radius: 9999px;
-  background-color: var(--color-background);
+  @apply bg-paper;
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
   transform: translateY(-50%);
   transition: left 200ms ease-out;
@@ -628,7 +628,7 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
   right: 0.625rem; /* 对齐 on 状态拇指中心 (32px from left = 12px from right) */
   width: 0.625rem; /* 10px (h-2.5) */
   height: 0.625rem;
-  color: var(--color-primary-foreground);
+  color: var(--color-accent);
   transform: translateY(-50%);
   z-index: 1;
 }

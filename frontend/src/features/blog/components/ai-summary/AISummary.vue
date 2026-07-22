@@ -88,14 +88,14 @@ async function switchToChat() {
 
 <template>
   <section
-    class="summary-card bg-background/60 border-border/60 mb-6 overflow-hidden rounded-3xl border shadow-sm transition-all"
+    class="summary-card bg-paper/60 border-border/60 mb-6 overflow-hidden rounded-3xl border shadow-sm transition-all"
     :class="{ 'is-loading': loading }"
   >
     <!-- Header -->
     <div class="flex items-center justify-between gap-3 px-5 pt-4 pb-3">
       <div class="flex items-center gap-2.5">
         <div
-          class="bg-primary/10 dark:bg-primary/15 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+          class="bg-accent/10 dark:bg-accent/15 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -107,7 +107,7 @@ async function switchToChat() {
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="text-primary"
+            class="text-accent"
           >
             <path d="M12 8V4H8" />
             <rect width="16" height="12" x="4" y="8" rx="2" />
@@ -117,7 +117,7 @@ async function switchToChat() {
             <path d="M9 13v2" />
           </svg>
         </div>
-        <h3 class="text-foreground text-base font-semibold tracking-tight">
+        <h3 class="text-ink text-base font-semibold tracking-tight">
           <template v-if="cardMode === CardMode.SUMMARY"> AI 总结 </template>
           <template v-else> AI 对话 </template>
         </h3>
@@ -143,8 +143,8 @@ async function switchToChat() {
             class="relative cursor-pointer rounded-md px-3 py-1 text-sm font-medium transition-all"
             :class="
               cardMode === CardMode.SUMMARY
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'bg-paper text-ink shadow-sm'
+                : 'text-muted-foreground hover:text-ink'
             "
             :disabled="loading"
             @click="cardMode = CardMode.SUMMARY"
@@ -155,8 +155,8 @@ async function switchToChat() {
             class="relative cursor-pointer rounded-md px-3 py-1 text-sm font-medium transition-all"
             :class="
               cardMode === CardMode.CHAT
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'bg-paper text-ink shadow-sm'
+                : 'text-muted-foreground hover:text-ink'
             "
             :disabled="loading"
             @click="switchToChat"
@@ -172,7 +172,7 @@ async function switchToChat() {
       <template v-if="cardMode === CardMode.SUMMARY">
         <select
           v-model="selectedModel"
-          class="border-border/70 bg-muted/40 text-foreground dark:border-border/70 dark:bg-muted/30 dark:text-foreground focus:ring-ring cursor-pointer rounded-md border px-2.5 py-1.5 text-sm transition-colors focus:ring-1 focus:outline-none"
+          class="border-border/70 bg-muted/40 text-ink dark:border-border/70 dark:bg-muted/30 dark:text-ink focus:ring-ring cursor-pointer rounded-md border px-2.5 py-1.5 text-sm transition-colors focus:ring-1 focus:outline-none"
           :disabled="loading"
         >
           <option
@@ -184,7 +184,7 @@ async function switchToChat() {
           </option>
         </select>
         <button
-          class="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-primary/30 dark:disabled:bg-primary/30 ml-auto inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed"
+          class="bg-accent text-accent hover:bg-accent/90 disabled:bg-accent/30 dark:disabled:bg-accent/30 ml-auto inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed"
           :disabled="!canSummarize"
           @click="onGenerate"
         >
@@ -220,7 +220,7 @@ async function switchToChat() {
       <template v-else>
         <button
           v-if="messages.length > 0"
-          class="text-muted-foreground hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground ml-auto cursor-pointer rounded-md px-2.5 py-1 text-sm transition-colors"
+          class="text-muted-foreground hover:text-ink dark:text-muted-foreground dark:hover:text-ink ml-auto cursor-pointer rounded-md px-2.5 py-1 text-sm transition-colors"
           :disabled="loading"
           @click="clearChat"
         >
@@ -307,8 +307,8 @@ async function switchToChat() {
                 class="max-w-[80%] rounded-2xl px-3.5 py-2.5 text-base leading-relaxed"
                 :class="
                   msg.role === 'user'
-                    ? 'bg-primary text-primary-foreground whitespace-pre-line'
-                    : 'bg-muted/50 text-foreground dark:bg-muted/30 dark:text-foreground prose max-w-none'
+                    ? 'bg-accent text-accent whitespace-pre-line'
+                    : 'bg-muted/50 text-ink dark:bg-muted/30 dark:text-ink prose max-w-none'
                 "
               >
                 <template v-if="msg.role === 'user'">
@@ -343,12 +343,12 @@ async function switchToChat() {
               v-model="chatInput"
               type="text"
               placeholder="继续提问..."
-              class="border-border/70 bg-muted/30 text-foreground placeholder-muted-foreground focus:border-ring focus:ring-ring dark:border-border/70 dark:bg-muted/20 dark:text-foreground dark:placeholder-muted-foreground dark:focus:border-ring dark:focus:ring-ring flex-1 rounded-lg border px-3.5 py-2.5 text-base transition-colors focus:ring-1 focus:outline-none"
+              class="border-border/70 bg-muted/30 text-ink placeholder-muted-foreground focus:border-ring focus:ring-ring dark:border-border/70 dark:bg-muted/20 dark:text-ink dark:placeholder-muted-foreground dark:focus:border-ring dark:focus:ring-ring flex-1 rounded-lg border px-3.5 py-2.5 text-base transition-colors focus:ring-1 focus:outline-none"
               :disabled="loading"
               @keydown="onChatKeydown"
             />
             <button
-              class="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-primary/30 dark:disabled:bg-primary/30 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg transition disabled:cursor-not-allowed"
+              class="bg-accent text-accent hover:bg-accent/90 disabled:bg-accent/30 dark:disabled:bg-accent/30 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg transition disabled:cursor-not-allowed"
               :disabled="!canChat"
               @click="onSendChat"
             >
@@ -405,8 +405,8 @@ async function switchToChat() {
 .summary-card:hover {
   transform: translateY(-1px);
   box-shadow:
-    0 4px 16px -2px oklch(from var(--color-primary) l c h / 0.08),
-    0 1px 4px oklch(from var(--color-primary) l c h / 0.04);
+    0 4px 16px -2px oklch(from var(--color-accent) l c h / 0.08),
+    0 1px 4px oklch(from var(--color-accent) l c h / 0.04);
 }
 
 .summary-card.is-loading {
@@ -427,11 +427,11 @@ async function switchToChat() {
 @keyframes card-breathe {
   0%,
   100% {
-    border-color: oklch(from var(--color-primary) l c h / 0.15);
+    border-color: oklch(from var(--color-accent) l c h / 0.15);
   }
   50% {
-    border-color: oklch(from var(--color-primary) l c h / 0.35);
-    box-shadow: 0 4px 20px oklch(from var(--color-primary) l c h / 0.08);
+    border-color: oklch(from var(--color-accent) l c h / 0.35);
+    box-shadow: 0 4px 20px oklch(from var(--color-accent) l c h / 0.08);
   }
 }
 </style>

@@ -23,14 +23,14 @@ export function FrontierCard({
   onDelete,
 }: FrontierCardProps) {
   return (
-    <article className="bg-background border-border group flex flex-col rounded-3xl border p-4 shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent),0_18px_32px_color-mix(in_oklch,var(--ink)_8%,transparent)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_2px_2px_color-mix(in_oklch,var(--ink)_7%,transparent),0_10px_22px_color-mix(in_oklch,var(--ink)_12%,transparent),0_24px_40px_color-mix(in_oklch,var(--ink)_10%,transparent)]">
+    <article className="bg-paper border-border group flex flex-col rounded-3xl border p-4 shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent),0_18px_32px_color-mix(in_oklch,var(--ink)_8%,transparent)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_2px_2px_color-mix(in_oklch,var(--ink)_7%,transparent),0_10px_22px_color-mix(in_oklch,var(--ink)_12%,transparent),0_24px_40px_color-mix(in_oklch,var(--ink)_10%,transparent)]">
       <button
         type="button"
         onClick={() => onOpen(task.slug)}
         className="focus-visible:ring-ring flex w-full flex-col items-stretch text-left focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
       >
         <span className="mb-2 flex flex-wrap items-center gap-1">
-          <CircleCheckBig className="text-primary size-5" />
+          <CircleCheckBig className="text-accent size-5" />
           <TypeBadge type={task.type} />
           <PriorityBadge priority={task.priority} />
           <KindBadge kind={task.kind} />
@@ -40,13 +40,13 @@ export function FrontierCard({
             </span>
           )}
           {task.slug && (
-            <span className="bg-primary/10 text-primary rounded-full px-1.5 py-px text-[10px] font-medium">
+            <span className="bg-accent/10 text-accent rounded-full px-1.5 py-px text-[10px] font-medium">
               {task.slug}
             </span>
           )}
         </span>
 
-        <span className="text-foreground text-sm font-medium">
+        <span className="text-ink text-sm font-medium">
           {task.title}
         </span>
 
@@ -93,7 +93,7 @@ export function FrontierCard({
               e.stopPropagation();
               onCycle(task.slug);
             }}
-            className="text-muted-foreground hover:bg-muted hover:text-primary focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
+            className="text-muted-foreground hover:bg-muted hover:text-accent focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
             title="推进状态"
             aria-label="推进状态"
           >

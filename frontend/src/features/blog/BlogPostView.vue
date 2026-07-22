@@ -312,7 +312,7 @@ const setupCodeCopy = () => {
     const button = document.createElement('button');
     button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
     button.className =
-      'copy-btn absolute top-1 w-fit right-3 rounded-lg bg-secondary/90 p-1 text-foreground';
+      'copy-btn absolute top-1 w-fit right-3 rounded-lg bg-secondary/90 p-1 text-ink';
     block.style.position = 'relative';
     block.appendChild(button);
   });
@@ -329,14 +329,14 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="blog-post bg-background">
+  <div class="blog-post bg-paper">
     <!-- 阅读进度条：跟随窗口滚动 -->
     <div
       class="bg-border/50 fixed inset-x-0 top-0 z-30 h-[2px] overflow-hidden"
       aria-hidden="true"
     >
       <div
-        class="bg-primary h-full origin-left transition-[width] duration-150 ease-out will-change-[width]"
+        class="bg-accent h-full origin-left transition-[width] duration-150 ease-out will-change-[width]"
         :style="{ width: `${readProgress * 100}%` }"
       ></div>
     </div>
@@ -345,7 +345,7 @@ onUnmounted(() => {
     <div class="mx-auto max-w-[42rem] px-6 pt-10 sm:pt-14">
       <router-link
         to="/blog"
-        class="text-muted-foreground hover:text-primary group inline-flex items-center gap-1.5 text-[13px] font-medium tracking-wide transition-colors"
+        class="text-muted-foreground hover:text-accent group inline-flex items-center gap-1.5 text-[13px] font-medium tracking-wide transition-colors"
       >
         <span
           class="transition-transform duration-200 group-hover:-translate-x-0.5"
@@ -414,7 +414,7 @@ onUnmounted(() => {
       >
         <router-link
           :to="`/blog/${post._id}/edit`"
-          class="bg-muted text-foreground hover:bg-muted/80 inline-flex cursor-pointer items-center gap-2 rounded-lg px-3.5 py-1.5 text-[13px] font-medium transition-all duration-150 active:scale-[0.96]"
+          class="bg-muted text-ink hover:bg-muted/80 inline-flex cursor-pointer items-center gap-2 rounded-lg px-3.5 py-1.5 text-[13px] font-medium transition-all duration-150 active:scale-[0.96]"
         >
           <EditIcon />
           编辑
@@ -462,14 +462,14 @@ onUnmounted(() => {
 
         <!-- Eyebrow / kicker — accent 唯一一次正式出场 -->
         <div
-          class="text-primary mb-5 flex items-center gap-2 text-[11px] font-semibold tracking-[0.14em] uppercase"
+          class="text-accent mb-5 flex items-center gap-2 text-[11px] font-semibold tracking-[0.14em] uppercase"
         >
-          <span class="bg-primary h-px w-5"></span>
+          <span class="bg-accent h-px w-5"></span>
           {{ post.tags?.[0] || '未分类' }}
         </div>
 
         <h1
-          class="text-foreground font-serif text-[clamp(1.875rem,5vw,2.5rem)] leading-[1.18] font-medium tracking-[-0.02em] text-balance"
+          class="text-ink font-serif text-[clamp(1.875rem,5vw,2.5rem)] leading-[1.18] font-medium tracking-[-0.02em] text-balance"
         >
           {{ post.title }}
         </h1>
@@ -499,14 +499,14 @@ onUnmounted(() => {
               class="inline-flex cursor-pointer items-center gap-1 rounded transition-colors duration-150 active:scale-[0.96] disabled:cursor-default"
               :class="
                 isLiked
-                  ? 'text-primary'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'text-accent'
+                  : 'text-muted-foreground hover:text-ink'
               "
               @click="handleLike"
             >
               <Heart
                 class="h-3.5 w-3.5 transition-all duration-150"
-                :class="isLiked ? 'fill-primary' : ''"
+                :class="isLiked ? 'fill-accent' : ''"
               />
               {{ likesCount }}
             </button>
@@ -517,7 +517,7 @@ onUnmounted(() => {
         <div
           class="text-muted-foreground mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[13px] tracking-[0.02em]"
         >
-          <span v-if="post.author" class="text-foreground/80 font-medium">
+          <span v-if="post.author" class="text-ink/80 font-medium">
             {{ post.author }}
           </span>
           <span
@@ -550,12 +550,12 @@ onUnmounted(() => {
         <div class="flex flex-wrap items-start justify-between gap-5">
           <div class="flex items-center gap-3.5">
             <span
-              class="text-foreground ring-border bg-muted flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-serif text-sm font-semibold ring-1"
+              class="text-ink ring-border bg-muted flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-serif text-sm font-semibold ring-1"
               >{{ (post.author || 'K').slice(0, 1) }}</span
             >
             <div class="min-w-0">
               <div
-                class="text-foreground text-[14px] font-medium tracking-wide"
+                class="text-ink text-[14px] font-medium tracking-wide"
               >
                 {{ post.author || 'Kurroome' }}
               </div>
@@ -575,7 +575,7 @@ onUnmounted(() => {
           <button
             type="button"
             @click="handleCopyLink"
-            class="text-muted-foreground hover:text-primary inline-flex cursor-pointer items-center gap-1.5 text-[12px] font-medium tracking-[0.02em] transition-all duration-150 active:scale-[0.96]"
+            class="text-muted-foreground hover:text-accent inline-flex cursor-pointer items-center gap-1.5 text-[12px] font-medium tracking-[0.02em] transition-all duration-150 active:scale-[0.96]"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

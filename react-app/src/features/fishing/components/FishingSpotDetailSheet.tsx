@@ -152,7 +152,7 @@ export function FishingSpotDetailSheet({
         <header className="shrink-0 px-5 pt-3 pb-4">
           <div className="border-border/60 flex items-center justify-between border-b px-0 pb-3">
             <div className="min-w-0 flex-1">
-              <h2 className="text-foreground truncate text-base font-semibold">
+              <h2 className="text-ink truncate text-base font-semibold">
                 {spot?.name || '钓点详情'}
               </h2>
               {dateLabel && (
@@ -165,7 +165,7 @@ export function FishingSpotDetailSheet({
               type="button"
               aria-label="关闭钓点详情"
               onClick={onClose}
-              className="text-muted-foreground hover:bg-muted hover:text-foreground ml-3 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors"
+              className="text-muted-foreground hover:bg-muted hover:text-ink ml-3 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
@@ -197,7 +197,7 @@ export function FishingSpotDetailSheet({
 
             {/* 描述正文 — serif 阅读节奏 */}
             {spot?.description && (
-              <p className="text-foreground/90 font-family-averia text-[15px] leading-relaxed">
+              <p className="text-ink/90 font-family-averia text-[15px] leading-relaxed">
                 {spot.description}
               </p>
             )}
@@ -240,7 +240,7 @@ export function FishingSpotDetailSheet({
                 type="button"
                 onClick={() => onRoute?.(marker!)}
                 disabled={!marker}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 min-h-11 flex w-full items-center justify-center gap-2 rounded-full px-5 text-sm font-medium transition-colors disabled:opacity-60"
+                className="bg-accent text-accent hover:bg-accent/90 min-h-11 flex w-full items-center justify-center gap-2 rounded-full px-5 text-sm font-medium transition-colors disabled:opacity-60"
               >
                 <Navigation className="h-4 w-4" />
                 导航到此处
@@ -285,7 +285,7 @@ export function FishingSpotDetailSheet({
                 type="button"
                 onClick={doDelete}
                 disabled={deleting}
-                className="bg-destructive text-primary-foreground hover:bg-destructive/90 min-h-11 flex-1 rounded-full px-5 text-sm font-medium transition-colors disabled:opacity-60"
+                className="bg-destructive text-accent hover:bg-destructive/90 min-h-11 flex-1 rounded-full px-5 text-sm font-medium transition-colors disabled:opacity-60"
               >
                 {deleting ? '删除中…' : '确认删除'}
               </button>
@@ -308,11 +308,11 @@ function RatingRow({ rating }: { rating: number }) {
           className={`h-5 w-5 ${
             i < stars
               ? 'fill-warning text-warning'
-              : 'text-foreground/15'
+              : 'text-ink/15'
           }`}
         />
       ))}
-      <span className="text-foreground ml-1 text-sm font-semibold tabular-nums">
+      <span className="text-ink ml-1 text-sm font-semibold tabular-nums">
         {rating.toFixed(1)}
       </span>
     </div>
@@ -335,7 +335,7 @@ function InfoRow({
         {icon}
         {label}
       </span>
-      <span className="text-foreground text-sm font-medium tabular-nums">
+      <span className="text-ink text-sm font-medium tabular-nums">
         {value}
       </span>
     </div>
@@ -378,7 +378,7 @@ function EditForm({
           type="text"
           value={name}
           onChange={(e) => onNameChange(e.target.value)}
-          className="border-input bg-background text-foreground min-h-11 rounded-xl border px-3.5 text-sm outline-none focus:border-ring focus:ring-ring/20 focus:ring-2"
+          className="border-input bg-paper text-ink min-h-11 rounded-xl border px-3.5 text-sm outline-none focus:border-ring focus:ring-ring/20 focus:ring-2"
         />
       </label>
 
@@ -388,7 +388,7 @@ function EditForm({
           value={description}
           onChange={(e) => onDescriptionChange(e.target.value)}
           rows={3}
-          className="border-input bg-background text-foreground resize-none rounded-xl border px-3.5 py-2.5 text-sm leading-relaxed outline-none focus:border-ring focus:ring-ring/20 focus:ring-2"
+          className="border-input bg-paper text-ink resize-none rounded-xl border px-3.5 py-2.5 text-sm leading-relaxed outline-none focus:border-ring focus:ring-ring/20 focus:ring-2"
         />
       </label>
 
@@ -400,7 +400,7 @@ function EditForm({
           type="text"
           value={tags}
           onChange={(e) => onTagsChange(e.target.value)}
-          className="border-input bg-background text-foreground min-h-11 rounded-xl border px-3.5 text-sm outline-none focus:border-ring focus:ring-ring/20 focus:ring-2"
+          className="border-input bg-paper text-ink min-h-11 rounded-xl border px-3.5 text-sm outline-none focus:border-ring focus:ring-ring/20 focus:ring-2"
         />
       </label>
 
@@ -419,7 +419,7 @@ function EditForm({
                 className={`h-6 w-6 transition-colors ${
                   i < rating
                     ? 'fill-warning text-warning'
-                    : 'text-foreground/15 hover:text-foreground/30'
+                    : 'text-ink/15 hover:text-ink/30'
                 }`}
               />
             </button>
@@ -439,7 +439,7 @@ function EditForm({
           type="button"
           onClick={onSave}
           disabled={saving}
-          className="bg-primary text-primary-foreground hover:bg-primary/90 min-h-11 flex-1 rounded-full px-5 text-sm font-medium transition-colors disabled:opacity-60"
+          className="bg-accent text-accent hover:bg-accent/90 min-h-11 flex-1 rounded-full px-5 text-sm font-medium transition-colors disabled:opacity-60"
         >
           {saving ? '保存中…' : '保存'}
         </button>

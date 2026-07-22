@@ -25,7 +25,7 @@ export function BentoClock() {
       </span>
 
       {/* 右侧：大数字时间 */}
-      <span className="text-foreground font-serif text-2xl font-extrabold tracking-tight tabular-nums">
+      <span className="text-ink font-serif text-2xl font-extrabold tracking-tight tabular-nums">
         {timeLabel}
       </span>
     </div>

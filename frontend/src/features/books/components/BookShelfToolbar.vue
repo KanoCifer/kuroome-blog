@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-background/85 top-0 z-20 -mx-4 mb-6 px-4 pt-3 pb-3 backdrop-blur-md sm:-mx-6 sm:px-6 md:-mx-10 md:px-10"
+    class="bg-paper/85 top-0 z-20 -mx-4 mb-6 px-4 pt-3 pb-3 backdrop-blur-md sm:-mx-6 sm:px-6 md:-mx-10 md:px-10"
   >
     <!-- Row 1: 搜索 + 密度切换 -->
     <div class="flex items-center gap-2">
@@ -12,14 +12,14 @@
           :value="searchQuery"
           type="text"
           placeholder="搜索书名或作者…"
-          class="border-border bg-background placeholder:text-muted-foreground/50 focus:border-primary focus:ring-primary/20 w-full rounded-xl border py-2 pr-3 pl-9 text-sm transition-colors outline-none focus:ring-2"
+          class="border-border bg-paper placeholder:text-muted-foreground/50 focus:border-accent focus:ring-accent/20 w-full rounded-xl border py-2 pr-3 pl-9 text-sm transition-colors outline-none focus:ring-2"
           @input="onSearchInput"
         />
       </div>
 
       <!-- 密度切换 -->
       <div
-        class="border-border bg-background hidden items-center rounded-xl border p-0.5 sm:flex"
+        class="border-border bg-paper hidden items-center rounded-xl border p-0.5 sm:flex"
         role="group"
         aria-label="书架密度"
       >
@@ -30,8 +30,8 @@
           class="flex h-8 w-8 items-center justify-center rounded-lg transition-colors"
           :class="
             density === opt.key
-              ? 'bg-primary text-primary-foreground shadow-sm'
-              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              ? 'bg-accent text-accent shadow-sm'
+              : 'text-muted-foreground hover:text-ink hover:bg-muted'
           "
           :aria-pressed="density === opt.key"
           :aria-label="opt.label"
@@ -46,7 +46,7 @@
       <div class="relative">
         <button
           type="button"
-          class="border-border bg-background hover:bg-muted text-foreground inline-flex h-9 items-center gap-1.5 rounded-xl border px-3 text-sm transition-colors"
+          class="border-border bg-paper hover:bg-muted text-ink inline-flex h-9 items-center gap-1.5 rounded-xl border px-3 text-sm transition-colors"
           :aria-expanded="sortMenuOpen"
           aria-haspopup="menu"
           @click="sortMenuOpen = !sortMenuOpen"
@@ -57,7 +57,7 @@
         </button>
         <div
           v-if="sortMenuOpen"
-          class="border-border bg-background absolute top-full right-0 z-30 mt-1 w-36 overflow-hidden rounded-xl border shadow-lg"
+          class="border-border bg-paper absolute top-full right-0 z-30 mt-1 w-36 overflow-hidden rounded-xl border shadow-lg"
           role="menu"
           @click.stop
         >
@@ -65,13 +65,13 @@
             v-for="opt in SORT_OPTIONS"
             :key="opt.key"
             type="button"
-            class="text-foreground hover:bg-muted flex w-full items-center justify-between px-3 py-2 text-left text-sm"
+            class="text-ink hover:bg-muted flex w-full items-center justify-between px-3 py-2 text-left text-sm"
             role="menuitemradio"
             :aria-checked="sort === opt.key"
             @click="onSelectSort(opt.key)"
           >
             <span>{{ opt.label }}</span>
-            <Check v-if="sort === opt.key" class="text-primary h-3.5 w-3.5" />
+            <Check v-if="sort === opt.key" class="text-accent h-3.5 w-3.5" />
           </button>
         </div>
       </div>
@@ -90,8 +90,8 @@
         class="flex h-8 flex-shrink-0 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-colors"
         :class="
           filter === chip.key
-            ? 'border-primary bg-primary text-primary-foreground'
-            : 'border-border bg-background text-muted-foreground hover:border-foreground/20 hover:text-foreground'
+            ? 'border-accent bg-accent text-accent'
+            : 'border-border bg-paper text-muted-foreground hover:border-ink/20 hover:text-ink'
         "
         role="tab"
         :aria-selected="filter === chip.key"

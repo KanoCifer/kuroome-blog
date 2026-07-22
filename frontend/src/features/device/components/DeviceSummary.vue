@@ -2,7 +2,7 @@
   <section class="grid grid-cols-2 gap-4">
     <!-- Total Price (Spans 2 columns on large screens) -->
     <div
-      class="squircle border-border/10 bg-background col-span-2 flex items-center justify-between border p-10 shadow-lg"
+      class="squircle border-border/10 bg-paper col-span-2 flex items-center justify-between border p-10 shadow-lg"
     >
       <div>
         <p class="text-muted-foreground text-sm font-medium">设备总价格</p>
@@ -31,7 +31,7 @@
 
     <!-- Active -->
     <div
-      class="squircle border-border/10 bg-background flex items-center gap-4 border p-8 shadow-lg"
+      class="squircle border-border/10 bg-paper flex items-center gap-4 border p-8 shadow-lg"
     >
       <div
         class="bg-success/20 text-success flex h-10 w-10 items-center justify-center rounded-full"
@@ -52,7 +52,7 @@
       </div>
       <div>
         <p class="text-muted-foreground text-xs font-medium">使用中</p>
-        <p class="text-foreground mt-1 text-xl font-bold">
+        <p class="text-ink mt-1 text-xl font-bold">
           {{ activeCount }}
         </p>
       </div>
@@ -60,7 +60,7 @@
 
     <!-- Total -->
     <div
-      class="squircle border-border/10 bg-background flex items-center gap-4 border p-8 shadow-lg"
+      class="squircle border-border/10 bg-paper flex items-center gap-4 border p-8 shadow-lg"
     >
       <div
         class="bg-warning/20 text-warning flex h-10 w-10 items-center justify-center rounded-full"
@@ -81,7 +81,7 @@
       </div>
       <div>
         <p class="text-muted-foreground text-xs font-medium">设备总数</p>
-        <p class="text-foreground mt-1 text-xl font-bold">
+        <p class="text-ink mt-1 text-xl font-bold">
           {{ totalCount }}
         </p>
       </div>

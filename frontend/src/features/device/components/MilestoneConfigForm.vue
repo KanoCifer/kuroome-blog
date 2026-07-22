@@ -16,16 +16,16 @@
         class="fixed inset-x-4 inset-y-24 z-50 flex items-center justify-center sm:inset-x-auto sm:inset-y-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2"
       >
         <div
-          class="bg-background max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl shadow-2xl dark:shadow-xl dark:shadow-slate-900/60"
+          class="bg-paper max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl shadow-2xl dark:shadow-xl dark:shadow-slate-900/60"
         >
           <!-- Header -->
           <div
-            class="bg-background border-border sticky top-0 z-10 border-b px-6 pt-6 pb-4"
+            class="bg-paper border-border sticky top-0 z-10 border-b px-6 pt-6 pb-4"
           >
             <div class="flex items-start justify-between gap-3">
               <div class="flex items-center gap-3">
                 <div
-                  class="bg-primary shadow-primary/30 flex h-10 w-10 items-center justify-center rounded-xl shadow-lg"
+                  class="bg-accent shadow-accent/30 flex h-10 w-10 items-center justify-center rounded-xl shadow-lg"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -33,7 +33,7 @@
                     viewBox="0 0 24 24"
                     stroke-width="2"
                     stroke="currentColor"
-                    class="text-primary-foreground h-5 w-5"
+                    class="text-accent h-5 w-5"
                   >
                     <path
                       stroke-linecap="round"
@@ -43,7 +43,7 @@
                   </svg>
                 </div>
                 <div>
-                  <h2 class="text-foreground font-serif text-2xl font-bold">
+                  <h2 class="text-ink font-serif text-2xl font-bold">
                     里程碑提醒
                   </h2>
                   <p class="text-muted-foreground mt-0.5 text-xs">
@@ -61,16 +61,16 @@
 
           <form
             @submit.prevent="handleSubmit"
-            class="bg-background space-y-6 p-6"
+            class="bg-paper space-y-6 p-6"
           >
             <!-- Enable Toggle -->
             <div
-              class="border-border bg-background flex items-center justify-between rounded-2xl border px-5 py-4 shadow-sm"
+              class="border-border bg-paper flex items-center justify-between rounded-2xl border px-5 py-4 shadow-sm"
             >
               <div class="flex items-center gap-3">
                 <div
                   v-if="form.enabled"
-                  class="bg-primary flex h-9 w-9 items-center justify-center rounded-xl shadow-md"
+                  class="bg-accent flex h-9 w-9 items-center justify-center rounded-xl shadow-md"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -78,7 +78,7 @@
                     viewBox="0 0 24 24"
                     stroke-width="2"
                     stroke="currentColor"
-                    class="text-primary-foreground h-4 w-4"
+                    class="text-accent h-4 w-4"
                   >
                     <path
                       stroke-linecap="round"
@@ -107,7 +107,7 @@
                   </svg>
                 </div>
                 <div>
-                  <p class="text-foreground text-sm font-semibold">
+                  <p class="text-ink text-sm font-semibold">
                     启用里程碑提醒
                   </p>
                   <p class="text-muted-foreground text-xs">
@@ -122,7 +122,7 @@
                 @click="form.enabled = !form.enabled"
                 :class="[
                   'relative flex h-6 w-11 shrink-0 rounded-full transition-colors duration-300',
-                  form.enabled ? 'bg-primary' : 'bg-muted-foreground/30',
+                  form.enabled ? 'bg-accent' : 'bg-muted-foreground/30',
                 ]"
               >
                 <span
@@ -158,8 +158,8 @@
                   :class="[
                     'relative flex flex-col items-center gap-1 rounded-xl px-3 py-3 text-xs font-semibold transition-all duration-200',
                     form.milestones.includes(preset.days)
-                      ? 'bg-primary text-primary-foreground shadow-primary/25 shadow-lg'
-                      : 'bg-background text-muted-foreground hover:bg-muted border-border border shadow-sm',
+                      ? 'bg-accent text-accent shadow-accent/25 shadow-lg'
+                      : 'bg-paper text-muted-foreground hover:bg-muted border-border border shadow-sm',
                   ]"
                 >
                   <span class="text-base">{{
@@ -169,7 +169,7 @@
                     :class="[
                       'text-[10px] font-medium',
                       form.milestones.includes(preset.days)
-                        ? 'text-primary-foreground/70'
+                        ? 'text-accent/70'
                         : 'text-muted-foreground/60',
                     ]"
                     >Day {{ preset.days }}</span
@@ -184,7 +184,7 @@
                       viewBox="0 0 24 24"
                       stroke-width="3"
                       stroke="currentColor"
-                      class="text-primary h-2 w-2"
+                      class="text-accent h-2 w-2"
                     >
                       <path
                         stroke-linecap="round"
@@ -204,7 +204,7 @@
                     type="number"
                     min="1"
                     placeholder="自定义天数..."
-                    class="text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 border-border bg-background w-full rounded-xl border py-2.5 pr-12 pl-4 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                    class="text-ink placeholder:text-muted-foreground focus:border-accent focus:ring-accent/30 border-border bg-paper w-full rounded-xl border py-2.5 pr-12 pl-4 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                   />
                   <span
                     class="text-muted-foreground pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-xs"
@@ -214,7 +214,7 @@
                 <button
                   type="button"
                   @click="addCustomMilestone"
-                  class="border-border bg-background text-muted-foreground hover:border-primary/30 hover:bg-primary/10 hover:text-primary flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-all active:scale-95"
+                  class="border-border bg-paper text-muted-foreground hover:border-accent/30 hover:bg-accent/10 hover:text-accent flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-all active:scale-95"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -236,18 +236,18 @@
               <!-- Selected milestones tags -->
               <div
                 v-if="form.milestones.length > 0"
-                class="border-primary/30 bg-primary/10 flex min-w-0 flex-wrap gap-1.5 rounded-xl border border-dashed p-3"
+                class="border-accent/30 bg-accent/10 flex min-w-0 flex-wrap gap-1.5 rounded-xl border border-dashed p-3"
               >
                 <span
                   v-for="d in form.milestones"
                   :key="d"
-                  class="bg-primary/15 text-primary inline-flex items-center gap-1 rounded-full py-0.5 pr-1.5 pl-2.5 text-xs font-semibold"
+                  class="bg-accent/15 text-accent inline-flex items-center gap-1 rounded-full py-0.5 pr-1.5 pl-2.5 text-xs font-semibold"
                 >
                   {{ formatMilestone(d) }}
                   <button
                     type="button"
                     @click="toggleMilestone(d)"
-                    class="hover:bg-primary/20 flex h-4 w-4 items-center justify-center rounded-full"
+                    class="hover:bg-accent/20 flex h-4 w-4 items-center justify-center rounded-full"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -282,7 +282,7 @@
                   type="button"
                   :disabled="testLoading"
                   @click="handleTestNotification"
-                  class="border-primary/20 bg-primary/10 text-primary hover:bg-primary/20 ml-auto flex shrink-0 items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                  class="border-accent/20 bg-accent/10 text-accent hover:bg-accent/20 ml-auto flex shrink-0 items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <svg
                     v-if="testLoading"
@@ -330,8 +330,8 @@
                   :class="[
                     'flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold transition-all duration-200',
                     form.channels.includes(opt.value)
-                      ? 'bg-primary text-primary-foreground shadow-primary/25 shadow-lg'
-                      : 'bg-background text-muted-foreground hover:bg-muted border-border border shadow-sm',
+                      ? 'bg-accent text-accent shadow-accent/25 shadow-lg'
+                      : 'bg-paper text-muted-foreground hover:bg-muted border-border border shadow-sm',
                   ]"
                 >
                   <span v-html="opt.icon" />
@@ -351,7 +351,7 @@
                   v-model="form.email"
                   type="email"
                   placeholder="example@domain.com"
-                  class="text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 border-border bg-background w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                  class="text-ink placeholder:text-muted-foreground focus:border-accent focus:ring-accent/30 border-border bg-paper w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
 
@@ -366,7 +366,7 @@
                   v-model="form.feishu_webhook_url"
                   type="url"
                   placeholder="https://open.feishu.cn/open-apis/bot/v2/hook/..."
-                  class="text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 border-border bg-background w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                  class="text-ink placeholder:text-muted-foreground focus:border-accent focus:ring-accent/30 border-border bg-paper w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
 
@@ -381,7 +381,7 @@
                   v-model="form.bark_device_key"
                   type="text"
                   placeholder="设备Key或完整推送URL"
-                  class="text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/30 border-border bg-background w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                  class="text-ink placeholder:text-muted-foreground focus:border-accent focus:ring-accent/30 border-border bg-paper w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
             </div>
@@ -398,7 +398,7 @@
             <button
               type="submit"
               :disabled="isSubmitting"
-              class="bg-primary text-primary-foreground hover:shadow-primary/40 shadow-primary/30 flex w-full items-center justify-center gap-2 rounded-full py-4 text-sm font-extrabold shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+              class="bg-accent text-accent hover:shadow-accent/40 shadow-accent/30 flex w-full items-center justify-center gap-2 rounded-full py-4 text-sm font-extrabold shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
             >
               <svg
                 v-if="isSubmitting"

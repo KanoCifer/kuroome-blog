@@ -1,6 +1,6 @@
 <template>
   <div
-    class="border-border/40 bg-background/60 mx-auto flex max-w-md flex-col items-center gap-4 rounded-2xl border border-dashed px-6 py-12 text-center"
+    class="border-border/40 bg-paper/60 mx-auto flex max-w-md flex-col items-center gap-4 rounded-2xl border border-dashed px-6 py-12 text-center"
   >
     <div
       class="bg-muted text-muted-foreground flex h-12 w-12 items-center justify-center rounded-full"
@@ -9,7 +9,7 @@
       <MomentIcon />
     </div>
     <div>
-      <h3 class="text-foreground font-serif text-lg">
+      <h3 class="text-ink font-serif text-lg">
         {{ title }}
       </h3>
       <p class="text-muted-foreground mt-1 text-sm">

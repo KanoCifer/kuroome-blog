@@ -50,7 +50,7 @@ function NavItem({ icon, to }: NavItemProps) {
     <div className="flex items-center justify-center">
       <Link
         to={to}
-        className="text-muted-foreground hover:text-primary flex h-14 w-16 items-center justify-center rounded-full transition duration-300 hover:scale-110 active:scale-[0.96]"
+        className="text-muted-foreground hover:text-accent flex h-14 w-16 items-center justify-center rounded-full transition duration-300 hover:scale-110 active:scale-[0.96]"
       >
         {icon}
       </Link>
@@ -66,11 +66,11 @@ function MenuItem({ icon, label, onClick }: MenuItemProps) {
         visible: { opacity: 1, transition: { duration: 0.2 } },
         exit: { opacity: 0, transition: { duration: 0.15 } },
       }}
-      className="border-border/20 bg-background/40 flex items-center gap-3 rounded-xl border p-4 transition-transform active:scale-[0.96]"
+      className="border-border/20 bg-paper/40 flex items-center gap-3 rounded-xl border p-4 transition-transform active:scale-[0.96]"
       onClick={(e) => onClick(e)}
     >
-      <span className="text-foreground shrink-0">{icon}</span>
-      <span className="text-foreground text-sm font-bold">{label}</span>
+      <span className="text-ink shrink-0">{icon}</span>
+      <span className="text-ink text-sm font-bold">{label}</span>
     </motion.button>
   );
 }
@@ -162,7 +162,7 @@ export function BasicNav() {
           {hidden ? null : (
             <motion.nav
               id="mobile-nav"
-              className="bg-background/80 fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] left-1/2 z-65 flex h-16 max-w-md -translate-x-1/2 items-center justify-around rounded-full px-6 py-3 shadow-lg backdrop-blur-sm"
+              className="bg-paper/80 fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] left-1/2 z-65 flex h-16 max-w-md -translate-x-1/2 items-center justify-around rounded-full px-6 py-3 shadow-lg backdrop-blur-sm"
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 80, opacity: 0 }}
@@ -170,7 +170,7 @@ export function BasicNav() {
             >
               {/* 滑动指示器 — 圆形 pills，跟随 activeIndex */}
               <motion.span
-                className="bg-primary/10 absolute top-1/2 left-6 h-14 w-16 rounded-full"
+                className="bg-accent/10 absolute top-1/2 left-6 h-14 w-16 rounded-full"
                 animate={{ x: activeIndex * NAV_ITEM_WIDTH, y: '-50%' }}
                 transition={{ type: 'spring', stiffness: 350, damping: 30 }}
               />
@@ -185,7 +185,7 @@ export function BasicNav() {
               <div className="flex items-center justify-center">
                 <button
                   onClick={() => setShowMenu((v) => !v)}
-                  className="text-muted-foreground hover:text-primary flex h-14 w-16 items-center justify-center rounded-full transition duration-200 hover:scale-110 active:scale-[0.96]"
+                  className="text-muted-foreground hover:text-accent flex h-14 w-16 items-center justify-center rounded-full transition duration-200 hover:scale-110 active:scale-[0.96]"
                   aria-label="更多导航"
                   aria-expanded={showMenu}
                 >

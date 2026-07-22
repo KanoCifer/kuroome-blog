@@ -28,8 +28,8 @@ const showPassword = ref<boolean>(false);
   <AuthLayout brand-width="w-3/5" form-width="lg:w-2/5">
     <template #branding>
       <div class="flex items-center gap-2 text-xl font-bold tracking-tight">
-        <IconCloud class="text-primary size-8" />
-        <span>Kanocifer<span class="text-primary">.chat</span></span>
+        <IconCloud class="text-accent size-8" />
+        <span>Kanocifer<span class="text-accent">.chat</span></span>
       </div>
       <div class="z-10 my-auto">
         <div class="flex flex-col">
@@ -49,12 +49,12 @@ const showPassword = ref<boolean>(false);
     <template #header>
       <div class="mb-8 flex flex-col items-center lg:items-start">
         <div
-          class="bg-primary text-primary-foreground mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)] lg:hidden"
+          class="bg-accent text-accent mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)] lg:hidden"
         >
           <IconCloud class="size-8" />
         </div>
         <h2
-          class="font-headline text-foreground text-center text-3xl text-[28px] font-extrabold tracking-tight lg:text-left"
+          class="font-headline text-ink text-center text-3xl text-[28px] font-extrabold tracking-tight lg:text-left"
         >
           Log in to your account
         </h2>
@@ -81,7 +81,7 @@ const showPassword = ref<boolean>(false);
             type="text"
             autocomplete="off"
             placeholder="username"
-            class="form-control border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="form-control border-border bg-muted text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.username,
@@ -120,7 +120,7 @@ const showPassword = ref<boolean>(false);
             :type="showPassword ? 'text' : 'password'"
             autocomplete="off"
             placeholder="password"
-            class="form-control border-border bg-muted text-foreground focus:ring-primary/30 w-full rounded-xl py-3 pr-12 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="form-control border-border bg-muted text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-12 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.password,
@@ -132,7 +132,7 @@ const showPassword = ref<boolean>(false);
             type="button"
             @click="showPassword = !showPassword"
             :aria-label="showPassword ? '隐藏密码' : '显示密码'"
-            class="text-muted-foreground hover:text-foreground absolute top-1/2 right-4 z-10 flex -translate-y-1/2 items-center justify-center rounded-md"
+            class="text-muted-foreground hover:text-ink absolute top-1/2 right-4 z-10 flex -translate-y-1/2 items-center justify-center rounded-md"
           >
             <!-- eye (显示) -->
             <svg
@@ -191,7 +191,7 @@ const showPassword = ref<boolean>(false);
       <div class="mt-6">
         <button
           type="submit"
-          class="bg-primary text-primary-foreground shadow-primary/30 hover:bg-primary/90 focus:ring-primary/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
+          class="bg-accent text-accent shadow-accent/30 hover:bg-accent/90 focus:ring-accent/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
           :disabled="isSubmitting"
         >
           <!-- SVG 加载动画 -->
@@ -225,7 +225,7 @@ const showPassword = ref<boolean>(false);
           type="button"
           @click="handlePasskeyLogin"
           :disabled="isPasskeySubmitting"
-          class="bg-success text-primary-foreground shadow-success/30 hover:bg-success/90 focus:ring-success/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          class="bg-success text-accent shadow-success/30 hover:bg-success/90 focus:ring-success/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
         >
           <IconKey />
           <!-- SVG 加载动画 -->
@@ -276,7 +276,7 @@ const showPassword = ref<boolean>(false);
           <span class="border-border w-full border-t"></span>
         </div>
         <div class="relative flex justify-center text-xs uppercase">
-          <span class="bg-background text-muted-foreground px-2">
+          <span class="bg-paper text-muted-foreground px-2">
             Or continue with
           </span>
         </div>
@@ -287,7 +287,7 @@ const showPassword = ref<boolean>(false);
         <button
           type="button"
           @click="handleGitHubLogin"
-          class="text-primary-foreground focus:ring-primary inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-black px-8 py-2.5 font-bold shadow-lg transition-colors hover:bg-black/90 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:text-white"
+          class="text-accent focus:ring-accent inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-black px-8 py-2.5 font-bold shadow-lg transition-colors hover:bg-black/90 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:text-white"
         >
           <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
             <path
@@ -305,7 +305,7 @@ const showPassword = ref<boolean>(false);
         Don't have an account?
         <RouterLink
           to="/register"
-          class="hover:text-primary font-semibold underline transition duration-100"
+          class="hover:text-accent font-semibold underline transition duration-100"
         >
           Register here
         </RouterLink>

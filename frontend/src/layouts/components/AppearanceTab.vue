@@ -66,8 +66,8 @@ const schemes: {
  */
 const cardBase =
   'flex w-full cursor-pointer items-stretch overflow-hidden rounded-xl border transition-colors';
-const cardDefault = 'border-border bg-background hover:border-primary';
-const cardActive = 'border-primary bg-primary/5 !shadow-sm';
+const cardDefault = 'border-border bg-paper hover:border-accent';
+const cardActive = 'border-accent bg-accent/5 !shadow-sm';
 
 const smallCardBase =
   'flex flex-col items-center gap-2 rounded-xl border p-3 transition-colors';
@@ -77,7 +77,7 @@ const smallCardBase =
   <div class="space-y-6">
     <!-- 页面元素 -->
     <div>
-      <h2 class="text-foreground mb-1 font-serif text-lg font-semibold">
+      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">
         页面元素
       </h2>
       <p class="text-muted-foreground mb-4 text-xs italic">
@@ -86,20 +86,20 @@ const smallCardBase =
 
       <button
         @click="themeStore.toggleFooter()"
-        class="border-border bg-background hover:border-primary flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-3 transition-colors"
+        class="border-border bg-paper hover:border-accent flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-3 transition-colors"
       >
         <div class="text-left">
-          <div class="text-foreground text-sm font-medium">显示页脚</div>
+          <div class="text-ink text-sm font-medium">显示页脚</div>
           <div class="text-muted-foreground mt-0.5 text-xs">
             Show footer on every page
           </div>
         </div>
         <div
           class="h-6 w-11 rounded-full p-0.5 transition-colors"
-          :class="themeStore.showFooter === 'true' ? 'bg-primary' : 'bg-muted'"
+          :class="themeStore.showFooter === 'true' ? 'bg-accent' : 'bg-muted'"
         >
           <div
-            class="bg-background h-5 w-5 rounded-full shadow-md transition-transform"
+            class="bg-paper h-5 w-5 rounded-full shadow-md transition-transform"
             :class="
               themeStore.showFooter === 'true'
                 ? 'translate-x-5'
@@ -112,7 +112,7 @@ const smallCardBase =
 
     <!-- 主题模式 -->
     <div>
-      <h2 class="text-foreground mb-1 font-serif text-lg font-semibold">
+      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">
         主题模式
       </h2>
       <p class="text-muted-foreground mb-4 text-xs italic">Theme mode</p>
@@ -126,23 +126,23 @@ const smallCardBase =
             smallCardBase,
             themeStore.theme === theme.value
               ? cardActive
-              : 'border-border bg-background hover:border-primary',
+              : 'border-border bg-paper hover:border-accent',
           ]"
         >
           <component
             :is="theme.icon"
             :class="
               themeStore.theme === theme.value
-                ? 'text-primary'
-                : 'text-foreground'
+                ? 'text-accent'
+                : 'text-ink'
             "
           />
           <span
             class="text-xs"
             :class="
               themeStore.theme === theme.value
-                ? 'text-primary font-semibold'
-                : 'text-foreground'
+                ? 'text-accent font-semibold'
+                : 'text-ink'
             "
           >
             {{ theme.label }}
@@ -153,7 +153,7 @@ const smallCardBase =
 
     <!-- 字体 -->
     <div>
-      <h2 class="text-foreground mb-1 font-serif text-lg font-semibold">
+      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">
         字体
       </h2>
       <p class="text-muted-foreground mb-4 text-xs italic">Reading font</p>
@@ -165,13 +165,13 @@ const smallCardBase =
             smallCardBase,
             themeStore.font === 'default'
               ? cardActive
-              : 'border-border bg-background hover:border-primary',
+              : 'border-border bg-paper hover:border-accent',
           ]"
         >
           <span
             class="text-sm font-semibold"
             :class="
-              themeStore.font === 'default' ? 'text-primary' : 'text-foreground'
+              themeStore.font === 'default' ? 'text-accent' : 'text-ink'
             "
           >
             默认字体
@@ -186,15 +186,15 @@ const smallCardBase =
             smallCardBase,
             themeStore.font === 'harmonyos'
               ? cardActive
-              : 'border-border bg-background hover:border-primary',
+              : 'border-border bg-paper hover:border-accent',
           ]"
         >
           <span
             class="text-sm font-semibold"
             :class="
               themeStore.font === 'harmonyos'
-                ? 'text-primary'
-                : 'text-foreground'
+                ? 'text-accent'
+                : 'text-ink'
             "
             style="font-family: 'Noto Sans SC', sans-serif; font-weight: 500"
           >
@@ -209,7 +209,7 @@ const smallCardBase =
 
     <!-- 配色方案 -->
     <div>
-      <h2 class="text-foreground mb-1 font-serif text-lg font-semibold">
+      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">
         配色方案
       </h2>
       <p class="text-muted-foreground mb-4 text-xs italic">
@@ -245,7 +245,7 @@ const smallCardBase =
             }"
           />
           <div class="flex-1 px-4 py-3 text-left">
-            <div class="text-foreground text-sm font-semibold">
+            <div class="text-ink text-sm font-semibold">
               {{ scheme.label }}
             </div>
             <div class="text-muted-foreground mt-0.5 text-[11px] italic">

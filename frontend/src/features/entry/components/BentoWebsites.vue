@@ -4,7 +4,7 @@
     @click="$router.push('/websites')"
   >
     <div
-      class="text-muted-foreground group-hover:text-foreground text-xs font-bold tracking-wide uppercase transition-colors duration-300"
+      class="text-muted-foreground group-hover:text-ink text-xs font-bold tracking-wide uppercase transition-colors duration-300"
     >
       Daily Pick
     </div>
@@ -36,14 +36,14 @@
         </svg>
       </div>
       <h3
-        class="text-foreground group-hover:text-foreground ml-2 text-lg leading-tight font-bold transition-colors duration-300"
+        class="text-ink group-hover:text-ink ml-2 text-lg leading-tight font-bold transition-colors duration-300"
       >
         {{ randomSite?.name || '加载中...' }}
       </h3>
     </div>
     <div>
       <p
-        class="text-muted-foreground group-hover:text-foreground line-clamp-2 text-sm transition-colors duration-300"
+        class="text-muted-foreground group-hover:text-ink line-clamp-2 text-sm transition-colors duration-300"
       >
         {{ randomSite?.description || '正在获取推荐网站...' }}
       </p>

@@ -22,9 +22,9 @@ export const STATUS_STYLES: Record<
   { bg: string; border: string; text: string }
 > = {
   待评估: {
-    bg: 'bg-primary/10',
-    border: 'border-primary/30',
-    text: 'text-primary',
+    bg: 'bg-accent/10',
+    border: 'border-accent/30',
+    text: 'text-accent',
   },
   待排期: {
     bg: 'bg-warning/10',

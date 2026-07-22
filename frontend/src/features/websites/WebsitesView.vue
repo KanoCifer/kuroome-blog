@@ -5,7 +5,7 @@
       <div
         role="tablist"
         aria-label="网站分类"
-        class="border-border bg-background/40 mb-10 flex flex-wrap items-center gap-2 rounded-full border p-1.5 shadow-sm sm:mb-12"
+        class="border-border bg-paper/40 mb-10 flex flex-wrap items-center gap-2 rounded-full border p-1.5 shadow-sm sm:mb-12"
       >
         <button
           v-for="opt in filterOptions"
@@ -17,8 +17,8 @@
           class="focus-visible:ring-ring inline-flex cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-[background-color,color] duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none sm:px-4 sm:text-[0.9375rem]"
           :class="
             activeSlug === opt.slug
-              ? 'bg-primary text-primary-foreground shadow-sm'
-              : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+              ? 'bg-accent text-accent shadow-sm'
+              : 'text-muted-foreground hover:bg-muted hover:text-ink'
           "
           @click="setCategory(opt.slug)"
         >
@@ -27,7 +27,7 @@
             class="text-xs tabular-nums"
             :class="
               activeSlug === opt.slug
-                ? 'text-primary-foreground/70'
+                ? 'text-accent/70'
                 : 'text-muted-foreground/70'
             "
           >
@@ -39,15 +39,15 @@
       <!-- 空状态 -->
       <div
         v-if="visibleSites.length === 0"
-        class="border-border bg-background/30 flex flex-col items-center justify-center rounded-4xl border py-20"
+        class="border-border bg-paper/30 flex flex-col items-center justify-center rounded-4xl border py-20"
       >
         <IconGlobeOutline class="text-muted-foreground mb-5 h-16 w-16" />
-        <p class="text-foreground font-serif text-lg">这个抽屉还没添东西。</p>
+        <p class="text-ink font-serif text-lg">这个抽屉还没添东西。</p>
         <p class="text-muted-foreground mt-2 text-sm">
           试试别的分类，或者
           <button
             type="button"
-            class="text-primary focus-visible:ring-ring rounded-sm underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:outline-none"
+            class="text-accent focus-visible:ring-ring rounded-sm underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:outline-none"
             @click="setCategory('all')"
           >
             全部展开
@@ -66,7 +66,7 @@
         <header class="mb-6 flex items-baseline gap-3">
           <h2
             :id="`group-${group.slug}`"
-            class="text-foreground font-serif text-2xl font-medium tracking-tight sm:text-[1.625rem]"
+            class="text-ink font-serif text-2xl font-medium tracking-tight sm:text-[1.625rem]"
           >
             {{ group.category }}
           </h2>
@@ -92,7 +92,7 @@
             :href="site.url"
             target="_blank"
             rel="noopener noreferrer"
-            class="group border-border bg-background/40 hover:border-primary/40 hover:bg-background/60 focus-visible:ring-ring relative block cursor-pointer overflow-hidden rounded-3xl border p-6 shadow-sm transition-[background-color,border-color,box-shadow] duration-300 hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+            class="group border-border bg-paper/40 hover:border-accent/40 hover:bg-paper/60 focus-visible:ring-ring relative block cursor-pointer overflow-hidden rounded-3xl border p-6 shadow-sm transition-[background-color,border-color,box-shadow] duration-300 hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
             <!-- 顶部：图标 + 名称 + 分类 chip -->
             <div class="mb-4 flex items-start gap-3">
@@ -113,12 +113,12 @@
               </div>
               <div class="min-w-0 flex-1">
                 <h3
-                  class="text-foreground font-serif text-lg leading-snug font-medium"
+                  class="text-ink font-serif text-lg leading-snug font-medium"
                 >
                   {{ site.name }}
                 </h3>
                 <span
-                  class="bg-primary/10 text-primary mt-1.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                  class="bg-accent/10 text-accent mt-1.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold"
                 >
                   {{ site.category }}
                 </span>
@@ -127,13 +127,13 @@
 
             <!-- 中段：note（书房语气的视觉重心） -->
             <p
-              class="text-foreground/85 mb-3 text-sm leading-relaxed text-pretty"
+              class="text-ink/85 mb-3 text-sm leading-relaxed text-pretty"
             >
-              <span class="text-primary/70 font-serif" aria-hidden="true"
+              <span class="text-accent/70 font-serif" aria-hidden="true"
                 >「</span
               >
               {{ site.note }}
-              <span class="text-primary/70 font-serif" aria-hidden="true"
+              <span class="text-accent/70 font-serif" aria-hidden="true"
                 >」</span
               >
             </p>
@@ -153,7 +153,7 @@
 
             <!-- 外链箭头 -->
             <IconExternalLink
-              class="text-muted-foreground/60 group-hover:text-foreground/80 absolute top-5 right-5 h-4 w-4 shrink-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              class="text-muted-foreground/60 group-hover:text-ink/80 absolute top-5 right-5 h-4 w-4 shrink-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
               aria-hidden="true"
             />
           </motion.a>

@@ -41,15 +41,15 @@ export function CategorySidebar({
           onClick={() => onSelectTag(null)}
           className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
             activeTag === null
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-muted text-foreground hover:bg-muted'
+              ? 'bg-accent text-accent'
+              : 'bg-muted text-ink hover:bg-muted'
           }`}
         >
           <span>全部</span>
           <span
             className={`rounded-full px-1.5 py-0.5 text-xs ${
               activeTag === null
-                ? 'bg-primary/80 text-primary-foreground'
+                ? 'bg-accent/80 text-accent'
                 : 'bg-muted-foreground/20'
             }`}
           >
@@ -63,15 +63,15 @@ export function CategorySidebar({
             onClick={() => onSelectTag(tag.name)}
             className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
               activeTag === tag.name
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted text-foreground hover:bg-muted'
+                ? 'bg-accent text-accent'
+                : 'bg-muted text-ink hover:bg-muted'
             }`}
           >
             <span>{tag.name}</span>
             <span
               className={`rounded-full px-1.5 py-0.5 text-xs ${
                 activeTag === tag.name
-                  ? 'bg-primary/80 text-primary-foreground'
+                  ? 'bg-accent/80 text-accent'
                   : 'bg-muted-foreground/20'
               }`}
             >

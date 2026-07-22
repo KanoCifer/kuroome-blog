@@ -139,7 +139,7 @@ onUnmounted(() => {
       class="pointer-events-none absolute inset-0 flex items-center justify-center"
     >
       <span
-        class="bg-background/80 text-muted-foreground rounded-full px-3 py-1.5 text-xs shadow-sm backdrop-blur-sm"
+        class="bg-paper/80 text-muted-foreground rounded-full px-3 py-1.5 text-xs shadow-sm backdrop-blur-sm"
       >
         点击地图放置钓点
       </span>

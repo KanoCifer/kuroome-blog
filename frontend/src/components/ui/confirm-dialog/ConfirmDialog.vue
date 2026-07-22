@@ -23,7 +23,7 @@
           </svg>
         </span>
         <div class="min-w-0 flex-1">
-          <h2 class="text-foreground text-base font-semibold">{{ title }}</h2>
+          <h2 class="text-ink text-base font-semibold">{{ title }}</h2>
           <p class="text-muted-foreground mt-1 text-sm leading-relaxed">
             {{ message }}
           </p>
@@ -81,10 +81,10 @@ const emit = defineEmits<{
 
 const VARIANT_STYLE = {
   default: {
-    iconBg: 'bg-primary/10',
-    iconColor: 'text-primary',
+    iconBg: 'bg-accent/10',
+    iconColor: 'text-accent',
     iconPath: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-    confirmClass: 'bg-primary text-primary-foreground hover:bg-primary/90',
+    confirmClass: 'bg-accent text-accent hover:bg-accent/90',
   },
   destructive: {
     iconBg: 'bg-destructive/10',

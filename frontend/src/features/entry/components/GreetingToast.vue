@@ -40,13 +40,13 @@ const goToChangelog = () => {
     >
       <div
         v-if="showToast"
-        class="group border-border bg-background/95 fixed bottom-6 left-4 z-50 w-[300px] overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-xl sm:bottom-8 sm:left-8"
+        class="group border-border bg-paper/95 fixed bottom-6 left-4 z-50 w-[300px] overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-xl sm:bottom-8 sm:left-8"
       >
         <div class="relative px-4 py-4">
           <!-- 关闭按钮 -->
           <button
             @click="closeToast"
-            class="text-muted-foreground/60 hover:bg-muted hover:text-foreground absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full transition-all duration-200 hover:scale-110"
+            class="text-muted-foreground/60 hover:bg-muted hover:text-ink absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full transition-all duration-200 hover:scale-110"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -108,7 +108,7 @@ const goToChangelog = () => {
             <!-- 文字 -->
             <div class="min-w-0 flex-1">
               <h3
-                class="text-foreground font-serif text-sm font-semibold tracking-wide"
+                class="text-ink font-serif text-sm font-semibold tracking-wide"
               >
                 {{ greeting }}
               </h3>
@@ -121,7 +121,7 @@ const goToChangelog = () => {
           <!-- CTA 按钮：hover 流光 -->
           <button
             @click="goToChangelog"
-            class="group/btn bg-primary text-primary-foreground hover:bg-primary/90 relative mt-3 flex w-full items-center justify-center gap-1.5 overflow-hidden rounded-xl py-2 text-xs font-medium shadow-sm transition-all duration-300 hover:shadow-md active:scale-[0.97]"
+            class="group/btn bg-accent text-accent hover:bg-accent/90 relative mt-3 flex w-full items-center justify-center gap-1.5 overflow-hidden rounded-xl py-2 text-xs font-medium shadow-sm transition-all duration-300 hover:shadow-md active:scale-[0.97]"
           >
             <span class="relative z-10">查看更新日志</span>
             <svg
@@ -140,7 +140,7 @@ const goToChangelog = () => {
             </svg>
             <!-- 流光条纹 -->
             <div
-              class="via-primary-foreground/25 absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent to-transparent transition-transform duration-500 group-hover/btn:translate-x-full"
+              class="via-accent/25 absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent to-transparent transition-transform duration-500 group-hover/btn:translate-x-full"
             />
           </button>
         </div>

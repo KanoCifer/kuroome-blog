@@ -100,7 +100,7 @@ export function BottomSheet({
         <div className="fixed inset-0 z-200">
           {/* 背景遮罩 */}
           <motion.div
-            className="bg-foreground/30 fixed inset-0 z-100 backdrop-blur-[2px]"
+            className="bg-ink/30 fixed inset-0 z-100 backdrop-blur-[2px]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -118,7 +118,7 @@ export function BottomSheet({
             aria-modal="true"
             tabIndex={-1}
             style={{ maxHeight: maxH }}
-            className="bg-background border-border fixed right-0 bottom-0 left-0 z-210 flex flex-col rounded-t-3xl border-t pb-[calc(1rem+env(safe-area-inset-bottom,0px))] shadow-2xl outline-none"
+            className="bg-paper border-border fixed right-0 bottom-0 left-0 z-210 flex flex-col rounded-t-3xl border-t pb-[calc(1rem+env(safe-area-inset-bottom,0px))] shadow-2xl outline-none"
             initial={reduce ? false : { y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
@@ -138,7 +138,7 @@ export function BottomSheet({
                   <div className="bg-muted mx-auto mb-3 h-1.5 w-10 rounded-full" />
                 )}
                 {title && (
-                  <h2 className="text-foreground text-center text-base font-semibold">
+                  <h2 className="text-ink text-center text-base font-semibold">
                     {title}
                   </h2>
                 )}

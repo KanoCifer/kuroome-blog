@@ -7,11 +7,11 @@
     <div class="fixed top-4 right-4 z-50 flex flex-col gap-2">
       <button
         @click="$emit('openSettings')"
-        class="fab group bg-secondary hover:bg-primary"
+        class="fab group bg-secondary hover:bg-accent"
         aria-label="偏好设置"
       >
         <SettingIcon
-          class="fab-icon text-primary group-hover:text-primary-foreground"
+          class="fab-icon text-accent group-hover:text-accent"
         />
         <span class="fab-label">偏好设置</span>
       </button>
@@ -21,11 +21,11 @@
     <div class="fixed top-16 right-4 z-50 flex flex-col gap-2">
       <button
         @click="goToNewPost"
-        class="fab group bg-primary hover:bg-primary/90"
+        class="fab group bg-accent hover:bg-accent/90"
         aria-label="写文章"
       >
         <svg
-          class="fab-icon text-primary-foreground"
+          class="fab-icon text-accent"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -35,7 +35,7 @@
         >
           <path d="M12 5v14M5 12h14" />
         </svg>
-        <span class="fab-label text-primary-foreground">新建</span>
+        <span class="fab-label text-accent">新建</span>
       </button>
     </div>
 
@@ -45,12 +45,12 @@
         @click="handleLike"
         :class="[
           'fab group',
-          liked ? 'bg-rose-500' : 'bg-primary hover:bg-rose-500',
+          liked ? 'bg-rose-500' : 'bg-accent hover:bg-rose-500',
         ]"
         aria-label="点赞"
       >
         <svg
-          :class="['fab-icon text-primary-foreground']"
+          :class="['fab-icon text-accent']"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -62,7 +62,7 @@
             d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
           />
         </svg>
-        <span class="fab-label text-primary-foreground">{{ likesCount }}</span>
+        <span class="fab-label text-accent">{{ likesCount }}</span>
       </button>
     </div>
 
@@ -70,11 +70,11 @@
     <div class="fixed top-40 right-4 z-50 flex flex-col gap-2">
       <button
         @click="$emit('goToFriendLinks')"
-        class="fab group bg-secondary hover:bg-primary"
+        class="fab group bg-secondary hover:bg-accent"
         aria-label="友情链接"
       >
         <svg
-          class="fab-icon text-primary group-hover:text-primary-foreground"
+          class="fab-icon text-accent group-hover:text-accent"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -97,11 +97,11 @@
     <div class="fixed top-52 right-4 z-50 flex flex-col gap-2">
       <button
         @click="toggleEditLayout"
-        class="fab group bg-secondary hover:bg-primary"
+        class="fab group bg-secondary hover:bg-accent"
         :aria-label="layoutStore.isEditing ? '退出编辑' : '编辑布局'"
       >
         <svg
-          class="fab-icon text-primary group-hover:text-primary-foreground"
+          class="fab-icon text-accent group-hover:text-accent"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -123,11 +123,11 @@
     <div class="fixed top-64 right-4 z-50 flex flex-col gap-2">
       <button
         @click="$emit('switchToMobile')"
-        class="fab group bg-secondary hover:bg-primary"
+        class="fab group bg-secondary hover:bg-accent"
         aria-label="切换到移动版"
       >
         <Smartphone
-          class="fab-icon text-primary group-hover:text-primary-foreground"
+          class="fab-icon text-accent group-hover:text-accent"
         />
         <span class="fab-label">移动版</span>
       </button>
@@ -137,11 +137,11 @@
     <div class="fixed top-76 right-4 z-50 flex flex-col gap-2">
       <button
         @click="goToRss"
-        class="fab group bg-secondary hover:bg-primary"
+        class="fab group bg-secondary hover:bg-accent"
         aria-label="RSS"
       >
         <Rss
-          class="fab-icon text-primary group-hover:text-primary-foreground"
+          class="fab-icon text-accent group-hover:text-accent"
         />
         <span class="fab-label">RSS</span>
       </button>
@@ -151,11 +151,11 @@
     <div class="fixed top-88 right-4 z-50 flex flex-col gap-2">
       <button
         @click="goToSubscription"
-        class="fab group bg-secondary hover:bg-primary"
+        class="fab group bg-secondary hover:bg-accent"
         aria-label="订阅管理"
       >
         <CreditCard
-          class="fab-icon text-primary group-hover:text-primary-foreground"
+          class="fab-icon text-accent group-hover:text-accent"
         />
         <span class="fab-label">订阅</span>
       </button>
@@ -165,11 +165,11 @@
     <div class="fixed top-100 right-4 z-50 flex flex-col gap-2">
       <button
         @click="goToImageToolbox"
-        class="fab group bg-secondary hover:bg-primary"
+        class="fab group bg-secondary hover:bg-accent"
         aria-label="图片工具"
       >
         <Wrench
-          class="fab-icon text-primary group-hover:text-primary-foreground"
+          class="fab-icon text-accent group-hover:text-accent"
         />
         <span class="fab-label">图片工具</span>
       </button>

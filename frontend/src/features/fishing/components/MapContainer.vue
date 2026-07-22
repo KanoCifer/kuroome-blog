@@ -13,19 +13,19 @@
       <!-- 添加钓点按钮 -->
       <button
         type="button"
-        class="bg-secondary/90 text-primary-foreground hover:bg-primary absolute right-2.5 bottom-36 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm transition-all duration-200 ease-out active:scale-95"
+        class="bg-secondary/90 text-accent hover:bg-accent absolute right-2.5 bottom-36 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm transition-all duration-200 ease-out active:scale-95"
         aria-label="添加钓点"
         @click="emit('addSpot')"
       >
-        <Plus class="text-primary h-5 w-5" />
+        <Plus class="text-accent h-5 w-5" />
       </button>
 
       <!-- 定位按钮：浏览器原生方式获取 -->
       <button
         type="button"
         :class="[
-          'bg-background/90 text-foreground hover:bg-background border-border/40 absolute right-2.5 bottom-5 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-all duration-200 ease-out active:scale-95 disabled:opacity-50',
-          isLocating && 'text-primary',
+          'bg-paper/90 text-ink hover:bg-paper border-border/40 absolute right-2.5 bottom-5 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-all duration-200 ease-out active:scale-95 disabled:opacity-50',
+          isLocating && 'text-accent',
         ]"
         :disabled="isLocating"
         aria-label="定位到当前位置"
@@ -49,7 +49,7 @@
       <!-- 地图全屏按钮 -->
       <button
         type="button"
-        class="bg-background/90 text-foreground hover:bg-background border-border/40 absolute right-2.5 bottom-20 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-all duration-200 ease-out active:scale-95 disabled:opacity-50"
+        class="bg-paper/90 text-ink hover:bg-paper border-border/40 absolute right-2.5 bottom-20 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-all duration-200 ease-out active:scale-95 disabled:opacity-50"
         @click="handleFullscreen"
       >
         <span
@@ -75,7 +75,7 @@
       >
         <div
           v-if="isPlanning || routeInfo"
-          class="bg-background/90 border-border absolute right-4 bottom-4 left-4 mx-auto w-fit rounded-2xl border p-4 shadow-lg backdrop-blur-md"
+          class="bg-paper/90 border-border absolute right-4 bottom-4 left-4 mx-auto w-fit rounded-2xl border p-4 shadow-lg backdrop-blur-md"
         >
           <div
             v-if="isPlanning"
@@ -95,7 +95,7 @@
                 路线信息
               </p>
               <p
-                class="text-foreground font-family-averia text-2xl leading-none tabular-nums sm:text-3xl"
+                class="text-ink font-family-averia text-2xl leading-none tabular-nums sm:text-3xl"
               >
                 <span>{{ formatDistance(routeInfo.distance) }}</span>
                 <span class="text-muted-foreground mx-2 text-base">·</span>
@@ -103,7 +103,7 @@
               </p>
             </div>
             <button
-              class="bg-destructive text-primary-foreground hover:bg-destructive/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+              class="bg-destructive text-accent hover:bg-destructive/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
               type="button"
               @click="emit('clearRoute')"
             >
@@ -115,7 +115,7 @@
 
       <p
         v-if="!isPlanning && !routeInfo"
-        class="text-muted-foreground/90 bg-background/70 absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full px-4 py-1.5 text-xs backdrop-blur-md"
+        class="text-muted-foreground/90 bg-paper/70 absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full px-4 py-1.5 text-xs backdrop-blur-md"
       >
         点击地图标记，查看钓点信息
       </p>

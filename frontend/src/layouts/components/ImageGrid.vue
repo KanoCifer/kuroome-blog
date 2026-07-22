@@ -17,8 +17,8 @@ defineEmits<{
       v-for="(bg, index) in images"
       :key="bg.id"
       @click="$emit('select', index)"
-      class="border-border hover:border-primary relative overflow-hidden rounded-xl border-2 transition-all"
-      :class="{ 'border-primary': selected === index }"
+      class="border-border hover:border-accent relative overflow-hidden rounded-xl border-2 transition-all"
+      :class="{ 'border-accent': selected === index }"
     >
       <img :src="bg.url" :alt="bg.name" class="h-24 w-full object-cover" />
       <div
@@ -40,7 +40,7 @@ defineEmits<{
         </svg>
       </div>
       <div
-        class="bg-background/80 absolute right-2 bottom-2 rounded-md px-2 py-0.5 text-xs backdrop-blur-sm"
+        class="bg-paper/80 absolute right-2 bottom-2 rounded-md px-2 py-0.5 text-xs backdrop-blur-sm"
       >
         {{ index + 1 }}
       </div>

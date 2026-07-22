@@ -1,9 +1,9 @@
 <template>
   <div
-    class="border-border/60 bg-background h-full rounded-3xl border p-6 shadow-sm"
+    class="border-border/60 bg-paper h-full rounded-3xl border p-6 shadow-sm"
   >
     <h2
-      class="text-foreground mb-4 flex items-center gap-2 text-sm font-medium"
+      class="text-ink mb-4 flex items-center gap-2 text-sm font-medium"
     >
       <icon-trend class="size-5" />
       访问趋势 · 最近 {{ selectedDays }} 天
@@ -18,7 +18,7 @@
       class="flex h-72 flex-col items-center justify-center gap-2 px-6 text-center"
     >
       <icon-trend class="text-muted-foreground/50 size-8" />
-      <p class="text-foreground text-sm font-medium">暂无访问记录</p>
+      <p class="text-ink text-sm font-medium">暂无访问记录</p>
       <p class="text-muted-foreground max-w-xs text-xs">
         网站开始接收流量后，近 {{ selectedDays }} 天的访问趋势将显示在这里。
       </p>

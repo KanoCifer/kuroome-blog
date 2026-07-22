@@ -74,7 +74,7 @@
             v-if="isOthersOpen"
             @mouseenter="openOthers"
             @mouseleave="closeOthers"
-            class="bg-background/80 absolute top-full right-0 z-50 mt-2 w-52 rounded-2xl p-1.5 ring-1 ring-black/5 backdrop-blur-xs dark:ring-white/10"
+            class="bg-paper/80 absolute top-full right-0 z-50 mt-2 w-52 rounded-2xl p-1.5 ring-1 ring-black/5 backdrop-blur-xs dark:ring-white/10"
           >
             <RouterLink
               v-for="item in othersRouteItems"

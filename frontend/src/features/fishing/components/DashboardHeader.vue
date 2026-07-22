@@ -20,13 +20,13 @@ defineEmits<{
 
 <template>
   <header
-    class="border-border/40 bg-background/80 top-0 z-30 border-b backdrop-blur-sm"
+    class="border-border/40 bg-paper/80 top-0 z-30 border-b backdrop-blur-sm"
   >
     <div
       class="mx-auto flex max-w-screen-2xl items-center justify-between px-4 py-3 sm:px-6"
     >
       <div class="flex items-baseline gap-3">
-        <h1 class="text-foreground text-wrap-balance font-serif text-xl">
+        <h1 class="text-ink text-wrap-balance font-serif text-xl">
           钓鱼地图
         </h1>
         <span
@@ -38,7 +38,7 @@ defineEmits<{
 
       <div class="flex items-center gap-2">
         <button
-          class="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors"
+          class="bg-accent text-accent hover:bg-accent/90 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors"
           type="button"
           @click="$emit('add-spot')"
         >
@@ -59,9 +59,9 @@ defineEmits<{
         </button>
 
         <button
-          class="border-border bg-background hover:bg-muted text-foreground inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors"
+          class="border-border bg-paper hover:bg-muted text-ink inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors"
           :class="
-            analysisOpen ? 'border-primary text-primary bg-primary/5' : ''
+            analysisOpen ? 'border-accent text-accent bg-accent/5' : ''
           "
           type="button"
           :aria-pressed="analysisOpen"

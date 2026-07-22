@@ -375,7 +375,7 @@ onBeforeUnmount(() => {
     · 状态不用彩色 chip（bg-warning/10 等），改用单一字色 + 留白 + 描线
     · 所有动画 honor prefers-reduced-motion
   -->
-  <div class="bg-background min-h-dvh">
+  <div class="bg-paper min-h-dvh">
     <div class="mx-auto w-full max-w-6xl px-5 pt-8 pb-28 sm:px-8 sm:pt-10">
       <!-- ─── Top bar: wordmark · breadcrumb · status ─── -->
       <header
@@ -383,7 +383,7 @@ onBeforeUnmount(() => {
       >
         <button
           type="button"
-          class="hover:text-foreground -mx-2 inline-flex items-center gap-1.5 rounded-md px-2 py-1 transition-colors"
+          class="hover:text-ink -mx-2 inline-flex items-center gap-1.5 rounded-md px-2 py-1 transition-colors"
           @click="$router.go(-1)"
         >
           <svg
@@ -404,7 +404,7 @@ onBeforeUnmount(() => {
 
         <span aria-hidden="true" class="text-border">/</span>
 
-        <span class="text-foreground/80 font-serif">
+        <span class="text-ink/80 font-serif">
           {{ isEdit ? '校样' : '新篇' }}
         </span>
 
@@ -443,7 +443,7 @@ onBeforeUnmount(() => {
           </svg>
         </span>
         <div class="min-w-0 flex-1 text-xs">
-          <p class="text-foreground font-serif">上次留有未完的草稿</p>
+          <p class="text-ink font-serif">上次留有未完的草稿</p>
           <p class="text-muted-foreground mt-0.5">
             {{
               lastSavedAt
@@ -455,14 +455,14 @@ onBeforeUnmount(() => {
         <div class="flex shrink-0 items-center gap-3 text-xs">
           <button
             type="button"
-            class="text-muted-foreground hover:text-foreground transition-colors"
+            class="text-muted-foreground hover:text-ink transition-colors"
             @click="discardDraftAndLoadServer"
           >
             放弃
           </button>
           <button
             type="button"
-            class="text-foreground hover:text-primary font-serif transition-colors"
+            class="text-ink hover:text-accent font-serif transition-colors"
             @click="adoptDraft"
           >
             续写 →
@@ -495,7 +495,7 @@ onBeforeUnmount(() => {
       <!-- ─── Loading ─── -->
       <div v-if="loading && isEdit" class="py-20 text-center">
         <div
-          class="border-border border-t-foreground mx-auto h-7 w-7 animate-spin rounded-full border-2 motion-reduce:animate-none"
+          class="border-border border-t-ink mx-auto h-7 w-7 animate-spin rounded-full border-2 motion-reduce:animate-none"
           aria-hidden="true"
         ></div>
         <p class="text-muted-foreground mt-3 font-serif text-xs italic">
@@ -519,7 +519,7 @@ onBeforeUnmount(() => {
             maxlength="120"
             :placeholder="isEdit ? '校订标题' : '无题'"
             aria-label="文章标题"
-            class="text-foreground placeholder:text-muted-foreground/50 w-full border-0 bg-transparent px-0 py-1 font-serif text-3xl leading-tight font-medium tracking-tight outline-0 focus:ring-0 sm:text-4xl"
+            class="text-ink placeholder:text-muted-foreground/50 w-full border-0 bg-transparent px-0 py-1 font-serif text-3xl leading-tight font-medium tracking-tight outline-0 focus:ring-0 sm:text-4xl"
             style="caret-color: var(--accent, currentColor)"
           />
           <div
@@ -542,7 +542,7 @@ onBeforeUnmount(() => {
             <span
               v-for="tag in tags"
               :key="tag"
-              class="bg-background text-foreground inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs"
+              class="bg-paper text-ink inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs"
             >
               #{{ tag }}
               <button
@@ -558,7 +558,7 @@ onBeforeUnmount(() => {
               v-model="tagInput"
               type="text"
               placeholder="回车新增…"
-              class="text-foreground placeholder:text-muted-foreground/50 min-w-[60px] flex-1 bg-transparent text-xs outline-none"
+              class="text-ink placeholder:text-muted-foreground/50 min-w-[60px] flex-1 bg-transparent text-xs outline-none"
               @keydown="handleTagKeydown"
               @blur="
                 () => {
@@ -574,8 +574,8 @@ onBeforeUnmount(() => {
             :class="[
               'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 transition-colors',
               pin
-                ? 'border-foreground/40 bg-foreground text-background'
-                : 'border-border bg-muted text-muted-foreground hover:text-foreground',
+                ? 'border-ink/40 bg-ink text-paper'
+                : 'border-border bg-muted text-muted-foreground hover:text-ink',
             ]"
             :aria-pressed="pin"
             @click="pin = !pin"
@@ -603,8 +603,8 @@ onBeforeUnmount(() => {
             :class="[
               'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 transition-colors',
               metaOpen
-                ? 'border-foreground/30 bg-muted text-foreground'
-                : 'border-border bg-muted text-muted-foreground hover:text-foreground',
+                ? 'border-ink/30 bg-muted text-ink'
+                : 'border-border bg-muted text-muted-foreground hover:text-ink',
             ]"
             :aria-expanded="metaOpen"
             aria-controls="meta-drawer"
@@ -626,7 +626,7 @@ onBeforeUnmount(() => {
             <span class="tracking-wide">摘要 · 封面</span>
             <span
               v-if="summary || cover"
-              class="text-foreground/60 ml-0.5 font-serif italic"
+              class="text-ink/60 ml-0.5 font-serif italic"
               aria-hidden="true"
             >
               ·
@@ -658,7 +658,7 @@ onBeforeUnmount(() => {
                 rows="2"
                 maxlength="200"
                 placeholder="两三行，写给读者的开场白…"
-                class="text-foreground placeholder:text-muted-foreground/60 border-border bg-muted focus:border-foreground/40 focus:ring-foreground/10 w-full resize-none rounded-lg border px-3 py-2 font-serif text-sm leading-relaxed outline-0 focus:ring-1"
+                class="text-ink placeholder:text-muted-foreground/60 border-border bg-muted focus:border-ink/40 focus:ring-ink/10 w-full resize-none rounded-lg border px-3 py-2 font-serif text-sm leading-relaxed outline-0 focus:ring-1"
               />
               <p
                 class="text-muted-foreground/60 mt-1 text-right font-mono text-[10px]"
@@ -680,7 +680,7 @@ onBeforeUnmount(() => {
                     v-model="cover"
                     type="text"
                     placeholder="粘贴封面 URL"
-                    class="text-foreground placeholder:text-muted-foreground/60 border-border bg-muted focus:border-foreground/40 focus:ring-foreground/10 w-full rounded-lg border px-3 py-2 font-mono text-sm outline-0 focus:ring-1"
+                    class="text-ink placeholder:text-muted-foreground/60 border-border bg-muted focus:border-ink/40 focus:ring-ink/10 w-full rounded-lg border px-3 py-2 font-mono text-sm outline-0 focus:ring-1"
                   />
                   <div class="flex items-center gap-3 text-xs">
                     <input
@@ -693,7 +693,7 @@ onBeforeUnmount(() => {
                     <button
                       type="button"
                       :disabled="coverUploading"
-                      class="text-muted-foreground hover:text-foreground transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                      class="text-muted-foreground hover:text-ink transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                       @click="coverInputRef?.click()"
                     >
                       {{ coverUploading ? '上传中…' : '上传图片' }}
@@ -701,7 +701,7 @@ onBeforeUnmount(() => {
                     <button
                       v-if="cover"
                       type="button"
-                      class="text-muted-foreground/70 hover:text-foreground transition-colors"
+                      class="text-muted-foreground/70 hover:text-ink transition-colors"
                       @click="cover = ''"
                     >
                       清除
@@ -764,8 +764,8 @@ onBeforeUnmount(() => {
             :class="[
               'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 transition-colors',
               autoSaveEnabled
-                ? 'border-foreground/30 bg-muted text-foreground'
-                : 'border-border bg-muted text-muted-foreground hover:text-foreground',
+                ? 'border-ink/30 bg-muted text-ink'
+                : 'border-border bg-muted text-muted-foreground hover:text-ink',
             ]"
             :title="
               autoSaveEnabled ? '自动保存 · ⌘S 手动触发' : '自动保存已关闭'
@@ -777,7 +777,7 @@ onBeforeUnmount(() => {
             <span
               :class="[
                 'h-1.5 w-1.5 rounded-full transition-colors',
-                autoSaveEnabled ? 'bg-foreground/70' : 'bg-muted-foreground/30',
+                autoSaveEnabled ? 'bg-ink/70' : 'bg-muted-foreground/30',
               ]"
               aria-hidden="true"
             ></span>
@@ -789,7 +789,7 @@ onBeforeUnmount(() => {
           <span class="ml-auto flex items-center gap-1">
             <button
               type="button"
-              class="text-muted-foreground hover:text-foreground inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-colors"
+              class="text-muted-foreground hover:text-ink inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-colors"
               title="保存草稿 (⌘S)"
               aria-label="保存草稿"
               @click="handleSaveDraft"
@@ -802,7 +802,7 @@ onBeforeUnmount(() => {
 
             <button
               type="button"
-              class="text-muted-foreground hover:text-foreground rounded-full px-3 py-1 transition-colors"
+              class="text-muted-foreground hover:text-ink rounded-full px-3 py-1 transition-colors"
               @click="handleCancel"
             >
               取消

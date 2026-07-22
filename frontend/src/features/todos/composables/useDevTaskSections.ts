@@ -52,7 +52,7 @@ export function useDevTaskSections(tasks: Ref<DevTask[]>) {
       key: 'in-progress',
       title: '开发中',
       tasks: inProgressTasks.value,
-      dotClass: 'bg-primary',
+      dotClass: 'bg-accent',
       emptyText: '没有进行中的任务',
     },
     {

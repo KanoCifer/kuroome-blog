@@ -2,10 +2,10 @@
   <Modal :open="open" size="lg" @close="emit('update:open', false)">
     <!-- 顶栏：卷序 + 关闭 + admin 操作 -->
     <header
-      class="border-border/40 bg-background sticky top-0 z-10 flex items-center justify-between gap-2 border-b px-6 py-4"
+      class="border-border/40 bg-paper sticky top-0 z-10 flex items-center justify-between gap-2 border-b px-6 py-4"
     >
       <div class="flex items-center gap-3">
-        <span class="text-foreground/70 font-serif text-sm italic">
+        <span class="text-ink/70 font-serif text-sm italic">
           {{ volumeLabel }}
         </span>
         <span class="text-muted-foreground/60">·</span>
@@ -31,7 +31,7 @@
           <button
             type="button"
             :disabled="!hasPrev"
-            class="hover:text-foreground border-border/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors disabled:cursor-not-allowed disabled:opacity-30"
+            class="hover:text-ink border-border/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors disabled:cursor-not-allowed disabled:opacity-30"
             :aria-label="'上一条'"
             @click="emit('navigate', 'prev')"
           >
@@ -40,7 +40,7 @@
           <button
             type="button"
             :disabled="!hasNext"
-            class="hover:text-foreground border-border/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors disabled:cursor-not-allowed disabled:opacity-30"
+            class="hover:text-ink border-border/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors disabled:cursor-not-allowed disabled:opacity-30"
             :aria-label="'下一条'"
             @click="emit('navigate', 'next')"
           >
@@ -52,7 +52,7 @@
         <template v-if="isAdmin">
           <button
             type="button"
-            class="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-medium shadow-sm transition-colors"
+            class="bg-accent text-accent hover:bg-accent/90 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-medium shadow-sm transition-colors"
             @click="emit('edit', moment)"
           >
             <EditIcon class="h-3.5 w-3.5" />
@@ -70,7 +70,7 @@
 
         <button
           type="button"
-          class="text-muted-foreground hover:text-foreground border-border/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
+          class="text-muted-foreground hover:text-ink border-border/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
           aria-label="关闭"
           @click="emit('update:open', false)"
         >
@@ -97,7 +97,7 @@
 
         <!-- 内容（保留换行，后端已 escape） -->
         <div
-          class="text-foreground/90 font-serif text-[16px] leading-loose"
+          class="text-ink/90 font-serif text-[16px] leading-loose"
           style="text-wrap: pretty; white-space: pre-wrap"
         >
           {{ moment.content }}
@@ -259,7 +259,7 @@ const MetaRow = defineComponent({
           'dd',
           {
             class: [
-              'text-foreground',
+              'text-ink',
               p.mono ? 'font-mono text-[12px]' : 'font-serif text-[13px]',
             ].join(' '),
           },
@@ -275,7 +275,7 @@ const Kbd = (props: { label: string }) =>
     'kbd',
     {
       class:
-        'text-foreground/80 font-mono text-[10px] px-1.5 py-0.5 bg-background border border-border/40 rounded',
+        'text-ink/80 font-mono text-[10px] px-1.5 py-0.5 bg-paper border border-border/40 rounded',
     },
     props.label,
   );

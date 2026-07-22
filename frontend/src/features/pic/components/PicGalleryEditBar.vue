@@ -7,14 +7,14 @@
         size="sm"
         @click="$emit('toggle-edit')"
         class="border-border/60 h-9 gap-2 rounded-full px-4 shadow-sm transition-all duration-300"
-        :class="isEditMode ? 'bg-primary text-primary-foreground' : ''"
+        :class="isEditMode ? 'bg-accent text-accent' : ''"
       >
         <component :is="isEditMode ? Check : Edit2" class="h-4 w-4" />
         {{ isEditMode ? '完成编辑' : '编辑模式' }}
       </Button>
       <button
         @click="$emit('shuffle')"
-        class="border-border/60 text-primary-foreground bg-primary flex h-9 items-center gap-2 rounded-lg px-4 shadow-sm"
+        class="border-border/60 text-accent bg-accent flex h-9 items-center gap-2 rounded-lg px-4 shadow-sm"
       >
         <Shuffle class="h-4 w-4" />
         重排
@@ -33,7 +33,7 @@
           variant="default"
           size="sm"
           @click="$emit('upload')"
-          class="bg-primary text-primary-foreground hover:bg-primary/90 h-9 gap-2 rounded-full px-4 shadow-md"
+          class="bg-accent text-accent hover:bg-accent/90 h-9 gap-2 rounded-full px-4 shadow-md"
         >
           <Upload class="h-4 w-4" />
           上传图片

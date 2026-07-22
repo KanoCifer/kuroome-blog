@@ -42,7 +42,7 @@ export function ProfileFormFields({
             onChange={(e) =>
               setForm((prev) => ({ ...prev, name: e.target.value }))
             }
-            className="bg-secondary text-foreground placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
+            className="bg-secondary text-ink placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
             placeholder="Your name"
           />
         </div>
@@ -69,7 +69,7 @@ export function ProfileFormFields({
             onChange={(e) =>
               setForm((prev) => ({ ...prev, username: e.target.value }))
             }
-            className="bg-secondary text-foreground placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
+            className="bg-secondary text-ink placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
             placeholder="Login username"
             required
           />
@@ -95,8 +95,8 @@ export function ProfileFormFields({
               onChange={() => toggleGender('male')}
               className="peer sr-only"
             />
-            <div className="border-border bg-background/70 peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-primary/10 hover:border-primary/30 flex items-center justify-center rounded-2xl border-2 py-3.5 transition-all duration-300 group-active:scale-95 peer-checked:shadow-lg">
-              <span className="text-muted-foreground peer-checked:text-primary text-sm font-medium transition-colors">
+            <div className="border-border bg-paper/70 peer-checked:border-accent peer-checked:bg-accent/10 peer-checked:shadow-accent/10 hover:border-accent/30 flex items-center justify-center rounded-2xl border-2 py-3.5 transition-all duration-300 group-active:scale-95 peer-checked:shadow-lg">
+              <span className="text-muted-foreground peer-checked:text-accent text-sm font-medium transition-colors">
                 Male
               </span>
             </div>
@@ -109,8 +109,8 @@ export function ProfileFormFields({
               onChange={() => toggleGender('female')}
               className="peer sr-only"
             />
-            <div className="border-border bg-background/70 peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:shadow-primary/10 hover:border-primary/30 flex items-center justify-center rounded-2xl border-2 py-3.5 transition-all duration-300 group-active:scale-95 peer-checked:shadow-lg">
-              <span className="text-muted-foreground peer-checked:text-primary text-sm font-medium transition-colors">
+            <div className="border-border bg-paper/70 peer-checked:border-accent peer-checked:bg-accent/10 peer-checked:shadow-accent/10 hover:border-accent/30 flex items-center justify-center rounded-2xl border-2 py-3.5 transition-all duration-300 group-active:scale-95 peer-checked:shadow-lg">
+              <span className="text-muted-foreground peer-checked:text-accent text-sm font-medium transition-colors">
                 Female
               </span>
             </div>
@@ -134,7 +134,7 @@ export function ProfileFormFields({
             onChange={(e) =>
               setForm((prev) => ({ ...prev, email: e.target.value }))
             }
-            className="bg-secondary text-foreground placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
+            className="bg-secondary text-ink placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
             placeholder="your@email.com"
           />
         </div>
@@ -161,7 +161,7 @@ export function ProfileFormFields({
             onChange={(e) =>
               setForm((prev) => ({ ...prev, mobile: e.target.value }))
             }
-            className="bg-secondary text-foreground placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
+            className="bg-secondary text-ink placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
             placeholder="Phone number"
           />
         </div>
@@ -187,13 +187,13 @@ export function ProfileFormFields({
             onChange={(e) =>
               setForm((prev) => ({ ...prev, password: e.target.value }))
             }
-            className="bg-secondary text-foreground placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-12 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
+            className="bg-secondary text-ink placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-12 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
             placeholder="Leave empty to keep current"
           />
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            className="text-muted-foreground hover:text-primary absolute inset-y-0 right-0 flex items-center pr-4 transition-all duration-200"
+            className="text-muted-foreground hover:text-accent absolute inset-y-0 right-0 flex items-center pr-4 transition-all duration-200"
           >
             {showPassword ? (
               <EyeOff className="size-5" />

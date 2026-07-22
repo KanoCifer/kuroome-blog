@@ -212,7 +212,7 @@ export function SnapSheet({
         <div className="fixed inset-0 z-200">
           {/* Backdrop */}
           <motion.div
-            className="bg-foreground/30 fixed inset-0 z-100 backdrop-blur-[2px]"
+            className="bg-ink/30 fixed inset-0 z-100 backdrop-blur-[2px]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -238,7 +238,7 @@ export function SnapSheet({
             transition={SPRING.modal}
             onClick={(e) => e.stopPropagation()}
             style={{ height: heightMV }}
-            className="bg-background border-border/40 fixed inset-x-0 bottom-0 z-210 flex flex-col overflow-hidden rounded-t-3xl border-t pb-[calc(1rem+env(safe-area-inset-bottom,0px))] shadow-2xl outline-none"
+            className="bg-paper border-border/40 fixed inset-x-0 bottom-0 z-210 flex flex-col overflow-hidden rounded-t-3xl border-t pb-[calc(1rem+env(safe-area-inset-bottom,0px))] shadow-2xl outline-none"
           >
             {/* Drag handle — 单独区域, pointer 事件专属此区域 */}
             <div

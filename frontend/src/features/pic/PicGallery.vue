@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-background min-h-screen w-full overflow-x-hidden overflow-y-auto"
+    class="bg-paper min-h-screen w-full overflow-x-hidden overflow-y-auto"
   >
     <!-- Subtle Dot Pattern Background -->
     <div
@@ -67,14 +67,14 @@
         class="gallery-empty flex h-[60vh] flex-col items-center justify-center"
       >
         <div
-          class="bg-background border-border relative max-w-md rounded-3xl border p-10 text-center shadow-2xl"
+          class="bg-paper border-border relative max-w-md rounded-3xl border p-10 text-center shadow-2xl"
         >
           <div
-            class="bg-primary/10 text-primary mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl"
+            class="bg-accent/10 text-accent mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl"
           >
             <ImageOff class="h-10 w-10" stroke-width="1.5" />
           </div>
-          <h3 class="text-foreground text-xl font-bold tracking-tight">
+          <h3 class="text-ink text-xl font-bold tracking-tight">
             还没有图片
           </h3>
           <p class="text-muted-foreground mt-2 text-sm">

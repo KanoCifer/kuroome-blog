@@ -84,7 +84,7 @@ const showDetails = ref(false);
 </script>
 
 <template>
-  <div class="bg-background min-h-screen">
+  <div class="bg-paper min-h-screen">
     <motion.div
       :initial="prefersReducedMotion ? false : { opacity: 0, y: 8 }"
       :animate="{ opacity: 1, y: 0 }"
@@ -112,7 +112,7 @@ const showDetails = ref(false);
               <!-- 状态词 -->
               <div class="space-y-3">
                 <h1
-                  class="text-foreground font-serif text-[clamp(2.25rem,5vw+1rem,4.5rem)] leading-[1.05] tracking-[-0.025em]"
+                  class="text-ink font-serif text-[clamp(2.25rem,5vw+1rem,4.5rem)] leading-[1.05] tracking-[-0.025em]"
                   style="text-wrap: balance"
                 >
                   {{ overallStatus.title }}
@@ -123,7 +123,7 @@ const showDetails = ref(false);
                   {{ overallStatus.sub
                   }}<span v-if="serverStatus">
                     · 启动于
-                    <span class="text-foreground/80">{{
+                    <span class="text-ink/80">{{
                       formatUptime(now - serverStatus.service.start_time * 1000)
                     }}</span
                     >前</span
@@ -132,13 +132,13 @@ const showDetails = ref(false);
 
                 <!-- mini 三联 -->
                 <div
-                  class="border-foreground/10 mt-5 grid grid-cols-3 gap-x-6 gap-y-1 border-t pt-4 text-[13px]"
+                  class="border-ink/10 mt-5 grid grid-cols-3 gap-x-6 gap-y-1 border-t pt-4 text-[13px]"
                 >
                   <div class="space-y-0.5">
                     <div class="text-muted-foreground">API</div>
                     <div class="flex items-baseline gap-1.5">
                       <span
-                        class="text-foreground font-mono text-[15px] font-semibold tabular-nums"
+                        class="text-ink font-mono text-[15px] font-semibold tabular-nums"
                       >
                         <AnimatePresence mode="popLayout">
                           <motion.span
@@ -213,7 +213,7 @@ const showDetails = ref(false);
               <div class="space-y-1 text-right">
                 <div class="text-muted-foreground text-[12px]">当前时刻</div>
                 <div
-                  class="text-foreground font-mono text-[clamp(1.75rem,2.5vw+0.5rem,2.5rem)] leading-none tracking-[-0.02em] tabular-nums"
+                  class="text-ink font-mono text-[clamp(1.75rem,2.5vw+0.5rem,2.5rem)] leading-none tracking-[-0.02em] tabular-nums"
                 >
                   {{ fmtClock(now) }}
                 </div>
@@ -228,7 +228,7 @@ const showDetails = ref(false);
 
       <!-- ─── 公告 + 30 天可用率 ─── -->
       <section class="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-baseline">
-        <p class="text-foreground/85 text-[14px] leading-relaxed">
+        <p class="text-ink/85 text-[14px] leading-relaxed">
           <template v-if="announcement">
             <span
               class="bg-warning/15 text-warning mr-2 inline-block rounded-full px-2 py-0.5 text-[11px] font-medium"
@@ -245,10 +245,10 @@ const showDetails = ref(false);
           过去 30 天 ·
           <span
             v-if="availability"
-            class="text-foreground font-mono font-semibold"
+            class="text-ink font-mono font-semibold"
             >{{ availability.rate.toFixed(2) }}%</span
           >
-          <span v-else class="text-foreground/60">—</span>
+          <span v-else class="text-ink/60">—</span>
           可用
           <template v-if="availability && availability.incidents > 0">
             · {{ availability.incidents }} 次中断
@@ -269,7 +269,7 @@ const showDetails = ref(false);
       <section>
         <button
           type="button"
-          class="text-muted-foreground hover:text-foreground group inline-flex items-center gap-2 text-[13px] transition-colors"
+          class="text-muted-foreground hover:text-ink group inline-flex items-center gap-2 text-[13px] transition-colors"
           :aria-expanded="showDetails"
           aria-controls="status-details-panel"
           @click="showDetails = !showDetails"

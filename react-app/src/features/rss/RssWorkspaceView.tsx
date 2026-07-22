@@ -99,19 +99,19 @@ export default function RssWorkspaceView() {
   };
 
   return (
-    <div className="bg-background min-h-dvh pb-28">
+    <div className="bg-paper min-h-dvh pb-28">
       {/* Header */}
-      <header className="bg-background/85 sticky top-0 z-10 backdrop-blur-md">
+      <header className="bg-paper/85 sticky top-0 z-10 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-md items-center gap-3 px-4 py-3">
-          <Rss className="text-primary h-5 w-5" />
-          <h1 className="text-foreground text-lg font-bold">RSS 阅读</h1>
+          <Rss className="text-accent h-5 w-5" />
+          <h1 className="text-ink text-lg font-bold">RSS 阅读</h1>
 
           {/* Feed selector */}
           {subscriptions.length > 1 && (
             <button
               type="button"
               onClick={() => setShowFeedPicker((v) => !v)}
-              className="border-border bg-background hover:bg-muted ml-auto flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+              className="border-border bg-paper hover:bg-muted ml-auto flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
             >
               <span className="max-w-32 truncate">
                 {selectedFeed?.feedTitle || '全部'}
@@ -130,14 +130,14 @@ export default function RssWorkspaceView() {
               exit={{ opacity: 0, height: 0 }}
               className="border-border/60 overflow-hidden border-t"
             >
-              <div className="bg-background/95 mx-auto w-full max-w-md px-4 py-2">
+              <div className="bg-paper/95 mx-auto w-full max-w-md px-4 py-2">
                 <button
                   type="button"
                   onClick={() => handleSelectFeed('')}
                   className={`flex w-full items-center rounded-lg px-3 py-2 text-sm transition-colors ${
                     !selectedFeedUrl
-                      ? 'bg-primary/10 text-primary'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                      ? 'bg-accent/10 text-accent'
+                      : 'text-muted-foreground hover:bg-muted hover:text-ink'
                   }`}
                 >
                   全部订阅
@@ -149,8 +149,8 @@ export default function RssWorkspaceView() {
                     onClick={() => handleSelectFeed(sub.rssUrl)}
                     className={`flex w-full items-center rounded-lg px-3 py-2 text-sm transition-colors ${
                       selectedFeedUrl === sub.rssUrl
-                        ? 'bg-primary/10 text-primary'
-                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                        ? 'bg-accent/10 text-accent'
+                        : 'text-muted-foreground hover:bg-muted hover:text-ink'
                     }`}
                   >
                     {sub.feedTitle || new URL(sub.rssUrl).hostname}
@@ -178,7 +178,7 @@ export default function RssWorkspaceView() {
             <button
               type="button"
               onClick={() => void fetchSubscriptions()}
-              className="text-primary mt-3 cursor-pointer text-sm font-medium underline underline-offset-4"
+              className="text-accent mt-3 cursor-pointer text-sm font-medium underline underline-offset-4"
             >
               重试
             </button>
@@ -205,7 +205,7 @@ export default function RssWorkspaceView() {
             <button
               type="button"
               onClick={() => void fetchArticles()}
-              className="text-primary mt-3 cursor-pointer text-sm font-medium underline underline-offset-4"
+              className="text-accent mt-3 cursor-pointer text-sm font-medium underline underline-offset-4"
             >
               重试
             </button>
@@ -225,9 +225,9 @@ export default function RssWorkspaceView() {
               >
                 <Link
                   to={`/rss/articles/${article.id}`}
-                  className="bg-background border-border/60 hover:bg-muted/50 block rounded-2xl border p-4 transition-colors active:scale-[0.99]"
+                  className="bg-paper border-border/60 hover:bg-muted/50 block rounded-2xl border p-4 transition-colors active:scale-[0.99]"
                 >
-                  <h2 className="text-foreground text-[15px] leading-snug font-semibold">
+                  <h2 className="text-ink text-[15px] leading-snug font-semibold">
                     {article.title || '无标题'}
                   </h2>
                   {article.summary && (
@@ -257,7 +257,7 @@ export default function RssWorkspaceView() {
               type="button"
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage <= 1}
-              className="border-border text-foreground disabled:text-muted-foreground flex items-center gap-1 rounded-full border px-4 py-2 font-medium transition-colors disabled:opacity-40"
+              className="border-border text-ink disabled:text-muted-foreground flex items-center gap-1 rounded-full border px-4 py-2 font-medium transition-colors disabled:opacity-40"
             >
               上一页
             </button>
@@ -268,7 +268,7 @@ export default function RssWorkspaceView() {
               type="button"
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage >= totalPages}
-              className="border-border text-foreground disabled:text-muted-foreground flex items-center gap-1 rounded-full border px-4 py-2 font-medium transition-colors disabled:opacity-40"
+              className="border-border text-ink disabled:text-muted-foreground flex items-center gap-1 rounded-full border px-4 py-2 font-medium transition-colors disabled:opacity-40"
             >
               下一页
             </button>

@@ -1,8 +1,8 @@
 <template>
-  <div class="bg-background min-h-screen">
+  <div class="bg-paper min-h-screen">
     <!-- Page header — literary register via Averia + Dongfang display -->
     <header class="mx-auto max-w-6xl px-6 pt-10 sm:px-8 sm:pt-14">
-      <div class="bg-primary/40 mb-4 h-px w-8"></div>
+      <div class="bg-accent/40 mb-4 h-px w-8"></div>
       <div class="flex items-center gap-3">
         <span
           class="bg-muted text-muted-foreground inline-block rounded-full px-2.5 py-0.5 font-mono text-[10px] font-medium tracking-[0.18em] uppercase"
@@ -11,7 +11,7 @@
         </span>
       </div>
       <h1
-        class="text-foreground font-family-dongfang mt-3 text-3xl sm:text-4xl"
+        class="text-ink font-family-dongfang mt-3 text-3xl sm:text-4xl"
       >
         访客 · 趋势
       </h1>
@@ -28,7 +28,7 @@
       <!-- Filter row -->
       <div class="mt-8">
         <div
-          class="border-border/60 bg-background flex flex-col items-center justify-between gap-3 rounded-2xl border p-3 sm:flex-row"
+          class="border-border/60 bg-paper flex flex-col items-center justify-between gap-3 rounded-2xl border p-3 sm:flex-row"
         >
           <!-- Days Filter: segmented control (radio group) -->
           <div
@@ -45,8 +45,8 @@
               class="rounded-lg px-4 py-1.5 text-sm font-medium transition-colors"
               :class="
                 selectedDays === option
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-paper text-ink shadow-sm'
+                  : 'text-muted-foreground hover:text-ink'
               "
               @click="selectedDays = option"
             >
@@ -59,7 +59,7 @@
             type="button"
             :disabled="loading && !!overviewData"
             @click="fetchAllData"
-            class="bg-primary text-primary-foreground hover:bg-primary/90 flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50"
+            class="bg-accent text-accent hover:bg-accent/90 flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50"
           >
             <svg
               :class="[
@@ -126,8 +126,8 @@
               label="总访问量"
               :value="overviewData.total_visits"
               :sparkline="sparklinePoints"
-              sparkline-class="text-primary"
-              accent="bg-primary/10 text-primary"
+              sparkline-class="text-accent"
+              accent="bg-accent/10 text-accent"
             >
               <template #icon>
                 <svg
@@ -233,11 +233,11 @@
         <!-- Collapsed secondary: 设备 & 浏览器 -->
         <div class="col-span-1 lg:col-span-3">
           <div
-            class="border-border/60 bg-background overflow-hidden rounded-3xl border"
+            class="border-border/60 bg-paper overflow-hidden rounded-3xl border"
           >
             <button
               type="button"
-              class="text-foreground hover:bg-muted/30 flex w-full items-center justify-between px-6 py-4 text-left transition-colors"
+              class="text-ink hover:bg-muted/30 flex w-full items-center justify-between px-6 py-4 text-left transition-colors"
               :aria-expanded="showOsBrowser"
               aria-controls="os-browser-panel"
               @click="showOsBrowser = !showOsBrowser"
@@ -295,10 +295,10 @@
         <!-- Login Logs Table -->
         <div class="col-span-1 lg:col-span-3">
           <div
-            class="border-border/60 bg-background overflow-hidden rounded-3xl border p-5"
+            class="border-border/60 bg-paper overflow-hidden rounded-3xl border p-5"
           >
             <h2
-              class="text-foreground mb-4 flex items-center gap-2 text-sm font-medium"
+              class="text-ink mb-4 flex items-center gap-2 text-sm font-medium"
             >
               <icon-user class="text-muted-foreground inline-block size-4" />
               用户登录记录
@@ -351,12 +351,12 @@
                       <td class="py-3.5">
                         <div class="flex items-center gap-3">
                           <div
-                            class="bg-primary/15 text-primary flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium"
+                            class="bg-accent/15 text-accent flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium"
                           >
                             {{ log.username?.charAt(0).toUpperCase() }}
                           </div>
                           <div>
-                            <p class="text-foreground font-medium">
+                            <p class="text-ink font-medium">
                               {{ log.name || log.username }}
                             </p>
                             <p class="text-muted-foreground text-xs">
@@ -372,10 +372,10 @@
                           {{ log.login_count }}
                         </span>
                       </td>
-                      <td class="text-foreground/80 py-3.5 tabular-nums">
+                      <td class="text-ink/80 py-3.5 tabular-nums">
                         {{ formatDateTime(log.last_login_at) }}
                       </td>
-                      <td class="text-foreground/80 py-3.5 tabular-nums">
+                      <td class="text-ink/80 py-3.5 tabular-nums">
                         {{ formatDateTime(log.current_login_at) }}
                       </td>
                       <td
@@ -417,7 +417,7 @@
                     "
                     :aria-label="`上一页，第 ${loginLogsData.page - 1} 页`"
                     @click="changePage(loginLogsData.page - 1)"
-                    class="hover:bg-muted text-foreground rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                    class="hover:bg-muted text-ink rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     上一页
                   </button>
@@ -428,7 +428,7 @@
                     "
                     :aria-label="`下一页，第 ${loginLogsData.page + 1} 页`"
                     @click="changePage(loginLogsData.page + 1)"
-                    class="hover:bg-muted text-foreground rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                    class="hover:bg-muted text-ink rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     下一页
                   </button>

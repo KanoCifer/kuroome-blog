@@ -69,7 +69,7 @@
         class="absolute top-2 left-2 z-20 flex h-7 w-7 items-center justify-center rounded-full border-2 backdrop-blur-sm transition-all duration-200"
         :class="
           selected
-            ? 'border-primary bg-primary text-primary-foreground shadow-sm'
+            ? 'border-accent bg-accent text-accent shadow-sm'
             : 'border-white/80 bg-black/20 text-transparent hover:bg-black/40'
         "
         :aria-pressed="selected"
@@ -93,7 +93,7 @@
       <!-- 选中态高亮描边 -->
       <div
         v-if="isEditMode && selected"
-        class="ring-primary ring-offset-primary/20 pointer-events-none absolute inset-0 z-10 rounded-[2px] ring-2 ring-offset-2"
+        class="ring-accent ring-offset-accent/20 pointer-events-none absolute inset-0 z-10 rounded-[2px] ring-2 ring-offset-2"
         aria-hidden="true"
       ></div>
     </div>

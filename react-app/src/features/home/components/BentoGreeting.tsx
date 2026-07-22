@@ -13,32 +13,32 @@ export function BentoGreeting() {
 
   const isEvening = dayjs().hour() >= 18 || dayjs().hour() < 6;
   return (
-    <BentoCard className="border-primary/30! from-primary/90 to-primary/90 relative overflow-hidden bg-linear-to-br p-8 shadow-xl">
+    <BentoCard className="border-accent/30! from-accent/90 to-accent/90 relative overflow-hidden bg-linear-to-br p-8 shadow-xl">
       <div className="relative z-10 flex flex-col justify-center">
-        <h3 className="text-primary-foreground/80 mb-1 font-serif text-sm font-medium">
+        <h3 className="text-accent/80 mb-1 font-serif text-sm font-medium">
           {greeting}
         </h3>
-        <h4 className="text-primary-foreground font-serif text-3xl leading-tight font-extrabold">
+        <h4 className="text-accent font-serif text-3xl leading-tight font-extrabold">
           Ready for a productive
         </h4>
-        <h4 className="text-primary-foreground mb-4 font-serif text-3xl leading-tight font-extrabold">
+        <h4 className="text-accent mb-4 font-serif text-3xl leading-tight font-extrabold">
           session now?
         </h4>
         <div className="mt-2">
           <button
             onClick={() => navigate('/todos')}
-            className="bg-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/30 rounded-full px-6 py-2.5 text-sm font-semibold backdrop-blur-md transition-all active:scale-95"
+            className="bg-accent/20 text-accent hover:bg-accent/30 rounded-full px-6 py-2.5 text-sm font-semibold backdrop-blur-md transition-all active:scale-95"
           >
             Check Today's Tasks
           </button>
         </div>
 
         {/* <!-- Decorative Abstract Shape --> */}
-        <div className="bg-primary-foreground/10 absolute -right-10 -bottom-10 h-48 w-48 rounded-full blur-3xl"></div>
+        <div className="bg-accent/10 absolute -right-10 -bottom-10 h-48 w-48 rounded-full blur-3xl"></div>
         <div className="absolute top-1/2 right-4 -translate-y-1/2 opacity-20">
           {isEvening ? (
             <svg
-              className="text-primary-foreground h-24 w-24"
+              className="text-accent h-24 w-24"
               fill="currentColor"
               viewBox="0 0 24 24"
             >
@@ -50,7 +50,7 @@ export function BentoGreeting() {
             </svg>
           ) : (
             <svg
-              className="text-primary-foreground h-24 w-24"
+              className="text-accent h-24 w-24"
               fill="currentColor"
               viewBox="0 0 24 24"
             >

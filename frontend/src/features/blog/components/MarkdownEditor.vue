@@ -224,9 +224,9 @@ defineExpose({
       <!-- Drag overlay -->
       <div
         v-if="isDraggingOver"
-        class="border-primary/50 bg-primary/10 pointer-events-none absolute inset-0 z-10 flex items-center justify-center border-2 border-dashed"
+        class="border-accent/50 bg-accent/10 pointer-events-none absolute inset-0 z-10 flex items-center justify-center border-2 border-dashed"
       >
-        <span class="text-primary text-sm font-semibold">释放以添加图片</span>
+        <span class="text-accent text-sm font-semibold">释放以添加图片</span>
       </div>
 
       <!-- Toolbar -->
@@ -236,7 +236,7 @@ defineExpose({
         <div class="flex items-center gap-1">
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted/50 hover:text-foreground rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted-foreground hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="wrapBold"
             title="粗体 (Cmd+B)"
           >
@@ -244,7 +244,7 @@ defineExpose({
           </button>
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted/50 hover:text-foreground rounded-lg px-2 py-1.5 text-sm font-medium italic transition"
+            class="text-muted-foreground hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium italic transition"
             @click="wrapItalic"
             title="斜体 (Cmd+I)"
           >
@@ -253,7 +253,7 @@ defineExpose({
           <div class="bg-border mx-1 h-4 w-px"></div>
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted/50 hover:text-foreground rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted-foreground hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="insertHeading"
             title="标题 (##)"
           >
@@ -261,7 +261,7 @@ defineExpose({
           </button>
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted/50 hover:text-foreground rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted-foreground hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="insertQuote"
             title="引用 (> )"
           >
@@ -269,7 +269,7 @@ defineExpose({
           </button>
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted/50 hover:text-foreground rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted-foreground hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="insertList"
             title="列表 (- )"
           >
@@ -277,7 +277,7 @@ defineExpose({
           </button>
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted/50 hover:text-foreground rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted-foreground hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="wrapCode"
             title="行内代码"
           >
@@ -285,7 +285,7 @@ defineExpose({
           </button>
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted/50 hover:text-foreground rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted-foreground hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="insertLink"
             title="链接 (Cmd+K)"
           >
@@ -301,7 +301,7 @@ defineExpose({
           />
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted/50 hover:text-foreground rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted-foreground hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="fileInputRef?.click()"
             title="插入图片"
           >
@@ -316,7 +316,7 @@ defineExpose({
               'rounded-lg px-3 py-1.5 text-xs font-medium transition',
               isFocusMode
                 ? 'bg-warning/10 text-warning'
-                : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
+                : 'text-muted-foreground hover:bg-muted/50 hover:text-ink',
             ]"
             @click="toggleFocusMode"
             title="聚焦模式 (Cmd+Shift+F)"
@@ -328,8 +328,8 @@ defineExpose({
             :class="[
               'rounded-lg px-3 py-1.5 text-xs font-medium transition',
               showPreview
-                ? 'bg-primary/10 text-primary'
-                : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
+                ? 'bg-accent/10 text-accent'
+                : 'text-muted-foreground hover:bg-muted/50 hover:text-ink',
             ]"
             @click="togglePreview"
             title="预览 (Cmd+Shift+P)"
@@ -343,7 +343,7 @@ defineExpose({
         <!-- Focus mode dimming overlay -->
         <div
           v-if="isFocusMode"
-          class="from-background/90 pointer-events-none absolute inset-x-0 top-0 z-10 h-1/4 bg-gradient-to-b to-transparent"
+          class="from-paper/90 pointer-events-none absolute inset-x-0 top-0 z-10 h-1/4 bg-gradient-to-b to-transparent"
         ></div>
 
         <textarea
@@ -375,14 +375,14 @@ defineExpose({
     >
       <div
         v-if="showPreview"
-        class="border-border/50 bg-background/50 border-l md:w-1/2 md:pl-4"
+        class="border-border/50 bg-paper/50 border-l md:w-1/2 md:pl-4"
       >
         <div class="flex h-full flex-col">
           <div class="flex h-10 shrink-0 items-center justify-between px-4">
             <h2 class="text-muted-foreground text-xs font-medium">预览</h2>
             <button
               type="button"
-              class="text-muted-foreground hover:text-foreground text-xs transition"
+              class="text-muted-foreground hover:text-ink text-xs transition"
               @click="togglePreview"
             >
               关闭

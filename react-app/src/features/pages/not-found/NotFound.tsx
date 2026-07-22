@@ -31,15 +31,15 @@ export default function NotFound() {
     <div className="flex flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
       <div className="bg-secondary/70 mx-auto max-w-md rounded-4xl p-8 text-center backdrop-blur-sm">
         <div className="relative mx-auto h-32 w-32">
-          <div className="bg-primary/10 absolute inset-0 animate-pulse rounded-full"></div>
+          <div className="bg-accent/10 absolute inset-0 animate-pulse rounded-full"></div>
           <div className="relative flex h-full items-center justify-center">
-            <span className="text-foreground text-6xl font-extrabold tracking-tight">
+            <span className="text-ink text-6xl font-extrabold tracking-tight">
               404
             </span>
           </div>
         </div>
 
-        <h1 className="text-foreground mt-8 font-serif text-3xl font-bold sm:text-4xl">
+        <h1 className="text-ink mt-8 font-serif text-3xl font-bold sm:text-4xl">
           页面未找到
         </h1>
 
@@ -57,7 +57,7 @@ export default function NotFound() {
           <button
             type="button"
             onClick={() => navigate('/')}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-ring inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium transition-all hover:shadow-lg focus:ring-2 focus:ring-offset-2 focus:outline-none"
+            className="bg-accent text-accent hover:bg-accent/90 focus:ring-ring inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium transition-all hover:shadow-lg focus:ring-2 focus:ring-offset-2 focus:outline-none"
           >
             <svg
               className="mr-2 h-5 w-5"
@@ -78,7 +78,7 @@ export default function NotFound() {
           <button
             type="button"
             onClick={goBack}
-            className="bg-background text-card-foreground ring-border hover:bg-muted focus:ring-ring inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium ring-1 transition-all ring-inset focus:ring-2 focus:outline-none"
+            className="bg-paper text-card-foreground ring-border hover:bg-muted focus:ring-ring inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium ring-1 transition-all ring-inset focus:ring-2 focus:outline-none"
           >
             <svg
               className="mr-2 h-5 w-5"

@@ -24,7 +24,7 @@
         class="bg-muted/40 border-border flex min-h-96 flex-col rounded-xl border p-3 transition-colors"
         :class="
           dragOverColumn === col.id
-            ? 'border-primary/60 bg-primary/5 ring-primary/30 ring-1'
+            ? 'border-accent/60 bg-accent/5 ring-accent/30 ring-1'
             : ''
         "
         @dragover.prevent="onDragOver(col.id)"
@@ -40,12 +40,12 @@
               aria-hidden="true"
             />
             <h3
-              class="text-foreground font-serif text-sm font-medium tracking-tight"
+              class="text-ink font-serif text-sm font-medium tracking-tight"
             >
               {{ col.label }}
             </h3>
             <span
-              class="text-muted-foreground bg-background rounded-full px-1.5 py-px text-[10px] tabular-nums"
+              class="text-muted-foreground bg-paper rounded-full px-1.5 py-px text-[10px] tabular-nums"
             >
               {{ columnCount(col.id) }}
             </span>
@@ -167,7 +167,7 @@ const KANBAN_COLUMNS: KanbanColumn[] = [
     label: '进行中',
     statuses: ['进行中'],
     targetStatus: '进行中',
-    dotClass: 'bg-primary',
+    dotClass: 'bg-accent',
   },
   {
     id: 'paused',

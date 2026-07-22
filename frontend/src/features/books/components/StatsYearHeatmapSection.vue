@@ -32,10 +32,10 @@ const WEEKDAY_CN = ['日', '一', '二', '三', '四', '五', '六'] as const;
 // L0(无数据 / 越界空槽) 用 muted,1..4 走 primary 的 4 级透明度
 const INTENSITY_CLASS = [
   'bg-muted',
-  'bg-primary/20',
-  'bg-primary/40',
-  'bg-primary/70',
-  'bg-primary',
+  'bg-accent/20',
+  'bg-accent/40',
+  'bg-accent/70',
+  'bg-accent',
 ] as const;
 
 function cellClass(cell: HeatmapCell | null) {
@@ -80,7 +80,7 @@ function onCellLeave() {
 <template>
   <section v-if="hasData" class="mb-14">
     <h2
-      class="text-foreground font-serif text-2xl font-semibold tracking-tight sm:text-3xl"
+      class="text-ink font-serif text-2xl font-semibold tracking-tight sm:text-3xl"
     >
       本年的阅读足迹
     </h2>
@@ -89,7 +89,7 @@ function onCellLeave() {
     </p>
 
     <div
-      class="border-border bg-background/50 overflow-x-auto rounded-lg border p-3 sm:p-4"
+      class="border-border bg-paper/50 overflow-x-auto rounded-lg border p-3 sm:p-4"
       role="img"
       :aria-label="`${year}年阅读足迹,共${totalActiveDays}天有阅读`"
     >
@@ -180,10 +180,10 @@ function onCellLeave() {
       >
         <div
           v-if="tooltipCell"
-          class="bg-background text-foreground border-border pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-full rounded-md border px-2.5 py-1.5 text-xs whitespace-nowrap shadow-md"
+          class="bg-paper text-ink border-border pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-full rounded-md border px-2.5 py-1.5 text-xs whitespace-nowrap shadow-md"
           :style="{ left: `${tooltipLeft}px`, top: `${tooltipTop}px` }"
         >
-          <div class="text-foreground font-medium tabular-nums">
+          <div class="text-ink font-medium tabular-nums">
             {{ formatTooltipDate(tooltipCell.date) }}
           </div>
           <div
@@ -205,11 +205,11 @@ function onCellLeave() {
       class="text-muted-foreground mt-3 text-xs sm:text-sm"
     >
       共
-      <span class="text-foreground font-medium tabular-nums">
+      <span class="text-ink font-medium tabular-nums">
         {{ totalActiveDays }}
       </span>
       天有阅读记录,最多的一天
-      <span class="text-foreground font-medium tabular-nums">
+      <span class="text-ink font-medium tabular-nums">
         {{ formatDuration(maxSeconds) }}
       </span>
     </p>

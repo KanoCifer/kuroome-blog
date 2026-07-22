@@ -76,7 +76,7 @@ onUnmounted(() => {
           :animate="{ scale: 1, opacity: 1 }"
           :exit="{ scale: 0.6, opacity: 0 }"
           :transition="SPRING_BOUNCE"
-          class="bg-background border-border relative w-full max-w-3xl overflow-hidden rounded-t-3xl border shadow-2xl sm:rounded-3xl"
+          class="bg-paper border-border relative w-full max-w-3xl overflow-hidden rounded-t-3xl border shadow-2xl sm:rounded-3xl"
         >
           <div class="grid grid-cols-1 sm:grid-cols-[200px_1fr]">
             <!-- Cover column — the morph happens here -->
@@ -91,13 +91,13 @@ onUnmounted(() => {
               />
               <span
                 v-if="book.newRating > 0"
-                class="bg-background/85 text-foreground absolute top-3 left-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium tabular-nums backdrop-blur-md"
+                class="bg-paper/85 text-ink absolute top-3 left-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium tabular-nums backdrop-blur-md"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                  class="text-primary h-3 w-3"
+                  class="text-accent h-3 w-3"
                   aria-hidden="true"
                 >
                   <path
@@ -122,7 +122,7 @@ onUnmounted(() => {
               <div class="mb-3 flex items-start justify-between gap-3">
                 <span
                   v-if="book.category"
-                  class="bg-primary/15 text-primary inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                  class="bg-accent/15 text-accent inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
                 >
                   {{ book.category }}
                 </span>
@@ -130,7 +130,7 @@ onUnmounted(() => {
 
                 <button
                   type="button"
-                  class="text-muted-foreground hover:bg-muted hover:text-foreground -mt-1 -mr-1 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-colors"
+                  class="text-muted-foreground hover:bg-muted hover:text-ink -mt-1 -mr-1 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-colors"
                   aria-label="关闭"
                   @click="emit('close')"
                 >
@@ -153,7 +153,7 @@ onUnmounted(() => {
 
               <!-- Title + author -->
               <h2
-                class="text-foreground font-serif text-2xl leading-tight font-bold tracking-tight sm:text-3xl"
+                class="text-ink font-serif text-2xl leading-tight font-bold tracking-tight sm:text-3xl"
               >
                 {{ book.title }}
               </h2>
@@ -183,7 +183,7 @@ onUnmounted(() => {
               <!-- Intro — scrollable if long -->
               <div
                 v-if="book.intro"
-                class="text-foreground/90 mt-5 max-h-48 overflow-y-auto pr-1 text-sm leading-relaxed sm:text-[15px]"
+                class="text-ink/90 mt-5 max-h-48 overflow-y-auto pr-1 text-sm leading-relaxed sm:text-[15px]"
               >
                 {{ book.intro }}
               </div>
@@ -192,7 +192,7 @@ onUnmounted(() => {
               <div class="mt-auto pt-6">
                 <a
                   :href="wereadHref"
-                  class="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-colors sm:w-auto"
+                  class="bg-accent text-accent hover:bg-accent/90 inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-colors sm:w-auto"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

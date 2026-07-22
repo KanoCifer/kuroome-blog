@@ -99,7 +99,7 @@
 
 /* 暗色模式 */
 .dark .liquid-glass {
-  background: color-mix(in oklch, var(--color-background) 40%, transparent);
+  @apply bg-paper/40;
   border-color: rgb(255 255 255 / 0.08);
   box-shadow:
     inset 0 0 2px 1px rgb(255 255 255 / 0.1),
@@ -109,7 +109,7 @@
 }
 
 .dark .liquid-glass-card {
-  background: color-mix(in oklch, var(--color-background) 40%, transparent);
+  @apply bg-paper/40;
   border-color: rgb(255 255 255 / 0.08);
   box-shadow:
     inset 0 0 2px 1px rgb(255 255 255 / 0.1),

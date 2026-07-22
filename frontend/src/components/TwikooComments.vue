@@ -41,7 +41,7 @@ watch(
         />
         <path d="m9 12 2 2 4-4" />
       </svg>
-      <h3 class="text-foreground text-lg font-semibold">评论</h3>
+      <h3 class="text-ink text-lg font-semibold">评论</h3>
     </div>
     <div class="p-8">
       <div id="tcomment" />
@@ -88,7 +88,7 @@ watch(
 #tcomment .el-button--primary {
   background: var(--accent);
   border-color: var(--accent);
-  color: var(--accent-contrast);
+  color: var(--accent);
 }
 #tcomment .el-button--primary:hover {
   opacity: 0.88;
@@ -167,7 +167,7 @@ watch(
 }
 #tcomment .el-pager li.active {
   background: var(--accent);
-  color: var(--accent-contrast);
+  color: var(--accent);
 }
 
 #tcomment .OwO {

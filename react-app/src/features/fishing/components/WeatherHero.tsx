@@ -20,7 +20,7 @@ interface Verdict {
 
 const VERDICT: Record<FishingLevel, Verdict> = {
   爆护: { text: '今日爆护', tone: 'text-success' },
-  好: { text: '今日宜出钓', tone: 'text-primary' },
+  好: { text: '今日宜出钓', tone: 'text-accent' },
   一般: { text: '今日可一试', tone: 'text-warning' },
   差: { text: '今日不宜出钓', tone: 'text-destructive' },
   空军: { text: '今日恐空军', tone: 'text-muted-foreground' },
@@ -70,14 +70,14 @@ export function WeatherHero({
           onClick={onToggleAnalysis}
           className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
             analysisOpen
-              ? 'bg-primary text-primary-foreground'
-              : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+              ? 'bg-accent text-accent'
+              : 'text-muted-foreground hover:bg-muted hover:text-ink'
           }`}
         >
           <span className="relative inline-flex">
             <Bot className="h-4 w-4" aria-hidden />
             {analysisHasData && !analysisOpen && (
-              <span className="bg-success ring-background absolute -top-1 -right-1 inline-flex h-2 w-2 rounded-full ring-2" />
+              <span className="bg-success ring-paper absolute -top-1 -right-1 inline-flex h-2 w-2 rounded-full ring-2" />
             )}
           </span>
           AI 分析
@@ -91,10 +91,10 @@ export function WeatherHero({
           <div className="mt-3 flex items-start justify-between gap-4">
             <div className="min-w-0">
               <div className="flex items-start">
-                <span className="text-foreground text-[64px] leading-[0.85] font-light tabular-nums tracking-tight">
+                <span className="text-ink text-[64px] leading-[0.85] font-light tabular-nums tracking-tight">
                   {liveWeather.temp}
                 </span>
-                <span className="text-foreground/60 mt-1 ml-0.5 text-3xl font-light">
+                <span className="text-ink/60 mt-1 ml-0.5 text-3xl font-light">
                   °
                 </span>
               </div>
@@ -107,7 +107,7 @@ export function WeatherHero({
               </p>
             </div>
             <i
-              className={`qi-${liveWeather.icon} text-foreground/85 -mt-1 text-6xl`}
+              className={`qi-${liveWeather.icon} text-ink/85 -mt-1 text-6xl`}
               aria-hidden
             />
           </div>

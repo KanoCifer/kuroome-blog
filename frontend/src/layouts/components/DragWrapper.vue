@@ -4,7 +4,7 @@
     :style="[position]"
     class="drag-wrapper absolute"
     :class="{
-      'outline-primary/60 rounded-3xl outline-2 outline-offset-8 outline-dashed':
+      'outline-accent/60 rounded-3xl outline-2 outline-offset-8 outline-dashed':
         layoutStore.isEditing,
       'cursor-grab': layoutStore.isEditing,
       'is-dragging': isThisCardDragging,

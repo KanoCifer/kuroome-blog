@@ -148,7 +148,7 @@ const statusLabel = computed(() => {
 });
 
 const statusClass = computed(() => {
-  if (loading.value) return 'bg-primary/15 text-primary';
+  if (loading.value) return 'bg-accent/15 text-accent';
   if (errorMessage.value) return 'bg-destructive/15 text-destructive';
   if (hasGenerated.value) return 'bg-success/15 text-success';
   return 'bg-muted text-muted-foreground';
@@ -263,7 +263,7 @@ onUnmounted(() => {
         <select
           v-if="!loading"
           v-model="selectedModel"
-          class="border-border bg-muted text-foreground min-w-0 truncate rounded-lg border px-2 py-1 text-xs"
+          class="border-border bg-muted text-ink min-w-0 truncate rounded-lg border px-2 py-1 text-xs"
           aria-label="选择模型"
         >
           <option v-for="model in AI_MODELS" :key="model.id" :value="model.id">
@@ -275,7 +275,7 @@ onUnmounted(() => {
       <button
         v-if="loading"
         type="button"
-        class="bg-destructive text-primary-foreground hover:bg-destructive/90 inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition"
+        class="bg-destructive text-accent hover:bg-destructive/90 inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition"
         @click="cancelAnalysis"
       >
         <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -286,7 +286,7 @@ onUnmounted(() => {
       <button
         v-else
         type="button"
-        class="bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition disabled:cursor-not-allowed"
+        class="bg-accent text-accent hover:bg-accent/90 disabled:bg-muted disabled:text-muted-foreground inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition disabled:cursor-not-allowed"
         :disabled="!canGenerate"
         @click="fetchWeatherAnalysis"
       >
@@ -354,7 +354,7 @@ onUnmounted(() => {
             :initial="{ opacity: 0, y: 8 }"
             :animate="{ opacity: 1, y: 0 }"
             :exit="{ opacity: 0, y: -8 }"
-            class="prose prose-sm text-foreground max-w-none"
+            class="prose prose-sm text-ink max-w-none"
             v-html="renderedSummary"
           ></motion.div>
           <motion.div

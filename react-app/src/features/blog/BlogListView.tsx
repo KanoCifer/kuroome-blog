@@ -195,7 +195,7 @@ export default function BlogListView() {
   };
 
   return (
-    <div className="bg-background min-h-dvh">
+    <div className="bg-paper min-h-dvh">
       {/* ──────────────────────────────────────────────────────────── */}
       {/*  BasicDetail 风格 hero：parallax 标题 + subtitle           */}
       {/* ──────────────────────────────────────────────────────────── */}
@@ -204,7 +204,7 @@ export default function BlogListView() {
           style={{ transform: `translateY(${scrollY * 0.3}px)` }}
           className="will-change-transform"
         >
-          <h1 className="text-foreground max-w-6xl text-center font-serif text-7xl max-sm:text-3xl">
+          <h1 className="text-ink max-w-6xl text-center font-serif text-7xl max-sm:text-3xl">
             {heroTitle}
           </h1>
           <div className="text-muted-foreground mt-4 flex flex-wrap items-center justify-center gap-4 text-sm">
@@ -245,13 +245,13 @@ export default function BlogListView() {
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder="在字里行间，寻一句心动…"
               aria-label="搜索文章"
-              className="text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:ring-primary/20 border-border bg-background w-full rounded-xl border py-3 pr-10 pl-10 font-serif text-sm placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+              className="text-ink placeholder:text-muted-foreground/70 focus:border-accent focus:ring-accent/20 border-border bg-paper w-full rounded-xl border py-3 pr-10 pl-10 font-serif text-sm placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             />
             {searchQuery && (
               <button
                 type="button"
                 aria-label="清空搜索"
-                className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center pr-3"
+                className="text-muted-foreground hover:text-ink absolute inset-y-0 right-0 flex items-center pr-3"
                 onClick={handleClearSearch}
               >
                 <svg
@@ -278,10 +278,10 @@ export default function BlogListView() {
             {activeTag && (
               <button
                 type="button"
-                className="border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+                className="border-border bg-paper text-muted-foreground hover:bg-muted hover:text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
                 onClick={handleResetFilter}
               >
-                <span className="text-primary/70 font-serif italic">#</span>
+                <span className="text-accent/70 font-serif italic">#</span>
                 <span className="font-serif">{activeTag}</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -320,10 +320,10 @@ export default function BlogListView() {
                 <span className="text-muted-foreground font-mono text-[10px] tracking-[0.4em] uppercase">
                   Volume · 壹
                 </span>
-                <h2 className="text-foreground font-serif text-base font-semibold sm:text-lg">
+                <h2 className="text-ink font-serif text-base font-semibold sm:text-lg">
                   {activeTag ? (
                     <>
-                      <span className="text-primary/70 mr-1">#</span>
+                      <span className="text-accent/70 mr-1">#</span>
                       {activeTag}
                     </>
                   ) : (
@@ -332,7 +332,7 @@ export default function BlogListView() {
                 </h2>
               </div>
               <div className="text-muted-foreground/70 flex items-center gap-1.5">
-                <div className="bg-primary/40 h-px w-6" />
+                <div className="bg-accent/40 h-px w-6" />
                 <span className="font-mono text-[10px] tracking-[0.2em] uppercase">
                   {activeTag ? 'Category' : 'Recent'}
                 </span>
@@ -390,7 +390,7 @@ export default function BlogListView() {
             {/* Pagination: 统一算法，gap ≥ 2 时自动插入省略号 */}
             {!isLoading && !error && pagination && pagination.pages > 1 && (
               <nav className="mt-10" aria-label="博客分页">
-                <ul className="border-border/80 bg-background/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2">
+                <ul className="border-border/80 bg-paper/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2">
                   <li>
                     <button
                       type="button"
@@ -398,7 +398,7 @@ export default function BlogListView() {
                       aria-disabled={!pagination?.has_prev}
                       className={`focus-visible:ring-ring inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${
                         pagination?.has_prev
-                          ? 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                          ? 'text-muted-foreground hover:bg-muted hover:text-ink'
                           : 'text-muted-foreground/50 cursor-not-allowed'
                       }`}
                       onClick={() => handlePageChange(pagination!.prev_num!)}
@@ -429,8 +429,8 @@ export default function BlogListView() {
                           }
                           className={`focus-visible:ring-ring inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${
                             item === pagination?.page
-                              ? 'bg-primary text-primary-foreground'
-                              : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                              ? 'bg-accent text-accent'
+                              : 'text-muted-foreground hover:bg-muted hover:text-ink'
                           }`}
                           onClick={() => handlePageChange(item)}
                         >
@@ -447,7 +447,7 @@ export default function BlogListView() {
                       aria-disabled={!pagination?.has_next}
                       className={`focus-visible:ring-ring inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${
                         pagination?.has_next
-                          ? 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                          ? 'text-muted-foreground hover:bg-muted hover:text-ink'
                           : 'text-muted-foreground/50 cursor-not-allowed'
                       }`}
                       onClick={() => handlePageChange(pagination!.next_num!)}

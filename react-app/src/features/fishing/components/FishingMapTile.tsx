@@ -77,20 +77,20 @@ export function FishingMapTile({
       {/* 定位按钮:重试定位,对齐 Vue MapContainer */}
       <button
         type="button"
-        className="bg-background/90 text-foreground hover:bg-background border-border/40 absolute right-2.5 bottom-5 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-all duration-200 ease-out active:scale-95 disabled:opacity-50"
+        className="bg-paper/90 text-ink hover:bg-paper border-border/40 absolute right-2.5 bottom-5 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-all duration-200 ease-out active:scale-95 disabled:opacity-50"
         aria-label="定位到当前位置"
         disabled={isLocating}
         onClick={() => void retryLocate()}
       >
         {isLocating ? (
-          <Loader2 className="text-primary h-4 w-4 animate-spin" />
+          <Loader2 className="text-accent h-4 w-4 animate-spin" />
         ) : (
           <Locate className="h-4 w-4" />
         )}
       </button>
 
       {!isMapReady && (
-        <div className="text-muted-foreground absolute inset-0 z-10 flex items-center justify-center bg-background/60 text-xs backdrop-blur-[2px]">
+        <div className="text-muted-foreground absolute inset-0 z-10 flex items-center justify-center bg-paper/60 text-xs backdrop-blur-[2px]">
           地图加载中…
         </div>
       )}

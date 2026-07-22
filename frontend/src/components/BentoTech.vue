@@ -8,7 +8,7 @@
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="text-foreground size-6"
+            class="text-ink size-6"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"

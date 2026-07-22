@@ -1,11 +1,11 @@
 <template>
   <section
     id="rss-parse"
-    class="border-border bg-background rounded-2xl border p-6"
+    class="border-border bg-paper rounded-2xl border p-6"
   >
     <div class="mb-5 flex items-center justify-between gap-3">
       <div>
-        <h2 class="text-primary text-xl font-bold">解析订阅地址</h2>
+        <h2 class="text-accent text-xl font-bold">解析订阅地址</h2>
         <p class="text-muted-foreground mt-1 text-sm">
           支持 RSS/Atom，解析后可直接保存到我的订阅
         </p>
@@ -19,7 +19,7 @@
       <div class="flex-1">
         <label
           for="rss-url"
-          class="text-primary mb-2 block text-sm font-medium"
+          class="text-accent mb-2 block text-sm font-medium"
         >
           RSS/Atom 地址
         </label>
@@ -28,7 +28,7 @@
           :value="rssUrl"
           type="text"
           placeholder="https://example.com/feed.xml"
-          class="border-border bg-background text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 w-full rounded-xl border px-4 py-3 transition-all focus:ring-2 focus:outline-none"
+          class="border-border bg-paper text-ink placeholder:text-muted-foreground focus:border-accent focus:ring-accent/20 w-full rounded-xl border px-4 py-3 transition-all focus:ring-2 focus:outline-none"
           @input="
             $emit('update:rssUrl', ($event.target as HTMLInputElement).value)
           "
@@ -37,7 +37,7 @@
 
       <button
         type="button"
-        class="border-primary/30 bg-primary/15 text-primary hover:bg-muted rounded-xl border px-5 py-3 text-sm font-medium transition-colors"
+        class="border-accent/30 bg-accent/15 text-accent hover:bg-muted rounded-xl border px-5 py-3 text-sm font-medium transition-colors"
         @click="$emit('update:saveToDb', !saveToDb)"
       >
         {{ saveToDb ? '已启用保存' : '保存到订阅' }}
@@ -46,7 +46,7 @@
       <button
         type="submit"
         :disabled="parseLoading"
-        class="bg-warning text-foreground hover:bg-warning/90 focus:ring-warning disabled:hover:bg-warning rounded-xl px-6 py-3 text-sm font-semibold transition-all focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70"
+        class="bg-warning text-ink hover:bg-warning/90 focus:ring-warning disabled:hover:bg-warning rounded-xl px-6 py-3 text-sm font-semibold transition-all focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70"
       >
         {{ parseLoading ? '解析中...' : '开始解析' }}
       </button>
@@ -58,7 +58,7 @@
         v-for="feed in exampleFeeds"
         :key="feed.url"
         type="button"
-        class="bg-primary/15 text-primary hover:bg-muted rounded-full px-3 py-1 text-xs font-medium transition-colors"
+        class="bg-accent/15 text-accent hover:bg-muted rounded-full px-3 py-1 text-xs font-medium transition-colors"
         @click="$emit('update:rssUrl', feed.url)"
       >
         {{ feed.name }}
@@ -74,7 +74,7 @@
         v-for="historyUrl in rssHistory.slice(0, 3)"
         :key="historyUrl"
         type="button"
-        class="bg-primary/15 text-primary hover:bg-muted rounded-full px-3 py-1 text-xs font-medium transition-colors"
+        class="bg-accent/15 text-accent hover:bg-muted rounded-full px-3 py-1 text-xs font-medium transition-colors"
         @click="$emit('update:rssUrl', historyUrl)"
       >
         {{ historyUrl }}
@@ -85,7 +85,7 @@
       v-if="parseMetadata"
       class="border-border bg-muted/40 mt-6 rounded-xl border p-5"
     >
-      <h3 class="text-primary text-lg font-bold">
+      <h3 class="text-accent text-lg font-bold">
         {{ parseMetadata.title }}
       </h3>
       <p
@@ -104,7 +104,7 @@
           :href="parseMetadata.link"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-primary hover:text-primary font-medium"
+          class="text-accent hover:text-accent font-medium"
         >
           访问原站
         </a>
@@ -112,20 +112,20 @@
     </div>
 
     <div v-if="parseEntries.length > 0" class="mt-5 space-y-3">
-      <div class="text-foreground text-sm font-semibold">
+      <div class="text-ink text-sm font-semibold">
         最新解析文章（{{ parseEntries.length }}）
       </div>
       <ul class="space-y-2">
         <li
           v-for="(entry, index) in parseEntries"
           :key="`${entry.link}-${index}`"
-          class="border-border bg-background rounded-xl border p-4"
+          class="border-border bg-paper rounded-xl border p-4"
         >
           <a
             :href="entry.link"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-primary hover:text-primary font-medium transition-colors"
+            class="text-accent hover:text-accent font-medium transition-colors"
           >
             {{ entry.title }}
           </a>

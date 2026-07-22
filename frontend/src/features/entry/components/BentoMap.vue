@@ -45,7 +45,7 @@
       <!-- 中部：统计和地图预览 -->
       <div class="mt-3 space-y-2">
         <div class="flex items-baseline gap-1">
-          <span class="text-foreground text-2xl font-bold tracking-tight">{{
+          <span class="text-ink text-2xl font-bold tracking-tight">{{
             displaySpots
           }}</span>
           <span class="text-muted-foreground text-xs">个钓点</span>

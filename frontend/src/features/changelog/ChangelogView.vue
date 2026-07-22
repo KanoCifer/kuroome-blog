@@ -45,7 +45,7 @@ const getTypeClass = (type: string): string => {
     fix: 'bg-destructive/15 text-destructive ring-1 ring-destructive/30',
     refactor: 'bg-chart-2/15 text-chart-2 ring-1 ring-chart-2/30',
     style: 'bg-chart-4/15 text-chart-4 ring-1 ring-chart-4/30',
-    docs: 'bg-primary/15 text-primary ring-1 ring-primary/30',
+    docs: 'bg-accent/15 text-accent ring-1 ring-accent/30',
     perf: 'bg-warning/15 text-warning ring-1 ring-warning/30',
     test: 'bg-chart-1/15 text-chart-1 ring-1 ring-chart-1/30',
     chore: 'bg-muted text-muted-foreground ring-1 ring-border/30',
@@ -63,7 +63,7 @@ const getTypeClass = (type: string): string => {
       <!-- Header Section -->
       <div class="mb-16 text-center">
         <div
-          class="bg-primary/15 text-primary mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium"
+          class="bg-accent/15 text-accent mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium"
         >
           <svg
             class="h-4 w-4"
@@ -81,7 +81,7 @@ const getTypeClass = (type: string): string => {
           版本更新记录
         </div>
         <h1
-          class="text-foreground mb-4 text-5xl font-bold tracking-tight md:text-6xl"
+          class="text-ink mb-4 text-5xl font-bold tracking-tight md:text-6xl"
         >
           变更日志
         </h1>
@@ -116,12 +116,12 @@ const getTypeClass = (type: string): string => {
             <!-- Content Card -->
             <div class="-mx-8 w-full md:w-1/2">
               <div
-                class="group squircle border-border bg-background/80 cursor-pointer border p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl md:p-8"
+                class="group squircle border-border bg-paper/80 cursor-pointer border p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl md:p-8"
               >
                 <!-- Version Badge & Date -->
                 <div class="mb-4 flex flex-wrap items-center gap-3">
                   <span
-                    class="from-gradient-primary-from to-gradient-primary-to text-primary-foreground shadow-primary/25 inline-flex items-center gap-2 rounded-full bg-linear-to-r px-4 py-2 text-sm font-bold shadow-lg"
+                    class="from-gradient-primary-from to-gradient-primary-to text-accent shadow-accent/25 inline-flex items-center gap-2 rounded-full bg-linear-to-r px-4 py-2 text-sm font-bold shadow-lg"
                   >
                     <svg
                       class="h-4 w-4"
@@ -159,7 +159,7 @@ const getTypeClass = (type: string): string => {
                 </div>
 
                 <!-- Release Title -->
-                <h2 class="text-foreground mb-4 text-2xl font-bold">
+                <h2 class="text-ink mb-4 text-2xl font-bold">
                   {{ r.title }}
                 </h2>
 
@@ -181,7 +181,7 @@ const getTypeClass = (type: string): string => {
                       }}</span>
                       {{ getTypeLabel(change.type) }}
                     </span>
-                    <span class="text-foreground">
+                    <span class="text-ink">
                       {{ change.content }}
                     </span>
                   </li>
@@ -194,12 +194,12 @@ const getTypeClass = (type: string): string => {
               class="absolute top-1/2 left-1/2 z-10 hidden h-8 w-8 -translate-x-1/2 -translate-y-1/2 md:block"
             >
               <div
-                class="bg-primary absolute inset-0 -m-2 rounded-full opacity-30 blur-md transition-all duration-300 group-hover:opacity-50 group-hover:blur-lg"
+                class="bg-accent absolute inset-0 -m-2 rounded-full opacity-30 blur-md transition-all duration-300 group-hover:opacity-50 group-hover:blur-lg"
               ></div>
               <div
-                class="bg-background ring-primary/20 relative flex h-full w-full items-center justify-center rounded-full ring-4"
+                class="bg-paper ring-accent/20 relative flex h-full w-full items-center justify-center rounded-full ring-4"
               >
-                <div class="bg-primary h-3 w-3 rounded-full"></div>
+                <div class="bg-accent h-3 w-3 rounded-full"></div>
               </div>
             </div>
 
@@ -208,9 +208,9 @@ const getTypeClass = (type: string): string => {
               class="absolute top-6 left-0 z-10 h-6 w-6 -translate-x-1/2 md:hidden"
             >
               <div
-                class="bg-background ring-primary/20 relative flex h-full w-full items-center justify-center rounded-full ring-3"
+                class="bg-paper ring-accent/20 relative flex h-full w-full items-center justify-center rounded-full ring-3"
               >
-                <div class="bg-primary h-2 w-2 rounded-full"></div>
+                <div class="bg-accent h-2 w-2 rounded-full"></div>
               </div>
             </div>
 

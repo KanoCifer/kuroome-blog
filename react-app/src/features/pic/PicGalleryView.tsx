@@ -238,7 +238,7 @@ export default function PicGalleryView() {
   };
 
   return (
-    <div className="bg-background relative min-h-dvh pb-40">
+    <div className="bg-paper relative min-h-dvh pb-40">
       <div
         className="pointer-events-none absolute inset-0 z-0 opacity-40 dark:opacity-20"
         style={{
@@ -250,10 +250,10 @@ export default function PicGalleryView() {
 
       <div className="relative z-10 px-4 pt-6">
         <div className="mx-auto w-full max-w-md">
-          <p className="text-primary text-xs font-semibold tracking-wide uppercase">
+          <p className="text-accent text-xs font-semibold tracking-wide uppercase">
             Mobile Gallery
           </p>
-          <h1 className="text-foreground mt-1 text-2xl font-bold">图片墙</h1>
+          <h1 className="text-ink mt-1 text-2xl font-bold">图片墙</h1>
           <p className="text-muted-foreground mt-1 text-sm">
             瀑布流展示，点击查看详情
           </p>
@@ -267,12 +267,12 @@ export default function PicGalleryView() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, type: 'spring' }}
-              className="border-border/80 bg-background/70 w-full max-w-xs rounded-[2rem] border p-8 text-center shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] backdrop-blur-xl"
+              className="border-border/80 bg-paper/70 w-full max-w-xs rounded-[2rem] border p-8 text-center shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] backdrop-blur-xl"
             >
-              <div className="from-primary/10 to-primary/10 text-primary mx-auto mb-6 flex h-18 w-18 items-center justify-center rounded-2xl bg-linear-to-tr shadow-inner">
+              <div className="from-accent/10 to-accent/10 text-accent mx-auto mb-6 flex h-18 w-18 items-center justify-center rounded-2xl bg-linear-to-tr shadow-inner">
                 <ImageOff className="h-9 w-9" strokeWidth={1.5} />
               </div>
-              <h3 className="text-foreground text-xl font-bold tracking-tight">
+              <h3 className="text-ink text-xl font-bold tracking-tight">
                 还没有图片
               </h3>
               <p className="text-muted-foreground mt-2 text-sm">
@@ -281,7 +281,7 @@ export default function PicGalleryView() {
               {canEdit && (
                 <button
                   type="button"
-                  className="bg-foreground text-background hover:bg-foreground/90 mt-6 rounded-full px-6 py-2.5 text-sm font-medium shadow-sm transition-colors"
+                  className="bg-ink text-paper hover:bg-ink/90 mt-6 rounded-full px-6 py-2.5 text-sm font-medium shadow-sm transition-colors"
                   onClick={openUploadModal}
                 >
                   开始上传
@@ -304,7 +304,7 @@ export default function PicGalleryView() {
                 }}
               >
                 <div
-                  className="bg-background ring-border group relative cursor-pointer overflow-hidden rounded-2xl shadow-sm ring-1 transition-shadow hover:shadow-md"
+                  className="bg-paper ring-border group relative cursor-pointer overflow-hidden rounded-2xl shadow-sm ring-1 transition-shadow hover:shadow-md"
                   onClick={() => openImageDetail(image)}
                 >
                   <img
@@ -314,8 +314,8 @@ export default function PicGalleryView() {
                     loading="lazy"
                   />
                   {image.description && (
-                    <div className="bg-background/90 pointer-events-none absolute inset-x-0 bottom-0 translate-y-full p-2.5 opacity-0 backdrop-blur-sm transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100">
-                      <p className="text-foreground line-clamp-2 text-xs leading-snug">
+                    <div className="bg-paper/90 pointer-events-none absolute inset-x-0 bottom-0 translate-y-full p-2.5 opacity-0 backdrop-blur-sm transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100">
+                      <p className="text-ink line-clamp-2 text-xs leading-snug">
                         {image.description}
                       </p>
                     </div>
@@ -329,13 +329,13 @@ export default function PicGalleryView() {
 
       {canEdit && (
         <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+5.75rem)] left-1/2 z-40 w-fit -translate-x-1/2">
-          <div className="border-border/50 bg-background/85 rounded-2xl border p-2 shadow-[0_10px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl">
+          <div className="border-border/50 bg-paper/85 rounded-2xl border p-2 shadow-[0_10px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl">
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={toggleEditMode}
                 className={`border-border/70 flex h-10 items-center gap-2 rounded-xl border px-3 text-sm shadow-sm ${
-                  isEditMode ? 'bg-primary/10 text-primary' : 'text-foreground'
+                  isEditMode ? 'bg-accent/10 text-accent' : 'text-ink'
                 }`}
               >
                 <Pencil className="h-4 w-4" />
@@ -345,7 +345,7 @@ export default function PicGalleryView() {
               <button
                 type="button"
                 onClick={openUploadModal}
-                className="bg-foreground text-background hover:bg-foreground/90 flex h-10 items-center rounded-xl px-3 shadow-sm transition-colors"
+                className="bg-ink text-paper hover:bg-ink/90 flex h-10 items-center rounded-xl px-3 shadow-sm transition-colors"
               >
                 <Upload className="h-4 w-4" />
               </button>
@@ -370,13 +370,13 @@ export default function PicGalleryView() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="bg-background/95 ring-border relative z-10 w-full max-w-md overflow-hidden rounded-[2rem] shadow-2xl ring-1 backdrop-blur-2xl"
+              className="bg-paper/95 ring-border relative z-10 w-full max-w-md overflow-hidden rounded-[2rem] shadow-2xl ring-1 backdrop-blur-2xl"
               onClick={(event) => event.stopPropagation()}
             >
               <button
                 type="button"
                 onClick={closeImageDetail}
-                className="bg-background/10 text-muted-foreground hover:bg-background/20 absolute top-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md transition-all hover:scale-105 active:scale-95"
+                className="bg-paper/10 text-muted-foreground hover:bg-paper/20 absolute top-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md transition-all hover:scale-105 active:scale-95"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -389,7 +389,7 @@ export default function PicGalleryView() {
                 />
               </div>
 
-              <div className="bg-background/60 space-y-4 p-5">
+              <div className="bg-paper/60 space-y-4 p-5">
                 <div className="text-muted-foreground flex items-center text-sm font-medium">
                   <Calendar className="mr-1.5 h-4 w-4" />
                   {formatDate(selectedImage.uploadedAt)}
@@ -407,7 +407,7 @@ export default function PicGalleryView() {
                       }
                       rows={3}
                       placeholder="输入新的描述..."
-                      className="border-border/80 bg-background text-foreground placeholder-muted-foreground focus:border-ring focus:ring-ring w-full resize-none rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
+                      className="border-border/80 bg-paper text-ink placeholder-muted-foreground focus:border-ring focus:ring-ring w-full resize-none rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
                     />
                     <div className="flex justify-end gap-3 pt-1">
                       <button
@@ -420,7 +420,7 @@ export default function PicGalleryView() {
                       </button>
                       <button
                         type="button"
-                        className="bg-foreground text-background hover:bg-foreground/90 rounded-full px-5 py-2 text-sm shadow-sm transition-colors"
+                        className="bg-ink text-paper hover:bg-ink/90 rounded-full px-5 py-2 text-sm shadow-sm transition-colors"
                         onClick={updateDescription}
                       >
                         保存修改
@@ -454,22 +454,22 @@ export default function PicGalleryView() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="bg-background/95 ring-border relative z-10 w-full max-w-md rounded-[2rem] p-6 shadow-2xl ring-1 backdrop-blur-2xl"
+              className="bg-paper/95 ring-border relative z-10 w-full max-w-md rounded-[2rem] p-6 shadow-2xl ring-1 backdrop-blur-2xl"
               onClick={(event) => event.stopPropagation()}
             >
               <button
                 type="button"
                 onClick={closeUploadModal}
-                className="text-muted-foreground hover:bg-muted hover:text-foreground absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+                className="text-muted-foreground hover:bg-muted hover:text-ink absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
 
               <div className="mb-6 text-center">
-                <div className="bg-primary/10 text-primary mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full">
+                <div className="bg-accent/10 text-accent mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full">
                   <UploadCloud className="h-6 w-6" />
                 </div>
-                <h3 className="text-foreground text-xl font-bold tracking-tight">
+                <h3 className="text-ink text-xl font-bold tracking-tight">
                   上传新图片
                 </h3>
                 <p className="text-muted-foreground mt-1 text-sm">
@@ -504,9 +504,9 @@ export default function PicGalleryView() {
                   </div>
                 ) : (
                   <div className="flex flex-col items-center">
-                    <div className="bg-background ring-border mb-4 flex h-14 w-14 items-center justify-center rounded-full shadow-sm ring-1 transition-transform group-hover:scale-110">
+                    <div className="bg-paper ring-border mb-4 flex h-14 w-14 items-center justify-center rounded-full shadow-sm ring-1 transition-transform group-hover:scale-110">
                       <ImagePlus
-                        className="text-muted-foreground group-hover:text-primary h-6 w-6 transition-colors"
+                        className="text-muted-foreground group-hover:text-accent h-6 w-6 transition-colors"
                         strokeWidth={1.5}
                       />
                     </div>
@@ -529,21 +529,21 @@ export default function PicGalleryView() {
                   onChange={(event) => setUploadDescription(event.target.value)}
                   type="text"
                   placeholder="为这张图片添加描述..."
-                  className="border-border/80 bg-background text-foreground placeholder-muted-foreground focus:border-ring focus:ring-ring mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
+                  className="border-border/80 bg-paper text-ink placeholder-muted-foreground focus:border-ring focus:ring-ring mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
                 />
               </div>
 
               <div className="mt-8 flex gap-3">
                 <button
                   type="button"
-                  className="border-border bg-background text-card-foreground hover:bg-muted flex-1 rounded-xl border py-3 text-sm font-medium shadow-sm transition-colors"
+                  className="border-border bg-paper text-card-foreground hover:bg-muted flex-1 rounded-xl border py-3 text-sm font-medium shadow-sm transition-colors"
                   onClick={closeUploadModal}
                 >
                   取消
                 </button>
                 <button
                   type="button"
-                  className="bg-foreground text-background hover:bg-foreground/90 flex flex-1 items-center justify-center rounded-xl py-3 text-sm font-medium shadow-md transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                  className="bg-ink text-paper hover:bg-ink/90 flex flex-1 items-center justify-center rounded-xl py-3 text-sm font-medium shadow-md transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                   disabled={!selectedFile || isUploading}
                   onClick={uploadImage}
                 >

@@ -15,7 +15,7 @@ const props = defineProps<{ kind?: DevTaskKind | '' | null }>();
 // spec 用中性色（默认，弱化）；subtask 用 primary 强调它是可执行单元
 const KIND_CLASS: Record<DevTaskKind, string> = {
   spec: 'border-border text-muted-foreground bg-warning/20',
-  subtask: 'border-primary/30 bg-primary/5 text-primary',
+  subtask: 'border-accent/30 bg-accent/5 text-accent',
 };
 
 // console.log('props.kind', props.kind);

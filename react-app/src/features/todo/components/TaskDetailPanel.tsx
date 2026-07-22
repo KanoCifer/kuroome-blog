@@ -85,7 +85,7 @@ export function TaskDetailPanel({
             damping: 32,
             mass: 0.8,
           }}
-          className="bg-background fixed right-0 bottom-0 left-0 z-[9999] flex max-h-[85vh] flex-col rounded-t-3xl shadow-[0_-12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)]"
+          className="bg-paper fixed right-0 bottom-0 left-0 z-[9999] flex max-h-[85vh] flex-col rounded-t-3xl shadow-[0_-12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)]"
           role="dialog"
           aria-modal="true"
           aria-labelledby="detail-title"
@@ -95,13 +95,13 @@ export function TaskDetailPanel({
           <header className="border-border flex shrink-0 items-start justify-between gap-3 border-b px-5 pt-4 pb-3">
             <h2
               id="detail-title"
-              className="text-foreground min-w-0 flex-1 truncate pr-2 font-serif text-lg leading-tight font-medium"
+              className="text-ink min-w-0 flex-1 truncate pr-2 font-serif text-lg leading-tight font-medium"
             >
               {task?.title || '任务详情'}
             </h2>
             <button
               type="button"
-              className="text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96]"
+              className="text-muted-foreground hover:bg-muted hover:text-ink focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96]"
               aria-label="关闭"
               onClick={onClose}
             >
@@ -138,7 +138,7 @@ export function TaskDetailPanel({
                     d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <p className="text-foreground text-sm font-medium">
+                <p className="text-ink text-sm font-medium">
                   找不到这个任务
                 </p>
                 <p className="text-muted-foreground max-w-[260px] text-xs leading-relaxed">
@@ -161,7 +161,7 @@ export function TaskDetailPanel({
                             i < statusIndex
                               ? 'border-success bg-success/10 text-success'
                               : i === statusIndex
-                                ? 'border-primary/40 bg-primary/10 text-primary'
+                                ? 'border-accent/40 bg-accent/10 text-accent'
                                 : 'border-border text-muted-foreground opacity-60'
                           }`}
                           aria-pressed={task.status === s}
@@ -186,7 +186,7 @@ export function TaskDetailPanel({
                           ) : (
                             <span
                               className={`h-1.5 w-1.5 rounded-full ${
-                                i === statusIndex ? 'bg-primary' : 'bg-border'
+                                i === statusIndex ? 'bg-accent' : 'bg-border'
                               }`}
                             />
                           )}
@@ -198,7 +198,7 @@ export function TaskDetailPanel({
                   {task.status !== '已完成' && task.status !== '已搁置' && (
                     <button
                       type="button"
-                      className="text-muted-foreground hover:bg-muted focus-visible:ring-ring hover:text-foreground mx-auto mt-2 block max-w-xs cursor-pointer rounded-md px-2 py-2 text-center text-[11px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
+                      className="text-muted-foreground hover:bg-muted focus-visible:ring-ring hover:text-ink mx-auto mt-2 block max-w-xs cursor-pointer rounded-md px-2 py-2 text-center text-[11px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
                       onClick={() => onSetStatus(task.slug, '已搁置')}
                     >
                       搁置此任务
@@ -225,7 +225,7 @@ export function TaskDetailPanel({
                     {task.parent_slug && (
                       <span className="text-muted-foreground">
                         归属{' '}
-                        <span className="text-foreground font-mono font-medium">
+                        <span className="text-ink font-mono font-medium">
                           {task.parent_slug}
                         </span>
                       </span>
@@ -269,7 +269,7 @@ export function TaskDetailPanel({
                 {/* 主区：描述 + 详情 */}
                 {task.description && (
                   <div
-                    className="prose prose-sm text-foreground mb-5 max-w-none leading-relaxed"
+                    className="prose prose-sm text-ink mb-5 max-w-none leading-relaxed"
                     dangerouslySetInnerHTML={{
                       __html: renderMarkdown(task.description),
                     }}
@@ -277,7 +277,7 @@ export function TaskDetailPanel({
                 )}
                 {task.detail && (
                   <div
-                    className="prose prose-sm text-foreground mb-5 max-w-none leading-relaxed"
+                    className="prose prose-sm text-ink mb-5 max-w-none leading-relaxed"
                     dangerouslySetInnerHTML={{
                       __html: renderMarkdown(task.detail),
                     }}
@@ -364,7 +364,7 @@ export function TaskDetailPanel({
                 <button
                   type="button"
                   onClick={() => onEdit(task.slug)}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                  className="bg-accent text-accent hover:bg-accent/90 focus-visible:ring-ring cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                 >
                   编辑
                 </button>

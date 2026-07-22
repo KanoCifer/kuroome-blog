@@ -7,7 +7,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="bg-background flex min-h-screen">
+  <div class="bg-paper flex min-h-screen">
     <!-- 左侧 Branding -->
     <div
       class="relative hidden flex-col justify-between bg-zinc-950 p-10 text-white lg:flex"
@@ -18,7 +18,7 @@ defineProps<{
 
     <!-- 右侧 Form -->
     <div
-      class="bg-background flex w-full items-center justify-center p-8"
+      class="bg-paper flex w-full items-center justify-center p-8"
       :class="formWidth"
     >
       <div :class="['w-full max-w-sm xl:max-w-md', formMaxWidth]">

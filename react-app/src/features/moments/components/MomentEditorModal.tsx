@@ -123,7 +123,7 @@ export function MomentEditorModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.18 }}
-          className="bg-background/60 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+          className="bg-paper/60 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
           onClick={onClose}
           role="dialog"
           aria-modal="true"
@@ -134,22 +134,22 @@ export function MomentEditorModal({
             exit={{ opacity: 0, scale: 0.97, y: 4 }}
             transition={{ duration: 0.18 }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-background border-border/40 relative flex max-h-[88vh] w-full max-w-[760px] flex-col overflow-hidden rounded-xl border shadow-xl"
+            className="bg-paper border-border/40 relative flex max-h-[88vh] w-full max-w-[760px] flex-col overflow-hidden rounded-xl border shadow-xl"
           >
             {/* Header */}
-            <div className="border-border/40 bg-background sticky top-0 z-10 flex items-center justify-between gap-2 border-b px-6 py-4">
+            <div className="border-border/40 bg-paper sticky top-0 z-10 flex items-center justify-between gap-2 border-b px-6 py-4">
               <div>
                 <div className="text-muted-foreground font-mono text-[10px] tracking-[0.18em] uppercase">
                   {isEdit ? 'EDIT · 编辑' : 'NEW · 写一句'}
                 </div>
-                <h2 className="text-foreground font-serif text-lg font-medium italic">
+                <h2 className="text-ink font-serif text-lg font-medium italic">
                   {isEdit ? '改一改' : '碎碎念'}
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={onClose}
-                className="text-muted-foreground hover:text-foreground border-border/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
+                className="text-muted-foreground hover:text-ink border-border/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
                 aria-label="关闭"
               >
                 <IconClose className="h-3.5 w-3.5" />
@@ -167,7 +167,7 @@ export function MomentEditorModal({
                   <div className="mb-1.5 flex items-baseline gap-2">
                     <label
                       htmlFor="moment-content"
-                      className="text-foreground font-serif text-sm font-medium"
+                      className="text-ink font-serif text-sm font-medium"
                     >
                       内容
                     </label>
@@ -183,7 +183,7 @@ export function MomentEditorModal({
                     rows={8}
                     maxLength={2000}
                     placeholder="今天想到什么..."
-                    className="bg-background border-input text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-ring/20 min-h-[180px] w-full resize-y rounded-lg border px-4 py-3 font-serif text-[15px] leading-loose focus:ring-2 focus:outline-none"
+                    className="bg-paper border-input text-ink placeholder:text-muted-foreground/60 focus:border-accent focus:ring-ring/20 min-h-[180px] w-full resize-y rounded-lg border px-4 py-3 font-serif text-[15px] leading-loose focus:ring-2 focus:outline-none"
                   />
                   <div className="text-muted-foreground mt-1.5 flex items-center justify-between font-mono text-[10px] tracking-wide">
                     <span>&nbsp;</span>
@@ -200,7 +200,7 @@ export function MomentEditorModal({
                 {/* Mood */}
                 <div>
                   <div className="mb-1.5 flex items-baseline gap-2">
-                    <label className="text-foreground font-serif text-sm font-medium">
+                    <label className="text-ink font-serif text-sm font-medium">
                       心情
                     </label>
                     <span className="text-muted-foreground text-[11px]">
@@ -216,8 +216,8 @@ export function MomentEditorModal({
                         className={[
                           'flex h-8 w-8 items-center justify-center rounded-lg border text-[16px] transition-colors',
                           mood === e
-                            ? 'border-primary bg-primary/10'
-                            : 'border-border/40 bg-background hover:bg-muted',
+                            ? 'border-accent bg-accent/10'
+                            : 'border-border/40 bg-paper hover:bg-muted',
                         ].join(' ')}
                       >
                         {e}
@@ -230,31 +230,31 @@ export function MomentEditorModal({
                     type="text"
                     maxLength={50}
                     placeholder="或自定义心情..."
-                    className="bg-background border-input text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-ring/20 mt-2 w-full rounded-lg border px-3 py-1.5 text-[13px] focus:ring-2 focus:outline-none"
+                    className="bg-paper border-input text-ink placeholder:text-muted-foreground/60 focus:border-accent focus:ring-ring/20 mt-2 w-full rounded-lg border px-3 py-1.5 text-[13px] focus:ring-2 focus:outline-none"
                   />
                 </div>
 
                 {/* Tags */}
                 <div>
                   <div className="mb-1.5 flex items-baseline gap-2">
-                    <label className="text-foreground font-serif text-sm font-medium">
+                    <label className="text-ink font-serif text-sm font-medium">
                       标签
                     </label>
                     <span className="text-muted-foreground text-[11px]">
                       回车添加，× 删除 · ≤20
                     </span>
                   </div>
-                  <div className="bg-background border-input flex flex-wrap items-center gap-1.5 rounded-lg border px-2 py-1.5">
+                  <div className="bg-paper border-input flex flex-wrap items-center gap-1.5 rounded-lg border px-2 py-1.5">
                     {tags.map((tag, i) => (
                       <span
                         key={tag + i}
-                        className="bg-muted text-foreground inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[12px]"
+                        className="bg-muted text-ink inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[12px]"
                       >
-                        <span className="text-primary/70 font-serif">#</span>
+                        <span className="text-accent/70 font-serif">#</span>
                         {tag}
                         <button
                           type="button"
-                          className="text-muted-foreground hover:text-foreground"
+                          className="text-muted-foreground hover:text-ink"
                           aria-label={`删除标签 ${tag}`}
                           onClick={() => removeTag(i)}
                         >
@@ -274,7 +274,7 @@ export function MomentEditorModal({
                       type="text"
                       maxLength={50}
                       placeholder="新标签..."
-                      className="text-foreground min-w-[80px] flex-1 bg-transparent px-1 text-[12px] outline-none"
+                      className="text-ink min-w-[80px] flex-1 bg-transparent px-1 text-[12px] outline-none"
                     />
                   </div>
                 </div>
@@ -293,8 +293,8 @@ export function MomentEditorModal({
                         className={[
                           'flex cursor-pointer items-start gap-2 rounded-lg border px-2.5 py-2',
                           visibility === opt.value
-                            ? 'border-primary bg-primary/5'
-                            : 'border-border/40 bg-background hover:bg-muted',
+                            ? 'border-accent bg-accent/5'
+                            : 'border-border/40 bg-paper hover:bg-muted',
                         ].join(' ')}
                       >
                         <input
@@ -306,7 +306,7 @@ export function MomentEditorModal({
                           className="mt-1"
                         />
                         <div>
-                          <div className="text-foreground text-[12px] font-medium">
+                          <div className="text-ink text-[12px] font-medium">
                             {opt.label}
                           </div>
                           <div className="text-muted-foreground mt-0.5 text-[11px]">
@@ -325,7 +325,7 @@ export function MomentEditorModal({
                   <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value as MomentStatus)}
-                    className="bg-background border-input text-foreground w-full rounded-lg border px-2.5 py-1.5 text-[13px]"
+                    className="bg-paper border-input text-ink w-full rounded-lg border px-2.5 py-1.5 text-[13px]"
                   >
                     <option value="published">已发布</option>
                     <option value="draft">草稿</option>
@@ -337,7 +337,7 @@ export function MomentEditorModal({
                   <div className="text-muted-foreground mb-2 font-mono text-[10px] tracking-[0.15em] uppercase">
                     选项
                   </div>
-                  <label className="text-foreground mb-1.5 flex items-center gap-2 text-[12px]">
+                  <label className="text-ink mb-1.5 flex items-center gap-2 text-[12px]">
                     <input
                       type="checkbox"
                       checked={isPinned}
@@ -345,7 +345,7 @@ export function MomentEditorModal({
                     />
                     置顶
                   </label>
-                  <label className="text-foreground flex items-center gap-2 text-[12px]">
+                  <label className="text-ink flex items-center gap-2 text-[12px]">
                     <input
                       type="checkbox"
                       checked={allowComment}
@@ -360,14 +360,14 @@ export function MomentEditorModal({
                     type="button"
                     onClick={() => handleSubmit()}
                     disabled={submitting}
-                    className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-[13px] font-medium shadow-sm transition-colors disabled:opacity-50"
+                    className="bg-accent text-accent hover:bg-accent/90 inline-flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-[13px] font-medium shadow-sm transition-colors disabled:opacity-50"
                   >
                     {submitting ? '保存中…' : isEdit ? '保存修改' : '发布'}
                   </button>
                   <button
                     type="button"
                     onClick={onClose}
-                    className="border-border/60 text-foreground hover:bg-muted inline-flex w-full items-center justify-center rounded-lg border px-3 py-1.5 text-[12px] transition-colors"
+                    className="border-border/60 text-ink hover:bg-muted inline-flex w-full items-center justify-center rounded-lg border px-3 py-1.5 text-[12px] transition-colors"
                   >
                     取消
                   </button>

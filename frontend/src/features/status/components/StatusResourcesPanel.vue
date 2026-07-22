@@ -65,10 +65,10 @@ const ResourceBar = defineComponent({
             class: 'flex items-baseline justify-between gap-3 text-[13px]',
           },
           [
-            h('span', { class: 'text-foreground/85' }, props.label),
+            h('span', { class: 'text-ink/85' }, props.label),
             h(
               'span',
-              { class: 'text-foreground font-mono tabular-nums' },
+              { class: 'text-ink font-mono tabular-nums' },
               props.rightDetail ||
                 `${props.value.toFixed(props.decimals)}${props.unit}`,
             ),
@@ -96,7 +96,7 @@ const ResourceBar = defineComponent({
     <section class="space-y-5" aria-label="系统资源">
       <header class="flex items-baseline justify-between">
         <h2
-          class="text-foreground font-serif text-[20px] tracking-[-0.01em]"
+          class="text-ink font-serif text-[20px] tracking-[-0.01em]"
         >
           系统资源
         </h2>
@@ -162,7 +162,7 @@ const ResourceBar = defineComponent({
     <section class="space-y-5" aria-label="API 延迟趋势">
       <header class="flex items-baseline justify-between">
         <h2
-          class="text-foreground font-serif text-[20px] tracking-[-0.01em]"
+          class="text-ink font-serif text-[20px] tracking-[-0.01em]"
         >
           API 延迟趋势
         </h2>

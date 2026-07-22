@@ -159,7 +159,7 @@
       >
         <div
           v-if="layoutStore.isEditing"
-          class="border-border bg-background/90 fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-2xl border px-4 py-2 shadow-lg backdrop-blur-md"
+          class="border-border bg-paper/90 fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-2xl border px-4 py-2 shadow-lg backdrop-blur-md"
         >
           <span class="text-muted-foreground px-1 text-sm font-medium">
             编辑布局
@@ -173,7 +173,7 @@
           </button>
           <button
             @click="layoutStore.saveEditing()"
-            class="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer rounded-xl px-4 py-2 text-sm font-medium transition-colors active:scale-[0.96]"
+            class="bg-accent text-accent hover:bg-accent/90 cursor-pointer rounded-xl px-4 py-2 text-sm font-medium transition-colors active:scale-[0.96]"
           >
             保存
           </button>

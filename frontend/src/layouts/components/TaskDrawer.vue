@@ -4,12 +4,12 @@
     <div class="fixed right-4 bottom-40 z-50">
       <button
         @click="toggle"
-        class="group bg-secondary hover:bg-primary flex h-10 cursor-pointer items-center overflow-hidden rounded-full px-2.5 shadow-md transition-all duration-300 ease-out hover:shadow-lg"
+        class="group bg-secondary hover:bg-accent flex h-10 cursor-pointer items-center overflow-hidden rounded-full px-2.5 shadow-md transition-all duration-300 ease-out hover:shadow-lg"
         title="开发任务"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="text-primary h-5 w-5 shrink-0 transition-colors duration-300 group-hover:text-white"
+          class="text-accent h-5 w-5 shrink-0 transition-colors duration-300 group-hover:text-white"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -39,27 +39,29 @@
         :animate="{ opacity: 1, x: 0 }"
         :exit="{ opacity: 0, x: 40 }"
         :transition="SPRING_SNUG"
-        class="bg-background border-border/60 fixed top-1/2 right-20 z-9999 flex max-w-lg min-w-90 -translate-y-1/2 justify-end rounded-2xl border shadow-2xl max-sm:right-2 max-sm:min-w-0"
+        class="drawer-panel fixed top-1/2 right-20 z-9999 flex max-w-lg min-w-90 -translate-y-1/2 justify-end rounded-2xl max-sm:right-2 max-sm:min-w-0"
         @click.self="close"
       >
         <div
           class="relative z-10 flex h-[90dvh] w-full flex-col overflow-hidden rounded-2xl"
         >
-          <!-- Header -->
+          <!-- Header：font-serif 标题 + 静默 active 计数 + 关闭键 -->
           <div
-            class="border-border flex shrink-0 items-center justify-between border-b px-6 py-4"
+            class="border-border/50 flex shrink-0 items-center justify-between border-b px-6 py-4"
           >
             <h3
-              class="text-foreground flex items-center gap-2 font-serif text-lg font-medium"
+              class="text-ink flex items-baseline gap-2 font-serif text-lg font-medium tracking-tight"
             >
               开发任务
-              <span class="text-muted-foreground text-sm font-normal">{{
-                activeCount
-              }}</span>
+              <span
+                v-if="activeCount"
+                class="text-muted-foreground bg-muted-foreground/10 inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
+                >{{ activeCount }}</span
+              >
             </h3>
             <button
               @click="close"
-              class="text-muted-foreground hover:bg-muted hover:text-foreground flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-colors"
+              class="text-muted-foreground hover:bg-muted hover:text-ink focus-visible:ring-ring flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
               aria-label="关闭"
             >
               <svg
@@ -100,7 +102,7 @@
               </svg>
               <p class="text-muted-foreground text-sm">请登录后使用</p>
               <button
-                class="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring mt-1 cursor-pointer rounded-lg px-4 py-1.5 text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                class="bg-accent text-accent hover:bg-accent/90 focus-visible:ring-ring mt-1 cursor-pointer rounded-lg px-4 py-1.5 text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                 @click="handleLogin"
               >
                 去登录
@@ -109,11 +111,11 @@
 
             <!-- 已登录后的可交互内容 -->
             <div v-else>
-              <!-- Collapsed add button -->
+              <!-- Collapsed add button：与 section header 同款 sentence-case 按钮 -->
               <button
                 v-if="!showAddForm"
                 @click="showAddForm = true"
-                class="border-border/60 bg-background/60 hover:border-primary/30 text-muted-foreground hover:text-foreground mb-5 flex w-full cursor-pointer items-center gap-2 rounded-xl border p-3 text-sm shadow-sm transition-all"
+                class="add-shell text-muted-foreground hover:text-ink hover:border-accent/40 mb-6 flex w-full cursor-pointer items-center gap-2 rounded-xl border border-dashed px-3.5 py-2.5 text-sm transition-colors"
               >
                 <svg
                   class="h-4 w-4"
@@ -128,33 +130,33 @@
                     d="M12 4v16m8-8H4"
                   />
                 </svg>
-                添加任务...
+                添加任务…
               </button>
 
-              <!-- Expanded add form -->
+              <!-- Expanded add form：和 section 行卡片同 surface 质感 -->
               <div
                 v-else
-                class="border-border bg-background mb-5 rounded-xl border p-4 shadow-sm"
+                class="add-shell mb-6 rounded-xl border border-border px-4 py-3.5"
               >
                 <input
                   ref="addTitleInput"
                   v-model="newTaskForm.title"
                   type="text"
-                  placeholder="任务标题..."
-                  class="placeholder:text-muted-foreground/50 text-foreground bg-muted focus:border-primary w-full rounded-lg border px-3 py-2 text-sm font-medium outline-none"
+                  placeholder="任务标题…"
+                  class="placeholder:text-muted-foreground/50 text-ink bg-muted focus:border-accent w-full rounded-lg border px-3 py-2 text-sm font-medium outline-none"
                   @keydown.enter="submitCreateTask"
                 />
                 <div class="mt-3 space-y-3">
                   <textarea
                     v-model="newTaskForm.description"
-                    placeholder="描述... (可选)"
+                    placeholder="描述… (可选)"
                     rows="3"
-                    class="border-border bg-muted focus:border-primary placeholder:text-muted-foreground/50 text-foreground w-full resize-none rounded-lg border p-2.5 text-sm outline-none"
+                    class="border-border bg-muted focus:border-accent placeholder:text-muted-foreground/50 text-ink w-full resize-none rounded-lg border p-2.5 text-sm outline-none"
                   ></textarea>
                   <div class="flex flex-wrap items-center gap-2">
                     <select
                       v-model="newTaskForm.type"
-                      class="border-border bg-muted text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
+                      class="border-border bg-muted text-ink cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
                     >
                       <option v-for="t in TASK_TYPES" :key="t" :value="t">
                         {{ t }}
@@ -162,7 +164,7 @@
                     </select>
                     <select
                       v-model="newTaskForm.priority"
-                      class="border-border bg-muted text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
+                      class="border-border bg-muted text-ink cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
                     >
                       <option v-for="p in PRIORITIES" :key="p" :value="p">
                         {{ p }}
@@ -173,19 +175,19 @@
                     <input
                       v-model="newTaskForm.due_date"
                       type="date"
-                      class="border-border bg-muted text-foreground cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
+                      class="border-border bg-muted text-ink cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
                     />
                     <div class="ml-auto flex gap-2">
                       <button
                         @click="cancelAdd"
-                        class="bg-muted text-foreground hover:bg-muted/80 cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
+                        class="bg-muted text-ink hover:bg-muted/80 cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
                       >
                         取消
                       </button>
                       <button
                         @click="submitCreateTask"
                         :disabled="!newTaskForm.title.trim()"
-                        class="bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer rounded-lg px-4 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                        class="bg-accent text-accent hover:bg-accent/90 cursor-pointer rounded-lg px-4 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         添加
                       </button>
@@ -194,26 +196,30 @@
                 </div>
               </div>
 
-              <!-- Status sections -->
-              <div v-for="section in sections" :key="section.key" class="mb-5">
-                <div class="mb-2 flex items-center gap-2 px-1">
-                  <span
-                    class="h-2.5 w-2.5 shrink-0 rounded-full"
-                    :class="section.dotClass"
-                  />
-                  <h4 class="text-foreground text-sm font-semibold">
-                    {{ section.title }}
-                  </h4>
-                  <span
-                    class="text-muted-foreground bg-muted rounded-full px-2 py-0.5 text-xs tabular-nums"
-                  >
-                    {{ section.tasks.length }}
+              <!-- Status sections：与 FrontierPanel / ReviewPanel 同款 lockup -->
+              <div v-for="section in sections" :key="section.key" class="mb-7">
+                <header class="mb-2.5 flex items-baseline justify-between">
+                  <div class="flex items-baseline gap-2">
+                    <h4
+                      class="text-ink font-serif text-base font-medium tracking-tight"
+                    >
+                      {{ section.title }}
+                    </h4>
+                    <span
+                      v-if="section.tasks.length"
+                      class="inline-block min-w-[1.25rem] rounded-full bg-muted-foreground/10 px-1.5 text-center text-[11px] font-medium text-muted-foreground tabular-nums"
+                    >
+                      {{ section.tasks.length }}
+                    </span>
+                  </div>
+                  <span class="text-muted-foreground text-xs">
+                    {{ sectionSubtitle(section.key) }}
                   </span>
-                </div>
+                </header>
 
                 <TransitionGroup
                   tag="div"
-                  class="space-y-2.5"
+                  class="space-y-2"
                   enter-active-class="transition-all duration-300 ease-out"
                   enter-from-class="opacity-0 translate-y-2"
                   enter-to-class="opacity-100 translate-y-0"
@@ -227,6 +233,7 @@
                     :key="task.id"
                     :task="task"
                     :done="section.key === 'done'"
+                    @open="(slug) => $emit('open-task', slug)"
                     @cycle-status="store.cycleStatus"
                     @delete-task="store.deleteTask"
                   />
@@ -257,14 +264,30 @@ import {
   useDevTaskSections,
   PRIORITIES,
 } from '@/features/todos';
-import type { DevTaskPriority, DevTaskType } from '@/features/todos';
+import type {
+  DevTaskPriority,
+  DevTaskSection,
+  DevTaskType,
+} from '@/features/todos';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref } from 'vue';
 import { useAuthStore } from '@/features/auth';
 
 const TASK_TYPES: DevTaskType[] = ['功能需求', '问题', '优化', '技术债'];
 
-const emit = defineEmits<{ requestLogin: [] }>();
+// 各 section 的右侧 italic 小字副标题 —— 与 FrontierPanel / ReviewPanel 同款 lockup。
+const SECTION_SUBTITLE: Record<DevTaskSection['key'], string> = {
+  'in-progress': '正在推进',
+  upcoming: '按优先级排序',
+  done: '最近关闭',
+};
+const sectionSubtitle = (key: DevTaskSection['key']) =>
+  SECTION_SUBTITLE[key] ?? '';
+
+const emit = defineEmits<{
+  requestLogin: [];
+  'open-task': [slug: string];
+}>();
 
 const authStore = useAuthStore();
 const isAuthenticated = computed(() => authStore.isAuthenticated);
@@ -330,3 +353,31 @@ onMounted(() => {
   }
 });
 </script>
+
+<style lang="scss" scoped>
+/* 抽屉面板：layered ambient + 顶部 inset 高光 = 「台灯下的纸」。
+   shadow 全部走 color-mix(in oklch, var(--ink) N%, transparent)，跟随主题自适应。 */
+.drawer-panel {
+  @apply bg-paper;
+  border: 1px solid color-mix(in oklch, var(--ink) 10%, transparent);
+  box-shadow:
+    0 1px 1px color-mix(in oklch, var(--ink) 6%, transparent),
+    0 6px 14px color-mix(in oklch, var(--ink) 10%, transparent),
+    0 18px 32px color-mix(in oklch, var(--ink) 8%, transparent),
+    inset 0 1px 0 0 oklch(from var(--paper) l c h / 0.6);
+}
+
+/* 新建任务折叠/展开：弱化为虚线 surface，不抢 section 主线的注意力。 */
+.add-shell {
+  background-color: color-mix(in oklch, var(--paper) 60%, transparent);
+  box-shadow: inset 0 1px 0 0 oklch(from var(--paper) l c h / 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* TransitionGroup 已用 transition-all；这里给 reduce-motion 用户直接落位 */
+  .drawer-panel,
+  .add-shell {
+    transition: none;
+  }
+}
+</style>

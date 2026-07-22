@@ -186,7 +186,7 @@ function FishingMapContent() {
       };
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="bg-paper min-h-screen">
         {/* Map — fixed full-screen background */}
         <FishingMapTile
           markers={markers}

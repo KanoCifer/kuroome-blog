@@ -9,13 +9,13 @@
     <template #actions>
       <button
         type="button"
-        class="border-border bg-background/60 hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors disabled:opacity-50"
+        class="border-border bg-paper/60 hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors disabled:opacity-50"
         :disabled="isSyncing"
         @click="$emit('sync')"
         aria-label="同步书架"
       >
         <CloudSync
-          class="text-foreground h-5 w-5"
+          class="text-ink h-5 w-5"
           :class="{ 'animate-breathe': isSyncing }"
         />
       </button>

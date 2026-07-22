@@ -47,7 +47,7 @@
 }
 
 /* Apple HIG Segmented Control 风格的容器 (harbor / date chip)。
-   bg-secondary 凹一层, 内部 item 选中态 bg-background + shadow-sm。 */
+   bg-secondary 凹一层, 内部 item 选中态 bg-paper + shadow-sm。 */
 .fm-segmented {
   background: color-mix(in oklch, var(--secondary) 70%, transparent);
   border-radius: var(--radius-lg); /* 0.625rem — DESIGN.md rounded.lg */

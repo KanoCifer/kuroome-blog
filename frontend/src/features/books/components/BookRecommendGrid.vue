@@ -142,7 +142,7 @@ function ratingScore(v: number): string {
       >
         <button
           type="button"
-          class="border-border/60 text-muted-foreground hover:border-primary/40 hover:text-foreground flex w-28 flex-shrink-0 snap-start flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed text-xs transition-colors disabled:opacity-50 sm:w-32 md:w-36"
+          class="border-border/60 text-muted-foreground hover:border-accent/40 hover:text-ink flex w-28 flex-shrink-0 snap-start flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed text-xs transition-colors disabled:opacity-50 sm:w-32 md:w-36"
           :disabled="loading"
           @click="emit('loadMore')"
           aria-label="加载更多推荐"

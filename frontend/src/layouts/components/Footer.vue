@@ -26,7 +26,7 @@
           href="https://github.com/KanoCifer/Flask-Example"
           target="_blank"
           rel="noopener"
-          class="hover:text-foreground inline-flex items-center gap-1.5 transition-colors"
+          class="hover:text-ink inline-flex items-center gap-1.5 transition-colors"
         >
           <img
             src="https://github.githubassets.com/favicons/favicon.svg"
@@ -40,13 +40,13 @@
           href="https://beian.miit.gov.cn/"
           target="_blank"
           rel="noopener"
-          class="hover:text-foreground font-mono transition-colors"
+          class="hover:text-ink font-mono transition-colors"
           >粤ICP备2026018113号</a
         >
         <span aria-hidden="true" class="text-border/50">·</span>
         <router-link
           to="/privacy"
-          class="hover:text-foreground transition-colors"
+          class="hover:text-ink transition-colors"
         >
           <span class="font-mono tracking-[0.1em]">隐私政策</span>
         </router-link>

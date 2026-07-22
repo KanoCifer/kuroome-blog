@@ -149,12 +149,11 @@ footer {
 
 @theme inline {
   /* Core */
-  --color-background: var(--paper);
-  --color-foreground: var(--ink);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
 
-  /* Primary */
-  --color-primary: var(--accent);
-  --color-primary-foreground: var(--accent-contrast);
+  /* Accent (was: --color-primary) */
+  --color-accent: var(--accent);
 
   /* Secondary / Muted */
   --color-secondary: var(--secondary);
@@ -196,7 +195,7 @@ footer {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-paper text-ink;
     font-family: var(--font-body);
   }
   /* 修复 iOS Safari 表单聚焦时自动放大 */
@@ -295,8 +294,8 @@ footer {
 .summary-card:hover {
   transform: translateY(-1px);
   box-shadow:
-    0 4px 16px -2px oklch(from var(--color-primary) l c h / 0.08),
-    0 1px 4px oklch(from var(--color-primary) l c h / 0.04);
+    0 4px 16px -2px oklch(from var(--color-accent) l c h / 0.08),
+    0 1px 4px oklch(from var(--color-accent) l c h / 0.04);
 }
 
 .summary-card.is-loading {
@@ -306,11 +305,11 @@ footer {
 @keyframes card-breathe {
   0%,
   100% {
-    border-color: oklch(from var(--color-primary) l c h / 0.15);
+    border-color: oklch(from var(--color-accent) l c h / 0.15);
   }
   50% {
-    border-color: oklch(from var(--color-primary) l c h / 0.35);
-    box-shadow: 0 4px 20px oklch(from var(--color-primary) l c h / 0.08);
+    border-color: oklch(from var(--color-accent) l c h / 0.35);
+    box-shadow: 0 4px 20px oklch(from var(--color-accent) l c h / 0.08);
   }
 }
 

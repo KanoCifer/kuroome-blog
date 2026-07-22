@@ -60,7 +60,7 @@ export default function BasicDetail({
         className="relative -z-5 mx-0 mt-60 flex flex-col items-center justify-center bg-transparent max-sm:mt-30"
       >
         <div>
-          <h1 className="text-foreground max-w-6xl text-center font-serif text-7xl max-sm:text-3xl">
+          <h1 className="text-ink max-w-6xl text-center font-serif text-7xl max-sm:text-3xl">
             {title}
           </h1>
           {/* <!-- Info --> */}
@@ -84,7 +84,7 @@ export default function BasicDetail({
         <div className="mt-12 text-center">
           <button
             onClick={() => navigate(-1)}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 mb-30 inline-flex cursor-pointer items-center gap-2 rounded-full px-6 py-3 font-medium transition-all duration-300 hover:shadow-lg"
+            className="bg-accent text-accent hover:bg-accent/90 mb-30 inline-flex cursor-pointer items-center gap-2 rounded-full px-6 py-3 font-medium transition-all duration-300 hover:shadow-lg"
           >
             <BackButton />
             返回上一页

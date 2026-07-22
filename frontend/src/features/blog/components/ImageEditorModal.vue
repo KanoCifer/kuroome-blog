@@ -34,11 +34,11 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
         @click.self="emit('close')"
       >
-        <div class="bg-background w-full max-w-md rounded-3xl shadow-2xl">
+        <div class="bg-paper w-full max-w-md rounded-3xl shadow-2xl">
           <div
             class="border-border flex items-center justify-between border-b px-6 py-4"
           >
-            <h3 class="text-foreground text-base font-semibold">编辑图片</h3>
+            <h3 class="text-ink text-base font-semibold">编辑图片</h3>
             <button
               type="button"
               class="text-muted-foreground hover:bg-muted bg-muted rounded-full px-3 py-1 text-xs font-semibold transition"
@@ -65,7 +65,7 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
                 :value="alt"
                 type="text"
                 placeholder="图片说明 (Alt)"
-                class="text-foreground placeholder:text-muted-foreground focus:border-ring border-border bg-background w-full rounded-xl border px-3 py-2 text-sm outline-none"
+                class="text-ink placeholder:text-muted-foreground focus:border-ring border-border bg-paper w-full rounded-xl border px-3 py-2 text-sm outline-none"
                 @input="
                   emit('update:alt', ($event.target as HTMLInputElement).value)
                 "
@@ -77,7 +77,7 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
                   type="number"
                   min="0"
                   placeholder="宽度"
-                  class="text-foreground placeholder:text-muted-foreground focus:border-ring border-border bg-background w-full rounded-xl border px-3 py-2 text-sm outline-none"
+                  class="text-ink placeholder:text-muted-foreground focus:border-ring border-border bg-paper w-full rounded-xl border px-3 py-2 text-sm outline-none"
                   @input="
                     emit(
                       'update:width',
@@ -90,7 +90,7 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
                   type="number"
                   min="0"
                   placeholder="高度"
-                  class="text-foreground placeholder:text-muted-foreground focus:border-ring border-border bg-background w-full rounded-xl border px-3 py-2 text-sm outline-none"
+                  class="text-ink placeholder:text-muted-foreground focus:border-ring border-border bg-paper w-full rounded-xl border px-3 py-2 text-sm outline-none"
                   @input="
                     emit(
                       'update:height',
@@ -123,7 +123,7 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
             </div>
             <button
               type="button"
-              class="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-4 py-2 text-xs font-semibold transition"
+              class="bg-accent text-accent hover:bg-accent/90 rounded-xl px-4 py-2 text-xs font-semibold transition"
               @click="emit('close')"
             >
               完成

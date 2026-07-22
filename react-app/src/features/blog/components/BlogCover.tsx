@@ -80,28 +80,28 @@ export function BlogCover({
             aria-hidden="true"
           />
           {/* 顶部条：分类 + 章节标 */}
-          <div className="text-primary-foreground/95 absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3 sm:p-3.5">
+          <div className="text-accent/95 absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3 sm:p-3.5">
             {categoryName && (
-              <span className="bg-primary/85 inline-flex max-w-[60%] items-center rounded-full px-2 py-0.5 font-serif text-[10px] tracking-wide shadow-sm">
+              <span className="bg-accent/85 inline-flex max-w-[60%] items-center rounded-full px-2 py-0.5 font-serif text-[10px] tracking-wide shadow-sm">
                 <span className="mr-0.5">#</span>
                 <span className="truncate">{categoryName}</span>
               </span>
             )}
-            <span className="text-primary-foreground/75 ml-auto font-mono text-[10px] tracking-[0.2em] uppercase">
+            <span className="text-accent/75 ml-auto font-mono text-[10px] tracking-[0.2em] uppercase">
               {chapterLabel}
             </span>
           </div>
           {/* 底部：标题（衬线）+ 装饰小线 + 副标斜体 */}
           <div className="absolute inset-x-0 bottom-0 flex flex-col gap-1.5 p-3 sm:p-4">
             <div className="flex items-center gap-1.5">
-              <div className="bg-primary-foreground/70 h-px w-5" />
-              <span className="text-primary-foreground/80 font-serif text-[10px] tracking-[0.2em] italic">
+              <div className="bg-accent/70 h-px w-5" />
+              <span className="text-accent/80 font-serif text-[10px] tracking-[0.2em] italic">
                 cover
               </span>
             </div>
             {title && (
               <h3
-                className={`text-primary-foreground font-serif leading-tight font-semibold drop-shadow-sm ${titleClass}`}
+                className={`text-accent font-serif leading-tight font-semibold drop-shadow-sm ${titleClass}`}
                 style={{ textWrap: 'balance' }}
               >
                 {title}

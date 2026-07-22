@@ -433,7 +433,7 @@ const chartOption = computed(() => {
   font-weight: 600;
   letter-spacing: -0.01em;
   line-height: 1.2;
-  color: var(--color-foreground);
+  color: var(--color-ink);
 }
 .hourly-h3__main {
   /* 中文主标 —— system sans */
@@ -469,7 +469,7 @@ const chartOption = computed(() => {
   align-items: center;
   gap: 6px;
   font-size: 11px;
-  color: var(--color-foreground);
+  color: var(--color-ink);
   letter-spacing: 0.04em;
 }
 .legend-dot {
@@ -479,7 +479,7 @@ const chartOption = computed(() => {
   border-radius: 1px;
 }
 .legend-dot--rain {
-  background: var(--color-primary);
+  background: var(--color-accent);
 }
 .legend-dot--temp {
   background: var(--color-warning);
@@ -546,7 +546,7 @@ const chartOption = computed(() => {
   font-weight: 600;
   letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
-  color: var(--color-foreground);
+  color: var(--color-ink);
 }
 .metric-num {
   font-size: 22px;
@@ -554,7 +554,7 @@ const chartOption = computed(() => {
   letter-spacing: -0.015em;
   font-variant-numeric: tabular-nums;
   line-height: 1.05;
-  color: var(--color-foreground);
+  color: var(--color-ink);
 }
 .metric-num--temp {
   color: var(--color-warning);
@@ -604,7 +604,7 @@ const chartOption = computed(() => {
   width: 24px;
   height: 24px;
   border: 1.5px solid color-mix(in oklch, var(--color-border) 70%, transparent);
-  border-top-color: var(--color-primary);
+  border-top-color: var(--color-accent);
   border-radius: 50%;
   animation: hourly-spin 0.9s linear infinite;
 }

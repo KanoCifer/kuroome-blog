@@ -5,14 +5,14 @@
   >
     <!-- 背景水波纹效果 -->
     <div
-      class="from-primary/70 via-secondary to-secondary absolute inset-0 bg-linear-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+      class="from-accent/70 via-secondary to-secondary absolute inset-0 bg-linear-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-100"
     />
     <div class="relative flex flex-col items-center justify-center text-center">
       <!-- Avatar with Glow + Active Badge -->
       <div class="group relative mb-4">
         <!-- 青/蓝色渐变 -->
         <div
-          class="from-primary to-secondary absolute -inset-1 rounded-full bg-linear-to-br opacity-50 blur"
+          class="from-accent to-secondary absolute -inset-1 rounded-full bg-linear-to-br opacity-50 blur"
         ></div>
         <img
           src="/images/about-thumb.webp"
@@ -40,10 +40,10 @@
       </div>
 
       <!-- Name -->
-      <h2 class="text-foreground font-family-averia mb-2 text-2xl">
-        I'm <span class="text-primary text-3xl font-bold">Kuroome</span>.
+      <h2 class="text-ink font-family-averia mb-2 text-2xl">
+        I'm <span class="text-accent text-3xl font-bold">Kuroome</span>.
       </h2>
-      <p class="font-family-averia text-foreground mb-2 text-2xl">
+      <p class="font-family-averia text-ink mb-2 text-2xl">
         Welcome to my site!
       </p>
     </div>

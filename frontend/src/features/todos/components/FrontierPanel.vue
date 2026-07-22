@@ -5,13 +5,13 @@
       <div class="mb-4">
         <div class="flex items-center gap-2.5">
           <h2
-            class="text-foreground font-serif text-xl font-medium tracking-tight"
+            class="text-ink font-serif text-xl font-medium tracking-tight"
           >
             现在能做什么
           </h2>
           <span
             v-if="frontierTasks.length"
-            class="inline-block min-w-[1.25rem] rounded-full bg-primary/15 px-1.5 text-center text-[11px] font-medium text-foreground tabular-nums"
+            class="inline-block min-w-[1.25rem] rounded-full bg-accent/15 px-1.5 text-center text-[11px] font-medium text-ink tabular-nums"
           >
             {{ frontierTasks.length }}
           </span>
@@ -78,7 +78,7 @@
         <div class="mb-3 flex items-baseline justify-between">
           <div class="flex items-center gap-2">
             <h3
-              class="text-foreground font-serif text-base font-medium tracking-tight"
+              class="text-ink font-serif text-base font-medium tracking-tight"
             >
               进行中
             </h3>
@@ -118,7 +118,7 @@
         <div class="mb-3 flex items-baseline justify-between">
           <div class="flex items-center gap-2">
             <h3
-              class="text-foreground font-serif text-base font-medium tracking-tight"
+              class="text-ink font-serif text-base font-medium tracking-tight"
             >
               本周已完成
             </h3>

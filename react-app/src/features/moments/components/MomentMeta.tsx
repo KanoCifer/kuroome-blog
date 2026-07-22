@@ -18,14 +18,14 @@ export function MomentMeta({ moment, volumeLabel }: MomentMetaProps) {
   return (
     <div className="text-muted-foreground flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] tracking-wide">
       {volumeLabel && (
-        <span className="text-foreground/60 font-serif">{volumeLabel}</span>
+        <span className="text-ink/60 font-serif">{volumeLabel}</span>
       )}
 
       {mood && (
         <span className="inline-flex items-center gap-1">
           <span aria-hidden="true">{moodIsEmoji ? mood : '·'}</span>
           {!moodIsEmoji && (
-            <span className="text-foreground/70 italic">{mood}</span>
+            <span className="text-ink/70 italic">{mood}</span>
           )}
         </span>
       )}

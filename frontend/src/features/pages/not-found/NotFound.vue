@@ -3,15 +3,15 @@
     class="flex flex-col items-center justify-center px-4 py-12 sm:px-6 lg:px-8"
   >
     <div
-      class="bg-background/70 mx-auto max-w-md rounded-4xl p-8 text-center backdrop-blur-sm"
+      class="bg-paper/70 mx-auto max-w-md rounded-4xl p-8 text-center backdrop-blur-sm"
     >
       <!-- 404 数字动画 -->
       <div class="relative mx-auto h-32 w-32">
         <div
-          class="bg-primary/15 absolute inset-0 animate-pulse rounded-full"
+          class="bg-accent/15 absolute inset-0 animate-pulse rounded-full"
         ></div>
         <div class="relative flex h-full items-center justify-center">
-          <span class="text-foreground text-6xl font-extrabold tracking-tight"
+          <span class="text-ink text-6xl font-extrabold tracking-tight"
             >404</span
           >
         </div>
@@ -19,7 +19,7 @@
 
       <!-- 标题 -->
       <h1
-        class="text-foreground mt-8 font-serif text-3xl font-bold sm:text-4xl"
+        class="text-ink mt-8 font-serif text-3xl font-bold sm:text-4xl"
       >
         页面未找到
       </h1>
@@ -40,7 +40,7 @@
       <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
         <RouterLink
           to="/"
-          class="bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-ring inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium transition-all hover:shadow-lg focus:ring-2 focus:ring-offset-2 focus:outline-none"
+          class="bg-accent text-accent hover:bg-accent/90 focus:ring-ring inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium transition-all hover:shadow-lg focus:ring-2 focus:ring-offset-2 focus:outline-none"
         >
           <svg
             class="mr-2 h-5 w-5"
@@ -60,7 +60,7 @@
 
         <button
           type="button"
-          class="bg-background text-foreground ring-border hover:bg-muted focus:ring-ring inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium ring-1 transition-all ring-inset focus:ring-2 focus:outline-none"
+          class="bg-paper text-ink ring-border hover:bg-muted focus:ring-ring inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium ring-1 transition-all ring-inset focus:ring-2 focus:outline-none"
           @click="goBack"
         >
           <svg

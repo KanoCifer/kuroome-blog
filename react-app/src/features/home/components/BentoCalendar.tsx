@@ -25,7 +25,7 @@ export function BentoCalendar() {
       <BentoCard className="flex flex-col">
         {/* 标题行 */}
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-foreground text-lg font-semibold">
+          <h3 className="text-ink text-lg font-semibold">
             {monthLabel}
           </h3>
           <div className="flex items-center gap-2">
@@ -77,8 +77,8 @@ export function BentoCalendar() {
                 key={idx}
                 className={`mx-auto flex aspect-square w-full max-w-8 items-center justify-center rounded-full text-sm transition-colors ${
                   isToday
-                    ? 'bg-primary text-primary-foreground font-bold'
-                    : 'text-card-foreground hover:bg-primary/10'
+                    ? 'bg-accent text-accent font-bold'
+                    : 'text-card-foreground hover:bg-accent/10'
                 }`}
               >
                 {day.date()}
@@ -138,8 +138,8 @@ export function BentoCalendar() {
                     transition={SPRING.reveal}
                     className={`mx-auto flex aspect-square w-full max-w-8 items-center justify-center rounded-full text-sm ${
                       isToday
-                        ? 'bg-primary text-primary-foreground font-bold'
-                        : 'text-foreground'
+                        ? 'bg-accent text-accent font-bold'
+                        : 'text-ink'
                     }`}
                   >
                     {dayNum}

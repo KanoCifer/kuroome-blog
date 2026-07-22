@@ -45,12 +45,12 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
 
   return (
     <section
-      className={`summary-card border-border/60 bg-background/60 dark:bg-background/50 mx-4 mb-6 overflow-hidden rounded-2xl border shadow-sm transition-all${loading ? 'is-loading' : ''}`}
+      className={`summary-card border-border/60 bg-paper/60 dark:bg-paper/50 mx-4 mb-6 overflow-hidden rounded-2xl border shadow-sm transition-all${loading ? 'is-loading' : ''}`}
     >
       {/* Header */}
       <div className="flex items-center justify-between gap-3 px-5 pt-4 pb-3">
         <div className="flex items-center gap-2.5">
-          <div className="bg-primary/10 dark:bg-primary/15 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+          <div className="bg-accent/10 dark:bg-accent/15 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width={17}
@@ -61,7 +61,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
               strokeWidth={2}
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="text-primary"
+              className="text-accent"
             >
               <path d="M12 8V4H8" />
               <rect width={16} height={12} x={4} y={8} rx={2} />
@@ -71,7 +71,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
               <path d="M9 13v2" />
             </svg>
           </div>
-          <h3 className="text-foreground text-base font-semibold tracking-tight">
+          <h3 className="text-ink text-base font-semibold tracking-tight">
             AI 总结
             {shimmerActive && (
               <motion.span
@@ -90,7 +90,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
 
         <div className="flex items-center gap-2">
           <select
-            className="bg-muted/50 text-foreground border-border/60 cursor-pointer rounded-lg border px-2 py-1 text-xs transition-colors outline-none"
+            className="bg-muted/50 text-ink border-border/60 cursor-pointer rounded-lg border px-2 py-1 text-xs transition-colors outline-none"
             value={selectedModel}
             onChange={(e) => setSelectedModel(e.target.value)}
           >
@@ -101,7 +101,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
             ))}
           </select>
           <button
-            className="bg-primary text-primary-foreground disabled:bg-muted cursor-pointer rounded-full px-2.5 py-1.5 text-xs transition-colors disabled:cursor-not-allowed"
+            className="bg-accent text-accent disabled:bg-muted cursor-pointer rounded-full px-2.5 py-1.5 text-xs transition-colors disabled:cursor-not-allowed"
             disabled={!content.trim() || loading}
             onClick={() => generateSummary({ title, content })}
           >

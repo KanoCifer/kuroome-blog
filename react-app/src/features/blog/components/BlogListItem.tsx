@@ -46,14 +46,14 @@ export function BlogListItem({ post, index }: BlogListItemProps) {
       >
         <article
           className={[
-            'border-border/40 bg-background group-hover:border-primary/30 relative overflow-hidden rounded-2xl border p-5 shadow-sm transition-all duration-500 ease-out',
+            'border-border/40 bg-paper group-hover:border-accent/30 relative overflow-hidden rounded-2xl border p-5 shadow-sm transition-all duration-500 ease-out',
             'group-hover:-translate-y-0.5',
             isFeatured ? 'sm:p-7' : '',
           ].join(' ')}
         >
           {/* Left book-spine accent — scales up on hover */}
           <div
-            className="bg-primary absolute top-0 left-0 h-full w-[3px] origin-top scale-y-0 transition-transform duration-500 ease-out group-hover:scale-y-100"
+            className="bg-accent absolute top-0 left-0 h-full w-[3px] origin-top scale-y-0 transition-transform duration-500 ease-out group-hover:scale-y-100"
             aria-hidden="true"
           />
 
@@ -84,7 +84,7 @@ export function BlogListItem({ post, index }: BlogListItemProps) {
               {/* 顶部元数据：置顶 / 分类 / 日期 */}
               <div className="text-muted-foreground mb-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px]">
                 {post.is_pinned && (
-                  <span className="bg-primary/15 text-primary inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold">
+                  <span className="bg-accent/15 text-accent inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-3 w-3"
@@ -98,8 +98,8 @@ export function BlogListItem({ post, index }: BlogListItemProps) {
                   </span>
                 )}
                 {post.tags?.length && (
-                  <span className="text-foreground/70 inline-flex items-center gap-1 font-medium">
-                    <span className="text-primary/70 font-serif">#</span>
+                  <span className="text-ink/70 inline-flex items-center gap-1 font-medium">
+                    <span className="text-accent/70 font-serif">#</span>
                     {post.tags[0]}
                   </span>
                 )}
@@ -114,7 +114,7 @@ export function BlogListItem({ post, index }: BlogListItemProps) {
               {/* 标题：衬线大字 */}
               <h2
                 className={[
-                  'text-foreground group-hover:text-primary font-serif leading-snug font-semibold transition-colors duration-300 ease-out',
+                  'text-ink group-hover:text-accent font-serif leading-snug font-semibold transition-colors duration-300 ease-out',
                   isFeatured ? 'text-2xl sm:text-3xl' : 'text-lg sm:text-xl',
                 ].join(' ')}
                 style={{ textWrap: 'balance' }}
@@ -125,15 +125,15 @@ export function BlogListItem({ post, index }: BlogListItemProps) {
               {/* 装饰小线：featured 走「— 篇 —」章回标，普通细线 */}
               {isFeatured ? (
                 <div className="mt-3 flex items-center gap-2">
-                  <div className="bg-primary/40 h-px w-8" />
+                  <div className="bg-accent/40 h-px w-8" />
                   <span className="text-muted-foreground font-serif text-[11px] tracking-[0.2em] italic">
                     篇
                   </span>
-                  <div className="bg-primary/40 h-px w-8" />
+                  <div className="bg-accent/40 h-px w-8" />
                 </div>
               ) : (
                 <div
-                  className="bg-border group-hover:bg-primary/30 my-2.5 h-px w-10 transition-all duration-500 ease-out group-hover:w-16"
+                  className="bg-border group-hover:bg-accent/30 my-2.5 h-px w-10 transition-all duration-500 ease-out group-hover:w-16"
                   aria-hidden="true"
                 />
               )}
@@ -142,7 +142,7 @@ export function BlogListItem({ post, index }: BlogListItemProps) {
               {post.summary ? (
                 <p
                   className={[
-                    'text-foreground/75 leading-relaxed',
+                    'text-ink/75 leading-relaxed',
                     isFeatured
                       ? 'mt-1 line-clamp-3 text-sm sm:line-clamp-4 sm:text-[15px]'
                       : 'line-clamp-2 text-sm',
@@ -153,7 +153,7 @@ export function BlogListItem({ post, index }: BlogListItemProps) {
               ) : (
                 <p
                   className={[
-                    'text-foreground/35 italic',
+                    'text-ink/35 italic',
                     isFeatured ? 'mt-1 text-sm' : 'text-xs',
                   ].join(' ')}
                 >
@@ -162,7 +162,7 @@ export function BlogListItem({ post, index }: BlogListItemProps) {
               )}
 
               {/* Footer meta: 阅读时长 / 字数 / 浏览量 */}
-              <footer className="text-foreground/55 mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-4 text-xs">
+              <footer className="text-ink/55 mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-4 text-xs">
                 <span className="inline-flex items-center gap-1">
                   <Clock className="h-3.5 w-3.5" />
                   <span>{readingTimeMinutes} 分钟</span>

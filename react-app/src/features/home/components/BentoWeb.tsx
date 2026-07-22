@@ -183,7 +183,7 @@ export function BentoWeb() {
                     </svg>
                   )}
                 </div>
-                <h3 className="text-foreground ml-2 text-lg leading-tight font-bold transition-colors duration-300">
+                <h3 className="text-ink ml-2 text-lg leading-tight font-bold transition-colors duration-300">
                   {currentSite.name}
                 </h3>
               </div>
@@ -205,7 +205,7 @@ export function BentoWeb() {
                   width: i === index % 5 ? 20 : 6,
                   backgroundColor:
                     i === index % 5
-                      ? 'var(--color-primary)'
+                      ? 'var(--color-accent)'
                       : 'var(--color-muted-foreground)',
                 }}
                 transition={SPRING.snappy}

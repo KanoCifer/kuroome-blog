@@ -92,12 +92,13 @@
 
 @theme inline {
   /* Core */
-  --color-background: var(--paper);
-  --color-foreground: var(--ink);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-card: var(--surface);
+  --color-surface: var(--surface);
 
-  /* Primary */
-  --color-primary: var(--accent);
-  --color-primary-foreground: var(--accent-contrast);
+  /* Accent (was: --color-primary) */
+  --color-accent: var(--accent);
 
   /* Secondary / Muted */
   --color-secondary: var(--secondary);
@@ -117,12 +118,9 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
 
-  --color-surface: var(--surface);
-  --color-card: var(--paper);
   --color-destructive: var(--color-rose-500);
   --color-success: var(--color-emerald-500);
   --color-warning: var(--color-amber-500);
-  --color-brand-devices: var(--accent);
   --color-gradient-primary-from: var(--gradient-primary-from);
   --color-gradient-primary-to: var(--gradient-primary-to);
   --color-gradient-decorative-from: var(--gradient-decorative-from);

@@ -12,13 +12,13 @@ import type { DevTaskType } from '@/features/todos/api';
 
 const props = defineProps<{ type: DevTaskType }>();
 
+// 类型色路由到 chart token，与 ReviewPanel 的类型分布条保持同一映射。
+// chart 系列在所有 4 个主题下都定义过 light/dark，无需硬编码。
 const TYPE_CLASS: Record<DevTaskType, string> = {
-  问题: 'border-rose-200 bg-rose-50/60 text-rose-700 dark:border-rose-800/60 dark:bg-rose-950/30 dark:text-rose-400',
-  功能需求:
-    'border-blue-200 bg-blue-50/60 text-blue-700 dark:border-blue-800/60 dark:bg-blue-950/30 dark:text-blue-400',
-  优化: 'border-amber-200 bg-amber-50/60 text-amber-700 dark:border-amber-800/60 dark:bg-amber-950/30 dark:text-amber-400',
-  技术债:
-    'border-purple-200 bg-purple-50/60 text-purple-700 dark:border-purple-800/60 dark:bg-purple-950/30 dark:text-purple-400',
+  功能需求: 'border-chart-1/40 bg-chart-1/10 text-chart-1',
+  问题: 'border-chart-4/40 bg-chart-4/10 text-chart-4',
+  优化: 'border-chart-5/40 bg-chart-5/10 text-chart-5',
+  技术债: 'border-chart-2/40 bg-chart-2/10 text-chart-2',
 };
 
 const cls = TYPE_CLASS[props.type] ?? 'border-border text-muted-foreground';

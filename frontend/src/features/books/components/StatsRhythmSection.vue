@@ -39,7 +39,7 @@ const visible = computed(() => hasData.value);
 <template>
   <section v-if="visible" class="mb-14 space-y-10">
     <h2
-      class="text-foreground font-serif text-2xl font-semibold tracking-tight sm:text-3xl"
+      class="text-ink font-serif text-2xl font-semibold tracking-tight sm:text-3xl"
     >
       你的阅读节奏
     </h2>
@@ -71,7 +71,7 @@ const visible = computed(() => hasData.value);
       </p>
       <div class="bg-muted flex h-2 overflow-hidden rounded-full">
         <div
-          class="bg-primary h-full transition-all duration-700"
+          class="bg-accent h-full transition-all duration-700"
           :style="{ width: `${readPercent}%` }"
         />
         <div
@@ -83,16 +83,16 @@ const visible = computed(() => hasData.value);
         class="text-muted-foreground mt-3 flex flex-wrap gap-x-6 gap-y-1 text-xs sm:text-sm"
       >
         <span class="flex items-center gap-2">
-          <span class="bg-primary inline-block h-2 w-2 rounded-full" />
+          <span class="bg-accent inline-block h-2 w-2 rounded-full" />
           文字阅读
-          <span class="text-foreground tabular-nums">
+          <span class="text-ink tabular-nums">
             {{ formatRead(snapshot.wrReadTime) }} · {{ readPercent }}%
           </span>
         </span>
         <span class="flex items-center gap-2">
           <span class="bg-success inline-block h-2 w-2 rounded-full" />
           听书
-          <span class="text-foreground tabular-nums">
+          <span class="text-ink tabular-nums">
             {{ formatListen(snapshot.wrListenTime) }} · {{ listenPercent }}%
           </span>
         </span>

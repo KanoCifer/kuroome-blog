@@ -13,7 +13,7 @@ interface FishingIndexCardProps {
 
 const LEVEL_COLORS: Record<string, string> = {
   爆护: 'text-success',
-  好: 'text-primary',
+  好: 'text-accent',
   一般: 'text-warning',
   差: 'text-destructive',
   空军: 'text-muted-foreground',
@@ -53,7 +53,7 @@ export function FishingIndexCard({
     <article className="px-1 pt-2 pb-6" aria-label="钓鱼指数">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="text-foreground text-sm font-semibold">钓鱼指数</h3>
+          <h3 className="text-ink text-sm font-semibold">钓鱼指数</h3>
           <p className="text-muted-foreground mt-0.5 text-xs">
             基于实时天气、潮汐综合计算
           </p>
@@ -62,7 +62,7 @@ export function FishingIndexCard({
           onClick={() => void refetch()}
           aria-label="刷新钓鱼指数"
           disabled={loading}
-          className="text-muted-foreground hover:text-foreground hover:bg-muted inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+          className="text-muted-foreground hover:text-ink hover:bg-muted inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60"
         >
           <RotateCw
             className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`}
@@ -113,7 +113,7 @@ export function FishingIndexCard({
           <div className="flex gap-2 px-0.5">
             <button
               onClick={handleFeedback}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 min-h-11 flex-1 rounded-full px-3 text-sm font-medium transition-colors"
+              className="bg-accent text-accent hover:bg-accent/90 min-h-11 flex-1 rounded-full px-3 text-sm font-medium transition-colors"
             >
               反馈今日指数
             </button>
@@ -121,7 +121,7 @@ export function FishingIndexCard({
               Object.keys(indexData.feature_breakdown).length > 0 && (
                 <button
                   onClick={handleDetail}
-                  className="bg-muted text-foreground hover:bg-muted/70 min-h-11 rounded-full px-5 text-sm font-medium transition-colors"
+                  className="bg-muted text-ink hover:bg-muted/70 min-h-11 rounded-full px-5 text-sm font-medium transition-colors"
                 >
                   详情
                 </button>
@@ -152,7 +152,7 @@ function DataRow({ label, value, emphasis = false }: DataRowProps) {
       <span
         className={`tabular-nums ${
           emphasis ? 'text-base font-semibold' : 'text-sm font-semibold'
-        } text-foreground`}
+        } text-ink`}
       >
         {value}
       </span>

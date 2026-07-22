@@ -1,19 +1,19 @@
 <template>
   <article
-    class="group squircle border-border/10 bg-background overflow-hidden p-6 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+    class="group squircle border-border/10 bg-paper overflow-hidden p-6 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
   >
     <div class="mb-6 flex items-start justify-between">
       <div class="flex items-center gap-4">
         <!-- Logo placeholder -->
         <div
-          class="border-border/50 bg-background flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border shadow-inner"
+          class="border-border/50 bg-paper flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border shadow-inner"
         >
           <span class="text-muted-foreground text-2xl font-bold">
             {{ device.name.charAt(0).toUpperCase() }}
           </span>
         </div>
         <div>
-          <h3 class="text-foreground text-lg font-bold">
+          <h3 class="text-ink text-lg font-bold">
             {{ device.name }}
           </h3>
           <p
@@ -80,14 +80,14 @@
         type="button"
         :disabled="isPending"
         @click="handleToggleStatus"
-        class="bg-brand-devices text-primary-foreground rounded-full px-4 py-3 text-sm font-bold shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+        class="bg-brand-devices text-accent rounded-full px-4 py-3 text-sm font-bold shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {{ isPending ? '处理中...' : isActive ? '标记退役' : '恢复使用' }}
       </button>
       <button
         type="button"
         @click="isMilestoneModalOpen = true"
-        class="bg-brand-devices text-primary-foreground rounded-full px-4 py-3 text-sm font-bold shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+        class="bg-brand-devices text-accent rounded-full px-4 py-3 text-sm font-bold shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
       >
         编辑配置
       </button>

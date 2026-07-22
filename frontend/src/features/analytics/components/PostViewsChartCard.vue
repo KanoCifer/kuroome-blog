@@ -1,9 +1,9 @@
 <template>
   <div
-    class="border-border/60 bg-background h-full rounded-3xl border p-6 shadow-sm"
+    class="border-border/60 bg-paper h-full rounded-3xl border p-6 shadow-sm"
   >
     <h2
-      class="text-foreground mb-2 flex items-center gap-2 text-sm font-medium"
+      class="text-ink mb-2 flex items-center gap-2 text-sm font-medium"
     >
       <icon-document-text class="size-5" /> 文章阅读量
     </h2>
@@ -20,7 +20,7 @@
       class="flex min-h-[14rem] flex-col items-center justify-center gap-2 px-6 text-center"
     >
       <icon-document-text class="text-muted-foreground/50 size-8" />
-      <p class="text-foreground text-sm font-medium">暂无文章阅读数据</p>
+      <p class="text-ink text-sm font-medium">暂无文章阅读数据</p>
       <p class="text-muted-foreground max-w-xs text-xs">
         文章发布并获得浏览量后，热门文章将显示在这里。
       </p>

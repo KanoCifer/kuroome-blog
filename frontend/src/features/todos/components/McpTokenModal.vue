@@ -6,7 +6,7 @@
         class="border-border flex items-start justify-between gap-3 border-b px-6 pt-5 pb-4"
       >
         <div>
-          <h2 class="text-foreground text-lg font-semibold">
+          <h2 class="text-ink text-lg font-semibold">
             签发 MCP 服务 Token
           </h2>
           <p class="text-muted-foreground mt-0.5 text-xs">
@@ -14,7 +14,7 @@
           </p>
         </div>
         <button
-          class="text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer rounded-md p-1.5 transition-colors"
+          class="text-muted-foreground hover:bg-muted hover:text-ink cursor-pointer rounded-md p-1.5 transition-colors"
           aria-label="关闭"
           @click="emit('close')"
         >
@@ -49,8 +49,8 @@
               class="cursor-pointer rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
               :class="
                 days === opt.days
-                  ? 'border-primary/40 bg-primary/10 text-primary'
-                  : 'border-border text-muted-foreground hover:text-foreground'
+                  ? 'border-accent/40 bg-accent/10 text-accent'
+                  : 'border-border text-muted-foreground hover:text-ink'
               "
               @click="days = opt.days"
             >
@@ -62,7 +62,7 @@
         <!-- 生成按钮 -->
         <button
           type="button"
-          class="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+          class="bg-accent text-accent hover:bg-accent/90 focus-visible:ring-ring inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
           :disabled="loading"
           @click="handleGenerate"
         >
@@ -118,14 +118,14 @@
 
           <div class="relative">
             <textarea
-              class="bg-muted border-border text-foreground block w-full resize-none rounded-lg border px-3 py-2 pr-10 font-mono text-[11px] leading-relaxed outline-none"
+              class="bg-muted border-border text-ink block w-full resize-none rounded-lg border px-3 py-2 pr-10 font-mono text-[11px] leading-relaxed outline-none"
               rows="4"
               readonly
               :value="result.token"
             />
             <button
               type="button"
-              class="text-muted-foreground hover:bg-muted hover:text-foreground absolute top-2 right-2 cursor-pointer rounded-md p-1.5 transition-colors"
+              class="text-muted-foreground hover:bg-muted hover:text-ink absolute top-2 right-2 cursor-pointer rounded-md p-1.5 transition-colors"
               :title="copied ? '已复制' : '复制'"
               @click="handleCopy"
             >

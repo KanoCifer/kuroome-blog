@@ -12,8 +12,8 @@
       class="focus-visible:ring-ring relative flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.96]"
       :class="
         activeTab === tab.id
-          ? 'bg-background text-foreground shadow-[0_1px_2px_color-mix(in_oklch,var(--ink)_6%,transparent),inset_0_1px_0_0_oklch(from_var(--paper)_l_c_h_/_0.6)]'
-          : 'text-muted-foreground hover:text-foreground'
+          ? 'bg-paper text-ink shadow-[0_1px_2px_color-mix(in_oklch,var(--ink)_6%,transparent),inset_0_1px_0_0_oklch(from_var(--paper)_l_c_h_/_0.6)]'
+          : 'text-muted-foreground hover:text-ink'
       "
       @click="activeTab = tab.id"
     >
@@ -22,7 +22,7 @@
         class="ml-1.5 inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[10px] font-medium tabular-nums"
         :class="
           activeTab === tab.id
-            ? 'text-foreground bg-primary/15'
+            ? 'text-ink bg-accent/15'
             : 'text-muted-foreground bg-muted-foreground/10'
         "
       >

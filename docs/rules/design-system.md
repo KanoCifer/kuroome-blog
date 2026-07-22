@@ -38,12 +38,12 @@ Layer 3 (Tailwind class: bg-background / bg-primary / border …)
 
 主题文件位于 `packages/brand/themes/`（跨双端共享），4 个配色方案，每个 41+ 变量：
 
-| 文件            | 风格                             | 备注              |
-| --------------- | -------------------------------- | ----------------- |
-| `paper.css`     | 落纸烟云（暖灰/赭/墨）           | **默认**          |
-| `sage.css`      | 清隽素雅（鼠尾草/驼）            |                   |
-| `mist.css`      | 烟岚氤氲（灰蓝/青/赭）           |                   |
-| `blush.css`     | 桃夭未央（藕粉/陶）              |                   |
+| 文件        | 风格                   | 备注     |
+| ----------- | ---------------------- | -------- |
+| `paper.css` | 落纸烟云（暖灰/赭/墨） | **默认** |
+| `sage.css`  | 清隽素雅（鼠尾草/驼）  |          |
+| `mist.css`  | 烟岚氤氲（灰蓝/青/赭） |          |
+| `blush.css` | 桃夭未央（藕粉/陶）    |          |
 
 > 历史方案（sky-blue, forest-green, spring, autumn, clear-sky, midnight）已精简移除（v3.7.0）。
 > 新增方案请编辑 `packages/brand/themes/` 下 CSS 文件，并在 `index.css` 注册。
@@ -63,20 +63,19 @@ Layer 3 (Tailwind class: bg-background / bg-primary / border …)
 
 ### Primary
 
-| Tailwind class            | 映射到                   | 用途            |
-| ------------------------- | ------------------------ | --------------- |
-| `bg-primary`              | `var(--accent)`          | 主按钮/强调背景 |
-| `text-primary-foreground` | `var(--accent-contrast)` | 主按钮上的文字  |
-| `text-primary`            | `var(--accent)`          | 强调文字        |
+| Tailwind class | 映射到          | 用途            |
+| -------------- | --------------- | --------------- |
+| `bg-primary`   | `var(--accent)` | 主按钮/强调背景 |
+| `text-primary` | `var(--accent)` | 强调文字        |
 
 ### Secondary / Muted
 
-| Tailwind class              | 映射到              | 用途                            |
-| --------------------------- | ------------------- | ------------------------------- |
-| `bg-secondary`              | `var(--warm-gray)`  | 次要背景                        |
-| `text-secondary-foreground` | `var(--ink)`        | 次要背景上的文字                |
-| `bg-muted`                  | `var(--warm-gray)`  | 静默/hover 高亮背景             |
-| `text-muted-foreground`     | `var(--muted-text)` | 辅助说明文字                    |
+| Tailwind class              | 映射到              | 用途                |
+| --------------------------- | ------------------- | ------------------- |
+| `bg-secondary`              | `var(--warm-gray)`  | 次要背景            |
+| `text-secondary-foreground` | `var(--ink)`        | 次要背景上的文字    |
+| `bg-muted`                  | `var(--warm-gray)`  | 静默/hover 高亮背景 |
+| `text-muted-foreground`     | `var(--muted-text)` | 辅助说明文字        |
 
 > `--warm-gray` 是中性灰 token 的来源。`bg-accent`/`text-accent-foreground` 已清理，统一用 `bg-muted`/`hover:bg-muted` 表达 hover 高亮。
 
@@ -90,14 +89,14 @@ Layer 3 (Tailwind class: bg-background / bg-primary / border …)
 
 ### Semantic Status
 
-| Tailwind class     | 映射到                     | 用途      |
-| ------------------ | -------------------------- | --------- |
-| `bg-destructive`   | `var(--accent-rose)`       | 危险操作  |
-| `text-destructive` | `var(--accent-rose)`       | 危险文字  |
+| Tailwind class     | 映射到                     | 用途                          |
+| ------------------ | -------------------------- | ----------------------------- |
+| `bg-destructive`   | `var(--accent-rose)`       | 危险操作                      |
+| `text-destructive` | `var(--accent-rose)`       | 危险文字                      |
 | `bg-success`       | `var(--color-emerald-500)` | 成功状态（Tailwind 默认色板） |
-| `text-success`     | `var(--color-emerald-500)` | 成功文字  |
-| `bg-warning`       | `var(--color-amber-500)`   | 警告/强调 |
-| `text-warning`     | `var(--color-amber-500)`   | 警告文字  |
+| `text-success`     | `var(--color-emerald-500)` | 成功文字                      |
+| `bg-warning`       | `var(--color-amber-500)`   | 警告/强调                     |
+| `text-warning`     | `var(--color-amber-500)`   | 警告文字                      |
 
 > `accent-slate/rose` 是 `ring` / `destructive` 的源，**不能删除**。`accent-sage/amber` 已清理，改用 Tailwind emerald/amber 色板。
 
@@ -123,11 +122,11 @@ Layer 3 (Tailwind class: bg-background / bg-primary / border …)
 
 ### 两套消费者对比
 
-| 消费者                           | 读取方式                                       | 用到的变量                                                                                                                                     |
-| -------------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Vue / React 组件**（绝大多数） | Tailwind class                                 | `foreground`/`border`/`muted-foreground`/`surface` 等                                                                                          |
-| **ECharts 图表**                 | `resolveCssColor('--color-primary', fallback)` | `--color-primary` `--color-warning` `--color-foreground` `--color-muted-foreground` `--color-border` `--color-background` `--color-chart-1..5` |
-| **主题切换动画**                 | 直接写 `data-color-scheme` 属性                | —（不读颜色，只切属性触发 transition）                                                                                                         |
+| 消费者                           | 读取方式                                       | 用到的变量                                                                                                                                                                                                                                                                      |
+| -------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Vue / React 组件**（绝大多数） | Tailwind class                                 | `foreground`/`border`/`muted-foreground`/`surface` 等                                                                                                                                                                                                                           |
+| **ECharts 图表**                 | `resolveCssColor('--color-primary', fallback)` | `--color-primary` `--color-warning` `--color-foreground` `--color-muted-foreground` `--color-border` `--color-background` `--color-chart-1..5`                                                                                                                                  |
+| **主题切换动画**                 | 直接写 `data-color-scheme` 属性                | —（不读颜色，只切属性触发 transition）                                                                                                                                                                                                                                          |
 | **明/暗模式**                    | `html.dark` class                              | 主题文件里的 `.dark` 块覆盖同名列。暗色模式必须遵循分层对比度契约：`--paper` (0.22) → `--card-bg` / `--surface` (0.28) → `--warm-gray` (0.36) → `--secondary` (0.42) → `--muted-text` (0.78) → `--ink` (0.94)，每阶 ≥5 点；`--muted-text` 必须相对 `--paper` (0.22) 保持 ≥4.5:1 |
 
 ### 图表色使用 Vue
@@ -180,16 +179,16 @@ const chartOption = computed(() => ({
 
 ## Vue vs React 差异
 
-| 维度        | Vue (`frontend/`)                                                                 | React (`react-app/`) |
-| ----------- | --------------------------------------------------------------------------------- | -------------------- |
-| 入口        | `src/main.ts` — Pinia + router + head                                             | `src/main.tsx` — React Router |
-| UI 方案     | 自研手写组件（`@/components/ui/`），命名前缀 `UiButton` / `UiCard` / `UiModal` 等 | 无，手写组件         |
-| 动画        | `motion-v` + `tw-animate-css` + CSS transition                                    | framer-motion        |
-| 主题数量    | 4 个配色方案（共享 `packages/brand/themes/`）                                     | 同左（共享）         |
-| 颜色格式    | oklch 为主                                                                        | oklch + hex 混用     |
-| cn() 工具   | `@/lib/utils` (clsx + tailwind-merge)                                             | 无                   |
-| AlertDialog | 自研 `<AlertDialog>` 基于原生 `<dialog>` + `showModal()`                          | 自定义 DialogOverlay |
-| 自定义 prose | `packages/brand/prose.css`（共享）                                               | 同左（共享）         |
+| 维度         | Vue (`frontend/`)                                                                 | React (`react-app/`)          |
+| ------------ | --------------------------------------------------------------------------------- | ----------------------------- |
+| 入口         | `src/main.ts` — Pinia + router + head                                             | `src/main.tsx` — React Router |
+| UI 方案      | 自研手写组件（`@/components/ui/`），命名前缀 `UiButton` / `UiCard` / `UiModal` 等 | 无，手写组件                  |
+| 动画         | `motion-v` + `tw-animate-css` + CSS transition                                    | framer-motion                 |
+| 主题数量     | 4 个配色方案（共享 `packages/brand/themes/`）                                     | 同左（共享）                  |
+| 颜色格式     | oklch 为主                                                                        | oklch + hex 混用              |
+| cn() 工具    | `@/lib/utils` (clsx + tailwind-merge)                                             | 无                            |
+| AlertDialog  | 自研 `<AlertDialog>` 基于原生 `<dialog>` + `showModal()`                          | 自定义 DialogOverlay          |
+| 自定义 prose | `packages/brand/prose.css`（共享）                                                | 同左（共享）                  |
 
 **API 契约修改时，两端的样式不需要同步（各自独立），但 token 名称一致。**
 

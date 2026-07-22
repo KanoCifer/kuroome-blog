@@ -2,7 +2,7 @@
   <section v-if="books.length" class="mb-8">
     <header class="mb-3 flex items-baseline justify-between">
       <div class="flex items-baseline gap-2">
-        <h2 class="text-foreground font-serif text-xl font-bold md:text-2xl">
+        <h2 class="text-ink font-serif text-xl font-bold md:text-2xl">
           你正在读
         </h2>
         <span class="text-muted-foreground text-xs tabular-nums">
@@ -12,7 +12,7 @@
       <button
         v-if="hasOverflow"
         type="button"
-        class="text-muted-foreground hover:text-foreground text-xs font-medium"
+        class="text-muted-foreground hover:text-ink text-xs font-medium"
         @click="scrollByPage(1)"
       >
         更多 →
@@ -42,7 +42,7 @@
               -->
               <span
                 v-if="book.readUpdateTime && !book.finishReading"
-                class="bg-background/85 text-foreground/80 rounded-full px-2 py-0.5 text-[10px] font-medium shadow-sm backdrop-blur-sm"
+                class="bg-paper/85 text-ink/80 rounded-full px-2 py-0.5 text-[10px] font-medium shadow-sm backdrop-blur-sm"
               >
                 {{ formatRelative(book.readUpdateTime) }}
               </span>

@@ -21,7 +21,7 @@ defineEmits<{ refresh: [] }>();
     </span>
     <button
       type="button"
-      class="hover:text-foreground inline-flex items-center gap-1.5 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+      class="hover:text-ink inline-flex items-center gap-1.5 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
       :disabled="loading"
       @click="$emit('refresh')"
     >

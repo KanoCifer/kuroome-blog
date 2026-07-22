@@ -4,14 +4,14 @@
     class="text-muted-foreground flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] tracking-wide"
   >
     <!-- 卷序：基于 published_at 在同年内累计 -->
-    <span v-if="volumeLabel" class="text-foreground/60 font-serif">
+    <span v-if="volumeLabel" class="text-ink/60 font-serif">
       {{ volumeLabel }}
     </span>
 
     <!-- 心情：emoji 或自定义文本 -->
     <span v-if="moment.mood" class="inline-flex items-center gap-1">
       <span aria-hidden="true">{{ moodEmoji }}</span>
-      <span class="text-foreground/70 italic">{{ moodText }}</span>
+      <span class="text-ink/70 italic">{{ moodText }}</span>
     </span>
 
     <!-- 标签在前置位 -->

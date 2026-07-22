@@ -27,7 +27,7 @@ const {
 /** 顶部大数字配色 (text-* 语义 token) */
 const levelTextColor: Record<string, string> = {
   爆护: 'text-success',
-  好: 'text-primary',
+  好: 'text-accent',
   一般: 'text-warning',
   差: 'text-destructive',
   空军: 'text-muted-foreground',
@@ -39,11 +39,11 @@ const levelTextColor: Record<string, string> = {
  */
 const gaugeGradientClass = (percentage: number): string => {
   if (percentage >= 85) return 'bg-gradient-to-r from-success/70 to-success';
-  if (percentage >= 70) return 'bg-gradient-to-r from-primary/70 to-primary';
+  if (percentage >= 70) return 'bg-gradient-to-r from-accent/70 to-accent';
   if (percentage >= 50) return 'bg-gradient-to-r from-warning/70 to-warning';
   if (percentage <= 30)
     return 'bg-gradient-to-r from-destructive/70 to-destructive';
-  return 'bg-gradient-to-r from-primary/50 to-primary/90';
+  return 'bg-gradient-to-r from-accent/50 to-accent/90';
 };
 
 const formatFeatureName = (name: string): string => {
@@ -71,7 +71,7 @@ const handleFeedback = () => {
     <!-- 标题 + 刷新 + 图标 -->
     <div class="mb-4 flex items-start justify-between gap-3">
       <div>
-        <h3 class="text-foreground text-lg font-semibold tracking-tight">
+        <h3 class="text-ink text-lg font-semibold tracking-tight">
           钓鱼指数
         </h3>
         <p class="text-muted-foreground mt-0.5 text-sm">
@@ -80,7 +80,7 @@ const handleFeedback = () => {
       </div>
       <div class="flex shrink-0 items-center gap-2">
         <button
-          class="text-muted-foreground hover:bg-muted hover:text-foreground inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+          class="text-muted-foreground hover:bg-muted hover:text-ink inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           type="button"
           :disabled="loading"
           @click="emit('refresh')"
@@ -89,7 +89,7 @@ const handleFeedback = () => {
           {{ loading ? '刷新中' : '刷新' }}
         </button>
         <div
-          class="bg-primary text-primary-foreground flex h-11 w-11 items-center justify-center rounded-2xl shadow-sm transition-all duration-300 group-hover:rounded-xl"
+          class="bg-accent text-accent flex h-11 w-11 items-center justify-center rounded-2xl shadow-sm transition-all duration-300 group-hover:rounded-xl"
         >
           <FishingRod class="h-5 w-5" />
         </div>
@@ -123,19 +123,19 @@ const handleFeedback = () => {
       <div class="mb-4 grid grid-cols-3 gap-2 text-center text-xs">
         <div class="bg-muted/40 rounded-lg px-2 py-2">
           <p class="text-muted-foreground">默认权重</p>
-          <p class="text-foreground mt-1 font-medium tabular-nums">
+          <p class="text-ink mt-1 font-medium tabular-nums">
             {{ indexData.expert_score }}
           </p>
         </div>
         <div class="bg-muted/40 rounded-lg px-2 py-2">
           <p class="text-muted-foreground">权重调整</p>
-          <p class="text-foreground mt-1 font-medium tabular-nums">
+          <p class="text-ink mt-1 font-medium tabular-nums">
             {{ indexData.residual > 0 ? '+' : '' }}{{ indexData.residual }}
           </p>
         </div>
         <div class="bg-muted/40 rounded-lg px-2 py-2">
           <p class="text-muted-foreground">综合</p>
-          <p class="text-foreground mt-1 font-medium tabular-nums">
+          <p class="text-ink mt-1 font-medium tabular-nums">
             {{ indexData.fishing_index }}
           </p>
         </div>
@@ -148,7 +148,7 @@ const handleFeedback = () => {
         class="text-xs"
       >
         <summary
-          class="text-muted-foreground hover:text-foreground cursor-pointer select-none"
+          class="text-muted-foreground hover:text-ink cursor-pointer select-none"
         >
           特征详情
         </summary>
@@ -158,7 +158,7 @@ const handleFeedback = () => {
             :key="keyName"
             class="border-border/60 bg-muted/30 rounded-xl border p-2.5"
           >
-            <p class="text-foreground">{{ formatFeatureName(keyName) }}</p>
+            <p class="text-ink">{{ formatFeatureName(keyName) }}</p>
             <div
               class="bg-muted relative mt-1.5 h-1.5 w-full overflow-hidden rounded-full"
             >
@@ -173,7 +173,7 @@ const handleFeedback = () => {
       </details>
 
       <button
-        class="bg-primary text-primary-foreground hover:bg-primary/90 mt-auto w-full rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+        class="bg-accent text-accent hover:bg-accent/90 mt-auto w-full rounded-lg px-3 py-2 text-sm font-medium transition-colors"
         type="button"
         @click="handleFeedback"
       >

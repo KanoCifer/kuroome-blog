@@ -36,8 +36,8 @@
             class="relative z-10 flex items-center gap-4 rounded-3xl px-6 py-3.5 font-medium transition-colors duration-150 active:scale-[0.98]"
             :class="
               hoverNavIndex === index
-                ? 'text-foreground'
-                : 'text-foreground/70 hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground'
+                ? 'text-ink'
+                : 'text-ink/70 hover:text-ink dark:text-muted-foreground dark:hover:text-ink'
             "
           >
             <component :is="item.icon" class="h-6 w-6" />
@@ -96,7 +96,7 @@ const userMenuItems: DropdownItem[] = [
   {
     icon: LogoutIcon,
     label: 'Logout',
-    class: 'text-primary font-bold',
+    class: 'text-accent font-bold',
     onClick: () => {
       auth.logout();
       router.push('/');

@@ -39,7 +39,7 @@ const heightClass = computed(() =>
   <div :class="['relative flex-shrink-0 overflow-hidden', heightClass]">
     <img :src="background" alt="" class="h-full w-full object-cover" />
     <div
-      class="from-background/40 via-background/5 to-background/40 pointer-events-none absolute inset-0 bg-gradient-to-b"
+      class="from-paper/40 via-paper/5 to-paper/40 pointer-events-none absolute inset-0 bg-gradient-to-b"
     />
 
     <!-- 顶栏:返回按钮(左) + actions(右) -->
@@ -49,7 +49,7 @@ const heightClass = computed(() =>
       <button
         v-if="back"
         type="button"
-        class="border-border bg-background/60 hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
+        class="border-border bg-paper/60 hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
         aria-label="返回"
         @click="goBack(backFallback)"
       >
@@ -59,7 +59,7 @@ const heightClass = computed(() =>
           viewBox="0 0 24 24"
           stroke-width="2"
           stroke="currentColor"
-          class="text-foreground h-5 w-5"
+          class="text-ink h-5 w-5"
         >
           <path
             stroke-linecap="round"

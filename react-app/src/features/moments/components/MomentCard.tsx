@@ -39,7 +39,7 @@ export function MomentCard({
           'focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2',
           moment.is_pinned
             ? 'bg-warning/8 border-warning/30'
-            : 'bg-background border-border/40 hover:border-primary/25',
+            : 'bg-paper border-border/40 hover:border-accent/25',
         ].join(' ')}
         onClick={() => onOpen?.(moment.id)}
         onKeyDown={(e) => {
@@ -65,7 +65,7 @@ export function MomentCard({
           <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100">
             <button
               type="button"
-              className="text-muted-foreground hover:text-primary border-border/40 bg-background/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
+              className="text-muted-foreground hover:text-accent border-border/40 bg-paper/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
               aria-label={`编辑 ${moment.id}`}
               onClick={(e) => {
                 e.stopPropagation();
@@ -76,7 +76,7 @@ export function MomentCard({
             </button>
             <button
               type="button"
-              className="text-muted-foreground hover:text-destructive border-border/40 bg-background/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
+              className="text-muted-foreground hover:text-destructive border-border/40 bg-paper/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
               aria-label={`删除 ${moment.id}`}
               onClick={(e) => {
                 e.stopPropagation();
@@ -93,10 +93,10 @@ export function MomentCard({
         </div>
 
         <p
-          className="text-foreground/85 relative mt-2 line-clamp-3 pl-3 font-serif text-[15px] leading-loose"
+          className="text-ink/85 relative mt-2 line-clamp-3 pl-3 font-serif text-[15px] leading-loose"
           style={{ textWrap: 'pretty' }}
         >
-          <span className="moment-drop-cap text-foreground/95">
+          <span className="moment-drop-cap text-ink/95">
             {moment.content.charAt(0)}
           </span>
           <span>{moment.content.slice(1)}</span>
