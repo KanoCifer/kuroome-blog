@@ -1,37 +1,55 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-15T00:00:00.000Z",
+  "generatedAt": "2026-07-22T00:00:00.000Z",
   "title": "Design System: kanocifer.chat",
   "extensions": {
     "colorMeta": {
-      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "oklch(0.2 0.018 50)" },
-      "paper": { "role": "neutral", "displayName": "Paper", "canonical": "oklch(0.97 0.013 50)" },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "oklch(0.2 0.018 50)", "tonalRamp": ["oklch(0.15 0.018 50)","oklch(0.25 0.018 50)","oklch(0.35 0.016 50)","oklch(0.45 0.015 50)","oklch(0.55 0.014 50)","oklch(0.65 0.013 50)","oklch(0.78 0.012 50)","oklch(0.9 0.011 50)"] },
+      "paper": { "role": "neutral", "displayName": "Paper", "canonical": "oklch(0.97 0.013 50)", "tonalRamp": ["oklch(0.3 0.01 50)","oklch(0.45 0.01 50)","oklch(0.6 0.01 50)","oklch(0.72 0.01 50)","oklch(0.82 0.011 50)","oklch(0.9 0.012 50)","oklch(0.95 0.012 50)","oklch(0.99 0.008 50)"] },
       "surface": { "role": "neutral", "displayName": "Surface (translucent)", "canonical": "oklch(0.97 0.013 50 / 0.75)" },
-      "warm-gray": { "role": "neutral", "displayName": "Warm Gray", "canonical": "oklch(0.95 0.018 50)" },
+      "warm-gray": { "role": "neutral", "displayName": "Warm Gray", "canonical": "oklch(0.95 0.018 50)", "tonalRamp": ["oklch(0.3 0.012 50)","oklch(0.45 0.012 50)","oklch(0.58 0.012 50)","oklch(0.7 0.014 50)","oklch(0.8 0.015 50)","oklch(0.88 0.016 50)","oklch(0.93 0.017 50)","oklch(0.97 0.014 50)"] },
       "secondary": { "role": "neutral", "displayName": "Secondary", "canonical": "oklch(0.92 0.022 50)" },
       "muted-text": { "role": "neutral", "displayName": "Muted Text", "canonical": "oklch(0.42 0.015 50)" },
       "border": { "role": "neutral", "displayName": "Border", "canonical": "oklch(0.88 0.02 50)" },
-      "accent": { "role": "primary", "displayName": "Copper", "canonical": "oklch(0.5 0.08 50)" },
-      "accent-slate": { "role": "secondary", "displayName": "Soft Blue", "canonical": "oklch(0.55 0.025 245)" },
-      "accent-rose": { "role": "tertiary", "displayName": "Vermillion Rose", "canonical": "oklch(0.58 0.13 28)" },
-      "accent-contrast": { "role": "neutral", "displayName": "Accent Contrast", "canonical": "oklch(0.99 0.003 50)" },
       "card-bg": { "role": "neutral", "displayName": "Card Bg", "canonical": "oklch(0.99 0.008 50)" },
+      "accent": { "role": "primary", "displayName": "Warm Copper", "canonical": "oklch(0.5 0.08 50)", "tonalRamp": ["oklch(0.2 0.06 50)","oklch(0.3 0.07 50)","oklch(0.4 0.075 50)","oklch(0.5 0.08 50)","oklch(0.6 0.1 50)","oklch(0.7 0.11 50)","oklch(0.8 0.1 50)","oklch(0.9 0.07 50)"] },
+      "accent-slate": { "role": "secondary", "displayName": "Slate Blue", "canonical": "oklch(0.55 0.025 245)" },
+      "accent-rose": { "role": "tertiary", "displayName": "Vermillion Rose", "canonical": "oklch(0.58 0.13 28)" },
+      "destructive": { "role": "tertiary", "displayName": "Destructive", "canonical": "oklch(0.644 0.21 25)" },
+      "success": { "role": "neutral", "displayName": "Success", "canonical": "oklch(0.696 0.17 162)" },
+      "warning": { "role": "neutral", "displayName": "Warning", "canonical": "oklch(0.769 0.188 70)" },
+      "chart-1": { "role": "neutral", "displayName": "Chart 1", "canonical": "oklch(0.6 0.14 50)" },
+      "chart-2": { "role": "neutral", "displayName": "Chart 2", "canonical": "oklch(0.55 0.08 145)" },
+      "chart-3": { "role": "neutral", "displayName": "Chart 3", "canonical": "oklch(0.55 0.1 245)" },
+      "chart-4": { "role": "neutral", "displayName": "Chart 4", "canonical": "oklch(0.58 0.13 28)" },
       "chart-5": { "role": "neutral", "displayName": "Chart 5", "canonical": "oklch(0.7 0.13 85)" }
     },
+    "typographyMeta": {
+      "display": { "displayName": "Averia Display", "purpose": "Latin display headings and literary moments." },
+      "body": { "displayName": "HarmonyOS Body", "purpose": "Body copy including CJK; the system default." },
+      "serif": { "displayName": "Editorial Serif", "purpose": "Prose h1–h6, drop caps, blockquote marks." },
+      "mono": { "displayName": "Mono", "purpose": "Code blocks, language tags, § section counter, tabular readouts." },
+      "display-cn": { "displayName": "Alibaba Display", "purpose": "阿里妈妈方圆体 — deliberate Chinese display only." },
+      "brush-cn": { "displayName": "Brush Chinese", "purpose": "阿里妈妈东方大楷 — deliberate Chinese display only." }
+    },
     "shadows": [
-      { "name": "card-ambient", "value": "0 1px 1px color-mix(in oklch, var(--ink) 6%, transparent), 0 6px 14px color-mix(in oklch, var(--ink) 10%, transparent), 0 18px 32px color-mix(in oklch, var(--ink) 8%, transparent)", "purpose": "Standard / Polaroid cards." },
-      { "name": "bento-card", "value": "color-mix(in srgb, var(--ink) 12%, transparent) 0px 40px 50px -32px, color-mix(in srgb, var(--ink) 8%, transparent) 0px 60px 80px -48px, rgba(255,255,255,0.35) 0px 0px 20px 0px inset", "purpose": "Home-page bento card layered ambient + inset white." },
+      { "name": "border-as-shadow", "value": "0px 0px 0px 1px rgba(0,0,0,0.06), 0px 1px 2px -1px rgba(0,0,0,0.06), 0px 2px 4px 0px rgba(0,0,0,0.04)", "purpose": "Global: every element with a Tailwind border class gets this layered, theme-adaptive outline." },
+      { "name": "card-ambient", "value": "0 1px 1px color-mix(in oklch, var(--ink) 6%, transparent), 0 6px 14px color-mix(in oklch, var(--ink) 10%, transparent), 0 18px 32px color-mix(in oklch, var(--ink) 8%, transparent)", "purpose": "Standard / Polaroid cards at rest and hover lift." },
+      { "name": "bento-card", "value": "color-mix(in srgb, var(--ink) 12%, transparent) 0px 40px 50px -32px, color-mix(in srgb, var(--ink) 8%, transparent) 0px 60px 80px -48px, rgba(255,255,255,0.35) 0px 0px 20px 0px inset", "purpose": "Home-page bento card — layered ambient plus inset white sheen." },
       { "name": "modal-panel", "value": "0 12px 32px color-mix(in oklch, var(--ink) 10%, transparent)", "purpose": "Default modal lift." },
-      { "name": "nav-liquid-glass", "value": "inset 0 0 2px 1px rgb(255 255 255 / 0.55), inset 0 0 10px 4px rgb(255 255 255 / 0.22), 0 6px 24px rgb(17 17 26 / 0.06), 0 12px 40px rgb(17 17 26 / 0.05)", "purpose": "Floating nav: pill glass (paired light/dark blocks, SVG url filter)." },
+      { "name": "nav-liquid-glass", "value": "inset 0 0 2px 1px rgb(255 255 255 / 0.55), inset 0 0 10px 4px rgb(255 255 255 / 0.22), 0 6px 24px rgb(17 17 26 / 0.06), 0 12px 40px rgb(17 17 26 / 0.05)", "purpose": "Floating nav pill glass (the one sanctioned glass surface)." },
       { "name": "drawer-settings", "value": "0 -1px 1px color-mix(in oklch, var(--ink) 6%, transparent), 0 -8px 18px color-mix(in oklch, var(--ink) 8%, transparent), 0 -24px 40px color-mix(in oklch, var(--ink) 5%, transparent), inset 0 1px 0 0 oklch(from var(--paper) l c h / 0.6)", "purpose": "Settings drawer: 3-layer right/up ambient + top paper highlight." }
     ],
     "motion": [
-      { "name": "spring-modal", "value": "{ type:'spring', stiffness:340, damping:32, mass:0.8 }", "purpose": "UiModal: scale 0.95→1, y 12→0." },
-      { "name": "spring-drawer", "value": "{ type:'spring', stiffness:320, damping:32, mass:0.8 }", "purpose": "Settings drawer / TodoModal: x 40→0." },
-      { "name": "spring-pic", "value": "{ type:'spring', stiffness:300, damping:26 }", "purpose": "Pic-detail family." },
-      { "name": "nav-indicator", "value": "transform translateX() · 280ms · cubic-bezier(0.32, 0.72, 0, 1)", "purpose": "Floating nav indicator slide (glass-button track, NOT a spring bg fill)." },
-      { "name": "ease-hero-word", "value": "cubic-bezier(0.22, 1, 0.36, 1) · 600ms · stagger 80ms", "purpose": "Hero h1 word reveal." },
-      { "name": "ease-card-enter", "value": "cubic-bezier(0.25, 0.46, 0.45, 0.94) · 800ms", "purpose": "Card / list-item stagger." }
+      { "name": "SPRING_SNUG", "value": "{ type:'spring', stiffness:320, damping:32, mass:0.8 }", "purpose": "Modal / Drawer / TaskDetail panel entrance — restrained, no overshoot." },
+      { "name": "SPRING_BOUNCE", "value": "{ type:'spring', stiffness:320, damping:28 }", "purpose": "Nav hover / decorative card entrance — slight overshoot." },
+      { "name": "SPRING_CRISP", "value": "{ type:'spring', stiffness:400, damping:30, bounce:0 }", "purpose": "Dynamic Island — Apple-style, zero bounce." },
+      { "name": "SPRING_REVEAL", "value": "{ type:'spring', duration:1, stiffness:100, damping:20 }", "purpose": "Scroll reveal — restrained but sustained." },
+      { "name": "FADE_FAST", "value": "{ duration:0.18 }", "purpose": "Backdrop / overlay fade." },
+      { "name": "FADE", "value": "{ duration:0.25 }", "purpose": "Content fade-in / blur handoff." },
+      { "name": "EASE", "value": "{ duration:0.24, ease:[0.22,1,0.36,1] }", "purpose": "Card hover / group entrance — snap in, soft rest." },
+      { "name": "EASE_SLOW", "value": "{ duration:0.4, ease:[0.16,1,0.3,1] }", "purpose": "Progress bars / status pages." },
+      { "name": "EASE_INOUT", "value": "{ duration:0.25, ease:'easeOut' }", "purpose": "Page / pagination transitions." }
     ],
     "breakpoints": [
       { "name": "sm", "value": "640px" },
@@ -46,110 +64,124 @@
       "name": "Button (primary)",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Single accent CTA per screen.",
+      "description": "Single accent CTA per screen — copper fill, paper text, scale-on-press.",
       "html": "<button class=\"ds-btn-primary\">Continue Reading</button>",
-      "css": ".ds-btn-primary { padding: 0.5rem 1rem; background: var(--accent); color: var(--accent-contrast); border-radius: 0.5rem; font-weight: 500; transition: background 180ms ease-out, box-shadow 180ms ease-out; } .ds-btn-primary:hover { background: color-mix(in oklch, var(--accent) 90%, transparent); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px color-mix(in oklch, var(--accent-slate) 50%, transparent); }"
+      "css": ".ds-btn-primary { display:inline-flex; align-items:center; justify-content:center; padding:0.5rem 1rem; background:var(--accent); color:var(--paper); border-radius:0.625rem; font-size:0.875rem; font-weight:500; transition:background 180ms ease-out, transform 180ms ease-out; } .ds-btn-primary:hover { background:color-mix(in oklch, var(--accent) 90%, transparent); } .ds-btn-primary:active { transform:scale(0.96); } .ds-btn-primary:focus-visible { outline:none; box-shadow:0 0 0 2px var(--accent-slate), 0 0 0 4px var(--paper); } .ds-btn-primary:disabled { opacity:0.5; cursor:not-allowed; }"
     },
     {
-      "name": "Floating Nav (liquid glass)",
+      "name": "Button (outline)",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary action — hairline border, muted text, muted fill on hover.",
+      "html": "<button class=\"ds-btn-outline\">Cancel</button>",
+      "css": ".ds-btn-outline { display:inline-flex; align-items:center; justify-content:center; padding:0.5rem 1rem; background:transparent; color:var(--muted-text); border:1px solid var(--border); border-radius:0.625rem; font-size:0.875rem; font-weight:500; transition:background 180ms ease-out, color 180ms ease-out; } .ds-btn-outline:hover { background:var(--warm-gray); color:var(--ink); } .ds-btn-outline:focus-visible { outline:none; box-shadow:0 0 0 2px var(--accent-slate), 0 0 0 4px var(--paper); }"
+    },
+    {
+      "name": "Button (ghost)",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Tertiary / icon-adjacent action — no border, muted fill on hover.",
+      "html": "<button class=\"ds-btn-ghost\">More</button>",
+      "css": ".ds-btn-ghost { display:inline-flex; align-items:center; justify-content:center; padding:0.5rem 1rem; background:transparent; color:var(--muted-text); border-radius:0.625rem; font-size:0.875rem; font-weight:500; transition:background 180ms ease-out, color 180ms ease-out; } .ds-btn-ghost:hover { background:var(--warm-gray); color:var(--ink); }"
+    },
+    {
+      "name": "Button (destructive)",
+      "kind": "button",
+      "refersTo": "button-destructive",
+      "description": "Delete / irreversible action — vermillion rose fill.",
+      "html": "<button class=\"ds-btn-destructive\">Delete</button>",
+      "css": ".ds-btn-destructive { display:inline-flex; align-items:center; justify-content:center; padding:0.5rem 1rem; background:var(--accent-rose); color:var(--paper); border-radius:0.625rem; font-size:0.875rem; font-weight:500; transition:background 180ms ease-out, transform 180ms ease-out; } .ds-btn-destructive:hover { background:color-mix(in oklch, var(--accent-rose) 90%, transparent); } .ds-btn-destructive:active { transform:scale(0.96); }"
+    },
+    {
+      "name": "Tag Pill",
+      "kind": "chip",
+      "refersTo": "tag-pill",
+      "description": "Muted rounded pill for categories / status. NOT uppercase.",
+      "html": "<span class=\"ds-tag-pill\">Reading</span>",
+      "css": ".ds-tag-pill { display:inline-block; padding:0.25rem 0.625rem; background:var(--warm-gray); color:var(--muted-text); border-radius:9999px; font-size:0.75rem; font-weight:500; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Standard surface — paper ground, hairline border, flat at rest (border-as-shadow).",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-content\">Content</div></div>",
+      "css": ".ds-card { background:var(--paper); color:var(--ink); border:1px solid var(--border); border-radius:0.625rem; padding:1.5rem; box-shadow:0px 0px 0px 1px rgba(0,0,0,0.06), 0px 1px 2px -1px rgba(0,0,0,0.06), 0px 2px 4px 0px rgba(0,0,0,0.04); }.ds-card-content { display:flex; flex-direction:column; gap:1.5rem; }"
+    },
+    {
+      "name": "Bento Card (signature)",
+      "kind": "card",
+      "refersTo": "bento-card",
+      "description": "Squircle home-page card — layered ambient + inset white sheen. 48px base / 64px @supports.",
+      "html": "<div class=\"ds-bento-card\">Home</div>",
+      "css": ".ds-bento-card { padding:1.25rem; background:var(--paper); color:var(--ink); border-radius:48px; box-shadow:color-mix(in srgb, var(--ink) 12%, transparent) 0px 40px 50px -32px, color-mix(in srgb, var(--ink) 8%, transparent) 0px 60px 80px -48px, rgba(255,255,255,0.35) 0px 0px 20px 0px inset; } @supports (corner-shape: squircle) { .ds-bento-card { corner-shape:squircle; border-radius:64px; } }"
+    },
+    {
+      "name": "Modal Panel",
+      "kind": "card",
+      "refersTo": "modal-panel",
+      "description": "Standard centered modal — rounded-2xl, single-layer shadow, spring entrance.",
+      "html": "<div class=\"ds-modal-panel\"><h2>Settings</h2><p>Choose a theme.</p></div>",
+      "css": ".ds-modal-panel { width:100%; max-width:560px; padding:1.5rem; background:var(--paper); color:var(--ink); border:1px solid color-mix(in oklch, var(--border) 60%, transparent); border-radius:1.125rem; box-shadow:0 12px 32px color-mix(in oklch, var(--ink) 10%, transparent); }"
+    },
+    {
+      "name": "Dynamic Island (nav)",
+      "kind": "nav",
+      "refersTo": "nav-island",
+      "description": "Bottom-fixed status pill — springs open (220x28 -> 260x96) with SPRING_CRISP. Latency dot, visitor count, task count.",
+      "html": "<div class=\"ds-island\"><span class=\"ds-island-dot ds-online\"></span><span class=\"ds-island-label\">42 ms</span><span class=\"ds-island-sep\">·</span><span class=\"ds-island-dot ds-success\"></span><span class=\"ds-island-label\">3 在线</span></div>",
+      "css": ".ds-island { display:flex; align-items:center; gap:0.375rem; padding:0.4375rem 0.75rem; background:var(--ink); color:var(--paper); border-radius:14px; font-size:0.625rem; font-weight:500; letter-spacing:0.05em; box-shadow:0 4px 12px rgba(0,0,0,0.2); cursor:pointer; }.ds-island-dot { width:0.375rem; height:0.375rem; border-radius:9999px; }.ds-island-dot.ds-online { background:oklch(0.696 0.17 162); }.ds-island-dot.ds-success { background:oklch(0.696 0.17 162); }.ds-island-sep { color:rgba(255,255,255,0.3); }.ds-island-label { font-variant-numeric:tabular-nums; }"
+    },
+    {
+      "name": "Slider (custom)",
       "kind": "custom",
-      "description": "The one sanctioned glass surface: SVG color-dispersion filter + backdrop-blur pill with a sliding glass-button indicator.",
-      "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-item\"><span class=\"ds-nav-ico\"></span><span>Home</span></a><span class=\"ds-nav-indicator\"></span></nav>",
-      "css": ".ds-nav { display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 2.25rem; border-radius: 999px; background: rgb(255 255 255 / 0.06); backdrop-filter: blur(7px) saturate(1.4); border: 1px solid rgb(21 20 15 / 0.08); box-shadow: inset 0 0 2px 1px rgb(255 255 255 / 0.55), inset 0 0 10px 4px rgb(255 255 255 / 0.22), 0 6px 24px rgb(17 17 26 / 0.06), 0 12px 40px rgb(17 17 26 / 0.05); }.ds-nav-item { position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem; width: 5rem; height: 2.75rem; font-size: 0.8125rem; font-weight: 600; border-radius: 999px; }.ds-nav-indicator { position: absolute; top: 50%; left: 0; z-index: 1; width: 5rem; height: 2.75rem; border-radius: 999px; transform: translateY(-50%); background: rgb(255 255 255 / 0.28); border: 1px solid rgb(255 255 255 / 0.4); box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.6), inset 0 -1px 2px rgb(0 0 0 / 0.04), 0 2px 6px rgb(0 0 0 / 0.06), 0 1px 2px rgb(0 0 0 / 0.04); transition: transform 280ms cubic-bezier(0.32, 0.72, 0, 1); }.ds-nav-ico { width: 1.25rem; height: 1.25rem; }"
+      "description": "Themed range — accent track-fill, paper thumb ringed in accent, live value chip.",
+      "html": "<div class=\"ds-slider-row\"><span class=\"ds-slider-label\"><svg class=\"ds-ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><circle cx=\"12\" cy=\"12\" r=\"10\"/></svg>背景模糊</span><span class=\"ds-value-chip\">8 px</span></div><input type=\"range\" min=\"5\" max=\"70\" class=\"ds-slider\" />",
+      "css": ".ds-slider-row { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:0.5rem; }.ds-slider-label { display:flex; align-items:center; gap:0.375rem; font-size:0.875rem; font-weight:500; }.ds-ico { width:1rem; height:1rem; color:var(--muted-text); }.ds-value-chip { font-family:ui-monospace, monospace; font-size:0.75rem; font-weight:500; background:var(--warm-gray); color:var(--ink); padding:0.125rem 0.5rem; border-radius:9999px; font-variant-numeric:tabular-nums; }.ds-slider { -webkit-appearance:none; appearance:none; background:transparent; width:100%; height:24px; }.ds-slider::-webkit-slider-runnable-track { height:6px; border-radius:9999px; background:linear-gradient(to right, var(--accent) 0%, var(--accent) 50%, var(--warm-gray) 50%, var(--warm-gray) 100%); }.ds-slider::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:18px; height:18px; margin-top:-6px; border-radius:9999px; background:var(--paper); border:2px solid var(--accent); box-shadow:0 1px 2px color-mix(in oklch, var(--ink) 12%, transparent); transition:transform 150ms ease-out, box-shadow 150ms ease-out; cursor:pointer; }.ds-slider::-webkit-slider-thumb:hover { transform:scale(1.12); box-shadow:0 2px 6px color-mix(in oklch, var(--ink) 16%, transparent), 0 0 0 4px color-mix(in oklch, var(--accent) 15%, transparent); }.ds-slider:focus-visible::-webkit-slider-thumb { box-shadow:0 0 0 4px color-mix(in oklch, var(--accent) 30%, transparent); }.ds-slider::-moz-range-track { height:6px; border-radius:9999px; background:linear-gradient(to right, var(--accent) 0%, var(--accent) 50%, var(--warm-gray) 50%, var(--warm-gray) 100%); }.ds-slider::-moz-range-thumb { width:18px; height:18px; border-radius:9999px; background:var(--paper); border:2px solid var(--accent); }"
     },
     {
       "name": "Drawer Panel (settings)",
       "kind": "custom",
       "refersTo": "drawer-settings",
       "description": "Right-side settings drawer — flagship panel. Slides from right with spring, 4-layer asymmetric shadow, rounded-3xl.",
-      "html": "<div class=\"ds-drawer\"><header><h1>偏好设置</h1><p>Customize your reading experience</p><div class=\"ds-bookmark\"><span class=\"ds-dot\"></span><span class=\"ds-bookmark-line\"></span><span class=\"ds-dot\"></span></div></header><nav class=\"ds-segmented\"><button class=\"ds-active\">外观</button><button>背景</button><button>卡片</button></nav></div>",
-      "css": ".ds-drawer { background: var(--paper); border: 1px solid color-mix(in oklch, var(--border) 60%, transparent); border-radius: 1.5rem; box-shadow: 0 -1px 1px color-mix(in oklch, var(--ink) 6%, transparent), 0 -8px 18px color-mix(in oklch, var(--ink) 8%, transparent), 0 -24px 40px color-mix(in oklch, var(--ink) 5%, transparent), inset 0 1px 0 0 oklch(from var(--paper) l c h / 0.6); }.ds-drawer header { padding: 3rem 2rem 1.25rem; text-align: center; }.ds-drawer h1 { font-family: ui-serif, Georgia, serif; font-size: 1.75rem; font-weight: 600; }.ds-bookmark { display: flex; align-items: center; gap: 0.5rem; padding: 0 4rem; margin-top: 1.25rem; }.ds-dot { width: 0.25rem; height: 0.25rem; border-radius: 9999px; background: color-mix(in oklch, var(--accent) 70%, transparent); }.ds-bookmark-line { flex: 1; height: 1px; background: linear-gradient(to right, var(--gradient-decorative-from), var(--gradient-decorative-to)); }.ds-segmented { display: flex; gap: 0.25rem; background: var(--warm-gray); padding: 0.25rem; border-radius: 0.75rem; margin: 0 2rem; }.ds-segmented button { flex: 1; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; color: color-mix(in oklch, var(--ink) 55%, transparent); transition: all 200ms ease-out; }.ds-segmented .ds-active { background: var(--paper); color: var(--accent); box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 8%, transparent); }"
-    },
-    {
-      "name": "Segmented Control",
-      "kind": "custom",
-      "description": "Capsule section switcher — muted track + lifted active tile.",
-      "html": "<div class=\"ds-seg\"><button class=\"ds-active\">外观</button><button>背景</button><button>卡片</button></div>",
-      "css": ".ds-seg { display: flex; gap: 0.25rem; background: var(--warm-gray); padding: 0.25rem; border-radius: 0.75rem; }.ds-seg button { flex: 1; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; color: color-mix(in oklch, var(--ink) 55%, transparent); transition: all 200ms ease-out; }.ds-seg .ds-active { background: var(--paper); color: var(--accent); box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 8%, transparent); }"
-    },
-    {
-      "name": "Slider (custom)",
-      "kind": "custom",
-      "description": "Themed range with accent track-fill, paper thumb, live value chip.",
-      "html": "<div class=\"ds-slider-row\"><span class=\"ds-slider-label\"><svg class=\"ds-ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><circle cx=\"12\" cy=\"12\" r=\"10\"/></svg>背景模糊</span><span class=\"ds-value-chip\">8 px</span></div><input type=\"range\" min=\"5\" max=\"70\" class=\"ds-slider\" />",
-      "css": ".ds-slider-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 0.5rem; }.ds-slider-label { display: flex; align-items: center; gap: 0.375rem; font-size: 0.875rem; font-weight: 500; }.ds-ico { width: 1rem; height: 1rem; color: var(--muted-text); }.ds-value-chip { font-family: ui-monospace, monospace; font-size: 0.75rem; font-weight: 500; background: var(--warm-gray); color: var(--ink); padding: 0.125rem 0.5rem; border-radius: 9999px; font-variant-numeric: tabular-nums; }.ds-slider { -webkit-appearance: none; appearance: none; background: transparent; width: 100%; height: 24px; }.ds-slider::-webkit-slider-runnable-track { height: 6px; border-radius: 9999px; background: linear-gradient(to right, var(--accent) 0%, var(--accent) 50%, var(--warm-gray) 50%, var(--warm-gray) 100%); }.ds-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; margin-top: -6px; border-radius: 9999px; background: var(--paper); border: 2px solid var(--accent); box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 12%, transparent); transition: transform 150ms ease-out; cursor: pointer; }.ds-slider::-webkit-slider-thumb:hover { transform: scale(1.12); box-shadow: 0 2px 6px color-mix(in oklch, var(--ink) 16%, transparent), 0 0 0 4px color-mix(in oklch, var(--accent) 15%, transparent); }.ds-slider:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px color-mix(in oklch, var(--accent) 30%, transparent); }.ds-slider::-moz-range-track { height: 6px; border-radius: 9999px; background: linear-gradient(to right, var(--accent) 0%, var(--accent) 50%, var(--warm-gray) 50%, var(--warm-gray) 100%); }.ds-slider::-moz-range-thumb { width: 18px; height: 18px; border-radius: 9999px; background: var(--paper); border: 2px solid var(--accent); }"
-    },
-    {
-      "name": "Bento Card (signature)",
-      "kind": "card",
-      "refersTo": "bento-card",
-      "description": "Squircle home-page card with layered ambient + inset white. Squircle = 48px base / 64px @supports.",
-      "html": "<div class=\"ds-bento-card\">Home</div>",
-      "css": ".ds-bento-card { padding: 1.25rem; background: var(--paper); color: var(--ink); border-radius: 48px; box-shadow: color-mix(in srgb, var(--ink) 12%, transparent) 0px 40px 50px -32px, color-mix(in srgb, var(--ink) 8%, transparent) 0px 60px 80px -48px, rgba(255,255,255,0.35) 0px 0px 20px 0px inset; } @supports (corner-shape: squircle) { .ds-bento-card { corner-shape: squircle; border-radius: 64px; } }"
-    },
-    {
-      "name": "Modal Panel",
-      "kind": "card",
-      "refersTo": "modal-panel",
-      "description": "Standard centered modal — rounded-2xl, single-layer shadow.",
-      "html": "<div class=\"ds-modal-panel\"><h2>Settings</h2><p>Choose a theme.</p></div>",
-      "css": ".ds-modal-panel { width: 100%; max-width: 560px; padding: 1.5rem; background: var(--paper); color: var(--ink); border: 1px solid color-mix(in oklch, var(--border) 60%, transparent); border-radius: 1.125rem; box-shadow: 0 12px 32px color-mix(in oklch, var(--ink) 10%, transparent); }"
-    },
-    {
-      "name": "Tag Pill",
-      "kind": "chip",
-      "refersTo": "tag-pill",
-      "description": "Muted rounded pill for categories / status. NOT uppercase (the uppercase tracked style is for Labels only).",
-      "html": "<span class=\"ds-tag-pill\">Reading</span>",
-      "css": ".ds-tag-pill { padding: 0.25rem 0.625rem; background: var(--warm-gray); color: var(--muted-text); border-radius: 9999px; font-size: 0.75rem; font-weight: 500; }"
+      "html": "<div class=\"ds-drawer\"><header><h1>偏好设置</h1><p>Customize your reading experience</p></header><nav class=\"ds-segmented\"><button class=\"ds-active\">外观</button><button>背景</button><button>卡片</button></nav></div>",
+      "css": ".ds-drawer { background:var(--paper); border:1px solid color-mix(in oklch, var(--border) 60%, transparent); border-radius:1.5rem; box-shadow:0 -1px 1px color-mix(in oklch, var(--ink) 6%, transparent), 0 -8px 18px color-mix(in oklch, var(--ink) 8%, transparent), 0 -24px 40px color-mix(in oklch, var(--ink) 5%, transparent), inset 0 1px 0 0 oklch(from var(--paper) l c h / 0.6); }.ds-drawer header { padding:3rem 2rem 1.25rem; text-align:center; }.ds-drawer h1 { font-family:ui-serif, Georgia, serif; font-size:1.75rem; font-weight:600; }.ds-segmented { display:flex; gap:0.25rem; background:var(--warm-gray); padding:0.25rem; border-radius:0.75rem; margin:0 2rem; }.ds-segmented button { flex:1; padding:0.5rem 0.75rem; border-radius:0.5rem; font-size:0.875rem; font-weight:500; color:color-mix(in oklch, var(--ink) 55%, transparent); transition:all 200ms ease-out; }.ds-segmented .ds-active { background:var(--paper); color:var(--accent); box-shadow:0 1px 2px color-mix(in oklch, var(--ink) 8%, transparent); }"
     }
   ],
   "narrative": {
-    "northStar": "The Black Cat's Study — Four Rooms, Twenty Surfaces.",
-    "overview": "kanocifer.chat is a personal study with a paint box. One author (Kuroome) reads, fishes, and writes. The interface reads as a quiet, deliberate workshop — a liquid-glass nav, literary typography, and a single black cat. Four themes × dark/light = 8 surfaces, one token architecture. The right-side settings drawer is the flagship panel: rounded-3xl, 4-layer asymmetric shadow, capsule segmented controls, custom pseudo-element sliders. Squircle (48px / 64px @supports) is the signature card shape; the liquid-glass nav is the one sanctioned glass surface.",
+    "northStar": "The Black Cat's Study",
+    "overview": "This is one person's private study, opened to visitors — a site that reads as a personal library and workshop, not a product dashboard. The design is Chinese-first and literary in register (书卷气): warm paper grounds, committed copper accents, serif headings with tightened tracking, and a black cat (kuro neko / 黒猫) as the quiet brand animal. Every visual decision is encoded as code — a three-layer token architecture, four named color schemes, and an explicit 禁止事項 (bans) list — because the site's taste lives in its design system, not in its prose.\n\nThe system spans two frontends that share one visual brain: a Vue desktop client and a React mobile web client both import the same theme files from packages/brand/themes/ and bridge them to Tailwind semantic classes through an identical @theme inline layer. The result is one design language expressed across two independent codebases, so a visitor moving between phone and desktop feels continuity, not duplication.",
     "keyCharacteristics": [
-      "4 themes × dark/light = 8 surfaces",
-      "OKLCH + color-mix shadow synthesis",
-      "Three-layer token contract",
-      "Chinese-first typography, HarmonyOS opt-in",
-      "Squircle signature card shape (48px / 64px @supports)",
-      "Liquid-glass floating nav (SVG color-dispersion filter) — the one sanctioned glass",
-      "Lifted-paper depth (ambient + inset highlight)",
-      "motion-v (Vue) + framer-motion (React)",
-      "Settings drawer: rounded-3xl + 4-layer right-shadow + spring x-entry",
-      "Custom CSS-pseudo sliders with accent-track gradient fill"
+      "Literary, not commercial — no CTAs, no growth copy, no social proof.",
+      "Four themed rooms — Paper, Sage, Mist, Blush — one study with four moods.",
+      "Theme as infrastructure — 3-layer token architecture; hardcoded colors are a code review red flag.",
+      "Squircle form language — 48px superellipse marks the home bento; restrained 0.625rem radius elsewhere.",
+      "Measured motion — spring primitives (snug/bounce/crisp/reveal); prefers-reduced-motion honored.",
+      "Editorial prose system — drop caps, § section counters, ink-tinted code blocks, language-label headers."
     ],
     "rules": [
-      { "name": "The Four-Rooms Rule", "section": "colors", "body": "Every theme is a complete identity, not a recolor." },
-      { "name": "The One-Voice Rule", "section": "colors", "body": "ONE accent per screen, ≤15% coverage." },
-      { "name": "The Theme-Not-Warmth Rule", "section": "colors", "body": "Tinted neutrals lean toward the theme's own hue, not warm/cool by default." },
-      { "name": "The CJK-First Rule", "section": "typography", "body": "Body stack must be CJK-capable; Averia never renders CJK." },
-      { "name": "The Muted-Text-Is-A-Floor Rule", "section": "colors", "body": "Muted-text is the readability floor; re-audit against --paper whenever paper changes." },
-      { "name": "The Lift-From-Below Rule", "section": "elevation", "body": "Ambient occlusion + soft white inset highlight. The liquid-glass nav is the one sanctioned glass exception." },
-      { "name": "The No-Fixed-RGBA Rule", "section": "elevation", "body": "Shadows derive from --ink / --paper via color-mix (nav glass blocks are the sanctioned exception)." },
-      { "name": "The Directional-Shadow Exception", "section": "elevation", "body": "The settings drawer shadow falls left/up; all other surfaces are top-down symmetric." },
-      { "name": "The Height-Difference Selection Principle", "section": "components", "body": "Selection = border + bg-tint + shadow, never border-width alone." },
-      { "name": "The Drawer-Parity Rule", "section": "components", "body": "Vue + React settings drawers share identical visual specs (parity-migrated 2026-07)." }
+      { "name": "The One Accent Rule", "section": "colors", "body": "The warm copper accent is used on ≤10% of any screen. Its rarity is the point." },
+      { "name": "The Flat-By-Default Rule", "section": "elevation", "body": "Surfaces rest flat (border-as-shadow). Shadows appear only on hover, focus, or lift." },
+      { "name": "The Drop Cap Rule", "section": "typography", "body": "The opening paragraph of a prose article begins with a 3.4em serif drop cap in accent; collapses below 30rem." },
+      { "name": "The Hairline Rule", "section": "shapes", "body": "Dividers, card outlines, and table borders are a 1px border-border hairline — never thick, never colored." },
+      { "name": "The Squircle Signature", "section": "shapes", "body": "A 48px superellipse (corner-shape: squircle) is the home entry's signature — the one moment the system curves decisively." },
+      { "name": "The CJK-First Rule", "section": "typography", "body": "Body stack must be CJK-capable (HarmonyOS Sans); Averia and 阿里妈妈 display fonts never render body text." }
     ],
     "dos": [
-      "Do use semantic Tailwind utilities (bg-primary, text-foreground, bg-muted, border-border)",
-      "Do use color-mix(in oklch, var(--ink) N%, transparent) for theme-adaptive shadows",
-      "Do use the squircle (48px / 64px @supports corner-shape) for bento-style cards",
-      "Do use the liquid-glass nav (SVG url filter + backdrop-blur, 999px pill) for the floating nav only",
-      "Do use the nav's glass-button indicator (translateX slide, cubic-bezier(0.32, 0.72, 0, 1)), not a spring bg fill",
-      "Do use rounded-3xl for the settings drawer panel (only sanctioned radius above rounded-2xl)",
-      "Do use the asymmetric right-facing 4-layer shadow for the settings drawer only",
-      "Do carry live value-chips on the right of slider labels",
-      "Do use the capsule segmented control for 2–4 section switching"
+      "Do build every surface from the three-layer token stack — raw oklch → theme activation → semantic Tailwind class.",
+      "Do keep the accent rare — copper on ≤10% of any screen.",
+      "Do use color-mix(in oklch, var(--ink) X%, var(--paper)) for tinted surfaces rather than new hex values.",
+      "Do honor prefers-reduced-motion: reduce on every animation.",
+      "Do reserve Averia, 阿里妈妈方圆体, and 东方大楷 for display moments only."
     ],
     "donts": [
-      "Don't hardcode color values (#hex, rgba(0,0,0,…)) in component code",
-      "Don't ship side-stripe borders (border-left/right > 1px as accent)",
-      "Don't ship graduated-numeral section markers — use clean capsule segments",
-      "Don't recreate the drawer from an outdated mental model (left-slide / spine / border-t)",
-      "Don't use modal/drawer radii below rounded-2xl for panels, rounded-3xl for the settings drawer",
-      "Don't conflate Tag Pills (lowercase, untracked) with Labels (uppercase, 0.18em tracked)",
-      "Don't extend the nav liquid-glass treatment to other surfaces — it is the one sanctioned glass"
+      "Don't hardcode colors (bg-black/75, text-white/90, from-violet-500…) — hardcoded color is a code review red flag.",
+      "Don't reference tokens across layers — no var(--ink) in a component template, no bg-amber-400 in a card.",
+      "Don't add decorative blur glows, traffic-light code headers, glass-card backdrops, or eyebrow labels.",
+      "Don't override component built-in styles on dialogs or modals.",
+      "Don't use text-white for body text — use text-foreground.",
+      "Don't ship identical-card grids unless uniformity is genuinely required.",
+      "Don't promote a single surface's composition into a system-wide pattern — the bento is the kitchen, not the wallpaper."
     ]
   }
 }
