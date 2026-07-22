@@ -1,4 +1,4 @@
-import { BasicLayout } from '@/components';
+import { BasicLayout } from '@/layouts';
 import { Suspense } from 'react';
 import { createBrowserRouter, redirect } from 'react-router-dom';
 import { useAuthStore } from '@/features/auth';

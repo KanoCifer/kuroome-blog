@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Mock the underlying apiClient module —— 与 blogGateway.test.ts 同模式。
-vi.mock('@/utils/apiClient', () => ({
-  default: {
+vi.mock('@/api/request', () => ({
+  apiClient: {
     get: vi.fn(),
     post: vi.fn(),
     patch: vi.fn(),

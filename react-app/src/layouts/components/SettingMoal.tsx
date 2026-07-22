@@ -6,8 +6,8 @@ import {
 } from '@/stores/themeState';
 import { useShallow } from 'zustand/shallow';
 import { playThemeTransition } from '@/lib/themeTransition';
+import { BottomSheet } from '@/components';
 import { useEffect } from 'react';
-import { BottomSheet } from './BottomSheet';
 
 /* ───────────────────────── static data ───────────────────────── */
 

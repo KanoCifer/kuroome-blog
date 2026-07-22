@@ -32,6 +32,7 @@ const PACKAGES = [
   'features/todo',
   'features/visitor',
   'hooks',
+  'layouts',
   'lib',
   'router',
   'stores',

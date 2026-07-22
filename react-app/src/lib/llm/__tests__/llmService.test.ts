@@ -1,10 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-vi.mock('@/api/request', () => ({
-  default: {
-    post: vi.fn(),
-  },
-}));
+vi.mock('@/api/apiClient', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/api/apiClient')>();
+  return {
+    default: {
+      post: vi.fn(),
+    },
+    extractData: actual.extractData,
+  };
+});
 
 import apiClient from '@/api/apiClient';
 import { llmService } from '../llmService';

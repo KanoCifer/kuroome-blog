@@ -1,14 +1,14 @@
-import { BentoNavSidebar } from '@/components/ui/BasicSidebar';
 import { TrackEvent } from '@/lib/visitorTracker';
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
 import { Outlet } from 'react-router-dom';
-import { BackToTop } from './BackToTop';
-import { BasicNav } from './BasicNav';
-import { CookieConsent } from './CookieConsent';
-import { NavVisibilityProvider } from './NavVisibilityContext';
-import { Notifier } from './NotificationContainer';
+import { BackToTop } from './components/BackToTop';
+import { BasicNav } from './components/BasicNav';
+import { BentoNavSidebar } from './components/BasicSidebar';
+import { CookieConsent } from './components/CookieConsent';
+import { NavVisibilityProvider } from './components/NavVisibilityContext';
+import { Notifier } from './components/NotificationContainer';
 
 function ScrollToTop() {
   const { pathname } = useLocation();

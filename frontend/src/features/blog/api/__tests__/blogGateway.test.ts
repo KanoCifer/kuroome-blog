@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { blogGateway } from '@/features/blog/api/blogGateway';
 
 // Mock the underlying apiClient module
-vi.mock('@/utils/apiClient', () => ({
-  default: {
+vi.mock('@/api/request', () => ({
+  apiClient: {
     get: vi.fn(),
     post: vi.fn(),
     put: vi.fn(),

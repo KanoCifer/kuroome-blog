@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import type { DevTask, DevTaskStatus } from '@/features/todo/api/types';
-import { useNavVisibility } from '@/components';
+import { useNavVisibility } from '@/layouts';
 import { useEffect, useMemo } from 'react';
 import { renderMarkdown } from '@/lib/markdown';
 import {

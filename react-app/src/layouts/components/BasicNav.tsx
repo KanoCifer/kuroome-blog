@@ -21,8 +21,8 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../features/auth';
 import { useThemeState } from '../../stores/themeState';
+import { BottomSheet } from '@/components';
 import { useNavVisibility } from './NavVisibilityContext';
-import { BottomSheet } from './BottomSheet';
 
 interface MenuItemProps {
   icon: React.ReactNode;

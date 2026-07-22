@@ -1,8 +1,8 @@
-import { BasicFooter } from '@/components/ui/BasicFooter';
-import { SettingModal } from '@/components/ui/SettingMoal';
 import { useAuthStore } from '@/features/auth';
 import { useVisitorCountStore } from '@/features/visitor';
 import { motion } from 'framer-motion';
+import { BasicFooter } from './BasicFooter';
+import { SettingModal } from './SettingMoal';
 import {
   BookOpen,
   ChevronDown,

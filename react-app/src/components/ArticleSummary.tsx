@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import DOMPurify from 'dompurify';
 import { Marked } from 'marked';
 import { useEffect, useMemo } from 'react';
-import { useArticleSummary } from '../../hooks/useArticleSummary';
+import { useArticleSummary } from '@/hooks/useArticleSummary';
 
 const marked = new Marked();
 function renderMarkdown(text: string): string {
@@ -94,7 +94,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
             value={selectedModel}
             onChange={(e) => setSelectedModel(e.target.value)}
           >
-            {modelOptions.map((m) => (
+            {modelOptions.map((m: { value: string; label: string }) => (
               <option key={m.value} value={m.value}>
                 {m.label}
               </option>

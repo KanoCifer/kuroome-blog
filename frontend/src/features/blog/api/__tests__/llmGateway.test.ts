@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { llmGateway } from '@/features/blog/api/llmGateway';
 
-vi.mock('@/utils/apiClient', () => ({
-  default: {
+vi.mock('@/api/request', () => ({
+  apiClient: {
     get: vi.fn(),
     post: vi.fn(),
     put: vi.fn(),

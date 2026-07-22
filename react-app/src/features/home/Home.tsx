@@ -1,4 +1,4 @@
-import { useNavVisibility } from '@/components';
+import { useNavVisibility } from '@/layouts';
 import { useEffect } from 'react';
 import { BentoCalendar } from './components/BentoCalendar';
 import { BentoClock } from './components/BentoClock';
