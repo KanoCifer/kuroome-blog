@@ -1,10 +1,5 @@
-import { useThemeState } from '@/stores/themeState';
-
 export function BasicFooter() {
-  const showFooter = useThemeState((s) => s.showFooter);
-  if (!showFooter) return null;
   return (
-    // Footer
     <footer className="mt-12">
       <p className="ext-center text-muted-foreground text-xs">
         Copyright &copy; 2026 All Rights Reserved.
