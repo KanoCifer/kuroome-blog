@@ -10,9 +10,7 @@ defineEmits<{ refresh: [] }>();
 </script>
 
 <template>
-  <p
-    class="text-muted-foreground mt-12 flex items-center justify-between text-xs"
-  >
+  <p class="text-muted mt-12 flex items-center justify-between text-xs">
     <span class="tabular-nums">
       <template v-if="lastRefreshedAt">
         数据更新于 {{ lastRefreshedAt.format('HH:mm') }}

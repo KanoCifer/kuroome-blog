@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ImageEditorModal from './ImageEditorModal.vue';
-import { useMarkdownImage } from '@/features/blog/composables';
+import { useMarkdownImage } from '@/features/upload/composables';
 import hljs from 'highlight.js/lib/common';
 import 'highlight.js/styles/github-dark.css';
 import { renderMarkdown } from '@/composables';
@@ -236,7 +236,7 @@ defineExpose({
         <div class="flex items-center gap-1">
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="wrapBold"
             title="粗体 (Cmd+B)"
           >
@@ -244,7 +244,7 @@ defineExpose({
           </button>
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium italic transition"
+            class="text-muted hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium italic transition"
             @click="wrapItalic"
             title="斜体 (Cmd+I)"
           >
@@ -253,7 +253,7 @@ defineExpose({
           <div class="bg-border mx-1 h-4 w-px"></div>
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="insertHeading"
             title="标题 (##)"
           >
@@ -261,7 +261,7 @@ defineExpose({
           </button>
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="insertQuote"
             title="引用 (> )"
           >
@@ -269,7 +269,7 @@ defineExpose({
           </button>
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="insertList"
             title="列表 (- )"
           >
@@ -277,7 +277,7 @@ defineExpose({
           </button>
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="wrapCode"
             title="行内代码"
           >
@@ -285,7 +285,7 @@ defineExpose({
           </button>
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="insertLink"
             title="链接 (Cmd+K)"
           >
@@ -301,7 +301,7 @@ defineExpose({
           />
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="fileInputRef?.click()"
             title="插入图片"
           >
@@ -316,7 +316,7 @@ defineExpose({
               'rounded-lg px-3 py-1.5 text-xs font-medium transition',
               isFocusMode
                 ? 'bg-warning/10 text-warning'
-                : 'text-muted-foreground hover:bg-muted/50 hover:text-ink',
+                : 'text-muted hover:bg-muted/50 hover:text-ink',
             ]"
             @click="toggleFocusMode"
             title="聚焦模式 (Cmd+Shift+F)"
@@ -329,7 +329,7 @@ defineExpose({
               'rounded-lg px-3 py-1.5 text-xs font-medium transition',
               showPreview
                 ? 'bg-accent/10 text-accent'
-                : 'text-muted-foreground hover:bg-muted/50 hover:text-ink',
+                : 'text-muted hover:bg-muted/50 hover:text-ink',
             ]"
             @click="togglePreview"
             title="预览 (Cmd+Shift+P)"
@@ -352,7 +352,7 @@ defineExpose({
           @keydown="handleKeydown"
           @paste="handlePaste"
           :class="[
-            'placeholder:text-muted-foreground/60 bg-muted field-sizing-content h-full min-h-80 w-full outline-none focus:ring-0',
+            'placeholder:text-muted/60 bg-muted field-sizing-content h-full min-h-80 w-full outline-none focus:ring-0',
             'px-8 py-6 text-lg leading-relaxed',
             'font-serif',
           ]"
@@ -379,10 +379,10 @@ defineExpose({
       >
         <div class="flex h-full flex-col">
           <div class="flex h-10 shrink-0 items-center justify-between px-4">
-            <h2 class="text-muted-foreground text-xs font-medium">预览</h2>
+            <h2 class="text-muted text-xs font-medium">预览</h2>
             <button
               type="button"
-              class="text-muted-foreground hover:text-ink text-xs transition"
+              class="text-muted hover:text-ink text-xs transition"
               @click="togglePreview"
             >
               关闭

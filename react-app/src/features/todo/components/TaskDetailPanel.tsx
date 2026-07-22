@@ -101,7 +101,7 @@ export function TaskDetailPanel({
             </h2>
             <button
               type="button"
-              className="text-muted-foreground hover:bg-muted hover:text-ink focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96]"
+              className="text-muted hover:bg-muted hover:text-ink focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96]"
               aria-label="关闭"
               onClick={onClose}
             >
@@ -126,7 +126,7 @@ export function TaskDetailPanel({
             {!task ? (
               <div className="flex h-full min-h-72 flex-col items-center justify-center gap-3 text-center">
                 <svg
-                  className="text-muted-foreground/40 h-10 w-10"
+                  className="text-muted/40 h-10 w-10"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -138,10 +138,8 @@ export function TaskDetailPanel({
                     d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <p className="text-ink text-sm font-medium">
-                  找不到这个任务
-                </p>
-                <p className="text-muted-foreground max-w-[260px] text-xs leading-relaxed">
+                <p className="text-ink text-sm font-medium">找不到这个任务</p>
+                <p className="text-muted max-w-[260px] text-xs leading-relaxed">
                   它可能已被删除，或链接错误。
                 </p>
               </div>
@@ -162,7 +160,7 @@ export function TaskDetailPanel({
                               ? 'border-success bg-success/10 text-success'
                               : i === statusIndex
                                 ? 'border-accent/40 bg-accent/10 text-accent'
-                                : 'border-border text-muted-foreground opacity-60'
+                                : 'border-border text-muted opacity-60'
                           }`}
                           aria-pressed={task.status === s}
                           onClick={() =>
@@ -198,14 +196,14 @@ export function TaskDetailPanel({
                   {task.status !== '已完成' && task.status !== '已搁置' && (
                     <button
                       type="button"
-                      className="text-muted-foreground hover:bg-muted focus-visible:ring-ring hover:text-ink mx-auto mt-2 block max-w-xs cursor-pointer rounded-md px-2 py-2 text-center text-[11px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
+                      className="text-muted hover:bg-muted focus-visible:ring-ring hover:text-ink mx-auto mt-2 block max-w-xs cursor-pointer rounded-md px-2 py-2 text-center text-[11px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
                       onClick={() => onSetStatus(task.slug, '已搁置')}
                     >
                       搁置此任务
                     </button>
                   )}
                   {task.status === '已搁置' && (
-                    <p className="text-muted-foreground mt-2 text-center text-[11px]">
+                    <p className="text-muted mt-2 text-center text-[11px]">
                       已搁置 — 从上面选择一个状态恢复
                     </p>
                   )}
@@ -223,7 +221,7 @@ export function TaskDetailPanel({
 
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs">
                     {task.parent_slug && (
-                      <span className="text-muted-foreground">
+                      <span className="text-muted">
                         归属{' '}
                         <span className="text-ink font-mono font-medium">
                           {task.parent_slug}
@@ -235,7 +233,7 @@ export function TaskDetailPanel({
                         className={`flex items-center gap-1 ${
                           isOverdue(task.due_date)
                             ? 'text-destructive'
-                            : 'text-muted-foreground'
+                            : 'text-muted'
                         }`}
                       >
                         <svg
@@ -290,11 +288,11 @@ export function TaskDetailPanel({
                 <div className="space-y-4">
                   {task.acceptance_criteria && (
                     <div>
-                      <span className="text-muted-foreground mb-1 block text-[10px] font-medium tracking-widest uppercase">
+                      <span className="text-muted mb-1 block text-[10px] font-medium tracking-widest uppercase">
                         验收标准
                       </span>
                       <div
-                        className="prose prose-sm text-muted-foreground max-w-none"
+                        className="prose prose-sm text-muted max-w-none"
                         dangerouslySetInnerHTML={{
                           __html: renderMarkdown(task.acceptance_criteria),
                         }}
@@ -304,11 +302,11 @@ export function TaskDetailPanel({
 
                   {task.constraints && (
                     <div>
-                      <span className="text-muted-foreground mb-1 block text-[10px] font-medium tracking-widest uppercase">
+                      <span className="text-muted mb-1 block text-[10px] font-medium tracking-widest uppercase">
                         约束
                       </span>
                       <div
-                        className="prose prose-sm text-muted-foreground max-w-none"
+                        className="prose prose-sm text-muted max-w-none"
                         dangerouslySetInnerHTML={{
                           __html: renderMarkdown(task.constraints),
                         }}
@@ -318,20 +316,20 @@ export function TaskDetailPanel({
 
                   {task.context_pointers && (
                     <div>
-                      <span className="text-muted-foreground mb-1 block text-[10px] font-medium tracking-widest uppercase">
+                      <span className="text-muted mb-1 block text-[10px] font-medium tracking-widest uppercase">
                         上下文指针
                       </span>
-                      <pre className="text-muted-foreground font-mono text-[12px] leading-relaxed break-words whitespace-pre-wrap">
+                      <pre className="text-muted font-mono text-[12px] leading-relaxed break-words whitespace-pre-wrap">
                         {task.context_pointers}
                       </pre>
                     </div>
                   )}
 
                   <div>
-                    <span className="text-muted-foreground mb-1 block text-[10px] font-medium tracking-widest uppercase">
+                    <span className="text-muted mb-1 block text-[10px] font-medium tracking-widest uppercase">
                       元数据
                     </span>
-                    <p className="text-muted-foreground font-mono text-[11px] leading-relaxed">
+                    <p className="text-muted font-mono text-[11px] leading-relaxed">
                       ID: {task.id}
                       <br />
                       创建于 {(task.created_at || '').slice(0, 10)} · 更新于
@@ -357,7 +355,7 @@ export function TaskDetailPanel({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="text-muted-foreground hover:bg-muted focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                  className="text-muted hover:bg-muted focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                 >
                   关闭
                 </button>

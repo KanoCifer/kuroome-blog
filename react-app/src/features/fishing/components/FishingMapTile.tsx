@@ -47,7 +47,10 @@ export function FishingMapTile({
    * marker click 回调：打开钓点详情面板。
    * 签名对齐 useMap 的 onMarkerClick(index, userPosition)。
    */
-  const handleMarkerClick = (index: number, userPosition: [number, number]): void => {
+  const handleMarkerClick = (
+    index: number,
+    userPosition: [number, number],
+  ): void => {
     void userPosition;
     const marker = markers[index];
     if (marker) onMarkerSelect(marker);
@@ -90,7 +93,7 @@ export function FishingMapTile({
       </button>
 
       {!isMapReady && (
-        <div className="text-muted-foreground absolute inset-0 z-10 flex items-center justify-center bg-paper/60 text-xs backdrop-blur-[2px]">
+        <div className="text-muted bg-paper/60 absolute inset-0 z-10 flex items-center justify-center text-xs backdrop-blur-[2px]">
           地图加载中…
         </div>
       )}

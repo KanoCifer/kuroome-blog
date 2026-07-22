@@ -244,7 +244,7 @@ watch(
                   :class="
                     i <= Math.round(spot!.rating)
                       ? 'fill-warning'
-                      : 'text-muted-foreground/30'
+                      : 'text-muted/30'
                   "
                 />
               </div>
@@ -255,7 +255,7 @@ watch(
           </div>
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted hover:text-ink inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors"
+            class="text-muted hover:bg-muted hover:text-ink inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors"
             aria-label="关闭详情"
             @click="emit('close')"
           >
@@ -277,7 +277,7 @@ watch(
           </ul>
 
           <!-- 日期 -->
-          <p v-if="dateLabel" class="text-muted-foreground text-xs">
+          <p v-if="dateLabel" class="text-muted text-xs">
             {{ dateLabel }}
           </p>
 
@@ -340,11 +340,11 @@ watch(
                     :class="
                       i <= editRating
                         ? 'fill-warning text-warning'
-                        : 'text-muted-foreground/30'
+                        : 'text-muted/30'
                     "
                   />
                 </button>
-                <span class="text-muted-foreground ml-2 text-xs tabular-nums">
+                <span class="text-muted ml-2 text-xs tabular-nums">
                   {{ editRating.toFixed(1) }}
                 </span>
               </div>
@@ -352,7 +352,7 @@ watch(
             <div class="flex items-center gap-2 pt-1">
               <button
                 type="button"
-                class="text-muted-foreground hover:bg-muted rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                class="text-muted hover:bg-muted rounded-lg px-4 py-2 text-sm font-medium transition-colors"
                 :disabled="saving"
                 @click="cancelEdit"
               >
@@ -377,7 +377,7 @@ watch(
             >
               {{ spot.description }}
             </p>
-            <p v-else class="text-muted-foreground text-sm text-pretty italic">
+            <p v-else class="text-muted text-sm text-pretty italic">
               钓点描述暂无 —— 出钓一次,把体验写进 feedback 里。
             </p>
           </div>
@@ -399,13 +399,13 @@ watch(
               />
             </button>
           </div>
-          <p v-else class="text-muted-foreground text-sm italic">
+          <p v-else class="text-muted text-sm italic">
             还没有照片 —— 下次出钓带上相机。
           </p>
 
           <!-- 迷你地图 -->
           <div v-if="position">
-            <div class="text-muted-foreground mb-2 flex items-center gap-1.5">
+            <div class="text-muted mb-2 flex items-center gap-1.5">
               <MapPin class="h-3.5 w-3.5" />
               <span class="text-xs">位置</span>
             </div>
@@ -429,7 +429,7 @@ watch(
             <button
               v-if="!editing"
               type="button"
-              class="text-muted-foreground hover:bg-muted hover:text-ink inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+              class="text-muted hover:bg-muted hover:text-ink inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
               @click="startEdit"
             >
               <Pencil class="h-3.5 w-3.5" />
@@ -438,7 +438,7 @@ watch(
             <button
               v-if="!editing"
               type="button"
-              class="text-muted-foreground hover:bg-destructive/10 hover:text-destructive inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+              class="text-muted hover:bg-destructive/10 hover:text-destructive inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
               @click="confirmDelete"
             >
               <Trash2 class="h-3.5 w-3.5" />

@@ -4,13 +4,13 @@
     @click="$router.push('/websites')"
   >
     <div
-      class="text-muted-foreground group-hover:text-ink text-xs font-bold tracking-wide uppercase transition-colors duration-300"
+      class="text-muted group-hover:text-ink text-xs font-bold tracking-wide uppercase transition-colors duration-300"
     >
       Daily Pick
     </div>
     <div class="my-1 flex items-center">
       <div
-        class="bg-muted text-muted-foreground group-hover:bg-secondary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors duration-300"
+        class="bg-muted text-muted group-hover:bg-secondary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors duration-300"
       >
         <img
           v-if="randomSite?.icon"
@@ -43,7 +43,7 @@
     </div>
     <div>
       <p
-        class="text-muted-foreground group-hover:text-ink line-clamp-2 text-sm transition-colors duration-300"
+        class="text-muted group-hover:text-ink line-clamp-2 text-sm transition-colors duration-300"
       >
         {{ randomSite?.description || '正在获取推荐网站...' }}
       </p>

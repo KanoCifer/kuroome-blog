@@ -19,7 +19,7 @@
         >
           {{ post.title }}
         </h3>
-        <p class="text-muted-foreground line-clamp-2 text-sm">
+        <p class="text-muted line-clamp-2 text-sm">
           {{ post.excerpt }}
         </p>
       </div>

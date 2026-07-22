@@ -23,7 +23,7 @@ const VERDICT: Record<FishingLevel, Verdict> = {
   好: { text: '今日宜出钓', tone: 'text-accent' },
   一般: { text: '今日可一试', tone: 'text-warning' },
   差: { text: '今日不宜出钓', tone: 'text-destructive' },
-  空军: { text: '今日恐空军', tone: 'text-muted-foreground' },
+  空军: { text: '今日恐空军', tone: 'text-muted' },
 };
 
 interface WeatherHeroProps {
@@ -54,11 +54,8 @@ export function WeatherHero({
     <section className="px-1 pt-2 pb-6" aria-label="当前天气">
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-1.5">
-          <MapPin
-            className="text-muted-foreground h-3.5 w-3.5 shrink-0"
-            aria-hidden
-          />
-          <span className="text-muted-foreground truncate text-sm font-medium">
+          <MapPin className="text-muted h-3.5 w-3.5 shrink-0" aria-hidden />
+          <span className="text-muted truncate text-sm font-medium">
             {locationName || '钓鱼地点'}
           </span>
         </div>
@@ -71,7 +68,7 @@ export function WeatherHero({
           className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
             analysisOpen
               ? 'bg-accent text-accent'
-              : 'text-muted-foreground hover:bg-muted hover:text-ink'
+              : 'text-muted hover:bg-muted hover:text-ink'
           }`}
         >
           <span className="relative inline-flex">
@@ -91,16 +88,16 @@ export function WeatherHero({
           <div className="mt-3 flex items-start justify-between gap-4">
             <div className="min-w-0">
               <div className="flex items-start">
-                <span className="text-ink text-[64px] leading-[0.85] font-light tabular-nums tracking-tight">
+                <span className="text-ink text-[64px] leading-[0.85] font-light tracking-tight tabular-nums">
                   {liveWeather.temp}
                 </span>
                 <span className="text-ink/60 mt-1 ml-0.5 text-3xl font-light">
                   °
                 </span>
               </div>
-              <p className="text-muted-foreground mt-2 text-sm">
+              <p className="text-muted mt-2 text-sm">
                 {liveWeather.text}
-                <span className="text-muted-foreground/70 ml-1.5">
+                <span className="text-muted/70 ml-1.5">
                   {'· 体感 '}
                   {liveWeather.feelsLike}°
                 </span>
@@ -113,15 +110,15 @@ export function WeatherHero({
           </div>
 
           {today && (
-            <p className="text-muted-foreground mt-3 text-sm tabular-nums">
+            <p className="text-muted mt-3 text-sm tabular-nums">
               最高 {today.tempMax}°
-              <span className="text-muted-foreground/40 mx-1.5">·</span>
+              <span className="text-muted/40 mx-1.5">·</span>
               最低 {today.tempMin}°
             </p>
           )}
         </>
       ) : (
-        <p className="text-muted-foreground mt-4 text-sm">暂无天气数据</p>
+        <p className="text-muted mt-4 text-sm">暂无天气数据</p>
       )}
 
       {/* Apple HIG hairline separator — 单一 1px hairline, 不用 SaaS divider block */}
@@ -129,9 +126,7 @@ export function WeatherHero({
 
       <div className="mt-4 flex items-center gap-2">
         <Fish
-          className={`h-4 w-4 shrink-0 ${
-            verdict?.tone ?? 'text-muted-foreground'
-          }`}
+          className={`h-4 w-4 shrink-0 ${verdict?.tone ?? 'text-muted'}`}
           aria-hidden
         />
         {verdict && indexData ? (
@@ -139,7 +134,7 @@ export function WeatherHero({
             <span className={`text-base font-semibold ${verdict.tone}`}>
               {verdict.text}
             </span>
-            <span className="text-muted-foreground text-xs">
+            <span className="text-muted text-xs">
               钓鱼指数 {indexData.level}
               <span className="ml-1.5 tabular-nums">
                 {indexData.fishing_index}
@@ -147,9 +142,7 @@ export function WeatherHero({
             </span>
           </p>
         ) : (
-          <span className="text-muted-foreground text-sm">
-            钓鱼指数计算中…
-          </span>
+          <span className="text-muted text-sm">钓鱼指数计算中…</span>
         )}
       </div>
     </section>
@@ -160,10 +153,10 @@ function HeroSkeleton() {
   return (
     <div className="mt-3 flex flex-col gap-3">
       <div className="flex items-start justify-between">
-        <div className="bg-muted-foreground/15 skeleton-pulse h-16 w-28 rounded-xl" />
-        <div className="bg-muted-foreground/15 skeleton-pulse h-14 w-14 rounded-xl" />
+        <div className="bg-muted/15 skeleton-pulse h-16 w-28 rounded-xl" />
+        <div className="bg-muted/15 skeleton-pulse h-14 w-14 rounded-xl" />
       </div>
-      <div className="bg-muted-foreground/15 skeleton-pulse h-3.5 w-40 rounded-md" />
+      <div className="bg-muted/15 skeleton-pulse h-3.5 w-40 rounded-md" />
     </div>
   );
 }

@@ -1,20 +1,18 @@
 <template>
   <div class="flex flex-col">
-    <h3
-      class="text-ink mb-2 flex items-center gap-2 text-sm font-medium"
-    >
+    <h3 class="text-ink mb-2 flex items-center gap-2 text-sm font-medium">
       <icon-analytics class="size-4" /> 操作系统分布
     </h3>
-    <p class="text-muted-foreground mb-3 text-xs">按操作系统分类的访问占比</p>
+    <p class="text-muted mb-3 text-xs">按操作系统分类的访问占比</p>
     <div
       v-if="loading && !hasOsData"
       class="bg-muted h-56 animate-pulse rounded-xl"
     ></div>
     <div
       v-else-if="!hasOsData"
-      class="text-muted-foreground flex h-56 flex-col items-center justify-center gap-2 px-4 text-center"
+      class="text-muted flex h-56 flex-col items-center justify-center gap-2 px-4 text-center"
     >
-      <icon-analytics class="text-muted-foreground/50 size-7" />
+      <icon-analytics class="text-muted/50 size-7" />
       <p class="text-sm font-medium">暂无系统数据</p>
       <p class="text-xs">操作系统分布会在访客到达后显示在这里。</p>
     </div>

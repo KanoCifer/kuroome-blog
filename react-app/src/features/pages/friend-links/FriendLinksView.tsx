@@ -102,13 +102,13 @@ function DailyPickBanner() {
                 onError={handleImageError}
               />
             ) : (
-              <Globe className="text-muted-foreground h-6 w-6" />
+              <Globe className="text-muted h-6 w-6" />
             )}
           </div>
 
           <div className="min-w-0 flex-1">
             <div className="mb-1 flex items-center gap-2">
-              <span className="text-muted-foreground text-[10px] font-bold tracking-wide uppercase">
+              <span className="text-muted text-[10px] font-bold tracking-wide uppercase">
                 每日推荐
               </span>
               <span className="bg-accent/10 text-accent rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
@@ -118,7 +118,7 @@ function DailyPickBanner() {
             <h3 className="text-ink text-base leading-tight font-bold">
               {pick?.name}
             </h3>
-            <p className="text-muted-foreground mt-1 line-clamp-2 text-xs leading-relaxed">
+            <p className="text-muted mt-1 line-clamp-2 text-xs leading-relaxed">
               {pick?.description}
             </p>
             {pick?.tags && pick.tags.length > 0 && (
@@ -142,7 +142,7 @@ function DailyPickBanner() {
               <RefreshCw className="h-3.5 w-3.5" />
             </button>
             <button
-              className="bg-muted text-muted-foreground flex h-8 w-8 items-center justify-center rounded-lg transition-transform active:scale-95"
+              className="bg-muted text-muted flex h-8 w-8 items-center justify-center rounded-lg transition-transform active:scale-95"
               onClick={(e) => {
                 e.stopPropagation();
                 navigate('/websites');
@@ -203,7 +203,7 @@ function SelfInfoCard() {
               本站
             </span>
           </div>
-          <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+          <p className="text-muted mt-1 text-xs leading-relaxed">
             {self.description}
           </p>
         </div>
@@ -218,11 +218,11 @@ function SelfInfoCard() {
 
       <div className="bg-paper/60 mt-3 space-y-1.5 rounded-xl p-3">
         <div className="flex items-center gap-2 text-xs">
-          <span className="text-muted-foreground w-12 shrink-0">URL</span>
+          <span className="text-muted w-12 shrink-0">URL</span>
           <code className="text-ink truncate">{self.url}</code>
         </div>
         <div className="flex items-center gap-2 text-xs">
-          <span className="text-muted-foreground w-12 shrink-0">Favicon</span>
+          <span className="text-muted w-12 shrink-0">Favicon</span>
           <code className="text-ink truncate">{self.icon}</code>
         </div>
         <div className="flex flex-wrap gap-1.5 pt-1">
@@ -268,14 +268,14 @@ function FriendLinkCard({ link, index }: { link: FriendLink; index: number }) {
               onError={handleImageError}
             />
           ) : (
-            <Globe className="text-muted-foreground h-6 w-6" />
+            <Globe className="text-muted h-6 w-6" />
           )}
         </div>
         <div className="min-w-0 flex-1">
           <h3 className="text-ink group-hover:text-accent text-base font-bold transition-colors">
             {link.name}
           </h3>
-          <p className="text-muted-foreground mt-1 line-clamp-2 text-xs leading-relaxed">
+          <p className="text-muted mt-1 line-clamp-2 text-xs leading-relaxed">
             {link.description}
           </p>
           {link.tags.length > 0 && (
@@ -286,7 +286,7 @@ function FriendLinkCard({ link, index }: { link: FriendLink; index: number }) {
             </div>
           )}
         </div>
-        <ExternalLink className="text-muted-foreground mt-1 h-4 w-4 shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
+        <ExternalLink className="text-muted mt-1 h-4 w-4 shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
       </div>
     </motion.a>
   );
@@ -304,7 +304,7 @@ function ApplyCard() {
         <Link2 className="text-accent h-4 w-4" />
         申请友链
       </h3>
-      <p className="text-muted-foreground mb-3 text-xs leading-relaxed">
+      <p className="text-muted mb-3 text-xs leading-relaxed">
         通过 GitHub Issue 提交友链申请，审核通过后将在 48 小时内上线
       </p>
 
@@ -313,7 +313,7 @@ function ApplyCard() {
           <Info className="text-accent h-3.5 w-3.5" />
           接入须知
         </h4>
-        <ul className="text-muted-foreground space-y-1.5 text-xs">
+        <ul className="text-muted space-y-1.5 text-xs">
           <li className="flex items-start gap-2">
             <span className="text-accent mt-0.5 shrink-0 text-[8px]">●</span>
             <span>网站需符合中国大陆相关法律法规</span>
@@ -360,9 +360,9 @@ function ApplyCard() {
 function EmptyState() {
   return (
     <div className="border-border bg-paper flex flex-col items-center justify-center rounded-2xl border py-12">
-      <Users className="text-muted-foreground mb-3 h-12 w-12" />
-      <p className="text-muted-foreground text-sm">暂无友链</p>
-      <p className="text-muted-foreground mt-1 text-xs">
+      <Users className="text-muted mb-3 h-12 w-12" />
+      <p className="text-muted text-sm">暂无友链</p>
+      <p className="text-muted mt-1 text-xs">
         欢迎提交申请，成为第一位友链伙伴
       </p>
     </div>
@@ -378,9 +378,7 @@ export default function FriendLinksView() {
       <div className="bg-surface sticky top-0 z-10 backdrop-blur-md">
         <div className="ml-12 max-w-2xl px-4 py-4">
           <h1 className="text-ink text-2xl font-bold">友情链接</h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            与志同道合的朋友交换链接
-          </p>
+          <p className="text-muted mt-1 text-sm">与志同道合的朋友交换链接</p>
         </div>
       </div>
 

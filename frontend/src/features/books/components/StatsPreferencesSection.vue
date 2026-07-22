@@ -24,7 +24,7 @@ const { topCategories, topAuthors, topPublishers, hasData } =
         v-if="topCategories.length"
         class="grid grid-cols-[5rem_1fr] gap-x-5 gap-y-1 sm:grid-cols-[6rem_1fr]"
       >
-        <dt class="text-muted-foreground pt-1">品类</dt>
+        <dt class="text-muted pt-1">品类</dt>
         <dd class="flex flex-wrap gap-x-3 gap-y-1.5">
           <span
             v-for="cat in topCategories"
@@ -32,7 +32,7 @@ const { topCategories, topAuthors, topPublishers, hasData } =
             class="text-ink"
           >
             <span class="font-serif">{{ cat.categoryTitle }}</span>
-            <span class="text-muted-foreground ml-1 text-xs tabular-nums">
+            <span class="text-muted ml-1 text-xs tabular-nums">
               {{ Math.round(cat.share * 100) }}%
             </span>
           </span>
@@ -43,7 +43,7 @@ const { topCategories, topAuthors, topPublishers, hasData } =
         v-if="topAuthors.length"
         class="grid grid-cols-[5rem_1fr] gap-x-5 gap-y-1 sm:grid-cols-[6rem_1fr]"
       >
-        <dt class="text-muted-foreground pt-1">作者</dt>
+        <dt class="text-muted pt-1">作者</dt>
         <dd class="flex flex-wrap gap-x-3 gap-y-1.5">
           <span
             v-for="(author, idx) in topAuthors"
@@ -53,10 +53,7 @@ const { topCategories, topAuthors, topPublishers, hasData } =
             <span class="font-serif">
               {{ author.name ?? '未知' }}
             </span>
-            <span
-              v-if="author.readTime"
-              class="text-muted-foreground ml-1 text-xs"
-            >
+            <span v-if="author.readTime" class="text-muted ml-1 text-xs">
               {{ author.readTime }}
             </span>
           </span>
@@ -67,7 +64,7 @@ const { topCategories, topAuthors, topPublishers, hasData } =
         v-if="topPublishers.length"
         class="grid grid-cols-[5rem_1fr] gap-x-5 gap-y-1 sm:grid-cols-[6rem_1fr]"
       >
-        <dt class="text-muted-foreground pt-1">出版社</dt>
+        <dt class="text-muted pt-1">出版社</dt>
         <dd class="flex flex-wrap gap-x-3 gap-y-1.5">
           <span
             v-for="(pub, idx) in topPublishers"
@@ -75,10 +72,7 @@ const { topCategories, topAuthors, topPublishers, hasData } =
             class="text-ink"
           >
             <span class="font-serif">{{ pub.name ?? '未知' }}</span>
-            <span
-              v-if="pub.count"
-              class="text-muted-foreground ml-1 text-xs tabular-nums"
-            >
+            <span v-if="pub.count" class="text-muted ml-1 text-xs tabular-nums">
               {{ pub.count }} 本
             </span>
           </span>

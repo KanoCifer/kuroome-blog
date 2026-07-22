@@ -75,9 +75,7 @@
                     CPU
                   </span>
                 </h3>
-                <span
-                  class="text-muted-foreground text-xs font-medium tabular-nums"
-                >
+                <span class="text-muted text-xs font-medium tabular-nums">
                   {{ serverStatus?.cpu_cores ?? 0 }} 核
                 </span>
               </div>
@@ -117,9 +115,7 @@
                     内存
                   </span>
                 </h3>
-                <span
-                  class="text-muted-foreground text-xs font-medium tabular-nums"
-                >
+                <span class="text-muted text-xs font-medium tabular-nums">
                   {{ serverStatus ? serverStatus.mem_used.toFixed(0) : '—' }} MB
                   /
                   {{ serverStatus ? serverStatus.mem_total.toFixed(0) : '—' }}
@@ -173,13 +169,13 @@
               <div class="space-y-4">
                 <div class="space-y-2">
                   <div class="flex justify-between text-sm">
-                    <span class="text-muted-foreground">已用</span>
+                    <span class="text-muted">已用</span>
                     <span class="text-ink font-medium tabular-nums">
                       {{ serverStatus?.disk_used.toFixed(2) ?? '—' }} GB
                     </span>
                   </div>
                   <div class="flex justify-between text-sm">
-                    <span class="text-muted-foreground">总计</span>
+                    <span class="text-muted">总计</span>
                     <span class="text-ink font-medium tabular-nums">
                       {{ serverStatus?.disk_total.toFixed(2) ?? '—' }} GB
                     </span>
@@ -264,7 +260,7 @@
               class="h-1.5 w-1.5 rounded-full"
               :style="{ backgroundColor: chartColors.cpu }"
             ></span>
-            <span class="text-muted-foreground text-xs">CPU</span>
+            <span class="text-muted text-xs">CPU</span>
             <span class="text-ink text-xs font-medium tabular-nums">
               {{ serverStatus ? serverStatus.cpu_percent.toFixed(0) : '—' }}%
             </span>
@@ -275,7 +271,7 @@
               class="h-1.5 w-1.5 rounded-full"
               :style="{ backgroundColor: chartColors.mem }"
             ></span>
-            <span class="text-muted-foreground text-xs">内存</span>
+            <span class="text-muted text-xs">内存</span>
             <span class="text-ink text-xs font-medium tabular-nums">
               {{ serverStatus ? serverStatus.mem_usage.toFixed(0) : '—' }}%
             </span>
@@ -288,7 +284,7 @@
                 backgroundColor: getStatusColor(serverStatus?.disk_usage ?? 0),
               }"
             ></span>
-            <span class="text-muted-foreground text-xs">磁盘</span>
+            <span class="text-muted text-xs">磁盘</span>
             <span class="text-ink text-xs font-medium tabular-nums">
               {{ serverStatus ? serverStatus.disk_usage.toFixed(0) : '—' }}%
             </span>
@@ -299,7 +295,7 @@
       <div class="flex items-center gap-2">
         <!-- Connection status -->
         <div
-          class="bg-muted text-muted-foreground flex items-center gap-2 rounded-full px-3 py-1 text-xs"
+          class="bg-muted text-muted flex items-center gap-2 rounded-full px-3 py-1 text-xs"
         >
           <div
             :class="[

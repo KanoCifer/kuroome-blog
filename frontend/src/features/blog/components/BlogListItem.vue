@@ -42,7 +42,7 @@
           <div class="flex min-w-0 flex-1 flex-col">
             <!-- 顶部元数据：置顶 / 章节章 / 分类 / 日期 -->
             <div
-              class="text-muted-foreground mb-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px]"
+              class="text-muted mb-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px]"
             >
               <span
                 v-if="post.is_pinned"
@@ -89,7 +89,7 @@
             <div v-if="isFeatured" class="mt-3 flex items-center gap-2">
               <div class="bg-accent/40 h-px w-8" />
               <span
-                class="text-muted-foreground font-serif text-[11px] tracking-[0.2em] italic"
+                class="text-muted font-serif text-[11px] tracking-[0.2em] italic"
                 >篇</span
               >
               <div class="bg-accent/40 h-px w-8" />

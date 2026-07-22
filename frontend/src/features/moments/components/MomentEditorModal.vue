@@ -6,7 +6,7 @@
     >
       <div>
         <div
-          class="text-muted-foreground font-mono text-[10px] tracking-[0.18em] uppercase"
+          class="text-muted font-mono text-[10px] tracking-[0.18em] uppercase"
         >
           {{ isEdit ? 'EDIT' : 'NEW' }} · {{ isEdit ? '编辑' : '写一句' }}
         </div>
@@ -16,7 +16,7 @@
       </div>
       <button
         type="button"
-        class="text-muted-foreground hover:text-ink border-border/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
+        class="text-muted hover:text-ink border-border/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
         aria-label="关闭"
         @click="emit('update:open', false)"
       >
@@ -41,7 +41,7 @@
               >内容</label
             >
             <span class="text-warning text-[11px]">*</span>
-            <span class="text-muted-foreground text-[11px]"
+            <span class="text-muted text-[11px]"
               >必填 · 1~2000 字 · 支持 Markdown</span
             >
           </div>
@@ -52,10 +52,10 @@
             rows="8"
             :maxlength="2000"
             placeholder="今天想到什么..."
-            class="bg-paper border-input text-ink placeholder:text-muted-foreground/60 focus:border-accent focus:ring-ring/20 min-h-[180px] w-full resize-y rounded-lg border px-4 py-3 font-serif text-[15px] leading-loose focus:ring-2 focus:outline-none"
+            class="bg-paper border-input text-ink placeholder:text-muted/60 focus:border-accent focus:ring-ring/20 min-h-[180px] w-full resize-y rounded-lg border px-4 py-3 font-serif text-[15px] leading-loose focus:ring-2 focus:outline-none"
           />
           <div
-            class="text-muted-foreground mt-1.5 flex items-center justify-between font-mono text-[10px] tracking-wide"
+            class="text-muted mt-1.5 flex items-center justify-between font-mono text-[10px] tracking-wide"
           >
             <span v-if="lastSavedAt">已保存草稿 · {{ lastSavedAt }}</span>
             <span v-else>&nbsp;</span>
@@ -68,12 +68,8 @@
         <!-- 心情 -->
         <div>
           <div class="mb-1.5 flex items-baseline gap-2">
-            <label class="text-ink font-serif text-sm font-medium"
-              >心情</label
-            >
-            <span class="text-muted-foreground text-[11px]"
-              >emoji 或一个词</span
-            >
+            <label class="text-ink font-serif text-sm font-medium">心情</label>
+            <span class="text-muted text-[11px]">emoji 或一个词</span>
           </div>
           <div class="flex flex-wrap gap-1.5">
             <button
@@ -96,19 +92,15 @@
             type="text"
             maxlength="50"
             placeholder="或自定义心情..."
-            class="bg-paper border-input text-ink placeholder:text-muted-foreground/60 focus:border-accent focus:ring-ring/20 mt-2 w-full rounded-lg border px-3 py-1.5 text-[13px] focus:ring-2 focus:outline-none"
+            class="bg-paper border-input text-ink placeholder:text-muted/60 focus:border-accent focus:ring-ring/20 mt-2 w-full rounded-lg border px-3 py-1.5 text-[13px] focus:ring-2 focus:outline-none"
           />
         </div>
 
         <!-- 标签 -->
         <div>
           <div class="mb-1.5 flex items-baseline gap-2">
-            <label class="text-ink font-serif text-sm font-medium"
-              >标签</label
-            >
-            <span class="text-muted-foreground text-[11px]"
-              >回车添加，× 删除 · ≤20</span
-            >
+            <label class="text-ink font-serif text-sm font-medium">标签</label>
+            <span class="text-muted text-[11px]">回车添加，× 删除 · ≤20</span>
           </div>
           <div
             class="bg-paper border-input flex flex-wrap items-center gap-1.5 rounded-lg border px-2 py-1.5"
@@ -121,7 +113,7 @@
               <span class="text-accent/70 font-serif">#</span>{{ tag }}
               <button
                 type="button"
-                class="text-muted-foreground hover:text-ink"
+                class="text-muted hover:text-ink"
                 :aria-label="`删除标签 ${tag}`"
                 @click="removeTag(i)"
               >
@@ -147,7 +139,7 @@
       >
         <div>
           <div
-            class="text-muted-foreground mb-2 font-mono text-[10px] tracking-[0.15em] uppercase"
+            class="text-muted mb-2 font-mono text-[10px] tracking-[0.15em] uppercase"
           >
             可见性
           </div>
@@ -172,7 +164,7 @@
                 <div class="text-ink text-[12px] font-medium">
                   {{ l }}
                 </div>
-                <div class="text-muted-foreground mt-0.5 text-[11px]">
+                <div class="text-muted mt-0.5 text-[11px]">
                   {{ d }}
                 </div>
               </div>
@@ -182,7 +174,7 @@
 
         <div>
           <div
-            class="text-muted-foreground mb-2 font-mono text-[10px] tracking-[0.15em] uppercase"
+            class="text-muted mb-2 font-mono text-[10px] tracking-[0.15em] uppercase"
           >
             状态
           </div>
@@ -198,13 +190,11 @@
 
         <div>
           <div
-            class="text-muted-foreground mb-2 font-mono text-[10px] tracking-[0.15em] uppercase"
+            class="text-muted mb-2 font-mono text-[10px] tracking-[0.15em] uppercase"
           >
             选项
           </div>
-          <label
-            class="text-ink mb-1.5 flex items-center gap-2 text-[12px]"
-          >
+          <label class="text-ink mb-1.5 flex items-center gap-2 text-[12px]">
             <input v-model="form.is_pinned" type="checkbox" /> 置顶
           </label>
           <label class="text-ink flex items-center gap-2 text-[12px]">
@@ -229,9 +219,7 @@
             取消
           </button>
         </div>
-        <div
-          class="text-muted-foreground text-center font-mono text-[10px] tracking-wide"
-        >
+        <div class="text-muted text-center font-mono text-[10px] tracking-wide">
           ⌘ + S 保存
         </div>
       </aside>

@@ -151,7 +151,7 @@ const statusClass = computed(() => {
   if (loading.value) return 'bg-accent/15 text-accent';
   if (errorMessage.value) return 'bg-destructive/15 text-destructive';
   if (hasGenerated.value) return 'bg-success/15 text-success';
-  return 'bg-muted text-muted-foreground';
+  return 'bg-muted text-muted';
 });
 
 const resetState = () => {
@@ -286,7 +286,7 @@ onUnmounted(() => {
       <button
         v-else
         type="button"
-        class="bg-accent text-accent hover:bg-accent/90 disabled:bg-muted disabled:text-muted-foreground inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition disabled:cursor-not-allowed"
+        class="bg-accent text-accent hover:bg-accent/90 disabled:bg-muted disabled:text-muted inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition disabled:cursor-not-allowed"
         :disabled="!canGenerate"
         @click="fetchWeatherAnalysis"
       >
@@ -304,7 +304,7 @@ onUnmounted(() => {
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="text-muted-foreground h-7 w-7"
+          class="text-muted h-7 w-7"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -318,16 +318,16 @@ onUnmounted(() => {
           />
         </svg>
       </div>
-      <p class="text-muted-foreground text-sm">等待天气与潮汐数据加载</p>
-      <p class="text-muted-foreground mt-1 text-xs">数据到位后即可生成分析</p>
+      <p class="text-muted text-sm">等待天气与潮汐数据加载</p>
+      <p class="text-muted mt-1 text-xs">数据到位后即可生成分析</p>
     </div>
 
     <!-- 有数据: 结果区 + 脚注 -->
     <div v-else class="flex min-h-0 flex-1 flex-col gap-3">
       <div class="bg-muted/40 flex-1 overflow-auto rounded-xl p-4">
-        <div class="text-muted-foreground mb-3 flex items-center gap-2 text-xs">
+        <div class="text-muted mb-3 flex items-center gap-2 text-xs">
           <span
-            class="bg-muted-foreground/40 h-1.5 w-1.5 rounded-full"
+            class="bg-muted/40 h-1.5 w-1.5 rounded-full"
             aria-hidden="true"
           ></span>
           AI 分析输出
@@ -339,7 +339,7 @@ onUnmounted(() => {
             :initial="{ opacity: 0, y: 8 }"
             :animate="{ opacity: 1, y: 0 }"
             :exit="{ opacity: 0, y: -8 }"
-            class="text-muted-foreground text-sm"
+            class="text-muted text-sm"
           >
             <p>{{ textShimmer[0] }}</p>
             <div class="mt-3 space-y-2">
@@ -363,7 +363,7 @@ onUnmounted(() => {
             :initial="{ opacity: 0, y: 8 }"
             :animate="{ opacity: 1, y: 0 }"
             :exit="{ opacity: 0, y: -8 }"
-            class="text-muted-foreground text-sm"
+            class="text-muted text-sm"
           >
             点击「生成分析」，获取适合外出与钓鱼的天气建议。
           </motion.div>
@@ -378,7 +378,7 @@ onUnmounted(() => {
         {{ errorMessage }}
       </div>
 
-      <div class="text-muted-foreground text-xs leading-relaxed">
+      <div class="text-muted text-xs leading-relaxed">
         天气更新: {{ formatDate(normalizedData?.liveWeather?.obsTime) ?? '--'
         }}<br />
         潮汐更新: {{ formatDate(normalizedData?.tideData?.updateTime) ?? '--' }}

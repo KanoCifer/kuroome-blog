@@ -77,10 +77,7 @@
           v-if="isPlanning || routeInfo"
           class="bg-paper/90 border-border absolute right-4 bottom-4 left-4 mx-auto w-fit rounded-2xl border p-4 shadow-lg backdrop-blur-md"
         >
-          <div
-            v-if="isPlanning"
-            class="text-muted-foreground flex items-center gap-3"
-          >
+          <div v-if="isPlanning" class="text-muted flex items-center gap-3">
             <Loader2 class="h-4 w-4 animate-spin" />
             <span class="text-sm">正在规划路线...</span>
           </div>
@@ -89,16 +86,14 @@
             class="flex items-center justify-between gap-4"
           >
             <div class="space-y-1.5">
-              <p
-                class="text-muted-foreground text-xs tracking-[0.2em] uppercase"
-              >
+              <p class="text-muted text-xs tracking-[0.2em] uppercase">
                 路线信息
               </p>
               <p
                 class="text-ink font-family-averia text-2xl leading-none tabular-nums sm:text-3xl"
               >
                 <span>{{ formatDistance(routeInfo.distance) }}</span>
-                <span class="text-muted-foreground mx-2 text-base">·</span>
+                <span class="text-muted mx-2 text-base">·</span>
                 <span>{{ formatDuration(routeInfo.time) }}</span>
               </p>
             </div>
@@ -115,7 +110,7 @@
 
       <p
         v-if="!isPlanning && !routeInfo"
-        class="text-muted-foreground/90 bg-paper/70 absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full px-4 py-1.5 text-xs backdrop-blur-md"
+        class="text-muted/90 bg-paper/70 absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full px-4 py-1.5 text-xs backdrop-blur-md"
       >
         点击地图标记，查看钓点信息
       </p>

@@ -185,7 +185,7 @@ export function CookieConsent() {
                   <span className="bg-warning/15 flex h-7 w-7 items-center justify-center rounded-full">
                     <CookieIcon />
                   </span>
-                  <span className="text-card-foreground text-[14px] font-semibold tracking-wide">
+                  <span className="text-muted text-[14px] font-semibold tracking-wide">
                     Cookie 与隐私设置
                   </span>
                 </div>
@@ -197,19 +197,19 @@ export function CookieConsent() {
                   <ChevronIcon />
                 </button>
               </div>
-              <p className="text-muted-foreground mb-4 text-[13px] leading-relaxed">
+              <p className="text-muted mb-4 text-[13px] leading-relaxed">
                 本站使用 Cookie 提升浏览体验。继续使用即表示您同意我们的 Cookie
                 政策与隐私协议。
               </p>
               <div className="flex items-center gap-2">
                 <button
-                  className="border-border text-muted-foreground hover:bg-muted hover:text-card-foreground flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-all duration-200 active:scale-[0.97]"
+                  className="border-border text-muted hover:bg-muted hover:text-muted flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-all duration-200 active:scale-[0.97]"
                   onClick={openSettings}
                 >
                   自定义
                 </button>
                 <button
-                  className="border-border text-muted-foreground hover:bg-muted hover:text-card-foreground flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-all duration-200 active:scale-[0.97]"
+                  className="border-border text-muted hover:bg-muted hover:text-muted flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-all duration-200 active:scale-[0.97]"
                   onClick={rejectAll}
                 >
                   拒绝
@@ -237,7 +237,7 @@ export function CookieConsent() {
               transition={{ duration: 0.2, ease: 'easeOut' }}
               className="border-border bg-paper/95 relative w-full max-w-[500px] overflow-hidden rounded-2xl border p-6 shadow-2xl backdrop-blur-sm"
             >
-              <h2 className="text-card-foreground relative text-[16px] font-medium">
+              <h2 className="text-muted relative text-[16px] font-medium">
                 隐私协议核心摘要
               </h2>
               <div
@@ -245,32 +245,32 @@ export function CookieConsent() {
                 className="custom-scrollbar relative flex max-h-[40vh] flex-col gap-3 overflow-y-auto py-2 pr-2"
                 onScroll={handlePrivacyScroll}
               >
-                <div className="text-card-foreground space-y-4 text-[13px] leading-relaxed">
+                <div className="text-muted space-y-4 text-[13px] leading-relaxed">
                   <div>
-                    <h4 className="text-card-foreground mb-1 flex items-center gap-1.5 font-medium">
+                    <h4 className="text-muted mb-1 flex items-center gap-1.5 font-medium">
                       <span className="bg-warning h-1.5 w-1.5 rounded-full" />
                       信息收集
                     </h4>
-                    <p className="text-muted-foreground">
+                    <p className="text-muted">
                       我们收集必要的网络身份标识(IP/UA)及浏览过程数据以保障服务运行。
                     </p>
                   </div>
                   <div>
-                    <h4 className="text-card-foreground mb-1 flex items-center gap-1.5 font-medium">
+                    <h4 className="text-muted mb-1 flex items-center gap-1.5 font-medium">
                       <span className="bg-warning h-1.5 w-1.5 rounded-full" />
                       本地存储
                     </h4>
-                    <p className="text-muted-foreground">
+                    <p className="text-muted">
                       使用 Cookie 和 LocalStorage
                       保存您的登录状态及界面偏好设置。
                     </p>
                   </div>
                   <div>
-                    <h4 className="text-card-foreground mb-1 flex items-center gap-1.5 font-medium">
+                    <h4 className="text-muted mb-1 flex items-center gap-1.5 font-medium">
                       <span className="bg-warning h-1.5 w-1.5 rounded-full" />
                       第三方服务
                     </h4>
-                    <p className="text-muted-foreground">
+                    <p className="text-muted">
                       接入 Gravatar (头像) 及 GitHub OAuth
                       (快捷登录)，仅在您使用时生效。
                     </p>
@@ -289,7 +289,7 @@ export function CookieConsent() {
               <div className="relative mt-4 flex justify-end gap-2">
                 <button
                   onClick={() => setShowPrivacyPreview(false)}
-                  className="border-border text-muted-foreground hover:bg-muted hover:text-card-foreground h-9 rounded-xl border px-4 text-[12px] font-medium transition-all duration-200"
+                  className="border-border text-muted hover:bg-muted hover:text-muted h-9 rounded-xl border px-4 text-[12px] font-medium transition-all duration-200"
                 >
                   返回
                 </button>
@@ -317,10 +317,10 @@ export function CookieConsent() {
               transition={{ duration: 0.2, ease: 'easeOut' }}
               className="border-border bg-paper/95 relative w-full max-w-[400px] overflow-hidden rounded-2xl border p-6 shadow-2xl backdrop-blur-sm"
             >
-              <h2 className="text-card-foreground relative text-[15px] font-medium">
+              <h2 className="text-muted relative text-[15px] font-medium">
                 Cookie 偏好设置
               </h2>
-              <p className="text-muted-foreground relative mt-1 text-[12.5px] leading-relaxed">
+              <p className="text-muted relative mt-1 text-[12.5px] leading-relaxed">
                 选择允许的 Cookie 类别。您可随时通过清除浏览器数据撤回同意。
               </p>
               <div className="relative flex flex-col gap-2.5 py-1">
@@ -343,15 +343,15 @@ export function CookieConsent() {
                       htmlFor={`cookie-${cat.id}`}
                       className="flex-1 cursor-pointer"
                     >
-                      <span className="text-card-foreground text-[13px] font-medium">
+                      <span className="text-muted text-[13px] font-medium">
                         {cat.label}
                       </span>
-                      <p className="text-muted-foreground mt-0.5 text-[11.5px]">
+                      <p className="text-muted mt-0.5 text-[11.5px]">
                         {cat.description}
                       </p>
                     </label>
                     {cat.required && (
-                      <span className="border-border text-muted-foreground mt-0.5 shrink-0 rounded-md border px-2 py-0.5 text-[10px]">
+                      <span className="border-border text-muted mt-0.5 shrink-0 rounded-md border px-2 py-0.5 text-[10px]">
                         必需
                       </span>
                     )}
@@ -361,7 +361,7 @@ export function CookieConsent() {
               <div className="relative mt-4 flex justify-end gap-2">
                 <button
                   onClick={() => setShowSettings(false)}
-                  className="border-border text-muted-foreground hover:bg-muted hover:text-card-foreground h-9 rounded-xl border px-4 text-[12px] font-medium transition-all duration-200"
+                  className="border-border text-muted hover:bg-muted hover:text-muted h-9 rounded-xl border px-4 text-[12px] font-medium transition-all duration-200"
                 >
                   取消
                 </button>

@@ -46,7 +46,7 @@ const visible = computed(() => hasData.value);
 
     <!-- 趋势 -->
     <div v-if="hasTrendData">
-      <p class="text-muted-foreground mb-4 text-sm">
+      <p class="text-muted mb-4 text-sm">
         {{ trendSubtitle }}
       </p>
       <div class="h-56 sm:h-64">
@@ -56,7 +56,7 @@ const visible = computed(() => hasData.value);
 
     <!-- 时段 -->
     <div v-if="hasPreferTimeData">
-      <p class="text-muted-foreground mb-4 text-sm">
+      <p class="text-muted mb-4 text-sm">
         {{ preferTimeSubtitle }}
       </p>
       <div class="h-44 sm:h-48">
@@ -66,7 +66,7 @@ const visible = computed(() => hasData.value);
 
     <!-- 文字 vs 听书 -->
     <div v-if="hasReadListenData">
-      <p class="text-muted-foreground mb-4 text-sm">
+      <p class="text-muted mb-4 text-sm">
         {{ readListenSubtitle }}
       </p>
       <div class="bg-muted flex h-2 overflow-hidden rounded-full">
@@ -80,7 +80,7 @@ const visible = computed(() => hasData.value);
         />
       </div>
       <div
-        class="text-muted-foreground mt-3 flex flex-wrap gap-x-6 gap-y-1 text-xs sm:text-sm"
+        class="text-muted mt-3 flex flex-wrap gap-x-6 gap-y-1 text-xs sm:text-sm"
       >
         <span class="flex items-center gap-2">
           <span class="bg-accent inline-block h-2 w-2 rounded-full" />

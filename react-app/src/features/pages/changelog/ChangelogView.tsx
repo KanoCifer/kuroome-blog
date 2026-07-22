@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 
-import { changelogGateway, type Changelog } from '@/features/pages/changelog/api/changelogGateway';
+import {
+  changelogGateway,
+  type Changelog,
+} from '@/features/pages/changelog/api/changelogGateway';
 import { motion } from 'framer-motion';
 
 const getTypeLabel = (type: string): string => {
@@ -43,7 +46,7 @@ const getTypeClass = (type: string): string => {
     perf: 'bg-linear-to-r from-warning/10 to-warning/10 text-warning ring-1 ring-warning/20',
     test: 'bg-linear-to-r from-cyan-100 to-teal-100 text-teal-700 ring-1 ring-teal-200/60 dark:from-cyan-900/30 dark:to-teal-900/30 dark:text-teal-300 dark:ring-teal-800/60',
     chore:
-      'bg-linear-to-r from-secondary to-secondary text-muted-foreground ring-1 ring-border',
+      'bg-linear-to-r from-secondary to-secondary text-muted ring-1 ring-border',
   };
   return classes[type] ?? classes.chore;
 };
@@ -94,7 +97,7 @@ export default function ChangelogView() {
           <h1 className="text-ink mb-4 text-5xl font-bold tracking-tight max-sm:text-3xl md:text-6xl">
             变更日志
           </h1>
-          <p className="text-muted-foreground mx-auto max-w-2xl text-lg max-sm:text-base">
+          <p className="text-muted mx-auto max-w-2xl text-lg max-sm:text-base">
             记录网站的每一次成长与进步
           </p>
         </div>
@@ -139,7 +142,7 @@ export default function ChangelogView() {
                         </svg>
                         v{release.version}
                       </span>
-                      <span className="text-muted-foreground flex items-center gap-1 text-sm max-sm:text-xs">
+                      <span className="text-muted flex items-center gap-1 text-sm max-sm:text-xs">
                         <svg
                           className="h-4 w-4"
                           fill="none"
@@ -175,7 +178,7 @@ export default function ChangelogView() {
                             )}
                             {getTypeLabel(change.type)}
                           </span>
-                          <span className="text-card-foreground max-sm:text-sm">
+                          <span className="text-muted max-sm:text-sm">
                             {change.content}
                           </span>
                         </li>

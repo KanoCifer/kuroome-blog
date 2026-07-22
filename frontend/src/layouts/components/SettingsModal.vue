@@ -40,7 +40,7 @@
             <!-- 关闭按钮 — 保留圆形 -->
             <button
               @click="close"
-              class="text-muted-foreground hover:bg-muted hover:text-ink absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full transition-colors active:scale-[0.96]"
+              class="text-muted hover:bg-muted hover:text-ink absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full transition-colors active:scale-[0.96]"
               aria-label="关闭"
             >
               <IconClose class="h-5 w-5" />
@@ -52,7 +52,7 @@
               偏好设置
             </h1>
 
-            <p class="text-muted-foreground mt-1.5 font-serif text-sm italic">
+            <p class="text-muted mt-1.5 font-serif text-sm italic">
               Customize your reading experience
             </p>
 
@@ -118,10 +118,8 @@
           <footer
             class="flex items-center justify-between px-8 pt-2 pb-4 font-mono text-[11px]"
           >
-            <span class="text-muted-foreground font-sans">Settings</span>
-            <span class="text-muted-foreground font-serif italic"
-              >ka·no·ci·fer</span
-            >
+            <span class="text-muted font-sans">Settings</span>
+            <span class="text-muted font-serif italic">ka·no·ci·fer</span>
           </footer>
         </div>
       </motion.div>
@@ -237,7 +235,7 @@ const DRAWER_SHADOW = [
   left: 0;
   height: calc(100% - 8px); /* fill nav minus vertical padding */
   z-index: 0;
-  background: var(--background);
+  background: var(--paper);
   border-radius: 0.5rem; /* rounded-lg, matches the buttons */
   box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 8%, transparent);
   transform: translateX(0);

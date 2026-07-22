@@ -35,19 +35,19 @@
           <span class="text-ink text-2xl font-bold tracking-tight">{{
             displayCount
           }}</span>
-          <span class="text-muted-foreground text-xs">本在读</span>
+          <span class="text-muted text-xs">本在读</span>
         </div>
 
         <!-- 阅读时长 -->
         <div class="space-y-1.5 text-[10px]">
           <div class="flex items-center justify-between">
-            <span class="text-muted-foreground">本周</span>
+            <span class="text-muted">本周</span>
             <span class="font-medium text-amber-600">{{
               formatDuration(weeklyMinutes)
             }}</span>
           </div>
           <div class="flex items-center justify-between">
-            <span class="text-muted-foreground">本月</span>
+            <span class="text-muted">本月</span>
             <span class="font-medium text-amber-600">{{
               formatDuration(monthlyMinutes)
             }}</span>

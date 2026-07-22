@@ -4,7 +4,7 @@ export type ImageAlign = 'left' | 'center' | 'right';
 
 export interface MarkdownImageEditorDeps {
   /** 上传单张图片,返回服务端 URL。 */
-  uploadImage: (formData: FormData) => Promise<{ url: string }>;
+  uploadImage: (file: File) => Promise<{ url: string }>;
 }
 
 /**
@@ -33,9 +33,7 @@ export class MarkdownImageEditor {
   readonly editingImageAlign: Ref<ImageAlign>;
   readonly editingImageFile: Ref<File | null>;
 
-  private readonly uploadImage: (
-    formData: FormData,
-  ) => Promise<{ url: string }>;
+  private readonly uploadImage: (file: File) => Promise<{ url: string }>;
 
   constructor(deps: MarkdownImageEditorDeps) {
     this.blobFileMap = ref(new Map());
@@ -149,9 +147,7 @@ export class MarkdownImageEditor {
     const entries = [...this.blobFileMap.value.entries()];
     const results = await Promise.all(
       entries.map(async ([blobUrl, file]) => {
-        const formData = new FormData();
-        formData.append('file', file);
-        const response = await this.uploadImage(formData);
+        const response = await this.uploadImage(file);
         URL.revokeObjectURL(blobUrl);
         return { blobUrl, serverUrl: response.url };
       }),

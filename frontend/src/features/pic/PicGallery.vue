@@ -1,10 +1,8 @@
 <template>
-  <div
-    class="bg-paper min-h-screen w-full overflow-x-hidden overflow-y-auto"
-  >
+  <div class="bg-paper min-h-screen w-full overflow-x-hidden overflow-y-auto">
     <!-- Subtle Dot Pattern Background -->
     <div
-      class="text-muted-foreground/40 pointer-events-none fixed inset-0 z-0 opacity-40 dark:opacity-20"
+      class="text-muted/40 pointer-events-none fixed inset-0 z-0 opacity-40 dark:opacity-20"
       style="
         background-image: radial-gradient(
           circle at 1px 1px,
@@ -74,10 +72,8 @@
           >
             <ImageOff class="h-10 w-10" stroke-width="1.5" />
           </div>
-          <h3 class="text-ink text-xl font-bold tracking-tight">
-            还没有图片
-          </h3>
-          <p class="text-muted-foreground mt-2 text-sm">
+          <h3 class="text-ink text-xl font-bold tracking-tight">还没有图片</h3>
+          <p class="text-muted mt-2 text-sm">
             你的图片墙就像一张白纸，点击上方按钮上传第一张照片吧
           </p>
           <Button

@@ -14,7 +14,9 @@ import SpotMiniMap from '@/features/fishing/components/SpotMiniMap.vue';
 import type { CreateFishingSpotPayload } from '@/features/fishing/api';
 import { fishingSpotsGateway } from '@/features/fishing/api';
 import { DEFAULT_MAP_CENTER } from '@/features/fishing/stores/fishingMap';
-import { useGalleryUpload, type Picture } from '@/features/pic';
+import { useUpload } from '@/features/upload/composables';
+import { rewriteMediaUrl } from '@/composables';
+import { useNotificationStore } from '@/stores';
 import {
   ImagePlus,
   ImageOff,
@@ -24,6 +26,8 @@ import {
   Star,
   X,
 } from '@lucide/vue';
+import dayjs from 'dayjs';
+import { v4 as uuidv4 } from 'uuid';
 import { computed, nextTick, ref, watch } from 'vue';
 import { SlideFadeTransitionX } from '@/components';
 
@@ -60,22 +64,67 @@ const tags = ref('');
 const rating = ref(0);
 const coordinate = ref<[number, number] | null>(null);
 
-// ── 图片上传:复用 useGalleryUpload composable,串行上传,单钓点最多 9 张 ──
+// ── 钓点图片 ──
+// 与照片墙 Picture 同形,但本地定义(避免跨域 import @/features/pic 类型)。
+interface SpotPicture {
+  id: string;
+  uploadedAt: string;
+  url: string;
+  description: string;
+}
+
+// ── 图片上传:useUpload + 本地文件选择/预览,串行上传,单钓点最多 9 张 ──
 const MAX_PICTURES = 9;
-const pictures = ref<Picture[]>([]);
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+const pictures = ref<SpotPicture[]>([]);
 const pendingError = ref<string | null>(null);
 
-const upload = useGalleryUpload();
-const {
-  fileInputRef,
-  previewUrl,
-  isUploading,
-  isDragging,
-  triggerFileInput,
-  handleFileSelect,
-  handleDrop,
-  uploadImage,
-} = upload;
+const { upload, isUploading } = useUpload({
+  type: 'gallery',
+  maxSize: MAX_UPLOAD_BYTES,
+  allowedTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+});
+
+// 文件选择 / 预览状态(原 useGalleryUpload 职责,现由组件自管)
+const fileInputRef = ref<HTMLInputElement | null>(null);
+const selectedFile = ref<File | null>(null);
+const previewUrl = ref<string | null>(null);
+const isDragging = ref(false);
+
+const triggerFileInput = () => fileInputRef.value?.click();
+
+// 校验 + 生成预览(对齐旧 useGalleryUpload.processFile 的 toast 行为)
+const processFile = (file: File) => {
+  if (!file.type.startsWith('image/')) {
+    useNotificationStore().error('请选择图片文件');
+    return;
+  }
+  if (file.size > MAX_UPLOAD_BYTES) {
+    useNotificationStore().error('图片大小不能超过 5MB');
+    return;
+  }
+  selectedFile.value = file;
+  previewUrl.value = URL.createObjectURL(file);
+};
+
+const handleFileSelect = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  if (target.files && target.files.length > 0) {
+    processFile(target.files[0]);
+  }
+};
+
+const handleDrop = (event: DragEvent) => {
+  isDragging.value = false;
+  if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
+    processFile(event.dataTransfer.files[0]);
+  }
+};
+
+// 释放旧预览 object URL,避免内存泄漏(对齐旧 useGalleryUpload 的 watch)
+watch(previewUrl, (_, prev) => {
+  if (prev) URL.revokeObjectURL(prev);
+});
 
 const canAddMore = computed(() => pictures.value.length < MAX_PICTURES);
 
@@ -91,20 +140,27 @@ const canSubmit = computed(
     !isUploading.value,
 );
 
-// ── 上传流:composable 选中文件后立刻触发 uploadImage ──
-watch(upload.selectedFile, async (file) => {
+// ── 上传流:选中文件后立刻触发 upload(串行) ──
+watch(selectedFile, async (file) => {
   if (!file) return;
   if (!canAddMore.value) {
     // 防御性:上限后不应再有 selectedFile(+ 瓦片已隐藏),清空避免残留预览
-    upload.selectedFile.value = null;
-    upload.previewUrl.value = null;
+    selectedFile.value = null;
+    previewUrl.value = null;
     return;
   }
   pendingError.value = null;
-  const result = await uploadImage();
-  if (result) {
-    pictures.value.push(result);
-  } else {
+  try {
+    const url = await upload(file);
+    pictures.value.push({
+      id: uuidv4().slice(0, 8),
+      uploadedAt: dayjs().toISOString(),
+      url: rewriteMediaUrl(url),
+      description: '',
+    });
+    selectedFile.value = null;
+    previewUrl.value = null;
+  } catch {
     pendingError.value = '图片上传失败,请重试';
   }
 });
@@ -122,8 +178,8 @@ watch(
       error.value = '';
       pictures.value = [];
       pendingError.value = null;
-      upload.selectedFile.value = null;
-      upload.previewUrl.value = null;
+      selectedFile.value = null;
+      previewUrl.value = null;
     }
   },
 );
@@ -158,23 +214,30 @@ async function handleSubmit(): Promise<void> {
 
 // ── 图片操作 ──
 async function retryUpload(): Promise<void> {
-  if (!upload.selectedFile.value || isUploading.value) return;
+  if (!selectedFile.value || isUploading.value) return;
   pendingError.value = null;
-  const result = await uploadImage();
-  if (result) {
-    pictures.value.push(result);
-  } else {
+  try {
+    const url = await upload(selectedFile.value);
+    pictures.value.push({
+      id: uuidv4().slice(0, 8),
+      uploadedAt: dayjs().toISOString(),
+      url: rewriteMediaUrl(url),
+      description: '',
+    });
+    selectedFile.value = null;
+    previewUrl.value = null;
+  } catch {
     pendingError.value = '图片上传失败,请重试';
   }
 }
 
-function removePicture(p: Picture): void {
+function removePicture(p: SpotPicture): void {
   pictures.value = pictures.value.filter((x) => x.id !== p.id);
 }
 
 function removeFailed(): void {
-  upload.selectedFile.value = null;
-  upload.previewUrl.value = null;
+  selectedFile.value = null;
+  previewUrl.value = null;
   pendingError.value = null;
 }
 
@@ -246,18 +309,16 @@ watch(
           class="border-border flex items-start justify-between gap-3 border-b px-6 pt-6 pb-5"
         >
           <div class="min-w-0">
-            <h2
-              class="text-ink font-family-averia text-2xl leading-snug"
-            >
+            <h2 class="text-ink font-family-averia text-2xl leading-snug">
               新增钓点
             </h2>
-            <p class="text-muted-foreground mt-0.5 text-xs">
+            <p class="text-muted mt-0.5 text-xs">
               在地图上选择位置，填写钓点信息
             </p>
           </div>
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted hover:text-ink inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors"
+            class="text-muted hover:bg-muted hover:text-ink inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors"
             aria-label="关闭"
             @click="emit('close')"
           >
@@ -278,7 +339,7 @@ watch(
         <div class="flex-1 space-y-5 overflow-y-auto px-6 py-5">
           <!-- 交互迷你地图选点 -->
           <div class="space-y-3">
-            <div class="text-muted-foreground flex items-center gap-1.5">
+            <div class="text-muted flex items-center gap-1.5">
               <MapPin class="h-3.5 w-3.5" />
               <span class="text-xs">点击地图选择钓点位置</span>
             </div>
@@ -291,10 +352,10 @@ watch(
             <div
               class="bg-muted flex items-center justify-between rounded-xl px-4 py-2.5"
             >
-              <span class="text-muted-foreground text-xs">坐标</span>
+              <span class="text-muted text-xs">坐标</span>
               <span
                 class="text-ink font-mono text-xs tabular-nums"
-                :class="{ 'text-muted-foreground/50': !coordinate }"
+                :class="{ 'text-muted/50': !coordinate }"
               >
                 {{
                   coordinate
@@ -319,7 +380,7 @@ watch(
                 v-model="name"
                 type="text"
                 placeholder="例如:南沙天后宫矶钓位"
-                class="bg-muted text-ink placeholder:text-muted-foreground/60 focus:ring-accent/30 w-full rounded-xl border-0 px-4 py-3 text-sm focus:ring-2 focus:outline-none"
+                class="bg-muted text-ink placeholder:text-muted/60 focus:ring-accent/30 w-full rounded-xl border-0 px-4 py-3 text-sm focus:ring-2 focus:outline-none"
               />
             </div>
 
@@ -335,7 +396,7 @@ watch(
                 v-model="description"
                 rows="3"
                 placeholder="水情、目标鱼、最佳出钓时段..."
-                class="bg-muted text-ink placeholder:text-muted-foreground/60 focus:ring-accent/30 w-full resize-none rounded-xl border-0 px-4 py-3 text-sm leading-relaxed focus:ring-2 focus:outline-none"
+                class="bg-muted text-ink placeholder:text-muted/60 focus:ring-accent/30 w-full resize-none rounded-xl border-0 px-4 py-3 text-sm leading-relaxed focus:ring-2 focus:outline-none"
               />
             </div>
 
@@ -351,11 +412,9 @@ watch(
                 v-model="tags"
                 type="text"
                 placeholder="矶钓, 海鲈, 夜钓(逗号分隔)"
-                class="bg-muted text-ink placeholder:text-muted-foreground/60 focus:ring-accent/30 w-full rounded-xl border-0 px-4 py-3 text-sm focus:ring-2 focus:outline-none"
+                class="bg-muted text-ink placeholder:text-muted/60 focus:ring-accent/30 w-full rounded-xl border-0 px-4 py-3 text-sm focus:ring-2 focus:outline-none"
               />
-              <p class="text-muted-foreground mt-1 text-xs">
-                多个标签以逗号分隔
-              </p>
+              <p class="text-muted mt-1 text-xs">多个标签以逗号分隔</p>
             </div>
 
             <!-- 评分 -->
@@ -377,13 +436,13 @@ watch(
                     :class="
                       i <= rating
                         ? 'fill-warning text-warning'
-                        : 'text-muted-foreground/30'
+                        : 'text-muted/30'
                     "
                   />
                 </button>
                 <span
                   v-if="rating > 0"
-                  class="text-muted-foreground ml-2 text-xs tabular-nums"
+                  class="text-muted ml-2 text-xs tabular-nums"
                 >
                   {{ rating.toFixed(1) }}
                 </span>
@@ -420,14 +479,12 @@ watch(
                   class="bg-paper ring-border/5 mb-3 flex h-12 w-12 items-center justify-center rounded-full shadow-sm ring-1 transition-transform group-hover:scale-110"
                 >
                   <ImagePlus
-                    class="text-muted-foreground group-hover:text-accent h-5 w-5 transition-colors"
+                    class="text-muted group-hover:text-accent h-5 w-5 transition-colors"
                     :stroke-width="1.5"
                   />
                 </div>
-                <p class="text-ink text-sm font-medium">
-                  点击或拖拽图片到此处
-                </p>
-                <p class="text-muted-foreground mt-1.5 text-xs">
+                <p class="text-ink text-sm font-medium">点击或拖拽图片到此处</p>
+                <p class="text-muted mt-1.5 text-xs">
                   最多 {{ MAX_PICTURES }} 张,单张 ≤5MB
                 </p>
               </button>
@@ -521,15 +578,15 @@ watch(
                     class="absolute inset-0 flex flex-col items-center justify-center"
                   >
                     <ImagePlus
-                      class="text-muted-foreground group-hover:text-ink h-5 w-5 transition-colors"
+                      class="text-muted group-hover:text-ink h-5 w-5 transition-colors"
                       :stroke-width="1.5"
                     />
-                    <span class="text-muted-foreground mt-1 text-xs">添加</span>
+                    <span class="text-muted mt-1 text-xs">添加</span>
                   </div>
                 </button>
               </div>
 
-              <p class="text-muted-foreground mt-1.5 text-xs tabular-nums">
+              <p class="text-muted mt-1.5 text-xs tabular-nums">
                 {{ pictures.length }} / {{ MAX_PICTURES }}
               </p>
             </div>
@@ -542,7 +599,7 @@ watch(
         >
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+            class="text-muted hover:bg-muted rounded-lg px-4 py-2 text-sm font-medium transition-colors"
             :disabled="submitting"
             @click="emit('close')"
           >

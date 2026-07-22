@@ -21,13 +21,13 @@
                 class="h-8 w-8 object-contain"
                 @error="handleImageError"
               />
-              <IconGlobeOutline v-else class="text-muted-foreground h-7 w-7" />
+              <IconGlobeOutline v-else class="text-muted h-7 w-7" />
             </div>
 
             <div class="min-w-0 flex-1">
               <div class="mb-1 flex items-center gap-2">
                 <span
-                  class="text-muted-foreground text-xs font-bold tracking-wide uppercase"
+                  class="text-muted text-xs font-bold tracking-wide uppercase"
                   >每日推荐</span
                 >
                 <span
@@ -39,7 +39,7 @@
               <h3 class="text-ink text-lg font-bold">
                 {{ dailyPick?.name }}
               </h3>
-              <p class="text-muted-foreground mt-1 line-clamp-2 text-sm">
+              <p class="text-muted mt-1 line-clamp-2 text-sm">
                 {{ dailyPick?.description }}
               </p>
               <div
@@ -65,7 +65,7 @@
                 <span class="hidden sm:inline">看更多</span>
               </button>
               <button
-                class="bg-muted hover:bg-secondary text-muted-foreground hover:text-ink flex cursor-pointer items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all duration-200 active:scale-95"
+                class="bg-muted hover:bg-secondary text-muted hover:text-ink flex cursor-pointer items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all duration-200 active:scale-95"
                 @click.stop="refreshDailyPick"
               >
                 <IconRefresh class="h-3.5 w-3.5" />
@@ -75,7 +75,7 @@
           </div>
         </Transition>
         <IconExternalLink
-          class="text-muted-foreground absolute top-4 right-4 h-5 w-5 shrink-0 opacity-40 transition-opacity duration-300 group-hover:opacity-100"
+          class="text-muted absolute top-4 right-4 h-5 w-5 shrink-0 opacity-40 transition-opacity duration-300 group-hover:opacity-100"
         />
       </div>
 
@@ -109,7 +109,7 @@
                     本站
                   </span>
                 </div>
-                <p class="text-muted-foreground mt-2 leading-relaxed">
+                <p class="text-muted mt-2 leading-relaxed">
                   {{ selfInfo.description }}
                 </p>
               </div>
@@ -130,18 +130,14 @@
             <!-- 信息行 -->
             <div class="bg-paper/60 space-y-2 rounded-xl p-4">
               <div class="flex items-center gap-3 text-sm">
-                <span class="text-muted-foreground w-16 shrink-0 font-medium"
-                  >URL</span
-                >
+                <span class="text-muted w-16 shrink-0 font-medium">URL</span>
                 <code class="text-ink truncate">{{ selfInfo.url }}</code>
               </div>
               <div class="flex items-center gap-3 text-sm">
-                <span class="text-muted-foreground w-16 shrink-0 font-medium"
+                <span class="text-muted w-16 shrink-0 font-medium"
                   >Favicon</span
                 >
-                <code class="text-ink truncate">{{
-                  selfInfo.icon
-                }}</code>
+                <code class="text-ink truncate">{{ selfInfo.icon }}</code>
               </div>
               <div class="flex flex-wrap gap-2 pt-1">
                 <TagPill v-for="tag in selfInfo.tags" :key="tag" compact>
@@ -175,10 +171,7 @@
                   class="h-16 w-16 rounded-full object-cover"
                   @error="handleImageError"
                 />
-                <IconGlobeOutline
-                  v-else
-                  class="text-muted-foreground h-10 w-10"
-                />
+                <IconGlobeOutline v-else class="text-muted h-10 w-10" />
               </div>
               <div class="min-w-0 flex-1">
                 <h3
@@ -187,7 +180,7 @@
                   {{ link.name }}
                 </h3>
                 <p
-                  class="text-muted-foreground group-hover:text-accent mt-2.5 leading-relaxed transition-colors duration-300"
+                  class="text-muted group-hover:text-accent mt-2.5 leading-relaxed transition-colors duration-300"
                 >
                   {{ link.description }}
                 </p>
@@ -203,7 +196,7 @@
             <div
               class="absolute top-6 right-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
             >
-              <IconExternalLink class="text-muted-foreground h-5 w-5" />
+              <IconExternalLink class="text-muted h-5 w-5" />
             </div>
           </motion.a>
 
@@ -212,9 +205,9 @@
             v-if="links.length === 0"
             class="border-border bg-paper/30 flex flex-col items-center justify-center rounded-4xl border py-16"
           >
-            <IconUsersGroup class="text-muted-foreground mb-4 h-16 w-16" />
-            <p class="text-muted-foreground text-lg">暂无友链</p>
-            <p class="text-muted-foreground mt-2 text-sm">
+            <IconUsersGroup class="text-muted mb-4 h-16 w-16" />
+            <p class="text-muted text-lg">暂无友链</p>
+            <p class="text-muted mt-2 text-sm">
               欢迎提交申请，成为第一位友链伙伴
             </p>
           </div>
@@ -233,7 +226,7 @@
                 <IconLinkChain class="text-accent h-5 w-5" />
                 申请友链
               </h3>
-              <p class="text-muted-foreground mt-1.5 text-sm">
+              <p class="text-muted mt-1.5 text-sm">
                 通过 GitHub Issue 提交友链申请，审核通过后将在 48 小时内上线
               </p>
             </div>
@@ -248,7 +241,7 @@
                 <IconInfoCircle class="text-accent h-4 w-4" />
                 接入须知
               </h4>
-              <ul class="text-muted-foreground space-y-2 text-sm">
+              <ul class="text-muted space-y-2 text-sm">
                 <li class="flex items-start gap-2">
                   <span class="text-accent mt-0.5 shrink-0 text-xs">●</span>
                   <span>网站需符合中国大陆相关法律法规</span>
@@ -284,7 +277,7 @@
                 申请格式
               </h4>
               <pre
-                class="bg-muted text-muted-foreground overflow-x-auto rounded-xl p-4 text-xs leading-relaxed"
+                class="bg-muted text-muted overflow-x-auto rounded-xl p-4 text-xs leading-relaxed"
               >
 - **站点名称**：
 - **描述**：

@@ -4,7 +4,6 @@
 // 消费者按需从对应文件导入，此处仅导出无冲突符号，避免 TS2308 二义性。
 export { useArticleChat, type ChatMessage } from './useArticleChat';
 export { useArticleSummary, MODEL_OPTIONS } from './useArticleSummary';
-export { useMarkdownImage } from './useMarkdownImage';
 export { consumeSseStream, parseSseChunk } from './useSseStream';
 export { useTwikoo } from '@/composables';
 export { useLikeSummary, type UseLikeSummaryReturn } from './useLikeSummary';

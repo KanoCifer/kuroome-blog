@@ -187,104 +187,104 @@ function FishingMapContent() {
 
   return (
     <div className="bg-paper min-h-screen">
-        {/* Map — fixed full-screen background */}
-        <FishingMapTile
-          markers={markers}
-          onMarkerSelect={handleMarkerSelect}
-          focusedLocation={selectedMarker?.position ?? null}
-        />
+      {/* Map — fixed full-screen background */}
+      <FishingMapTile
+        markers={markers}
+        onMarkerSelect={handleMarkerSelect}
+        focusedLocation={selectedMarker?.position ?? null}
+      />
 
-        {/* Persistent DashboardSheet — draggable between collapsed / half / full */}
-        <DashboardSheet>
-          <motion.div
-            variants={container}
-            initial="hidden"
-            animate="show"
-            className="mx-auto w-full max-w-xl px-4 pt-1 pb-2"
-          >
-            {/* Route banner — sits at top of sheet so it stays visible in any snap */}
-            <motion.div variants={item} className="mb-2">
-              <RouteBanner onClearRoute={handleClearRoute} />
-            </motion.div>
-
-            {/* Hero — flat surface */}
-            <motion.div variants={item}>
-              <WeatherHero
-                analysisOpen={analysis.open}
-                analysisHasData={analysis.hasData}
-                onToggleAnalysis={analysis.toggle}
-              />
-            </motion.div>
-
-            {/* iOS Weather rhythm: hairline-suggested sections, varied gap */}
-            <motion.div variants={item} className="mt-2">
-              <FishingIndexCard
-                location={userPosition ?? MAP_CENTER}
-                onFeedbackClick={handleFeedbackClick}
-                onDetailClick={handleDetailClick}
-              />
-            </motion.div>
-
-            {showFeedbackBanner && (
-              <motion.div variants={item} className="mt-6">
-                <QuickFeedbackBanner
-                  visible={showFeedbackBanner}
-                  disabled={!indexData}
-                  onSubmit={handleQuickFeedback}
-                />
-              </motion.div>
-            )}
-
-            <motion.div variants={item} className="mt-6">
-              <WeatherCard location={userPosition ?? MAP_CENTER} />
-            </motion.div>
-
-            <motion.div variants={item} className="mt-6">
-              <TideCard />
-            </motion.div>
-
-            <motion.div variants={item} className="mt-6">
-              <HourlyWeather />
-            </motion.div>
-
-            {/* Closing line — literary voice stays */}
-            <p className="text-muted-foreground/60 font-family-averia mt-10 text-center text-xs italic">
-              在出钓与阅读之间，留一片安静
-            </p>
+      {/* Persistent DashboardSheet — draggable between collapsed / half / full */}
+      <DashboardSheet>
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="mx-auto w-full max-w-xl px-4 pt-1 pb-2"
+        >
+          {/* Route banner — sits at top of sheet so it stays visible in any snap */}
+          <motion.div variants={item} className="mb-2">
+            <RouteBanner onClearRoute={handleClearRoute} />
           </motion.div>
-        </DashboardSheet>
 
-        {feedback.currentFishingData && (
-          <FishingFeedbackForm
-            open={feedback.open}
-            fishingData={feedback.currentFishingData}
-            locationId={feedback.locationId}
-            locationName={feedback.locationName}
-            onSuccess={feedback.closeFeedback}
-            onCancel={feedback.closeFeedback}
-          />
-        )}
+          {/* Hero — flat surface */}
+          <motion.div variants={item}>
+            <WeatherHero
+              analysisOpen={analysis.open}
+              analysisHasData={analysis.hasData}
+              onToggleAnalysis={analysis.toggle}
+            />
+          </motion.div>
 
-        <FishingAnalysisDrawer
-          open={analysis.open}
-          onClose={analysis.close}
-          onGenerate={analysis.generateAnalysis}
+          {/* iOS Weather rhythm: hairline-suggested sections, varied gap */}
+          <motion.div variants={item} className="mt-2">
+            <FishingIndexCard
+              location={userPosition ?? MAP_CENTER}
+              onFeedbackClick={handleFeedbackClick}
+              onDetailClick={handleDetailClick}
+            />
+          </motion.div>
+
+          {showFeedbackBanner && (
+            <motion.div variants={item} className="mt-6">
+              <QuickFeedbackBanner
+                visible={showFeedbackBanner}
+                disabled={!indexData}
+                onSubmit={handleQuickFeedback}
+              />
+            </motion.div>
+          )}
+
+          <motion.div variants={item} className="mt-6">
+            <WeatherCard location={userPosition ?? MAP_CENTER} />
+          </motion.div>
+
+          <motion.div variants={item} className="mt-6">
+            <TideCard />
+          </motion.div>
+
+          <motion.div variants={item} className="mt-6">
+            <HourlyWeather />
+          </motion.div>
+
+          {/* Closing line — literary voice stays */}
+          <p className="text-muted/60 font-family-averia mt-10 text-center text-xs italic">
+            在出钓与阅读之间，留一片安静
+          </p>
+        </motion.div>
+      </DashboardSheet>
+
+      {feedback.currentFishingData && (
+        <FishingFeedbackForm
+          open={feedback.open}
+          fishingData={feedback.currentFishingData}
+          locationId={feedback.locationId}
+          locationName={feedback.locationName}
+          onSuccess={feedback.closeFeedback}
+          onCancel={feedback.closeFeedback}
         />
+      )}
 
-        <FishingIndexDetailSheet
-          open={detailSheet.open}
-          data={detailSheet.data}
-          onClose={handleDetailClose}
-        />
+      <FishingAnalysisDrawer
+        open={analysis.open}
+        onClose={analysis.close}
+        onGenerate={analysis.generateAnalysis}
+      />
 
-        <FishingSpotDetailSheet
-          open={selectedMarker !== null}
-          marker={selectedMarker}
-          onClose={handleSpotClose}
-          onRoute={handleSpotRoute}
-          onSpotUpdated={handleSpotUpdated}
-          onSpotDeleted={handleSpotDeleted}
-        />
-      </div>
+      <FishingIndexDetailSheet
+        open={detailSheet.open}
+        data={detailSheet.data}
+        onClose={handleDetailClose}
+      />
+
+      <FishingSpotDetailSheet
+        open={selectedMarker !== null}
+        marker={selectedMarker}
+        onClose={handleSpotClose}
+        onRoute={handleSpotRoute}
+        onSpotUpdated={handleSpotUpdated}
+        onSpotDeleted={handleSpotDeleted}
+      />
+    </div>
   );
 }

@@ -24,7 +24,7 @@
           role="dialog"
           aria-modal="true"
           aria-labelledby="pdm-title"
-          class="bg-paper text-card-foreground border-border/60 relative z-10 grid w-full max-w-5xl overflow-hidden rounded-2xl border shadow-[0_12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)] md:grid-cols-[1.45fr_1fr]"
+          class="bg-paper text-muted border-border/60 relative z-10 grid w-full max-w-5xl overflow-hidden rounded-2xl border shadow-[0_12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)] md:grid-cols-[1.45fr_1fr]"
         >
           <!-- ============= 左侧：胶片查看 ============= -->
           <section
@@ -42,7 +42,7 @@
                 {{ filmLabel }}
               </span>
               <span
-                class="text-muted-foreground text-[11px] tracking-[0.18em] uppercase"
+                class="text-muted text-[11px] tracking-[0.18em] uppercase"
                 style="font-family: var(--font-mono)"
                 :aria-label="`当前帧位 ${frameNo} / 36`"
               >
@@ -87,26 +87,26 @@
 
             <footer class="flex items-center justify-between gap-4">
               <dl
-                class="text-muted-foreground flex items-center gap-2.5 text-[11px] tracking-[0.16em] uppercase"
+                class="text-muted flex items-center gap-2.5 text-[11px] tracking-[0.16em] uppercase"
                 style="font-family: var(--font-mono)"
                 aria-label="拍摄参数"
               >
                 <dt class="sr-only">感光度</dt>
                 <dd>{{ iso }}</dd>
                 <span
-                  class="bg-muted-foreground/30 h-1 w-1 rounded-full"
+                  class="bg-muted/30 h-1 w-1 rounded-full"
                   aria-hidden="true"
                 ></span>
                 <dt class="sr-only">快门</dt>
                 <dd>{{ exposure }}</dd>
                 <span
-                  class="bg-muted-foreground/30 h-1 w-1 rounded-full"
+                  class="bg-muted/30 h-1 w-1 rounded-full"
                   aria-hidden="true"
                 ></span>
                 <dt class="sr-only">光圈</dt>
                 <dd>{{ aperture }}</dd>
                 <span
-                  class="bg-muted-foreground/30 h-1 w-1 rounded-full"
+                  class="bg-muted/30 h-1 w-1 rounded-full"
                   aria-hidden="true"
                 ></span>
                 <dt class="sr-only">焦距</dt>
@@ -173,7 +173,7 @@
               </span>
               <button
                 type="button"
-                class="text-muted-foreground hover:text-ink hover:bg-muted inline-flex h-8 w-8 items-center justify-center rounded-full border border-[color-mix(in_oklch,var(--ink)_12%,transparent)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+                class="text-muted hover:text-ink hover:bg-muted inline-flex h-8 w-8 items-center justify-center rounded-full border border-[color-mix(in_oklch,var(--ink)_12%,transparent)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
                 aria-label="关闭详情"
                 @click="$emit('close')"
               >
@@ -199,9 +199,7 @@
               >
                 {{ ex.camera || '未命名' }}
               </h2>
-              <div
-                class="text-muted-foreground mt-2 flex items-center gap-2 text-[13px]"
-              >
+              <div class="text-muted mt-2 flex items-center gap-2 text-[13px]">
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
@@ -226,7 +224,7 @@
             >
               <div class="bg-paper p-2.5">
                 <div
-                  class="text-muted-foreground mb-1 text-[10px] tracking-[0.16em] uppercase"
+                  class="text-muted mb-1 text-[10px] tracking-[0.16em] uppercase"
                   style="font-family: var(--font-mono)"
                 >
                   机身
@@ -243,7 +241,7 @@
               </div>
               <div class="bg-paper p-2.5">
                 <div
-                  class="text-muted-foreground mb-1 text-[10px] tracking-[0.16em] uppercase"
+                  class="text-muted mb-1 text-[10px] tracking-[0.16em] uppercase"
                   style="font-family: var(--font-mono)"
                 >
                   镜头
@@ -260,7 +258,7 @@
               </div>
               <div class="bg-paper p-2.5">
                 <div
-                  class="text-muted-foreground mb-1 text-[10px] tracking-[0.16em] uppercase"
+                  class="text-muted mb-1 text-[10px] tracking-[0.16em] uppercase"
                   style="font-family: var(--font-mono)"
                 >
                   光圈
@@ -277,7 +275,7 @@
               </div>
               <div class="bg-paper p-2.5">
                 <div
-                  class="text-muted-foreground mb-1 text-[10px] tracking-[0.16em] uppercase"
+                  class="text-muted mb-1 text-[10px] tracking-[0.16em] uppercase"
                   style="font-family: var(--font-mono)"
                 >
                   地点
@@ -297,7 +295,7 @@
             <div class="flex flex-col gap-2">
               <div class="flex items-center justify-between gap-2">
                 <span
-                  class="text-muted-foreground text-[10px] tracking-[0.22em] uppercase"
+                  class="text-muted text-[10px] tracking-[0.22em] uppercase"
                   style="font-family: var(--font-mono)"
                 >
                   拍摄笔记
@@ -305,7 +303,7 @@
                 <button
                   v-if="editable"
                   type="button"
-                  class="text-muted-foreground hover:text-accent rounded-md px-1.5 py-1 text-[10px] tracking-[0.16em] uppercase transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+                  class="text-muted hover:text-accent rounded-md px-1.5 py-1 text-[10px] tracking-[0.16em] uppercase transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
                   style="font-family: var(--font-mono)"
                   aria-label="编辑描述"
                   @click="toggleEdit"
@@ -320,7 +318,7 @@
                 v-model="localDescription"
                 rows="4"
                 aria-label="编辑拍摄笔记"
-                class="bg-paper text-ink placeholder:text-muted-foreground focus:border-accent focus:ring-accent/20 w-full resize-y rounded-xl border border-[color-mix(in_oklch,var(--ink)_18%,transparent)] px-4 py-3.5 text-[14.5px] leading-[1.55] transition-shadow focus:ring-2 focus:outline-none"
+                class="bg-paper text-ink placeholder:text-muted focus:border-accent focus:ring-accent/20 w-full resize-y rounded-xl border border-[color-mix(in_oklch,var(--ink)_18%,transparent)] px-4 py-3.5 text-[14.5px] leading-[1.55] transition-shadow focus:ring-2 focus:outline-none"
                 style="font-family: var(--font-sans)"
                 @keydown.esc="toggleEdit"
               ></textarea>
@@ -330,7 +328,7 @@
                 :class="[
                   'font-family-dongfang min-h-24 rounded-xl border border-dashed px-4 py-3.5 text-[18px] leading-[1.55] whitespace-pre-wrap',
                   isEmpty
-                    ? 'text-muted-foreground/70 grid place-items-center text-center italic'
+                    ? 'text-muted/70 grid place-items-center text-center italic'
                     : 'text-ink/90',
                 ]"
                 :style="

@@ -6,13 +6,13 @@
     <div class="flex items-center gap-2">
       <div class="relative flex-1">
         <Search
-          class="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
+          class="text-muted pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
         />
         <input
           :value="searchQuery"
           type="text"
           placeholder="搜索书名或作者…"
-          class="border-border bg-paper placeholder:text-muted-foreground/50 focus:border-accent focus:ring-accent/20 w-full rounded-xl border py-2 pr-3 pl-9 text-sm transition-colors outline-none focus:ring-2"
+          class="border-border bg-paper placeholder:text-muted/50 focus:border-accent focus:ring-accent/20 w-full rounded-xl border py-2 pr-3 pl-9 text-sm transition-colors outline-none focus:ring-2"
           @input="onSearchInput"
         />
       </div>
@@ -31,7 +31,7 @@
           :class="
             density === opt.key
               ? 'bg-accent text-accent shadow-sm'
-              : 'text-muted-foreground hover:text-ink hover:bg-muted'
+              : 'text-muted hover:text-ink hover:bg-muted'
           "
           :aria-pressed="density === opt.key"
           :aria-label="opt.label"
@@ -91,7 +91,7 @@
         :class="
           filter === chip.key
             ? 'border-accent bg-accent text-accent'
-            : 'border-border bg-paper text-muted-foreground hover:border-ink/20 hover:text-ink'
+            : 'border-border bg-paper text-muted hover:border-ink/20 hover:text-ink'
         "
         role="tab"
         :aria-selected="filter === chip.key"

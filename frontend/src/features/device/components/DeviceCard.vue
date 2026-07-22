@@ -8,7 +8,7 @@
         <div
           class="border-border/50 bg-paper flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border shadow-inner"
         >
-          <span class="text-muted-foreground text-2xl font-bold">
+          <span class="text-muted text-2xl font-bold">
             {{ device.name.charAt(0).toUpperCase() }}
           </span>
         </div>
@@ -28,12 +28,10 @@
           >
             已退役
           </p>
-          <span class="text-muted-foreground text-xs">
+          <span class="text-muted text-xs">
             {{ formatPurchaseDate(device.purchase_date) }}
           </span>
-          <p
-            class="font-family-dongfang text-muted-foreground mt-2 text-xs font-bold"
-          >
+          <p class="font-family-dongfang text-muted mt-2 text-xs font-bold">
             {{
               `日均 ${formatPrice(calcSpendPerDay(device), device.currency)}/天`
             }}
@@ -44,9 +42,7 @@
         <p class="text-brand-devices text-xl font-bold">
           {{ formatPrice(device.price, device.currency) }}
         </p>
-        <p
-          class="text-muted-foreground text-[10px] font-bold tracking-wider uppercase"
-        >
+        <p class="text-muted text-[10px] font-bold tracking-wider uppercase">
           {{ device.currency }}
         </p>
       </div>
@@ -70,7 +66,7 @@
           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
         />
       </svg>
-      <span class="text-muted-foreground truncate text-sm font-medium">
+      <span class="text-muted truncate text-sm font-medium">
         {{ device.notes }}
       </span>
     </div>

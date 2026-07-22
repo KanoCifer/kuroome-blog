@@ -55,13 +55,13 @@
               开发任务
               <span
                 v-if="activeCount"
-                class="text-muted-foreground bg-muted-foreground/10 inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
+                class="text-muted bg-muted/10 inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
                 >{{ activeCount }}</span
               >
             </h3>
             <button
               @click="close"
-              class="text-muted-foreground hover:bg-muted hover:text-ink focus-visible:ring-ring flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+              class="text-muted hover:bg-muted hover:text-ink focus-visible:ring-ring flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
               aria-label="关闭"
             >
               <svg
@@ -88,7 +88,7 @@
               class="flex h-full min-h-48 flex-col items-center justify-center gap-2 text-center"
             >
               <svg
-                class="text-muted-foreground/40 h-10 w-10"
+                class="text-muted/40 h-10 w-10"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -100,7 +100,7 @@
                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 />
               </svg>
-              <p class="text-muted-foreground text-sm">请登录后使用</p>
+              <p class="text-muted text-sm">请登录后使用</p>
               <button
                 class="bg-accent text-accent hover:bg-accent/90 focus-visible:ring-ring mt-1 cursor-pointer rounded-lg px-4 py-1.5 text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                 @click="handleLogin"
@@ -115,7 +115,7 @@
               <button
                 v-if="!showAddForm"
                 @click="showAddForm = true"
-                class="add-shell text-muted-foreground hover:text-ink hover:border-accent/40 mb-6 flex w-full cursor-pointer items-center gap-2 rounded-xl border border-dashed px-3.5 py-2.5 text-sm transition-colors"
+                class="add-shell text-muted hover:text-ink hover:border-accent/40 mb-6 flex w-full cursor-pointer items-center gap-2 rounded-xl border border-dashed px-3.5 py-2.5 text-sm transition-colors"
               >
                 <svg
                   class="h-4 w-4"
@@ -136,14 +136,14 @@
               <!-- Expanded add form：和 section 行卡片同 surface 质感 -->
               <div
                 v-else
-                class="add-shell mb-6 rounded-xl border border-border px-4 py-3.5"
+                class="add-shell border-border mb-6 rounded-xl border px-4 py-3.5"
               >
                 <input
                   ref="addTitleInput"
                   v-model="newTaskForm.title"
                   type="text"
                   placeholder="任务标题…"
-                  class="placeholder:text-muted-foreground/50 text-ink bg-muted focus:border-accent w-full rounded-lg border px-3 py-2 text-sm font-medium outline-none"
+                  class="placeholder:text-muted/50 text-ink bg-muted focus:border-accent w-full rounded-lg border px-3 py-2 text-sm font-medium outline-none"
                   @keydown.enter="submitCreateTask"
                 />
                 <div class="mt-3 space-y-3">
@@ -151,7 +151,7 @@
                     v-model="newTaskForm.description"
                     placeholder="描述… (可选)"
                     rows="3"
-                    class="border-border bg-muted focus:border-accent placeholder:text-muted-foreground/50 text-ink w-full resize-none rounded-lg border p-2.5 text-sm outline-none"
+                    class="border-border bg-muted focus:border-accent placeholder:text-muted/50 text-ink w-full resize-none rounded-lg border p-2.5 text-sm outline-none"
                   ></textarea>
                   <div class="flex flex-wrap items-center gap-2">
                     <select
@@ -207,12 +207,12 @@
                     </h4>
                     <span
                       v-if="section.tasks.length"
-                      class="inline-block min-w-[1.25rem] rounded-full bg-muted-foreground/10 px-1.5 text-center text-[11px] font-medium text-muted-foreground tabular-nums"
+                      class="bg-muted/10 text-muted inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
                     >
                       {{ section.tasks.length }}
                     </span>
                   </div>
-                  <span class="text-muted-foreground text-xs">
+                  <span class="text-muted text-xs">
                     {{ sectionSubtitle(section.key) }}
                   </span>
                 </header>
@@ -241,7 +241,7 @@
 
                 <p
                   v-if="section.tasks.length === 0"
-                  class="text-muted-foreground/60 py-4 text-center text-xs"
+                  class="text-muted/60 py-4 text-center text-xs"
                 >
                   {{ section.emptyText }}
                 </p>

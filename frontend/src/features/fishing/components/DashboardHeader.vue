@@ -26,12 +26,8 @@ defineEmits<{
       class="mx-auto flex max-w-screen-2xl items-center justify-between px-4 py-3 sm:px-6"
     >
       <div class="flex items-baseline gap-3">
-        <h1 class="text-ink text-wrap-balance font-serif text-xl">
-          钓鱼地图
-        </h1>
-        <span
-          class="text-muted-foreground font-serif text-xs tracking-[0.2em] italic"
-        >
+        <h1 class="text-ink text-wrap-balance font-serif text-xl">钓鱼地图</h1>
+        <span class="text-muted font-serif text-xs tracking-[0.2em] italic">
           ka·no·ci·fer
         </span>
       </div>
@@ -60,9 +56,7 @@ defineEmits<{
 
         <button
           class="border-border bg-paper hover:bg-muted text-ink inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors"
-          :class="
-            analysisOpen ? 'border-accent text-accent bg-accent/5' : ''
-          "
+          :class="analysisOpen ? 'border-accent text-accent bg-accent/5' : ''"
           type="button"
           :aria-pressed="analysisOpen"
           @click="$emit('toggle-analysis')"

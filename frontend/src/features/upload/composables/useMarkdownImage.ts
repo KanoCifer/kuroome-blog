@@ -1,6 +1,6 @@
 import { onBeforeUnmount } from 'vue';
-import { uploadGateway } from '@/features/blog/api';
-import { MarkdownImageEditor } from './markdownImageRuntime';
+import { uploadGateway } from '@/features/upload/api';
+import { MarkdownImageEditor } from '../runtime/markdownImageRuntime';
 
 /**
  * Markdown 图像编辑器的 Vue 入口(ADR-0002 facade 模板)。
@@ -23,7 +23,7 @@ import { MarkdownImageEditor } from './markdownImageRuntime';
  */
 export function useMarkdownImage() {
   const editor = new MarkdownImageEditor({
-    uploadImage: uploadGateway.uploadEditorImage,
+    uploadImage: (file: File) => uploadGateway.upload(file, 'blog'),
   });
 
   onBeforeUnmount(() => {

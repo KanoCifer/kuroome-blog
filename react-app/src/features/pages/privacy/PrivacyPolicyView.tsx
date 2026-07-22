@@ -14,11 +14,11 @@ export default function PrivacyPolicyView() {
         transition={{ duration: 0.5, ease: 'easeOut' }}
         className="border-border/60 bg-paper/80 w-full max-w-2xl rounded-2xl border p-6 shadow-sm backdrop-blur-sm md:p-10"
       >
-        <article className="text-card-foreground space-y-7 text-base leading-relaxed">
+        <article className="text-muted space-y-7 text-base leading-relaxed">
           {/* 标题 */}
           <header className="space-y-2">
             <h1 className="text-ink text-2xl font-bold">隐私政策</h1>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-muted text-sm">
               更新日期：2026 年 5 月 16 日 &nbsp;·&nbsp; 生效日期：2026 年 05 月
               16 日
             </p>
@@ -33,13 +33,11 @@ export default function PrivacyPolicyView() {
 
           {/* 信息收集与使用 */}
           <section className="space-y-4">
-            <h2 className="text-ink text-lg font-semibold">
-              信息收集与使用
-            </h2>
+            <h2 className="text-ink text-lg font-semibold">信息收集与使用</h2>
 
             <div className="space-y-2">
-              <h3 className="text-card-foreground font-medium">在您访问时</h3>
-              <blockquote className="border-accent/30 bg-accent/10 text-muted-foreground border-l-3 py-2 pl-4 italic">
+              <h3 className="text-muted font-medium">在您访问时</h3>
+              <blockquote className="border-accent/30 bg-accent/10 text-muted border-l-3 py-2 pl-4 italic">
                 <p>在访问时，收集访问信息的服务会收集不限于以下信息：</p>
               </blockquote>
               <ul className="list-disc space-y-1 pl-6">
@@ -59,10 +57,8 @@ export default function PrivacyPolicyView() {
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-card-foreground font-medium">
-                在您注册 / 评论时
-              </h3>
-              <blockquote className="border-accent/30 bg-accent/10 text-muted-foreground border-l-3 py-2 pl-4 italic">
+              <h3 className="text-muted font-medium">在您注册 / 评论时</h3>
+              <blockquote className="border-accent/30 bg-accent/10 text-muted border-l-3 py-2 pl-4 italic">
                 <p>
                   在您注册账户或发表评论时，本站会通过以下途径获取您的相关信息：
                 </p>
@@ -77,8 +73,8 @@ export default function PrivacyPolicyView() {
                   用于公开显示的用户身份标识
                 </li>
                 <li>
-                  <strong className="text-ink">您的头像</strong> — 通过
-                  Gravatar 服务获取，基于您注册时使用的邮箱
+                  <strong className="text-ink">您的头像</strong> — 通过 Gravatar
+                  服务获取，基于您注册时使用的邮箱
                 </li>
                 <li>
                   <strong className="text-ink">您的网址</strong> —
@@ -96,7 +92,7 @@ export default function PrivacyPolicyView() {
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-card-foreground font-medium">
+              <h3 className="text-muted font-medium">
                 如何使用 Cookies 和本地存储
               </h3>
               <p>
@@ -120,9 +116,7 @@ export default function PrivacyPolicyView() {
 
           {/* 信息的分享和披露 */}
           <section className="space-y-2">
-            <h2 className="text-ink text-lg font-semibold">
-              信息的分享和披露
-            </h2>
+            <h2 className="text-ink text-lg font-semibold">信息的分享和披露</h2>
             <p>
               本站不会出售、交易或出租您的个人身份信息给外部的公司或个人，除非得到您的许可、需要遵从法律要求、保护本站的权利和财产或在紧急情况下保护个人安全。
             </p>
@@ -130,9 +124,7 @@ export default function PrivacyPolicyView() {
 
           {/* 第三方服务 */}
           <section className="space-y-2">
-            <h2 className="text-ink text-lg font-semibold">
-              第三方服务
-            </h2>
+            <h2 className="text-ink text-lg font-semibold">第三方服务</h2>
             <p>本站使用以下第三方服务，它们可能收集您的相关信息：</p>
             <ul className="list-disc space-y-1 pl-6">
               <li>
@@ -148,9 +140,7 @@ export default function PrivacyPolicyView() {
 
           {/* 第三方网站 */}
           <section className="space-y-2">
-            <h2 className="text-ink text-lg font-semibold">
-              第三方网站
-            </h2>
+            <h2 className="text-ink text-lg font-semibold">第三方网站</h2>
             <p>
               本站可能包含指向其他网站的链接。本站不对这些第三方网站的隐私政策或内容负责，请您在离开本站访问其他网站时阅读其隐私政策。
             </p>
@@ -180,9 +170,7 @@ export default function PrivacyPolicyView() {
 
           {/* 隐私政策的变更 */}
           <section className="space-y-2">
-            <h2 className="text-ink text-lg font-semibold">
-              隐私政策的变更
-            </h2>
+            <h2 className="text-ink text-lg font-semibold">隐私政策的变更</h2>
             <p>
               本站保留随时更新或更改本隐私政策的权利。本隐私政策最新的修订日期将会在本页顶部显示。
             </p>

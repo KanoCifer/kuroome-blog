@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { MarkdownImageEditor } from '@/features/blog/composables/markdownImageRuntime';
+import { MarkdownImageEditor } from '@/features/upload/runtime';
 
 function makeFile(name = 'a.png', type = 'image/png'): File {
   return new File(['content'], name, { type });
@@ -233,8 +233,8 @@ describe('MarkdownImageEditor', () => {
       const result = await editor.getContentForPublish(content);
 
       expect(uploadFn).toHaveBeenCalledTimes(1);
-      const formData = uploadFn.mock.calls[0]?.[0] as FormData;
-      expect(formData.get('file')).toBeInstanceOf(File);
+      const file = uploadFn.mock.calls[0]?.[0] as File;
+      expect(file).toBeInstanceOf(File);
       expect(result).toBe('![image](http://srv/1.png)');
       expect(editor.blobFileMap.value.size).toBe(0);
     });
@@ -252,8 +252,8 @@ describe('MarkdownImageEditor', () => {
     it('并发上传多张图片', async () => {
       const uploadFn = vi
         .fn()
-        .mockImplementation(async (fd: FormData) => ({
-          url: `http://srv/${fd.get('file') instanceof File ? 'x' : '?'}.png`,
+        .mockImplementation(async (file: File) => ({
+          url: `http://srv/${file instanceof File ? 'x' : '?'}.png`,
         }));
       const editor = new MarkdownImageEditor({ uploadImage: uploadFn });
 

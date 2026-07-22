@@ -153,19 +153,17 @@ export default function BookShelf() {
         >
           <div className="flex items-center gap-4 sm:gap-6">
             <div className="flex-1">
-              <p className="text-muted-foreground mb-1 text-xs">本周阅读</p>
+              <p className="text-muted mb-1 text-xs">本周阅读</p>
               <p className="text-ink text-xl font-bold">
                 {formatDuration(weeklySnapshot.totalReadTime)}
               </p>
             </div>
             <div className="bg-border h-10 w-px" />
             <div className="flex-1">
-              <p className="text-muted-foreground mb-1 text-xs">阅读天数</p>
+              <p className="text-muted mb-1 text-xs">阅读天数</p>
               <p className="text-ink text-xl font-bold">
                 {weeklySnapshot.readDays ?? 0}
-                <span className="text-muted-foreground text-xs font-normal">
-                  天
-                </span>
+                <span className="text-muted text-xs font-normal">天</span>
               </p>
             </div>
             <div className="bg-border hidden h-10 w-px sm:block" />
@@ -179,9 +177,7 @@ export default function BookShelf() {
                   />
                 )}
                 <div className="min-w-0">
-                  <p className="text-muted-foreground mb-0.5 text-xs">
-                    最近在读
-                  </p>
+                  <p className="text-muted mb-0.5 text-xs">最近在读</p>
                   <p className="text-ink truncate text-sm font-medium">
                     {latestBook.book?.title}
                   </p>
@@ -194,7 +190,7 @@ export default function BookShelf() {
               viewBox="0 0 24 24"
               strokeWidth="2"
               stroke="currentColor"
-              className="text-muted-foreground h-5 w-5 flex-shrink-0"
+              className="text-muted h-5 w-5 flex-shrink-0"
             >
               <path
                 strokeLinecap="round"
@@ -244,8 +240,8 @@ export default function BookShelf() {
           {/* Empty state */}
           {!isLoading && !errorMessage && visibleBooks.length === 0 && (
             <div className="flex flex-col items-center justify-center py-20">
-              <p className="text-muted-foreground font-medium">暂无书籍</p>
-              <p className="text-muted-foreground/60 mt-1 text-sm">
+              <p className="text-muted font-medium">暂无书籍</p>
+              <p className="text-muted/60 mt-1 text-sm">
                 你的微信读书书架还是空的
               </p>
             </div>
@@ -282,7 +278,7 @@ export default function BookShelf() {
                         />
                       ) : (
                         <div className="bg-muted flex h-full w-full items-center justify-center">
-                          <span className="text-muted-foreground/40 font-serif text-2xl">
+                          <span className="text-muted/40 font-serif text-2xl">
                             {book.title.slice(0, 1)}
                           </span>
                         </div>
@@ -309,7 +305,7 @@ export default function BookShelf() {
                         {book.title}
                       </p>
                       <p
-                        className="text-muted-foreground mt-1 truncate text-[11px] leading-snug"
+                        className="text-muted mt-1 truncate text-[11px] leading-snug"
                         title={book.author}
                       >
                         {book.author}

@@ -11,7 +11,7 @@
           @click.stop
         >
           <button
-            class="bg-destructive text-destructive-foreground hover:bg-destructive/90 absolute top-4 right-4 z-50 rounded-full px-1.5 py-1.5"
+            class="bg-destructive text-destructive-muted hover:bg-destructive/90 absolute top-4 right-4 z-50 rounded-full px-1.5 py-1.5"
             @click="onClose"
           >
             <svg

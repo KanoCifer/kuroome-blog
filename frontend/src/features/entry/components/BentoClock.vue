@@ -6,13 +6,11 @@
     <div
       class="from-accent/30 via-secondary/30 to-secondary/30 absolute inset-0 bg-linear-to-br opacity-0 transition-opacity duration-500 group-hover:opacity-100"
     />
-    <p
-      class="text-muted-foreground relative text-sm font-medium tracking-wider"
-    >
+    <p class="text-muted relative text-sm font-medium tracking-wider">
       {{ dateLabel }}
     </p>
     <BentoClockTime />
-    <p class="text-muted-foreground relative mt-1 text-sm">
+    <p class="text-muted relative mt-1 text-sm">
       {{ weekdayLabel }}
     </p>
   </BentoCard>

@@ -4,13 +4,11 @@ export {
   blogGateway,
   llmGateway,
   socialGateway,
-  uploadGateway,
 } from './api';
 export type {
   BlogGateway,
   LlmGateway,
   SocialGateway,
-  UploadGateway,
 } from './api';
 
 export {
@@ -19,7 +17,6 @@ export {
   useArticleChat,
   useArticleSummary,
   useLikeSummary,
-  useMarkdownImage,
   useTwikoo,
   MODEL_OPTIONS,
 } from './composables';

@@ -24,9 +24,7 @@
         </svg>
       </div>
       <div>
-        <div
-          class="text-ink mb-1 text-xs font-bold tracking-wide uppercase"
-        >
+        <div class="text-ink mb-1 text-xs font-bold tracking-wide uppercase">
           Recommended Read
         </div>
         <h3
@@ -34,7 +32,7 @@
         >
           {{ item.title }}
         </h3>
-        <p class="text-muted-foreground line-clamp-3 text-sm">
+        <p class="text-muted line-clamp-3 text-sm">
           {{ item.description }}
         </p>
       </div>

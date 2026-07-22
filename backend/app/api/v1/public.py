@@ -13,7 +13,6 @@ from fastapi import APIRouter, Body, Depends, Request
 from fastapi.responses import PlainTextResponse
 from redis.asyncio import Redis as AsyncRedis
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette import status
 
 from app.api.des.appstate import get_app_state
 from app.api.des.db import get_session

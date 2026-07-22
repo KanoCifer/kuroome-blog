@@ -16,7 +16,7 @@
         <KindBadge :kind="task.kind" />
         <span
           v-if="task.scope"
-          class="text-muted-foreground border-border rounded-full border px-1.5 py-px text-[10px]"
+          class="text-muted border-border rounded-full border px-1.5 py-px text-[10px]"
         >
           {{ task.scope }}
         </span>
@@ -44,9 +44,7 @@
       <span
         v-if="task.due_date"
         class="flex items-center gap-1 text-[10px]"
-        :class="
-          overdue(task.due_date) ? 'text-destructive' : 'text-muted-foreground'
-        "
+        :class="overdue(task.due_date) ? 'text-destructive' : 'text-muted'"
       >
         <svg class="h-2.5 w-2.5" viewBox="0 0 20 20" fill="currentColor">
           <path
@@ -65,7 +63,7 @@
       >
         <button
           type="button"
-          class="text-muted-foreground hover:bg-muted hover:text-accent focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
+          class="text-muted hover:bg-muted hover:text-accent focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
           title="推进状态"
           aria-label="推进状态"
           @click="$emit('cycle', task.slug)"
@@ -86,7 +84,7 @@
         </button>
         <button
           type="button"
-          class="text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
+          class="text-muted hover:bg-destructive/10 hover:text-destructive focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
           title="删除"
           aria-label="删除"
           @click="$emit('delete', task.slug)"

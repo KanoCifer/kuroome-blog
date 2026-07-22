@@ -1,15 +1,11 @@
 <template>
   <BentoCard>
     <div class="p-4">
-      <h3
-        class="text-muted-foreground mb-3 text-xs font-bold tracking-wider uppercase"
-      >
+      <h3 class="text-muted mb-3 text-xs font-bold tracking-wider uppercase">
         Tags
       </h3>
-      <p v-if="isLoading" class="text-muted-foreground text-xs">加载中…</p>
-      <p v-else-if="tags.length === 0" class="text-muted-foreground text-xs">
-        暂无标签
-      </p>
+      <p v-if="isLoading" class="text-muted text-xs">加载中…</p>
+      <p v-else-if="tags.length === 0" class="text-muted text-xs">暂无标签</p>
       <ul v-else class="space-y-1">
         <li>
           <button
@@ -18,14 +14,14 @@
               'flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
               activeTag === null
                 ? 'bg-accent/15 text-accent font-medium'
-                : 'text-muted-foreground hover:bg-muted hover:text-ink',
+                : 'text-muted hover:bg-muted hover:text-ink',
             ]"
           >
             <span class="flex items-center gap-2">
               <IconTags class="size-4" />
               全部文章
             </span>
-            <span class="text-muted-foreground text-xs">
+            <span class="text-muted text-xs">
               {{ totalPosts }}
             </span>
           </button>
@@ -37,14 +33,14 @@
               'flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
               activeTag === tag.name
                 ? 'bg-accent/15 text-accent font-medium'
-                : 'text-muted-foreground hover:bg-muted hover:text-ink',
+                : 'text-muted hover:bg-muted hover:text-ink',
             ]"
           >
             <span class="flex items-center gap-2">
               <IconTags class="size-4" />
               {{ tag.name }}
             </span>
-            <span class="text-muted-foreground text-xs">{{ tag.count }}</span>
+            <span class="text-muted text-xs">{{ tag.count }}</span>
           </button>
         </li>
       </ul>

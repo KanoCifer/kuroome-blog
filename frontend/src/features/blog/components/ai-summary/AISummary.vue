@@ -129,7 +129,7 @@ async function switchToChat() {
             :animate="{ opacity: 1, y: 0 }"
             :exit="{ opacity: 0, y: -6 }"
             :transition="FADE"
-            class="text-muted-foreground text-sm"
+            class="text-muted text-sm"
           >
             {{ textShimmer[0] }}
           </motion.span>
@@ -144,7 +144,7 @@ async function switchToChat() {
             :class="
               cardMode === CardMode.SUMMARY
                 ? 'bg-paper text-ink shadow-sm'
-                : 'text-muted-foreground hover:text-ink'
+                : 'text-muted hover:text-ink'
             "
             :disabled="loading"
             @click="cardMode = CardMode.SUMMARY"
@@ -156,7 +156,7 @@ async function switchToChat() {
             :class="
               cardMode === CardMode.CHAT
                 ? 'bg-paper text-ink shadow-sm'
-                : 'text-muted-foreground hover:text-ink'
+                : 'text-muted hover:text-ink'
             "
             :disabled="loading"
             @click="switchToChat"
@@ -220,7 +220,7 @@ async function switchToChat() {
       <template v-else>
         <button
           v-if="messages.length > 0"
-          class="text-muted-foreground hover:text-ink dark:text-muted-foreground dark:hover:text-ink ml-auto cursor-pointer rounded-md px-2.5 py-1 text-sm transition-colors"
+          class="text-muted hover:text-ink dark:text-muted dark:hover:text-ink ml-auto cursor-pointer rounded-md px-2.5 py-1 text-sm transition-colors"
           :disabled="loading"
           @click="clearChat"
         >
@@ -261,7 +261,7 @@ async function switchToChat() {
                 stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                class="text-muted-foreground"
+                class="text-muted"
               >
                 <path
                   d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"
@@ -272,9 +272,7 @@ async function switchToChat() {
                 <path d="M10 9H8" />
               </svg>
             </div>
-            <p
-              class="text-muted-foreground dark:text-muted-foreground text-base leading-relaxed"
-            >
+            <p class="text-muted dark:text-muted text-base leading-relaxed">
               点击「生成总结」，快速提炼文章核心要点
             </p>
           </div>
@@ -287,7 +285,7 @@ async function switchToChat() {
       <div class="border-border/40 border-t">
         <template v-if="!hasGenerated">
           <div class="px-5 py-6 text-center">
-            <p class="text-muted-foreground text-base">
+            <p class="text-muted text-base">
               切换到对话模式后，输入问题即可开始讨论文章内容
             </p>
           </div>
@@ -321,16 +319,14 @@ async function switchToChat() {
                   ></div>
                   <span
                     v-if="loading && idx === messages.length - 1 && msg.content"
-                    class="text-muted-foreground ml-0.5 animate-pulse"
+                    class="text-muted ml-0.5 animate-pulse"
                     >▎</span
                   >
                 </template>
                 <template
                   v-if="loading && idx === messages.length - 1 && !msg.content"
                 >
-                  <span class="text-muted-foreground animate-pulse"
-                    >思考中...</span
-                  >
+                  <span class="text-muted animate-pulse">思考中...</span>
                 </template>
               </div>
             </div>
@@ -343,7 +339,7 @@ async function switchToChat() {
               v-model="chatInput"
               type="text"
               placeholder="继续提问..."
-              class="border-border/70 bg-muted/30 text-ink placeholder-muted-foreground focus:border-ring focus:ring-ring dark:border-border/70 dark:bg-muted/20 dark:text-ink dark:placeholder-muted-foreground dark:focus:border-ring dark:focus:ring-ring flex-1 rounded-lg border px-3.5 py-2.5 text-base transition-colors focus:ring-1 focus:outline-none"
+              class="border-border/70 bg-muted/30 text-ink placeholder-muted focus:border-ring focus:ring-ring dark:border-border/70 dark:bg-muted/20 dark:text-ink dark:placeholder-muted dark:focus:border-ring dark:focus:ring-ring flex-1 rounded-lg border px-3.5 py-2.5 text-base transition-colors focus:ring-1 focus:outline-none"
               :disabled="loading"
               @keydown="onChatKeydown"
             />

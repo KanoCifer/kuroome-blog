@@ -106,7 +106,7 @@ export function AIAnalysisWidget({
     if (analysisLoading) return 'bg-accent/15 text-accent';
     if (analysisError) return 'bg-destructive/15 text-destructive';
     if (analysisResult) return 'bg-success/15 text-success';
-    return 'bg-muted text-muted-foreground';
+    return 'bg-muted text-muted';
   })();
 
   // 内嵌模式：去掉 fixed + portal，改为流式容器
@@ -122,7 +122,7 @@ export function AIAnalysisWidget({
           {analysisOpen && (
             <button
               onClick={closeAnalysis}
-              className="text-muted-foreground hover:bg-muted rounded-full p-1"
+              className="text-muted hover:bg-muted rounded-full p-1"
               aria-label="关闭分析"
             >
               <X className="h-3.5 w-3.5" />
@@ -194,7 +194,7 @@ export function AIAnalysisWidget({
                 setAnalysisLoading(true);
               }}
               disabled={!analysisHasData}
-              className="bg-accent text-accent hover:bg-accent/90 disabled:bg-muted disabled:text-muted-foreground relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors disabled:cursor-not-allowed"
+              className="bg-accent text-accent hover:bg-accent/90 disabled:bg-muted disabled:text-muted relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors disabled:cursor-not-allowed"
             >
               {analysisResult ? '重新分析' : '生成分析'}
             </button>
@@ -228,7 +228,7 @@ export function AIAnalysisWidget({
                     <h3 className="text-ink text-sm font-semibold tracking-tight">
                       AI 天气分析
                     </h3>
-                    <p className="text-muted-foreground mt-0.5 text-xs">
+                    <p className="text-muted mt-0.5 text-xs">
                       结合实时天气与潮汐节奏给出出行建议
                     </p>
                   </div>
@@ -240,7 +240,7 @@ export function AIAnalysisWidget({
                     </span>
                     <button
                       onClick={closeAnalysis}
-                      className="text-muted-foreground hover:bg-muted rounded-full p-1"
+                      className="text-muted hover:bg-muted rounded-full p-1"
                       aria-label="关闭分析"
                     >
                       <X className="h-3.5 w-3.5" />
@@ -312,7 +312,7 @@ export function AIAnalysisWidget({
                         setAnalysisLoading(true);
                       }}
                       disabled={!analysisHasData}
-                      className="bg-accent text-accent hover:bg-accent/90 disabled:bg-muted disabled:text-muted-foreground relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors disabled:cursor-not-allowed"
+                      className="bg-accent text-accent hover:bg-accent/90 disabled:bg-muted disabled:text-muted relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors disabled:cursor-not-allowed"
                     >
                       {analysisResult ? '重新分析' : '生成分析'}
                     </button>
@@ -356,8 +356,8 @@ function EmptyState({
       <div className="bg-muted mb-3 flex h-12 w-12 items-center justify-center rounded-2xl">
         {icon}
       </div>
-      <p className="text-muted-foreground text-sm">{title}</p>
-      <p className="text-muted-foreground mt-1 text-xs">{subtitle}</p>
+      <p className="text-muted text-sm">{title}</p>
+      <p className="text-muted mt-1 text-xs">{subtitle}</p>
     </div>
   );
 }
@@ -365,11 +365,11 @@ function EmptyState({
 function LoadingState({ shimmerText }: { shimmerText: string }) {
   return (
     <div className="space-y-3">
-      <p className="text-muted-foreground text-sm">{shimmerText}</p>
+      <p className="text-muted text-sm">{shimmerText}</p>
       <div className="space-y-2">
-        <div className="bg-secondary h-3 w-full skeleton-pulse rounded" />
-        <div className="bg-secondary h-3 w-5/6 skeleton-pulse rounded" />
-        <div className="bg-secondary h-3 w-2/3 skeleton-pulse rounded" />
+        <div className="bg-secondary skeleton-pulse h-3 w-full rounded" />
+        <div className="bg-secondary skeleton-pulse h-3 w-5/6 rounded" />
+        <div className="bg-secondary skeleton-pulse h-3 w-2/3 rounded" />
       </div>
     </div>
   );
@@ -394,7 +394,7 @@ function ResultState({ html }: { html: string }) {
 
 function PlaceholderState() {
   return (
-    <p className="text-muted-foreground text-sm">
+    <p className="text-muted text-sm">
       点击「生成分析」，获取适合外出与钓鱼的天气建议。
     </p>
   );

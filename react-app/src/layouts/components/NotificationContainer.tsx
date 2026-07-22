@@ -55,11 +55,11 @@ export function Notifier() {
       >
         <AnimationLayer type={n.type} />
 
-        <div className="text-card-foreground flex-1 text-sm leading-snug font-semibold">
+        <div className="text-muted flex-1 text-sm leading-snug font-semibold">
           {n.message}
         </div>
         <button
-          className="text-muted-foreground hover:bg-muted hover:text-card-foreground mr-2 shrink-0 cursor-pointer rounded-md p-1 transition-colors"
+          className="text-muted hover:bg-muted hover:text-muted mr-2 shrink-0 cursor-pointer rounded-md p-1 transition-colors"
           onClick={() => notificationStore.dismiss(n.id)}
           aria-label="dismiss"
         >

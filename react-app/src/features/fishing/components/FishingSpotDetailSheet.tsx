@@ -108,9 +108,9 @@ export function FishingSpotDetailSheet({
         },
       });
     } catch (err: unknown) {
-      useNotificationStore.getState().error(
-        err instanceof Error ? err.message : '更新钓点失败',
-      );
+      useNotificationStore
+        .getState()
+        .error(err instanceof Error ? err.message : '更新钓点失败');
     } finally {
       setSaving(false);
     }
@@ -127,9 +127,9 @@ export function FishingSpotDetailSheet({
       onSpotDeleted?.(spot.id);
       onClose();
     } catch (err: unknown) {
-      useNotificationStore.getState().error(
-        err instanceof Error ? err.message : '删除钓点失败',
-      );
+      useNotificationStore
+        .getState()
+        .error(err instanceof Error ? err.message : '删除钓点失败');
     } finally {
       setDeleting(false);
     }
@@ -156,16 +156,14 @@ export function FishingSpotDetailSheet({
                 {spot?.name || '钓点详情'}
               </h2>
               {dateLabel && (
-                <p className="text-muted-foreground mt-0.5 text-xs">
-                  {dateLabel}
-                </p>
+                <p className="text-muted mt-0.5 text-xs">{dateLabel}</p>
               )}
             </div>
             <button
               type="button"
               aria-label="关闭钓点详情"
               onClick={onClose}
-              className="text-muted-foreground hover:bg-muted hover:text-ink ml-3 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors"
+              className="text-muted hover:bg-muted hover:text-ink ml-3 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
@@ -191,9 +189,7 @@ export function FishingSpotDetailSheet({
         ) : (
           <>
             {/* 评分星级 — Apple Weather 大数字区同层 */}
-            {spot?.rating !== undefined && (
-              <RatingRow rating={spot.rating} />
-            )}
+            {spot?.rating !== undefined && <RatingRow rating={spot.rating} />}
 
             {/* 描述正文 — serif 阅读节奏 */}
             {spot?.description && (
@@ -208,7 +204,7 @@ export function FishingSpotDetailSheet({
                 {spot.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="bg-muted text-muted-foreground rounded-full px-3 py-1 text-xs font-medium"
+                    className="bg-muted text-muted rounded-full px-3 py-1 text-xs font-medium"
                   >
                     {tag}
                   </span>
@@ -240,7 +236,7 @@ export function FishingSpotDetailSheet({
                 type="button"
                 onClick={() => onRoute?.(marker!)}
                 disabled={!marker}
-                className="bg-accent text-accent hover:bg-accent/90 min-h-11 flex w-full items-center justify-center gap-2 rounded-full px-5 text-sm font-medium transition-colors disabled:opacity-60"
+                className="bg-accent text-accent hover:bg-accent/90 flex min-h-11 w-full items-center justify-center gap-2 rounded-full px-5 text-sm font-medium transition-colors disabled:opacity-60"
               >
                 <Navigation className="h-4 w-4" />
                 导航到此处
@@ -249,7 +245,7 @@ export function FishingSpotDetailSheet({
                 <button
                   type="button"
                   onClick={startEdit}
-                  className="border-border text-muted-foreground hover:bg-muted min-h-11 flex flex-1 items-center justify-center gap-2 rounded-full border px-5 text-sm font-medium transition-colors"
+                  className="border-border text-muted hover:bg-muted flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full border px-5 text-sm font-medium transition-colors"
                 >
                   <Pencil className="h-4 w-4" />
                   编辑
@@ -257,7 +253,7 @@ export function FishingSpotDetailSheet({
                 <button
                   type="button"
                   onClick={confirmDelete}
-                  className="text-destructive hover:bg-destructive/10 min-h-11 flex flex-1 items-center justify-center gap-2 rounded-full px-5 text-sm font-medium transition-colors"
+                  className="text-destructive hover:bg-destructive/10 flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full px-5 text-sm font-medium transition-colors"
                 >
                   <Trash2 className="h-4 w-4" />
                   删除
@@ -270,14 +266,14 @@ export function FishingSpotDetailSheet({
         {/* 删除确认 */}
         {deleteOpen && (
           <div className="border-border/60 border-t pt-4">
-            <p className="text-muted-foreground mb-3 text-sm">
+            <p className="text-muted mb-3 text-sm">
               删除钓点「{spot?.name ?? ''}」？软删可在后端恢复。
             </p>
             <div className="flex gap-2.5">
               <button
                 type="button"
                 onClick={() => setDeleteOpen(false)}
-                className="border-border text-muted-foreground hover:bg-muted min-h-11 flex-1 rounded-full border px-5 text-sm font-medium transition-colors"
+                className="border-border text-muted hover:bg-muted min-h-11 flex-1 rounded-full border px-5 text-sm font-medium transition-colors"
               >
                 取消
               </button>
@@ -306,9 +302,7 @@ function RatingRow({ rating }: { rating: number }) {
         <Star
           key={i}
           className={`h-5 w-5 ${
-            i < stars
-              ? 'fill-warning text-warning'
-              : 'text-ink/15'
+            i < stars ? 'fill-warning text-warning' : 'text-ink/15'
           }`}
         />
       ))}
@@ -331,13 +325,11 @@ function InfoRow({
 }) {
   return (
     <div className="flex items-center justify-between px-4 py-2.5">
-      <span className="text-muted-foreground flex items-center gap-2 text-xs font-medium">
+      <span className="text-muted flex items-center gap-2 text-xs font-medium">
         {icon}
         {label}
       </span>
-      <span className="text-ink text-sm font-medium tabular-nums">
-        {value}
-      </span>
+      <span className="text-ink text-sm font-medium tabular-nums">{value}</span>
     </div>
   );
 }
@@ -373,39 +365,37 @@ function EditForm({
   return (
     <div className="flex flex-col gap-4">
       <label className="flex flex-col gap-1.5">
-        <span className="text-muted-foreground text-xs font-medium">名称</span>
+        <span className="text-muted text-xs font-medium">名称</span>
         <input
           type="text"
           value={name}
           onChange={(e) => onNameChange(e.target.value)}
-          className="border-input bg-paper text-ink min-h-11 rounded-xl border px-3.5 text-sm outline-none focus:border-ring focus:ring-ring/20 focus:ring-2"
+          className="border-input bg-paper text-ink focus:border-ring focus:ring-ring/20 min-h-11 rounded-xl border px-3.5 text-sm outline-none focus:ring-2"
         />
       </label>
 
       <label className="flex flex-col gap-1.5">
-        <span className="text-muted-foreground text-xs font-medium">描述</span>
+        <span className="text-muted text-xs font-medium">描述</span>
         <textarea
           value={description}
           onChange={(e) => onDescriptionChange(e.target.value)}
           rows={3}
-          className="border-input bg-paper text-ink resize-none rounded-xl border px-3.5 py-2.5 text-sm leading-relaxed outline-none focus:border-ring focus:ring-ring/20 focus:ring-2"
+          className="border-input bg-paper text-ink focus:border-ring focus:ring-ring/20 resize-none rounded-xl border px-3.5 py-2.5 text-sm leading-relaxed outline-none focus:ring-2"
         />
       </label>
 
       <label className="flex flex-col gap-1.5">
-        <span className="text-muted-foreground text-xs font-medium">
-          标签（逗号分隔）
-        </span>
+        <span className="text-muted text-xs font-medium">标签（逗号分隔）</span>
         <input
           type="text"
           value={tags}
           onChange={(e) => onTagsChange(e.target.value)}
-          className="border-input bg-paper text-ink min-h-11 rounded-xl border px-3.5 text-sm outline-none focus:border-ring focus:ring-ring/20 focus:ring-2"
+          className="border-input bg-paper text-ink focus:border-ring focus:ring-ring/20 min-h-11 rounded-xl border px-3.5 text-sm outline-none focus:ring-2"
         />
       </label>
 
       <div className="flex flex-col gap-1.5">
-        <span className="text-muted-foreground text-xs font-medium">评分</span>
+        <span className="text-muted text-xs font-medium">评分</span>
         <div className="flex items-center gap-1.5">
           {Array.from({ length: 5 }).map((_, i) => (
             <button
@@ -431,7 +421,7 @@ function EditForm({
         <button
           type="button"
           onClick={onCancel}
-          className="border-border text-muted-foreground hover:bg-muted min-h-11 flex-1 rounded-full border px-5 text-sm font-medium transition-colors"
+          className="border-border text-muted hover:bg-muted min-h-11 flex-1 rounded-full border px-5 text-sm font-medium transition-colors"
         >
           取消
         </button>

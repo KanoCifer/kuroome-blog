@@ -43,13 +43,10 @@
           class="text-ink/80 font-mono text-[11px] tracking-[0.1em] uppercase"
           >{{ row.label }}</span
         >
-        <span class="text-muted-foreground/70 text-[11px]">{{
-          row.status
+        <span class="text-muted/70 text-[11px]">{{ row.status }}</span>
+        <span class="text-ink ml-auto font-mono text-[12px] tabular-nums">{{
+          row.value
         }}</span>
-        <span
-          class="text-ink ml-auto font-mono text-[12px] tabular-nums"
-          >{{ row.value }}</span
-        >
       </li>
     </ul>
   </div>
@@ -101,7 +98,7 @@ const wsLatency = computed(() => {
 
 const wsDotClass = computed(() => {
   const ms = connectionDelay?.value ?? 0;
-  if (!ms) return 'bg-muted-foreground/40';
+  if (!ms) return 'bg-muted/40';
   if (ms < 200) return 'bg-emerald-500';
   if (ms < 2000) return 'bg-yellow-500';
   return 'bg-red-500';
@@ -164,8 +161,8 @@ const rows = computed<ServiceRow[]>(() => {
       label: 'Database',
       status: dbOk ? '连接正常' : '检测中…',
       value: dbOk ? 'OK' : '--',
-      dotClass: dbOk ? 'bg-emerald-500' : 'bg-muted-foreground/40',
-      pingClass: dbOk ? 'bg-emerald-500' : 'bg-muted-foreground/40',
+      dotClass: dbOk ? 'bg-emerald-500' : 'bg-muted/40',
+      pingClass: dbOk ? 'bg-emerald-500' : 'bg-muted/40',
     },
   ];
 });

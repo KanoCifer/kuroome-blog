@@ -6,9 +6,7 @@
     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
       <div>
         <h2 class="text-accent text-xl font-bold">文章列表</h2>
-        <p class="text-muted-foreground mt-1 text-sm">
-          搜索与分页阅读已保存文章
-        </p>
+        <p class="text-muted mt-1 text-sm">搜索与分页阅读已保存文章</p>
       </div>
       <button
         type="button"
@@ -26,7 +24,7 @@
           :value="searchQuery"
           type="search"
           placeholder="搜索文章标题和内容..."
-          class="border-border bg-paper text-ink placeholder:text-muted-foreground focus:border-accent focus:ring-accent/20 w-full rounded-xl border py-3 pr-24 pl-4 text-sm focus:ring-2 focus:outline-none"
+          class="border-border bg-paper text-ink placeholder:text-muted focus:border-accent focus:ring-accent/20 w-full rounded-xl border py-3 pr-24 pl-4 text-sm focus:ring-2 focus:outline-none"
           @input="
             $emit(
               'update:searchQuery',
@@ -87,7 +85,7 @@
 
     <div
       v-else-if="articles.length === 0"
-      class="border-border bg-muted/40 text-muted-foreground rounded-xl border border-dashed p-8 text-center text-sm"
+      class="border-border bg-muted/40 text-muted rounded-xl border border-dashed p-8 text-center text-sm"
     >
       暂无文章，尝试刷新订阅或更换搜索条件。
     </div>
@@ -118,15 +116,10 @@
                 {{ article.is_read ? '已读' : '未读' }}
               </span>
             </div>
-            <p
-              v-if="article.summary"
-              class="text-muted-foreground line-clamp-2 text-sm"
-            >
+            <p v-if="article.summary" class="text-muted line-clamp-2 text-sm">
               {{ article.summary }}
             </p>
-            <div
-              class="text-muted-foreground flex flex-wrap items-center gap-3 text-xs"
-            >
+            <div class="text-muted flex flex-wrap items-center gap-3 text-xs">
               <span v-if="article.author">作者: {{ article.author }}</span>
               <span>发布时间: {{ formatDate(article.published) }}</span>
               <span class="truncate">来源: {{ article.feed_url }}</span>
@@ -154,7 +147,7 @@
           :class="
             currentPage > 1
               ? 'bg-accent text-accent hover:bg-accent/90'
-              : 'bg-muted text-muted-foreground cursor-not-allowed'
+              : 'bg-muted text-muted cursor-not-allowed'
           "
           @click="$emit('goToPage', currentPage - 1)"
         >
@@ -170,7 +163,7 @@
           :class="
             currentPage < totalPages
               ? 'bg-accent text-accent hover:bg-accent/90'
-              : 'bg-muted text-muted-foreground cursor-not-allowed'
+              : 'bg-muted text-muted cursor-not-allowed'
           "
           @click="$emit('goToPage', currentPage + 1)"
         >

@@ -82,7 +82,7 @@ export function BlogListItem({ post, index }: BlogListItemProps) {
             {/* 文字区 */}
             <div className="flex min-w-0 flex-1 flex-col">
               {/* 顶部元数据：置顶 / 分类 / 日期 */}
-              <div className="text-muted-foreground mb-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px]">
+              <div className="text-muted mb-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px]">
                 {post.is_pinned && (
                   <span className="bg-accent/15 text-accent inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold">
                     <svg
@@ -126,7 +126,7 @@ export function BlogListItem({ post, index }: BlogListItemProps) {
               {isFeatured ? (
                 <div className="mt-3 flex items-center gap-2">
                   <div className="bg-accent/40 h-px w-8" />
-                  <span className="text-muted-foreground font-serif text-[11px] tracking-[0.2em] italic">
+                  <span className="text-muted font-serif text-[11px] tracking-[0.2em] italic">
                     篇
                   </span>
                   <div className="bg-accent/40 h-px w-8" />

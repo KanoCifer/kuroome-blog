@@ -126,14 +126,14 @@ const handleSubmit = async () => {
       <div class="t-modal" :class="{ 'is-open': isOpen }">
         <h3 class="text-ink mb-4 text-lg font-semibold">
           钓鱼反馈
-          <span class="text-muted-foreground ml-2 text-sm font-normal"
+          <span class="text-muted ml-2 text-sm font-normal"
             >你的反馈会帮助我们改进</span
           >
         </h3>
 
         <div class="bg-muted mb-4 rounded-lg p-3 text-sm">
-          <p class="text-muted-foreground">地点: {{ locationName }}</p>
-          <p class="text-muted-foreground">
+          <p class="text-muted">地点: {{ locationName }}</p>
+          <p class="text-muted">
             当前指数: {{ fishingData.fishing_index }} ({{ fishingData.level }})
           </p>
         </div>
@@ -198,7 +198,7 @@ const handleSubmit = async () => {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: oklch(from var(--foreground) l c h / 0.4);
+  background: oklch(from var(--muted) l c h / 0.4);
   backdrop-filter: blur(2px);
   --modal-open-dur: 250ms;
   --modal-close-dur: 150ms;

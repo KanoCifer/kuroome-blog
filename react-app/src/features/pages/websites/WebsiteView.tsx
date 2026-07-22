@@ -49,23 +49,23 @@ export default function WebsiteView() {
             />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="text-ink group-hover:text-card-foreground truncate text-lg font-bold transition-colors duration-300">
+            <h3 className="text-ink group-hover:text-muted truncate text-lg font-bold transition-colors duration-300">
               {t.name}
             </h3>
-            <span className="bg-secondary text-muted-foreground inline-block rounded-full px-2 py-0.5 text-xs font-medium">
+            <span className="bg-secondary text-muted inline-block rounded-full px-2 py-0.5 text-xs font-medium">
               {t.category}
             </span>
           </div>
         </div>
 
-        <p className="text-muted-foreground line-clamp-3 text-sm leading-relaxed">
+        <p className="text-muted line-clamp-3 text-sm leading-relaxed">
           {t.description}
         </p>
 
         <div className="mt-4 flex flex-wrap gap-2">
           <span
             key={t.id}
-            className="bg-secondary text-muted-foreground rounded-full px-2 py-1 text-xs"
+            className="bg-secondary text-muted rounded-full px-2 py-1 text-xs"
           >
             {t.tags.map((tag) => (
               <span key={tag}>{tag}</span>
@@ -76,7 +76,7 @@ export default function WebsiteView() {
         <div className="absolute top-4 right-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="text-muted-foreground h-5 w-5"
+            className="text-muted h-5 w-5"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

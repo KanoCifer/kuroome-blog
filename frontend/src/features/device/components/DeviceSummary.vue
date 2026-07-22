@@ -5,7 +5,7 @@
       class="squircle border-border/10 bg-paper col-span-2 flex items-center justify-between border p-10 shadow-lg"
     >
       <div>
-        <p class="text-muted-foreground text-sm font-medium">设备总价格</p>
+        <p class="text-muted text-sm font-medium">设备总价格</p>
         <p class="text-brand-devices mt-1 text-3xl font-bold tracking-tight">
           ¥{{ totalPrice.toFixed(2) }}
         </p>
@@ -51,7 +51,7 @@
         </svg>
       </div>
       <div>
-        <p class="text-muted-foreground text-xs font-medium">使用中</p>
+        <p class="text-muted text-xs font-medium">使用中</p>
         <p class="text-ink mt-1 text-xl font-bold">
           {{ activeCount }}
         </p>
@@ -80,7 +80,7 @@
         </svg>
       </div>
       <div>
-        <p class="text-muted-foreground text-xs font-medium">设备总数</p>
+        <p class="text-muted text-xs font-medium">设备总数</p>
         <p class="text-ink mt-1 text-xl font-bold">
           {{ totalCount }}
         </p>

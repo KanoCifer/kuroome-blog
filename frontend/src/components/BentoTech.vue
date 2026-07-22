@@ -20,9 +20,7 @@
             <polyline points="8 6 2 12 8 18" />
           </svg>
         </div>
-        <h3
-          class="text-muted-foreground text-xs font-bold tracking-wider uppercase"
-        >
+        <h3 class="text-muted text-xs font-bold tracking-wider uppercase">
           TechStack
         </h3>
       </div>

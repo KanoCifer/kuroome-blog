@@ -129,7 +129,7 @@
    Any element with a non-zero Tailwind border-width class automatically gets
    a layered box-shadow outline REPLACING the hard border. The original 1px
    border is made transparent (since shadow is a more flexible, theme-adaptive
-   replacement), and the shadow adapts to the active theme via --foreground
+   replacement), and the shadow adapts to the active theme via --muted
    at low alpha. */
 @layer base {
   :where([class~='border']) {

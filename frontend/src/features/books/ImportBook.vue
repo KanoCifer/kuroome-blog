@@ -10,7 +10,7 @@
         >
           绑定微信读书<br />API Key
         </h1>
-        <p class="text-muted-foreground mt-4 text-base leading-relaxed">
+        <p class="text-muted mt-4 text-base leading-relaxed">
           在下方输入您的微信读书
           <code
             class="bg-muted text-ink rounded px-1.5 py-0.5 font-mono text-xs"
@@ -69,7 +69,7 @@
               :aria-describedby="
                 hasFieldError ? 'api-key-error' : 'api-key-hint'
               "
-              class="border-input bg-paper text-ink placeholder:text-muted-foreground/70 focus:ring-accent/20 w-full rounded-2xl border px-5 py-4 pr-14 font-mono text-base transition-all duration-200 focus:ring-2 focus:outline-none"
+              class="border-input bg-paper text-ink placeholder:text-muted/70 focus:ring-accent/20 w-full rounded-2xl border px-5 py-4 pr-14 font-mono text-base transition-all duration-200 focus:ring-2 focus:outline-none"
               :class="
                 hasFieldError
                   ? 'border-destructive focus:border-destructive focus:ring-destructive/20'
@@ -79,7 +79,7 @@
             />
             <button
               type="button"
-              class="text-muted-foreground hover:text-ink focus:ring-ring absolute inset-y-0 right-2 my-auto flex h-8 w-8 items-center justify-center rounded-lg transition-colors focus:ring-2 focus:outline-none"
+              class="text-muted hover:text-ink focus:ring-ring absolute inset-y-0 right-2 my-auto flex h-8 w-8 items-center justify-center rounded-lg transition-colors focus:ring-2 focus:outline-none"
               :aria-label="showKey ? '隐藏 API Key' : '显示 API Key'"
               :aria-pressed="showKey"
               @click="toggleKeyVisibility"
@@ -128,11 +128,7 @@
           >
             {{ fieldError }}
           </p>
-          <p
-            v-else
-            id="api-key-hint"
-            class="text-muted-foreground mt-1 text-xs"
-          >
+          <p v-else id="api-key-hint" class="text-muted mt-1 text-xs">
             API Key 仅保存在您的服务端账户中，不会在浏览器本地留存。
           </p>
           <a

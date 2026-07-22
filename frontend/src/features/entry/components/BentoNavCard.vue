@@ -11,7 +11,7 @@
 
     <!-- 导航分类 -->
     <div
-      class="text-ink dark:text-muted-foreground mb-4 px-3 text-sm font-bold tracking-wider"
+      class="text-ink dark:text-muted mb-4 px-3 text-sm font-bold tracking-wider"
     >
       GENERAL
     </div>
@@ -37,7 +37,7 @@
             :class="
               hoverNavIndex === index
                 ? 'text-ink'
-                : 'text-ink/70 hover:text-ink dark:text-muted-foreground dark:hover:text-ink'
+                : 'text-ink/70 hover:text-ink dark:text-muted dark:hover:text-ink'
             "
           >
             <component :is="item.icon" class="h-6 w-6" />

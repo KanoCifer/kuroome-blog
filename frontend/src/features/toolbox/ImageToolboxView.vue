@@ -11,19 +11,14 @@
           >
             <header class="mb-8">
               <h2 class="text-ink text-xl font-bold">参数配置</h2>
-              <p class="text-muted-foreground mt-1 text-xs">
-                本地处理，保护隐私安全
-              </p>
+              <p class="text-muted mt-1 text-xs">本地处理，保护隐私安全</p>
             </header>
 
             <div class="space-y-8">
               <!-- 尺寸限制 -->
               <div class="space-y-3">
                 <div class="flex items-center justify-between">
-                  <label
-                    for="max-width"
-                    class="text-ink text-sm font-semibold"
-                  >
+                  <label for="max-width" class="text-ink text-sm font-semibold">
                     最大宽度限制
                   </label>
                   <button
@@ -60,10 +55,10 @@
                     type="number"
                     min="1"
                     :disabled="!enableMaxWidth"
-                    class="text-ink placeholder:text-muted-foreground focus:border-ink border-border bg-paper disabled:bg-muted disabled:text-muted-foreground w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
+                    class="text-ink placeholder:text-muted focus:border-ink border-border bg-paper disabled:bg-muted disabled:text-muted w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
                   />
                   <span
-                    class="text-muted-foreground absolute top-1/2 right-4 -translate-y-1/2 text-xs"
+                    class="text-muted absolute top-1/2 right-4 -translate-y-1/2 text-xs"
                     >px</span
                   >
                 </div>
@@ -72,15 +67,10 @@
               <!-- 压缩质量 -->
               <div class="space-y-3">
                 <div class="flex items-center justify-between">
-                  <label
-                    for="quality"
-                    class="text-ink text-sm font-semibold"
-                  >
+                  <label for="quality" class="text-ink text-sm font-semibold">
                     压缩质量
                   </label>
-                  <span
-                    class="text-muted-foreground font-mono text-xs font-medium"
-                  >
+                  <span class="text-muted font-mono text-xs font-medium">
                     {{ Math.round(quality * 100) }}%
                   </span>
                 </div>
@@ -92,7 +82,7 @@
                   v-model="qualityArray"
                 />
                 <div
-                  class="text-muted-foreground flex justify-between text-[10px] uppercase"
+                  class="text-muted flex justify-between text-[10px] uppercase"
                 >
                   <span>高压缩</span>
                   <span>原画</span>
@@ -101,9 +91,7 @@
 
               <!-- 输出格式 -->
               <div class="space-y-3">
-                <span class="text-ink text-sm font-semibold"
-                  >输出格式</span
-                >
+                <span class="text-ink text-sm font-semibold">输出格式</span>
                 <div class="grid grid-cols-3 gap-2">
                   <button
                     v-for="option in outputTypes"
@@ -113,7 +101,7 @@
                     :class="
                       outputType === option.value
                         ? 'border-ink bg-ink text-paper'
-                        : 'border-border bg-paper text-muted-foreground hover:border-muted-foreground'
+                        : 'border-border bg-paper text-muted hover:border-muted'
                     "
                     @click="outputType = option.value"
                   >
@@ -125,14 +113,11 @@
               <!-- 导出文件名 -->
               <div v-if="originalFile" class="space-y-3">
                 <div class="flex items-center justify-between">
-                  <label
-                    for="file-name"
-                    class="text-ink text-sm font-semibold"
-                  >
+                  <label for="file-name" class="text-ink text-sm font-semibold">
                     导出文件名
                   </label>
                   <span
-                    class="text-muted-foreground font-mono text-[10px] font-medium tracking-wider uppercase"
+                    class="text-muted font-mono text-[10px] font-medium tracking-wider uppercase"
                   >
                     扩展名: {{ outputTypeLabel }}
                   </span>
@@ -143,7 +128,7 @@
                   type="text"
                   spellcheck="false"
                   placeholder="留空则使用原文件名"
-                  class="text-ink placeholder:text-muted-foreground focus:border-ink border-border bg-paper w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
+                  class="text-ink placeholder:text-muted focus:border-ink border-border bg-paper w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
                 />
               </div>
 
@@ -204,7 +189,7 @@
 
                 <button
                   type="button"
-                  class="text-muted-foreground hover:text-ink py-2 text-xs font-medium"
+                  class="text-muted hover:text-ink py-2 text-xs font-medium"
                   @click="resetAll"
                 >
                   清空并重置
@@ -225,7 +210,7 @@
                     ? 'border-ink bg-ink/5'
                     : originalFile
                       ? 'bg-paper border-transparent shadow-sm'
-                      : 'border-border bg-paper hover:border-muted-foreground'
+                      : 'border-border bg-paper hover:border-muted'
                 "
                 @click="triggerFilePicker"
               >
@@ -238,7 +223,7 @@
                 <div class="relative z-10 p-8 text-center">
                   <div v-if="!originalFile" class="space-y-4">
                     <div
-                      class="bg-muted text-muted-foreground mx-auto flex h-16 w-16 items-center justify-center rounded-2xl transition-transform group-hover:scale-110"
+                      class="bg-muted text-muted mx-auto flex h-16 w-16 items-center justify-center rounded-2xl transition-transform group-hover:scale-110"
                     >
                       <svg
                         class="h-8 w-8"
@@ -258,7 +243,7 @@
                       <p class="text-ink text-base font-bold">
                         {{ isOverDropZone ? '即刻上传' : '点击或拖拽图片' }}
                       </p>
-                      <p class="text-muted-foreground mt-1 text-xs">
+                      <p class="text-muted mt-1 text-xs">
                         支持 JPG, PNG, WebP, GIF, AVIF (最大 20MB)
                       </p>
                     </div>
@@ -278,12 +263,10 @@
                         />
                       </div>
                       <div class="text-left">
-                        <p
-                          class="text-ink max-w-50 truncate text-sm font-bold"
-                        >
+                        <p class="text-ink max-w-50 truncate text-sm font-bold">
                           {{ originalFile.name }}
                         </p>
-                        <p class="text-muted-foreground text-xs">
+                        <p class="text-muted text-xs">
                           {{ formatBytes(originalFile.size) }}
                         </p>
                       </div>
@@ -320,17 +303,17 @@
                     class="border-border/50 flex items-center justify-between border-b p-4"
                   >
                     <span
-                      class="text-muted-foreground text-xs font-bold tracking-wider uppercase"
+                      class="text-muted text-xs font-bold tracking-wider uppercase"
                       >原始图像</span
                     >
                     <div class="flex items-center gap-2">
-                      <span class="text-muted-foreground text-[10px]"
+                      <span class="text-muted text-[10px]"
                         >缩放:
                         {{ Math.round(originalPreviewZoom * 100) }}%</span
                       >
                       <button
                         @click="originalPreviewZoom = 1"
-                        class="text-muted-foreground hover:text-ink text-[10px]"
+                        class="text-muted hover:text-ink text-[10px]"
                       >
                         重置
                       </button>
@@ -364,7 +347,7 @@
                       min="1"
                       max="4"
                       step="0.1"
-                      class="accent-foreground h-1 w-full"
+                      class="accent-muted h-1 w-full"
                     />
                   </div>
                 </div>
@@ -378,7 +361,7 @@
                   >
                     <div class="flex items-center gap-2">
                       <span
-                        class="text-muted-foreground text-xs font-bold tracking-wider uppercase"
+                        class="text-muted text-xs font-bold tracking-wider uppercase"
                         >处理后:{{
                           formatBytes(processedBlob?.size ?? 0) || '0 KB'
                         }}</span
@@ -391,13 +374,13 @@
                       </span>
                     </div>
                     <div class="flex items-center gap-2">
-                      <span class="text-muted-foreground text-[10px]"
+                      <span class="text-muted text-[10px]"
                         >缩放:
                         {{ Math.round(processedPreviewZoom * 100) }}%</span
                       >
                       <button
                         @click="processedPreviewZoom = 1"
-                        class="text-muted-foreground hover:text-ink text-[10px]"
+                        class="text-muted hover:text-ink text-[10px]"
                       >
                         重置
                       </button>
@@ -413,9 +396,7 @@
                       <div
                         class="border-ink h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"
                       ></div>
-                      <span class="text-muted-foreground text-xs"
-                        >正在渲染...</span
-                      >
+                      <span class="text-muted text-xs">正在渲染...</span>
                     </div>
                     <button
                       v-else-if="processedPreviewUrl"
@@ -460,7 +441,7 @@
                       min="1"
                       max="4"
                       step="0.1"
-                      class="accent-foreground h-1 w-full"
+                      class="accent-muted h-1 w-full"
                     />
                   </div>
                 </div>
@@ -542,8 +523,10 @@ const {
 
 const outputTypeLabel = computed(
   () =>
-    outputTypes.find((option: { label: string; value: string }) => option.value === outputType.value)?.label ??
-    '',
+    outputTypes.find(
+      (option: { label: string; value: string }) =>
+        option.value === outputType.value,
+    )?.label ?? '',
 );
 
 const {

@@ -86,8 +86,7 @@ const SectionHeader = (props: { number: string; title: string }) =>
     h(
       'span',
       {
-        class:
-          'text-muted-foreground font-mono text-[11px] tracking-[0.2em] tabular-nums',
+        class: 'text-muted font-mono text-[11px] tracking-[0.2em] tabular-nums',
       },
       `§ ${props.number}`,
     ),
@@ -107,7 +106,7 @@ const SubHeader = (props: { title: string; desc?: string }) =>
     props.desc
       ? h(
           'p',
-          { class: 'text-muted-foreground mt-1.5 text-sm leading-relaxed' },
+          { class: 'text-muted mt-1.5 text-sm leading-relaxed' },
           props.desc,
         )
       : null,
@@ -134,16 +133,11 @@ const SecurityItem = (props: { tag: string; desc: string }) =>
     h(
       'dt',
       {
-        class:
-          'text-ink/90 font-mono text-[10px] tracking-[0.2em] uppercase',
+        class: 'text-ink/90 font-mono text-[10px] tracking-[0.2em] uppercase',
       },
       props.tag,
     ),
-    h(
-      'dd',
-      { class: 'text-muted-foreground mt-1.5 text-sm leading-relaxed' },
-      props.desc,
-    ),
+    h('dd', { class: 'text-muted mt-1.5 text-sm leading-relaxed' }, props.desc),
   ]);
 
 const ServiceRow = (props: {
@@ -165,7 +159,7 @@ const ServiceRow = (props: {
           'span',
           {
             class:
-              'bg-paper text-muted-foreground rounded-full px-2 py-0.5 font-mono text-[10px] tracking-wide',
+              'bg-paper text-muted rounded-full px-2 py-0.5 font-mono text-[10px] tracking-wide',
           },
           props.tag,
         ),
@@ -185,11 +179,7 @@ const ServiceRow = (props: {
             },
             '触发',
           ),
-          h(
-            'dd',
-            { class: 'text-muted-foreground leading-relaxed' },
-            props.triggered,
-          ),
+          h('dd', { class: 'text-muted leading-relaxed' }, props.triggered),
           h(
             'dt',
             {
@@ -198,11 +188,7 @@ const ServiceRow = (props: {
             },
             '带走',
           ),
-          h(
-            'dd',
-            { class: 'text-muted-foreground leading-relaxed' },
-            props.sends,
-          ),
+          h('dd', { class: 'text-muted leading-relaxed' }, props.sends),
           h(
             'dt',
             {
@@ -211,11 +197,7 @@ const ServiceRow = (props: {
             },
             '留在',
           ),
-          h(
-            'dd',
-            { class: 'text-muted-foreground leading-relaxed' },
-            props.lands,
-          ),
+          h('dd', { class: 'text-muted leading-relaxed' }, props.lands),
         ],
       ),
     ],
@@ -236,7 +218,7 @@ const RetentionRow = (props: { what: string; until: string }) =>
         },
         props.what,
       ),
-      h('dd', { class: 'text-muted-foreground leading-relaxed' }, props.until),
+      h('dd', { class: 'text-muted leading-relaxed' }, props.until),
     ],
   );
 
@@ -250,11 +232,7 @@ const RightItem = (props: { title: string; desc: string }) =>
       },
       props.title,
     ),
-    h(
-      'span',
-      { class: 'text-muted-foreground flex-1 leading-relaxed' },
-      props.desc,
-    ),
+    h('span', { class: 'text-muted flex-1 leading-relaxed' }, props.desc),
   ]);
 
 const ContactCard = (props: { label: string; value: string; href: string }) =>
@@ -273,19 +251,15 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
           'p',
           {
             class:
-              'text-muted-foreground font-mono text-[10px] tracking-[0.2em] uppercase',
+              'text-muted font-mono text-[10px] tracking-[0.2em] uppercase',
           },
           props.label,
         ),
-        h(
-          'p',
-          { class: 'text-ink mt-1.5 text-sm font-medium' },
-          props.value,
-        ),
+        h('p', { class: 'text-ink mt-1.5 text-sm font-medium' }, props.value),
       ]),
       h(IconExternalLink, {
         class:
-          'text-muted-foreground group-hover:text-accent h-4 w-4 shrink-0 transition-colors',
+          'text-muted group-hover:text-accent h-4 w-4 shrink-0 transition-colors',
       }),
     ],
   );
@@ -311,7 +285,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
     >
       <!-- Eyebrow -->
       <div
-        class="text-muted-foreground mb-5 flex items-center gap-2 text-[10px] tracking-[0.32em] uppercase"
+        class="text-muted mb-5 flex items-center gap-2 text-[10px] tracking-[0.32em] uppercase"
       >
         <span class="bg-accent/60 inline-block h-px w-6"></span>
         <span class="font-mono">kanocifer · legal</span>
@@ -334,14 +308,14 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
 
       <!-- Subtitle -->
       <p
-        class="text-muted-foreground mt-6 max-w-xl text-center text-base leading-relaxed sm:text-lg"
+        class="text-muted mt-6 max-w-xl text-center text-base leading-relaxed sm:text-lg"
       >
         这是一份关于本站如何收集、使用与保护你信息的说明。
       </p>
 
       <!-- Meta strip -->
       <div
-        class="text-muted-foreground mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs"
+        class="text-muted mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs"
       >
         <span class="inline-flex items-center gap-1.5">
           <span
@@ -371,7 +345,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
       >
         <!-- ----- 引言 ----- -->
         <p
-          class="text-muted-foreground first-letter:text-ink first-letter:float-left first-letter:mr-2 first-letter:font-serif first-letter:text-3xl first-letter:leading-none"
+          class="text-muted first-letter:text-ink first-letter:float-left first-letter:mr-2 first-letter:font-serif first-letter:text-3xl first-letter:leading-none"
         >
           欢迎来到
           <strong class="text-ink font-semibold">Kuroome's Blog</strong>
@@ -390,7 +364,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
             title="在你访问本站时"
             desc="以下信息由访问链路上的服务自动产生，本站本身不在前端持久化存储它们。"
           />
-          <ul class="text-muted-foreground mt-4 space-y-2.5">
+          <ul class="text-muted mt-4 space-y-2.5">
             <DataRow label="网络标识"
               >浏览器 UA、IP 地址等用于识别一次访问的最小标识</DataRow
             >
@@ -406,7 +380,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
             title="在你注册账户或发表评论时"
             desc="仅在你主动提交时收集；任何字段都可以留空，留空等同于不提供。"
           />
-          <ul class="text-muted-foreground mt-4 space-y-2.5">
+          <ul class="text-muted mt-4 space-y-2.5">
             <DataRow label="邮箱"
               >用于账户注册、密码重置与回复通知（不会公开展示）</DataRow
             >
@@ -434,7 +408,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
               本站不会使用任何跨站跟踪 Cookie。
               所有写入都用于本站自身功能：身份认证、深色 / 浅色模式、用户偏好。
             </p>
-            <p class="text-muted-foreground mt-3 text-sm leading-relaxed">
+            <p class="text-muted mt-3 text-sm leading-relaxed">
               你可以随时在浏览器设置中清除本站的 Cookie 与 LocalStorage。
               清除后只需重新登录，不影响其它功能。
             </p>
@@ -455,10 +429,10 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
              ============================================= -->
         <section id="share" class="scroll-mt-28 pt-16">
           <SectionHeader number="02" title="信息的分享和披露" />
-          <p class="text-muted-foreground mt-5">
+          <p class="text-muted mt-5">
             本站不会出售、交易或出租你的个人身份信息给任何外部公司或个人，除非：
           </p>
-          <ul class="text-muted-foreground mt-4 space-y-2.5">
+          <ul class="text-muted mt-4 space-y-2.5">
             <li class="flex gap-3">
               <span
                 class="bg-ink/60 mt-2.5 inline-block h-1 w-1 shrink-0 rounded-full"
@@ -495,9 +469,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
              ============================================= -->
         <section id="third-party" class="scroll-mt-28 pt-16">
           <SectionHeader number="03" title="第三方服务与数据流向" />
-          <p class="text-muted-foreground mt-5">
-            本节列明本站真实接入的所有外部服务。
-          </p>
+          <p class="text-muted mt-5">本节列明本站真实接入的所有外部服务。</p>
 
           <ul class="mt-7 space-y-3">
             <ServiceRow
@@ -551,7 +523,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
             />
           </ul>
 
-          <p class="text-muted-foreground mt-7 text-sm leading-relaxed">
+          <p class="text-muted mt-7 text-sm leading-relaxed">
             媒体资源（背景图、文章内图片、你上传的图片）一律由本站
             <code class="bg-muted rounded px-1.5 py-0.5 font-mono text-[0.85em]"
               >/api/v1/media/*</code
@@ -565,7 +537,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
              ============================================= -->
         <section id="third-site" class="scroll-mt-28 pt-16">
           <SectionHeader number="04" title="第三方网站" />
-          <p class="text-muted-foreground mt-5">
+          <p class="text-muted mt-5">
             本站文章中可能包含指向其它网站的链接，例如技术文档、引用来源或朋友站点。
             点击这些链接离开本站后，本站的隐私政策不再适用 ——
             请阅读目标网站自己的隐私政策。
@@ -577,7 +549,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
              ============================================= -->
         <section id="retention" class="scroll-mt-28 pt-16">
           <SectionHeader number="05" title="数据保留与销毁" />
-          <p class="text-muted-foreground mt-5">
+          <p class="text-muted mt-5">
             不同数据有不同的保留期。下面按字段给出最长期限；除非法律要求更久，否则不会超出。
           </p>
 
@@ -618,13 +590,13 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
              ============================================= -->
         <section id="rights" class="scroll-mt-28 pt-16">
           <SectionHeader number="06" title="你的权利" />
-          <p class="text-muted-foreground mt-5">
+          <p class="text-muted mt-5">
             你对自己的数据享有以下权利。任一项都可以通过页脚的联系方式发起，我会在
             <strong class="text-ink/90 font-medium">7 个自然日内</strong>
             给出首次回复。
           </p>
 
-          <ul class="text-muted-foreground mt-6 space-y-3.5">
+          <ul class="text-muted mt-6 space-y-3.5">
             <RightItem
               title="知情与访问"
               desc="你有权了解本站持有你的哪些数据。可以申请一份你的账号信息、评论、文章、设置项的 JSON 导出。"
@@ -653,7 +625,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
              ============================================= -->
         <section id="security" class="scroll-mt-28 pt-16">
           <SectionHeader number="07" title="安全性" />
-          <p class="text-muted-foreground mt-5">
+          <p class="text-muted mt-5">
             本站采取与本站规模相称的安全措施来保护你提交的信息：
           </p>
 
@@ -686,22 +658,20 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
              ============================================= -->
         <section id="automation" class="scroll-mt-28 pt-16">
           <SectionHeader number="08" title="自动化处理" />
-          <p class="text-muted-foreground mt-5">
+          <p class="text-muted mt-5">
             本站存在以下自动化处理逻辑，用于辅助阅读与决策；它们
             <strong class="text-ink/90 font-medium"
               >不会单独对你产生法律或经济上的约束</strong
             >：
           </p>
-          <ul class="text-muted-foreground mt-5 space-y-3">
+          <ul class="text-muted mt-5 space-y-3">
             <li class="flex gap-3">
               <span
                 class="bg-ink/60 mt-2.5 inline-block h-1 w-1 shrink-0 rounded-full"
                 aria-hidden="true"
               ></span>
               <span>
-                <strong class="text-ink/90 font-medium"
-                  >AI 文章摘要</strong
-                >
+                <strong class="text-ink/90 font-medium">AI 文章摘要</strong>
                 — 把你提交的文章正文发给阿里云 Tbox
                 LLM，返回结构化摘要。多轮对话上下文
                 <code class="bg-muted rounded px-1 font-mono text-[0.85em]"
@@ -716,9 +686,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
                 aria-hidden="true"
               ></span>
               <span>
-                <strong class="text-ink/90 font-medium"
-                  >AI 钓鱼天气分析</strong
-                >
+                <strong class="text-ink/90 font-medium">AI 钓鱼天气分析</strong>
                 — 把当前地理位置的实时气象数据 + 钓鱼指标历史喂给同一个
                 LLM，可选地触发 Bing
                 联网检索。返回的内容是建议，不会被用来限制或影响你的实际行为。
@@ -730,15 +698,13 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
                 aria-hidden="true"
               ></span>
               <span>
-                <strong class="text-ink/90 font-medium"
-                  >反垃圾评论识别</strong
-                >
+                <strong class="text-ink/90 font-medium">反垃圾评论识别</strong>
                 — 提交评论时根据
                 IP、UA、内容指纹做规则判断，命中黑名单的请求会被自动拦截。
               </span>
             </li>
           </ul>
-          <p class="text-muted-foreground mt-5 text-sm">
+          <p class="text-muted mt-5 text-sm">
             你随时可以在 AI 摘要面板选择"不使用
             AI"；钓鱼页可以切换到纯规则模型，跳过 LLM 调用。
           </p>
@@ -749,7 +715,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
              ============================================= -->
         <section id="minor" class="scroll-mt-28 pt-16">
           <SectionHeader number="09" title="未成年人" />
-          <p class="text-muted-foreground mt-5">
+          <p class="text-muted mt-5">
             本站是个人作品集与工具，不面向 14 岁以下未成年人设计。
             <strong class="text-ink/90 font-medium">14 岁以下</strong>
             请在监护人同意下使用；如果发现未成年人在未经监护人同意下提交了个人信息，请通过页脚联系方式告知，我会尽快删除。
@@ -789,12 +755,12 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
               </span>
               <div class="space-y-2">
                 <p class="text-ink font-medium">反滥用黑名单</p>
-                <p class="text-muted-foreground text-sm leading-relaxed">
+                <p class="text-muted text-sm leading-relaxed">
                   当本站监测到存在恶意访问、恶意请求、攻击行为或恶意评论时，
                   为了防止损害扩大，可能会临时将相关 IP
                   与访问信息加入短期黑名单。
                 </p>
-                <p class="text-muted-foreground text-sm leading-relaxed">
+                <p class="text-muted text-sm leading-relaxed">
                   该黑名单可能会被公开，并可能共享给其它站点以协助防御，包括但不限于
                   IP 地址、设备指纹、地理位置等。
                 </p>
@@ -808,11 +774,11 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
              ============================================= -->
         <section id="change" class="scroll-mt-28 pt-16">
           <SectionHeader number="11" title="隐私政策的变更" />
-          <p class="text-muted-foreground mt-5">
+          <p class="text-muted mt-5">
             本站保留随时更新或修改本隐私政策的权利。任何修订都会在本页顶部显示最新日期，
             重大变更会通过站内公告告知。在新政策生效后继续使用本站，即视为你接受修订后的内容。
           </p>
-          <p class="text-muted-foreground mt-3 text-sm">
+          <p class="text-muted mt-3 text-sm">
             旧版本会以日期归档在本站的版本日志中，欢迎回溯查阅。
           </p>
         </section>
@@ -822,7 +788,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
              ============================================= -->
         <section id="contact" class="scroll-mt-28 pt-16">
           <SectionHeader number="12" title="联系本站" />
-          <p class="text-muted-foreground mt-5">
+          <p class="text-muted mt-5">
             如果你对本政策有任何疑问、建议或投诉，欢迎通过以下任一方式联系。
             我会亲自阅读每一封来信 —— 请尽量描述清楚场景，方便我准确回复。
           </p>
@@ -843,7 +809,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
 
         <!-- ----- 文末落款 ----- -->
         <footer
-          class="text-muted-foreground border-border/60 mt-20 flex flex-col items-center gap-3 border-t pt-10 text-center"
+          class="text-muted border-border/60 mt-20 flex flex-col items-center gap-3 border-t pt-10 text-center"
         >
           <p class="font-serif text-base italic">谢谢你读到最后。</p>
           <p class="font-mono text-[10px] tracking-[0.28em] uppercase">
@@ -856,7 +822,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
       <aside class="hidden lg:block">
         <nav class="sticky top-16" aria-label="目录">
           <p
-            class="text-muted-foreground mb-4 font-mono text-[10px] tracking-[0.28em] uppercase"
+            class="text-muted mb-4 font-mono text-[10px] tracking-[0.28em] uppercase"
           >
             目录 · on this page
           </p>
@@ -868,16 +834,14 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
                   'group flex w-full items-baseline gap-3 rounded-lg px-2 py-1.5 text-left text-sm transition-colors',
                   activeId === item.id
                     ? 'text-ink'
-                    : 'text-muted-foreground hover:text-ink',
+                    : 'text-muted hover:text-ink',
                 ]"
                 @click="scrollTo(item.id)"
               >
                 <span
                   class="font-mono text-[10px] tabular-nums"
                   :class="
-                    activeId === item.id
-                      ? 'text-accent'
-                      : 'text-muted-foreground/60'
+                    activeId === item.id ? 'text-accent' : 'text-muted/60'
                   "
                 >
                   {{ item.number }}

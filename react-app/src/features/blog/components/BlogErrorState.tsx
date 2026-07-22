@@ -22,7 +22,7 @@ export function BlogErrorState({
         />
       </svg>
       <p className="text-destructive text-lg font-medium">加载失败</p>
-      <p className="text-muted-foreground mt-1 text-sm">{message}</p>
+      <p className="text-muted mt-1 text-sm">{message}</p>
       <button
         onClick={onRetry}
         className="bg-destructive/90 hover:bg-destructive mt-4 cursor-pointer rounded-lg px-5 py-2.5 text-sm font-medium text-white transition-transform active:scale-95"

@@ -11,10 +11,7 @@ defineOptions({
 </script>
 
 <template>
-  <p
-    data-slot="card-description"
-    :class="['text-muted-foreground text-sm', props.class]"
-  >
+  <p data-slot="card-description" :class="['text-muted text-sm', props.class]">
     <slot />
   </p>
 </template>

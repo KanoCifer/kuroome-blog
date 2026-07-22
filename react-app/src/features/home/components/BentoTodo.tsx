@@ -1,9 +1,5 @@
 import { BentoCard } from '@/components';
-import {
-  useTodoState,
-  STATUS_STYLES,
-  selectFrontier,
-} from '@/features/todo';
+import { useTodoState, STATUS_STYLES, selectFrontier } from '@/features/todo';
 import type { DevTask, DevTaskStatus } from '@/features/todo/api/types';
 import { BookCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -63,9 +59,7 @@ export function BentoTodo() {
       <div className="min-w-0 flex-1">
         <span
           className={`text-sm leading-tight transition-colors duration-200 select-none ${
-            t.status === '已完成'
-              ? 'text-muted-foreground line-through'
-              : 'text-ink'
+            t.status === '已完成' ? 'text-muted line-through' : 'text-ink'
           }`}
         >
           {t.title}
@@ -76,7 +70,7 @@ export function BentoTodo() {
             className={`ml-1.5 text-[10px] tabular-nums ${
               isOverdue(t) && t.status !== '已完成'
                 ? 'text-destructive'
-                : 'text-muted-foreground'
+                : 'text-muted'
             }`}
           >
             {t.due_date}
@@ -91,16 +85,16 @@ export function BentoTodo() {
       <div className="flex h-full flex-col">
         {/* 标题行 */}
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-muted-foreground text-xs font-bold tracking-wide uppercase">
+          <h3 className="text-muted text-xs font-bold tracking-wide uppercase">
             {title}
           </h3>
           <div className="flex items-center gap-2">
-            <span className="text-muted-foreground text-xs font-medium tabular-nums">
+            <span className="text-muted text-xs font-medium tabular-nums">
               {doneCount} / {activeTasks.length}
             </span>
             <Link
               to="/todos"
-              className="text-muted-foreground hover:bg-muted hover:text-ink cursor-pointer rounded-md p-2 outline-0 transition-colors"
+              className="text-muted hover:bg-muted hover:text-ink cursor-pointer rounded-md p-2 outline-0 transition-colors"
               title="查看详情"
             >
               <svg
@@ -137,7 +131,7 @@ export function BentoTodo() {
 
             {activeTasks.length === 0 && (
               <div className="flex h-full flex-col items-center justify-center py-6">
-                <p className="text-md text-muted-foreground flex flex-col items-center gap-2 font-medium tracking-wide">
+                <p className="text-md text-muted flex flex-col items-center gap-2 font-medium tracking-wide">
                   <BookCheck className="size-12" />
                   暂无开发任务
                 </p>

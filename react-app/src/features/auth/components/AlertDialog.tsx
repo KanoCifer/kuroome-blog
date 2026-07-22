@@ -30,7 +30,7 @@ export function AlertDialog({
       <div className="border-border/50 bg-paper/80 relative z-10 w-full max-w-md rounded-2xl border p-6 shadow-xl backdrop-blur-xl">
         <div className="mb-4">
           <h2 className="text-ink text-xl font-bold">{title}</h2>
-          <p className="text-muted-foreground mt-2 text-sm">{description}</p>
+          <p className="text-muted mt-2 text-sm">{description}</p>
         </div>
         <div className="flex justify-end gap-3">
           <button

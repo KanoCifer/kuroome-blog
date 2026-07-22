@@ -157,7 +157,7 @@ const handleSubmit = async () => {
           Create your account
         </h2>
         <p
-          class="text-muted-foreground mt-2 text-center text-[15px] font-medium lg:text-left"
+          class="text-muted mt-2 text-center text-[15px] font-medium lg:text-left"
         >
           Fill in the details below to get started.
         </p>
@@ -170,7 +170,7 @@ const handleSubmit = async () => {
       <div>
         <div class="relative my-4">
           <div
-            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
+            class="text-muted/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
           >
             <ShieldUser class="size-6" />
           </div>
@@ -210,7 +210,7 @@ const handleSubmit = async () => {
       <div>
         <div class="relative my-4">
           <div
-            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
+            class="text-muted/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
           >
             <Mail class="size-6" />
           </div>
@@ -250,7 +250,7 @@ const handleSubmit = async () => {
       <div>
         <div class="relative my-4">
           <div
-            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
+            class="text-muted/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
           >
             <IconLock class="size-6" />
           </div>
@@ -290,7 +290,7 @@ const handleSubmit = async () => {
       <div>
         <div class="relative my-4">
           <div
-            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
+            class="text-muted/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
           >
             <IconLock class="size-6" />
           </div>
@@ -330,7 +330,7 @@ const handleSubmit = async () => {
       <div>
         <div class="relative my-4">
           <div
-            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
+            class="text-muted/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
           >
             <Mail class="size-6" />
           </div>
@@ -407,12 +407,9 @@ const handleSubmit = async () => {
 
     <template #footer>
       <!-- 登录链接 -->
-      <div class="text-muted-foreground mt-8 text-center text-sm">
+      <div class="text-muted mt-8 text-center text-sm">
         已有账号？
-        <RouterLink
-          to="/login"
-          class="text-accent font-medium hover:underline"
-        >
+        <RouterLink to="/login" class="text-accent font-medium hover:underline">
           立即登录
         </RouterLink>
       </div>

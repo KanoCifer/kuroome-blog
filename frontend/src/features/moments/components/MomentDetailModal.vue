@@ -8,8 +8,8 @@
         <span class="text-ink/70 font-serif text-sm italic">
           {{ volumeLabel }}
         </span>
-        <span class="text-muted-foreground/60">·</span>
-        <span class="text-muted-foreground font-mono text-[11px] tracking-wide">
+        <span class="text-muted/60">·</span>
+        <span class="text-muted font-mono text-[11px] tracking-wide">
           {{ formattedDateTime }}
         </span>
         <span
@@ -26,7 +26,7 @@
         <!-- 上下条按钮 -->
         <div
           v-if="hasPrev || hasNext"
-          class="text-muted-foreground flex items-center gap-1 text-[11px]"
+          class="text-muted flex items-center gap-1 text-[11px]"
         >
           <button
             type="button"
@@ -60,7 +60,7 @@
           </button>
           <button
             type="button"
-            class="text-muted-foreground hover:text-destructive border-border/40 hover:border-destructive/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
+            class="text-muted hover:text-destructive border-border/40 hover:border-destructive/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
             aria-label="删除"
             @click="emit('delete', moment)"
           >
@@ -70,7 +70,7 @@
 
         <button
           type="button"
-          class="text-muted-foreground hover:text-ink border-border/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
+          class="text-muted hover:text-ink border-border/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
           aria-label="关闭"
           @click="emit('update:open', false)"
         >
@@ -89,7 +89,7 @@
         <!-- 心情 -->
         <div
           v-if="moment.mood"
-          class="text-muted-foreground mb-6 flex items-center gap-2 text-sm"
+          class="text-muted mb-6 flex items-center gap-2 text-sm"
         >
           <span class="text-2xl" aria-hidden="true">{{ moodEmoji }}</span>
           <span v-if="moodText" class="italic">{{ moodText }}</span>
@@ -106,19 +106,19 @@
         <!-- 标签 -->
         <div
           v-if="moment.tags.length"
-          class="text-muted-foreground mt-8 flex flex-wrap items-center gap-2 text-[12px]"
+          class="text-muted mt-8 flex flex-wrap items-center gap-2 text-[12px]"
         >
           <MomentTagChip v-for="tag in moment.tags" :key="tag" :name="tag" />
         </div>
 
         <!-- 元数据条 -->
         <div
-          class="text-muted-foreground border-border/40 mt-10 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-dashed pt-4 font-mono text-[11px] tracking-wide"
+          class="text-muted border-border/40 mt-10 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-dashed pt-4 font-mono text-[11px] tracking-wide"
         >
           <span>发布于 {{ moment.published_at ?? moment.created_at }}</span>
-          <span v-if="moment.source" class="text-muted-foreground/60">·</span>
+          <span v-if="moment.source" class="text-muted/60">·</span>
           <span v-if="moment.source">来源 {{ moment.source }}</span>
-          <span class="text-muted-foreground/60">·</span>
+          <span class="text-muted/60">·</span>
           <span>允许评论 {{ moment.allow_comment ? '是' : '否' }}</span>
         </div>
       </div>
@@ -128,7 +128,7 @@
         class="bg-muted/30 border-border/40 hidden border-l px-5 py-6 md:block"
       >
         <div
-          class="text-muted-foreground sticky top-4 font-mono text-[10px] tracking-[0.18em] uppercase"
+          class="text-muted sticky top-4 font-mono text-[10px] tracking-[0.18em] uppercase"
         >
           META
         </div>
@@ -146,11 +146,11 @@
         </dl>
 
         <div
-          class="text-muted-foreground border-border/40 mt-6 border-t border-dashed pt-4 font-mono text-[10px] tracking-[0.18em] uppercase"
+          class="text-muted border-border/40 mt-6 border-t border-dashed pt-4 font-mono text-[10px] tracking-[0.18em] uppercase"
         >
           KEYBOARD
         </div>
-        <ul class="text-muted-foreground mt-3 space-y-1.5 text-[12px]">
+        <ul class="text-muted mt-3 space-y-1.5 text-[12px]">
           <li class="flex items-center gap-2">
             <Kbd label="J" /><span>下一条</span>
           </li>
@@ -251,7 +251,7 @@ const MetaRow = defineComponent({
           'dt',
           {
             class:
-              'text-muted-foreground font-mono text-[10px] tracking-[0.1em] uppercase',
+              'text-muted font-mono text-[10px] tracking-[0.1em] uppercase',
           },
           p.label,
         ),

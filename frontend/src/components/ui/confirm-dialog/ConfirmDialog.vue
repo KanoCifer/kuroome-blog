@@ -24,7 +24,7 @@
         </span>
         <div class="min-w-0 flex-1">
           <h2 class="text-ink text-base font-semibold">{{ title }}</h2>
-          <p class="text-muted-foreground mt-1 text-sm leading-relaxed">
+          <p class="text-muted mt-1 text-sm leading-relaxed">
             {{ message }}
           </p>
         </div>
@@ -35,7 +35,7 @@
         <button
           type="button"
           @click="handleCancel"
-          class="text-muted-foreground hover:bg-muted focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+          class="text-muted hover:bg-muted focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
           {{ cancelText }}
         </button>

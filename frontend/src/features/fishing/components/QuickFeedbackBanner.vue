@@ -17,7 +17,10 @@ defineEmits<{
 </script>
 
 <template>
-  <SlideFadeTransition enter-from-class="opacity-0 -translate-y-1" leave-to-class="opacity-0 -translate-y-1">
+  <SlideFadeTransition
+    enter-from-class="opacity-0 -translate-y-1"
+    leave-to-class="opacity-0 -translate-y-1"
+  >
     <section
       v-if="!disabled"
       class="border-border bg-muted/30 flex flex-col items-start gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5"
@@ -26,7 +29,7 @@ defineEmits<{
         <p class="text-ink font-family-averia text-base italic">
           钓完了？告诉我们今天实际如何
         </p>
-        <p class="text-muted-foreground mt-0.5 text-sm">
+        <p class="text-muted mt-0.5 text-sm">
           三个问题，三十秒——您的反馈会帮系统下次更准
         </p>
       </div>

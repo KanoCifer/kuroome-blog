@@ -20,9 +20,7 @@ export function BentoClock() {
   return (
     <div className="flex items-center justify-between px-2">
       {/* 左侧：日期 */}
-      <span className="text-muted-foreground text-sm font-medium">
-        {dateLabel}
-      </span>
+      <span className="text-muted text-sm font-medium">{dateLabel}</span>
 
       {/* 右侧：大数字时间 */}
       <span className="text-ink font-serif text-2xl font-extrabold tracking-tight tabular-nums">

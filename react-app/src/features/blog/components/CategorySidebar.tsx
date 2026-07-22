@@ -17,7 +17,7 @@ export function CategorySidebar({
   if (isLoading) {
     return (
       <div className="space-y-3">
-        <h3 className="text-muted-foreground text-sm font-semibold">标签</h3>
+        <h3 className="text-muted text-sm font-semibold">标签</h3>
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
             <div
@@ -32,7 +32,7 @@ export function CategorySidebar({
 
   return (
     <div className="space-y-3">
-      <h3 className="text-muted-foreground text-sm font-semibold tracking-wide uppercase">
+      <h3 className="text-muted text-sm font-semibold tracking-wide uppercase">
         标签
       </h3>
       <div className="flex flex-wrap gap-2">
@@ -48,9 +48,7 @@ export function CategorySidebar({
           <span>全部</span>
           <span
             className={`rounded-full px-1.5 py-0.5 text-xs ${
-              activeTag === null
-                ? 'bg-accent/80 text-accent'
-                : 'bg-muted-foreground/20'
+              activeTag === null ? 'bg-accent/80 text-accent' : 'bg-muted/20'
             }`}
           >
             {tags.reduce((a, b) => a + b.count, 0)}
@@ -72,7 +70,7 @@ export function CategorySidebar({
               className={`rounded-full px-1.5 py-0.5 text-xs ${
                 activeTag === tag.name
                   ? 'bg-accent/80 text-accent'
-                  : 'bg-muted-foreground/20'
+                  : 'bg-muted/20'
               }`}
             >
               {tag.count}

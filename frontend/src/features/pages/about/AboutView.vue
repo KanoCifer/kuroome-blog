@@ -146,14 +146,12 @@ onMounted(() => {
       :transition="{ duration: 0.6 }"
       class="social-section mt-10 flex items-center gap-5"
     >
-      <span class="text-muted-foreground text-sm font-medium tracking-wide"
-        >联系方式</span
-      >
+      <span class="text-muted text-sm font-medium tracking-wide">联系方式</span>
       <div class="bg-border h-4 w-px"></div>
       <a
         href="https://github.com/KanoCifer"
         target="_blank"
-        class="social-link text-muted-foreground hover:text-ink"
+        class="social-link text-muted hover:text-ink"
         title="GitHub"
       >
         <svg
@@ -171,7 +169,7 @@ onMounted(() => {
       </a>
       <a
         href="mailto:kano3255@outlook.com"
-        class="social-link text-muted-foreground hover:text-ink"
+        class="social-link text-muted hover:text-ink"
         title="Email"
       >
         <svg

@@ -46,7 +46,7 @@
                   <h2 class="text-ink font-serif text-2xl font-bold">
                     里程碑提醒
                   </h2>
-                  <p class="text-muted-foreground mt-0.5 text-xs">
+                  <p class="text-muted mt-0.5 text-xs">
                     {{ device.name }}
                   </p>
                 </div>
@@ -59,10 +59,7 @@
             </div>
           </div>
 
-          <form
-            @submit.prevent="handleSubmit"
-            class="bg-paper space-y-6 p-6"
-          >
+          <form @submit.prevent="handleSubmit" class="bg-paper space-y-6 p-6">
             <!-- Enable Toggle -->
             <div
               class="border-border bg-paper flex items-center justify-between rounded-2xl border px-5 py-4 shadow-sm"
@@ -97,7 +94,7 @@
                     viewBox="0 0 24 24"
                     stroke-width="2"
                     stroke="currentColor"
-                    class="text-muted-foreground h-4 w-4"
+                    class="text-muted h-4 w-4"
                   >
                     <path
                       stroke-linecap="round"
@@ -107,10 +104,8 @@
                   </svg>
                 </div>
                 <div>
-                  <p class="text-ink text-sm font-semibold">
-                    启用里程碑提醒
-                  </p>
-                  <p class="text-muted-foreground text-xs">
+                  <p class="text-ink text-sm font-semibold">启用里程碑提醒</p>
+                  <p class="text-muted text-xs">
                     在设备到达里程碑天数时发送通知
                   </p>
                 </div>
@@ -122,7 +117,7 @@
                 @click="form.enabled = !form.enabled"
                 :class="[
                   'relative flex h-6 w-11 shrink-0 rounded-full transition-colors duration-300',
-                  form.enabled ? 'bg-accent' : 'bg-muted-foreground/30',
+                  form.enabled ? 'bg-accent' : 'bg-muted/30',
                 ]"
               >
                 <span
@@ -141,7 +136,7 @@
                   class="via-border h-px flex-1 bg-linear-to-r from-transparent to-transparent"
                 />
                 <span
-                  class="text-muted-foreground shrink-0 text-xs font-semibold tracking-widest uppercase"
+                  class="text-muted shrink-0 text-xs font-semibold tracking-widest uppercase"
                   >里程碑节点</span
                 >
                 <div
@@ -159,7 +154,7 @@
                     'relative flex flex-col items-center gap-1 rounded-xl px-3 py-3 text-xs font-semibold transition-all duration-200',
                     form.milestones.includes(preset.days)
                       ? 'bg-accent text-accent shadow-accent/25 shadow-lg'
-                      : 'bg-paper text-muted-foreground hover:bg-muted border-border border shadow-sm',
+                      : 'bg-paper text-muted hover:bg-muted border-border border shadow-sm',
                   ]"
                 >
                   <span class="text-base">{{
@@ -170,7 +165,7 @@
                       'text-[10px] font-medium',
                       form.milestones.includes(preset.days)
                         ? 'text-accent/70'
-                        : 'text-muted-foreground/60',
+                        : 'text-muted/60',
                     ]"
                     >Day {{ preset.days }}</span
                   >
@@ -204,17 +199,17 @@
                     type="number"
                     min="1"
                     placeholder="自定义天数..."
-                    class="text-ink placeholder:text-muted-foreground focus:border-accent focus:ring-accent/30 border-border bg-paper w-full rounded-xl border py-2.5 pr-12 pl-4 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                    class="text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 border-border bg-paper w-full rounded-xl border py-2.5 pr-12 pl-4 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                   />
                   <span
-                    class="text-muted-foreground pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-xs"
+                    class="text-muted pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-xs"
                     >天</span
                   >
                 </div>
                 <button
                   type="button"
                   @click="addCustomMilestone"
-                  class="border-border bg-paper text-muted-foreground hover:border-accent/30 hover:bg-accent/10 hover:text-accent flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-all active:scale-95"
+                  class="border-border bg-paper text-muted hover:border-accent/30 hover:bg-accent/10 hover:text-accent flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-all active:scale-95"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -275,7 +270,7 @@
                   class="via-border h-px flex-1 bg-linear-to-r from-transparent to-transparent"
                 />
                 <span
-                  class="text-muted-foreground shrink-0 text-xs font-semibold tracking-widest uppercase"
+                  class="text-muted shrink-0 text-xs font-semibold tracking-widest uppercase"
                   >通知渠道</span
                 >
                 <button
@@ -331,7 +326,7 @@
                     'flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold transition-all duration-200',
                     form.channels.includes(opt.value)
                       ? 'bg-accent text-accent shadow-accent/25 shadow-lg'
-                      : 'bg-paper text-muted-foreground hover:bg-muted border-border border shadow-sm',
+                      : 'bg-paper text-muted hover:bg-muted border-border border shadow-sm',
                   ]"
                 >
                   <span v-html="opt.icon" />
@@ -344,14 +339,14 @@
                 v-if="form.channels.includes('email')"
                 class="block space-y-1"
               >
-                <span class="text-muted-foreground ml-1 text-xs font-semibold"
+                <span class="text-muted ml-1 text-xs font-semibold"
                   >邮件地址</span
                 >
                 <input
                   v-model="form.email"
                   type="email"
                   placeholder="example@domain.com"
-                  class="text-ink placeholder:text-muted-foreground focus:border-accent focus:ring-accent/30 border-border bg-paper w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                  class="text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 border-border bg-paper w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
 
@@ -359,14 +354,14 @@
                 v-if="form.channels.includes('feishu')"
                 class="block space-y-1"
               >
-                <span class="text-muted-foreground ml-1 text-xs font-semibold"
+                <span class="text-muted ml-1 text-xs font-semibold"
                   >飞书 Webhook URL</span
                 >
                 <input
                   v-model="form.feishu_webhook_url"
                   type="url"
                   placeholder="https://open.feishu.cn/open-apis/bot/v2/hook/..."
-                  class="text-ink placeholder:text-muted-foreground focus:border-accent focus:ring-accent/30 border-border bg-paper w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                  class="text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 border-border bg-paper w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
 
@@ -374,14 +369,14 @@
                 v-if="form.channels.includes('bark')"
                 class="block space-y-1"
               >
-                <span class="text-muted-foreground ml-1 text-xs font-semibold"
+                <span class="text-muted ml-1 text-xs font-semibold"
                   >Bark Device Key</span
                 >
                 <input
                   v-model="form.bark_device_key"
                   type="text"
                   placeholder="设备Key或完整推送URL"
-                  class="text-ink placeholder:text-muted-foreground focus:border-accent focus:ring-accent/30 border-border bg-paper w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                  class="text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 border-border bg-paper w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
             </div>

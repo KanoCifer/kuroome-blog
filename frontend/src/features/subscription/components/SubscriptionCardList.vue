@@ -34,14 +34,12 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <section
-    class="border-border/80 bg-paper rounded-3xl border p-5 shadow-sm"
-  >
+  <section class="border-border/80 bg-paper rounded-3xl border p-5 shadow-sm">
     <header class="mb-4 flex items-center justify-between gap-3">
       <h3 class="text-ink text-sm font-semibold tracking-wide uppercase">
         订阅列表
       </h3>
-      <p class="text-muted-foreground text-xs">{{ subscriptions.length }} 项</p>
+      <p class="text-muted text-xs">{{ subscriptions.length }} 项</p>
     </header>
 
     <div
@@ -52,7 +50,7 @@ const emit = defineEmits<{
         <span>{{ errorMessage }}</span>
         <button
           type="button"
-          class="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-lg px-3 py-1.5 text-xs font-medium transition"
+          class="bg-destructive text-destructive-muted hover:bg-destructive/90 rounded-lg px-3 py-1.5 text-xs font-medium transition"
           @click="emit('retry')"
         >
           重试
@@ -73,7 +71,7 @@ const emit = defineEmits<{
 
     <div
       v-else-if="subscriptions.length === 0"
-      class="border-border bg-muted/50 text-muted-foreground rounded-2xl border border-dashed px-5 py-10 text-center text-sm"
+      class="border-border bg-muted/50 text-muted rounded-2xl border border-dashed px-5 py-10 text-center text-sm"
     >
       还没有订阅记录，点击「新增订阅」开始管理。
     </div>
@@ -93,7 +91,7 @@ const emit = defineEmits<{
         <div class="flex items-start justify-between gap-4">
           <div class="flex min-w-0 items-center gap-4">
             <div
-              class="border-border bg-paper text-muted-foreground flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border text-lg font-bold"
+              class="border-border bg-paper text-muted flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border text-lg font-bold"
             >
               {{ subscription.name.charAt(0).toUpperCase() }}
             </div>
@@ -101,7 +99,7 @@ const emit = defineEmits<{
               <h4 class="text-ink truncate text-lg font-bold">
                 {{ subscription.name }}
               </h4>
-              <p class="text-muted-foreground mt-0.5 text-xs">
+              <p class="text-muted mt-0.5 text-xs">
                 {{ subscription.provider }} ·
                 {{ getCycleLabel(subscription.billing_cycle) }}
               </p>
@@ -112,9 +110,7 @@ const emit = defineEmits<{
             <p class="text-brand-devices text-xl font-bold">
               {{ formatPrice(subscription.price, subscription.currency) }}
             </p>
-            <p
-              class="text-muted-foreground text-[10px] tracking-wider uppercase"
-            >
+            <p class="text-muted text-[10px] tracking-wider uppercase">
               {{ subscription.currency }}
             </p>
           </div>
@@ -123,11 +119,11 @@ const emit = defineEmits<{
         <div
           class="bg-muted/50 mt-4 flex items-center gap-2 rounded-2xl px-4 py-3"
         >
-          <span class="text-muted-foreground text-sm">下次扣费:</span>
+          <span class="text-muted text-sm">下次扣费:</span>
           <span class="text-ink text-sm font-bold">
             {{ toDateInputValue(subscription.next_billing_date) }}
           </span>
-          <span class="text-muted-foreground text-xs">
+          <span class="text-muted text-xs">
             ({{ getDaysUntil(subscription.next_billing_date) }} 天后)
           </span>
           <span
@@ -144,13 +140,13 @@ const emit = defineEmits<{
 
         <div class="mt-4 grid grid-cols-2 gap-3 text-xs">
           <div class="border-border bg-muted/70 rounded-xl border px-3 py-2">
-            <p class="text-muted-foreground">提醒渠道</p>
+            <p class="text-muted">提醒渠道</p>
             <p class="text-ink mt-1 font-medium">
               {{ getReminderChannelsText(subscription.reminder_config) }}
             </p>
           </div>
           <div class="border-border bg-muted/70 rounded-xl border px-3 py-2">
-            <p class="text-muted-foreground">提醒节点</p>
+            <p class="text-muted">提醒节点</p>
             <p class="text-ink mt-1 font-medium">
               {{ getReminderPointsText(subscription.reminder_config) }}
             </p>

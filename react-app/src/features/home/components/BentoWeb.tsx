@@ -88,14 +88,14 @@ export function BentoWeb() {
     <div>
       {/* 标签 + 导航 */}
       <div className="mb-3 flex items-center justify-between">
-        <span className="text-muted-foreground text-xs font-bold tracking-wide uppercase">
+        <span className="text-muted text-xs font-bold tracking-wide uppercase">
           Daily Pick
         </span>
         {!reduce && (
           <div className="flex gap-1">
             <button
               onClick={() => navigate(-1)}
-              className="text-muted-foreground hover:bg-muted rounded-full p-1.5 transition-colors"
+              className="text-muted hover:bg-muted rounded-full p-1.5 transition-colors"
               aria-label="上一个"
             >
               <svg
@@ -114,7 +114,7 @@ export function BentoWeb() {
             </button>
             <button
               onClick={() => navigate(1)}
-              className="text-muted-foreground hover:bg-muted rounded-full p-1.5 transition-colors"
+              className="text-muted hover:bg-muted rounded-full p-1.5 transition-colors"
               aria-label="下一个"
             >
               <svg
@@ -157,7 +157,7 @@ export function BentoWeb() {
             >
               {/* 站点图标 + 名字 */}
               <div className="my-1 flex items-center">
-                <div className="bg-muted text-card-foreground group-hover:bg-secondary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors duration-300">
+                <div className="bg-muted text-muted group-hover:bg-secondary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors duration-300">
                   {currentSite.icon && (
                     <img
                       src={currentSite.icon}
@@ -189,7 +189,7 @@ export function BentoWeb() {
               </div>
 
               {/* 描述 */}
-              <p className="text-muted-foreground group-hover:text-card-foreground line-clamp-2 text-sm transition-colors duration-300">
+              <p className="text-muted group-hover:text-muted line-clamp-2 text-sm transition-colors duration-300">
                 {currentSite.description}
               </p>
             </motion.div>

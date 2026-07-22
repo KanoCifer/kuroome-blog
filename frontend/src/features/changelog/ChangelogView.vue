@@ -48,7 +48,7 @@ const getTypeClass = (type: string): string => {
     docs: 'bg-accent/15 text-accent ring-1 ring-accent/30',
     perf: 'bg-warning/15 text-warning ring-1 ring-warning/30',
     test: 'bg-chart-1/15 text-chart-1 ring-1 ring-chart-1/30',
-    chore: 'bg-muted text-muted-foreground ring-1 ring-border/30',
+    chore: 'bg-muted text-muted ring-1 ring-border/30',
   };
   return classes[type] ?? classes.chore ?? '';
 };
@@ -80,12 +80,10 @@ const getTypeClass = (type: string): string => {
           </svg>
           版本更新记录
         </div>
-        <h1
-          class="text-ink mb-4 text-5xl font-bold tracking-tight md:text-6xl"
-        >
+        <h1 class="text-ink mb-4 text-5xl font-bold tracking-tight md:text-6xl">
           变更日志
         </h1>
-        <p class="text-muted-foreground mx-auto max-w-2xl text-lg">
+        <p class="text-muted mx-auto max-w-2xl text-lg">
           记录网站的每一次成长与进步
         </p>
       </div>
@@ -138,9 +136,7 @@ const getTypeClass = (type: string): string => {
                     </svg>
                     v{{ r.version }}
                   </span>
-                  <span
-                    class="text-muted-foreground flex items-center gap-1 text-sm"
-                  >
+                  <span class="text-muted flex items-center gap-1 text-sm">
                     <svg
                       class="h-4 w-4"
                       fill="none"

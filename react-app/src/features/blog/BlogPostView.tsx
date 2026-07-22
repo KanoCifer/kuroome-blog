@@ -54,7 +54,7 @@ function ErrorState({
         />
       </svg>
       <p className="text-destructive text-lg font-medium">加载失败</p>
-      <p className="text-muted-foreground mt-1 text-sm">{message}</p>
+      <p className="text-muted mt-1 text-sm">{message}</p>
       <button
         onClick={onRetry}
         className="bg-destructive/90 hover:bg-destructive mt-4 cursor-pointer rounded-lg px-5 py-2.5 text-sm font-medium text-white transition-all duration-150 active:scale-[0.96]"
@@ -82,7 +82,7 @@ function setupCodeCopy(
     btn.innerHTML = COPY_ICON_SVG;
     btn.title = '复制';
     btn.className =
-      'absolute top-2 right-2 p-1.5 rounded-md bg-muted/80 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-muted cursor-pointer';
+      'absolute top-2 right-2 p-1.5 rounded-md bg-muted/80 text-muted opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-muted cursor-pointer';
     btn.setAttribute('aria-label', '复制代码');
 
     const handleClick = () => {
@@ -293,7 +293,7 @@ export default function BlogPostView() {
       <div className="mx-auto max-w-[42rem] px-6 pt-10 sm:pt-14">
         <a
           onClick={() => navigate('/blog')}
-          className="text-muted-foreground hover:text-accent group inline-flex cursor-pointer items-center gap-1.5 text-[13px] font-medium tracking-wide transition-colors"
+          className="text-muted hover:text-accent group inline-flex cursor-pointer items-center gap-1.5 text-[13px] font-medium tracking-wide transition-colors"
         >
           <span className="transition-transform duration-200 group-hover:-translate-x-0.5">
             ←
@@ -337,9 +337,9 @@ export default function BlogPostView() {
           )}
 
           {/* 刊号式元信息带：出版物气质，mono 大字距 */}
-          <div className="text-muted-foreground mb-6 flex items-center justify-between border-b pb-3 font-mono text-[10px] tracking-[0.18em] uppercase">
+          <div className="text-muted mb-6 flex items-center justify-between border-b pb-3 font-mono text-[10px] tracking-[0.18em] uppercase">
             <span>Vol · 随笔录</span>
-            <span className="text-muted-foreground/70">
+            <span className="text-muted/70">
               No · {post._id?.slice(-6) || '——'}
             </span>
           </div>
@@ -356,18 +356,18 @@ export default function BlogPostView() {
           </h1>
 
           {/* Deck — 阅读时长 + 字数 + 阅读量 + 可点击喜欢 */}
-          <p className="text-muted-foreground mt-5 inline-flex flex-wrap items-center gap-x-1 text-[15px] leading-relaxed tracking-[0.01em] tabular-nums">
+          <p className="text-muted mt-5 inline-flex flex-wrap items-center gap-x-1 text-[15px] leading-relaxed tracking-[0.01em] tabular-nums">
             约 {stats.minutes} 分钟阅读 · {stats.count.toLocaleString()} 字
             {post.views != null && (
               <>
-                <span className="text-muted-foreground/50">·</span>
+                <span className="text-muted/50">·</span>
                 <Eye className="h-3.5 w-3.5" />
                 <span>{post.views}</span>
               </>
             )}
             {post.likes != null && (
               <>
-                <span className="text-muted-foreground/50">·</span>
+                <span className="text-muted/50">·</span>
                 <button
                   type="button"
                   aria-label={
@@ -378,9 +378,7 @@ export default function BlogPostView() {
                   disabled={isLiked || isLiking}
                   onClick={handleLike}
                   className={`inline-flex cursor-pointer items-center gap-1 rounded transition-colors duration-150 active:scale-[0.96] disabled:cursor-default ${
-                    isLiked
-                      ? 'text-accent'
-                      : 'text-muted-foreground hover:text-ink'
+                    isLiked ? 'text-accent' : 'text-muted hover:text-ink'
                   }`}
                 >
                   <Heart
@@ -395,11 +393,9 @@ export default function BlogPostView() {
           </p>
 
           {/* Byline / dateline */}
-          <div className="text-muted-foreground mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[13px] tracking-[0.02em]">
+          <div className="text-muted mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[13px] tracking-[0.02em]">
             {post.author && (
-              <span className="text-ink/80 font-medium">
-                {post.author}
-              </span>
+              <span className="text-ink/80 font-medium">{post.author}</span>
             )}
             {post.author && post.created_at && (
               <span className="bg-border h-3 w-px" />
@@ -429,7 +425,7 @@ export default function BlogPostView() {
                   style={{ boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.08)' }}
                 />
               </div>
-              <figcaption className="text-muted-foreground mt-2.5 text-[11px] tracking-[0.04em]">
+              <figcaption className="text-muted mt-2.5 text-[11px] tracking-[0.04em]">
                 封面 · {post.tags?.[0] || 'ReadingList'}
               </figcaption>
             </figure>
@@ -449,7 +445,7 @@ export default function BlogPostView() {
                   }}
                 />
               ) : (
-                <p className="text-muted-foreground italic">暂无内容</p>
+                <p className="text-muted italic">暂无内容</p>
               )}
             </div>
           </div>
@@ -465,7 +461,7 @@ export default function BlogPostView() {
                   <div className="text-ink text-[14px] font-medium tracking-wide">
                     {post.author || 'Kurroome'}
                   </div>
-                  <div className="text-muted-foreground mt-0.5 text-[12px] tracking-[0.02em]">
+                  <div className="text-muted mt-0.5 text-[12px] tracking-[0.02em]">
                     {hasUpdate
                       ? `最后更新于 ${formatDate(post.updated_at!, 'YYYY-MM-DD')}`
                       : post.created_at
@@ -477,7 +473,7 @@ export default function BlogPostView() {
               <button
                 type="button"
                 onClick={handleCopyLink}
-                className="text-muted-foreground hover:text-accent inline-flex cursor-pointer items-center gap-1.5 text-[12px] font-medium tracking-[0.02em] transition-all duration-150 active:scale-[0.96]"
+                className="text-muted hover:text-accent inline-flex cursor-pointer items-center gap-1.5 text-[12px] font-medium tracking-[0.02em] transition-all duration-150 active:scale-[0.96]"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -514,7 +510,7 @@ export default function BlogPostView() {
           />
           <div className="bg-paper border-border relative w-full max-w-sm rounded-2xl border p-6 shadow-lg">
             <h3 className="text-ink text-lg font-semibold">确认删除</h3>
-            <p className="text-muted-foreground mt-2 text-sm">
+            <p className="text-muted mt-2 text-sm">
               确定要删除这篇文章吗？此操作无法撤销。
             </p>
             <div className="mt-6 flex justify-end gap-3">

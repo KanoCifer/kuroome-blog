@@ -2,7 +2,10 @@ import { useEffect, useMemo } from 'react';
 
 import dayjs from 'dayjs';
 
-import { HARBOR_OPTIONS, useFishingMapStore } from '@/features/fishing/stores/fishingMapStore';
+import {
+  HARBOR_OPTIONS,
+  useFishingMapStore,
+} from '@/features/fishing/stores/fishingMapStore';
 import { useChartTheme, withAlpha } from '../hooks/useChartTheme';
 import type { TideTableItem } from '../types';
 import { SkeletonCard } from './SkeletonCard';
@@ -193,7 +196,7 @@ export function TideCard() {
               className={`min-h-8 flex-1 shrink-0 rounded-md px-3 text-xs font-medium transition-all duration-200 ease-out ${
                 isActive
                   ? 'bg-paper text-ink shadow-sm'
-                  : 'text-muted-foreground hover:text-ink'
+                  : 'text-muted hover:text-ink'
               }`}
             >
               {opt.name}
@@ -233,9 +236,9 @@ export function TideCard() {
             <TideChart option={tideChartOption} />
           </div>
           {/* High / low tide — Apple HIG inset-grouped 双列 */}
-          <div className="fm-grouped grid grid-cols-2 gap-px bg-border/40">
+          <div className="fm-grouped bg-border/40 grid grid-cols-2 gap-px">
             <div className="bg-paper flex flex-col gap-1 px-4 py-3">
-              <span className="text-muted-foreground text-xs font-medium">
+              <span className="text-muted text-xs font-medium">
                 最高潮
                 <span className="text-ink ml-1.5 tabular-nums">
                   {highTide ? dayjs(highTide.fxTime).format('HH:mm') : '--'}
@@ -246,7 +249,7 @@ export function TideCard() {
               </span>
             </div>
             <div className="bg-paper flex flex-col gap-1 px-4 py-3">
-              <span className="text-muted-foreground text-xs font-medium">
+              <span className="text-muted text-xs font-medium">
                 最低潮
                 <span className="text-ink ml-1.5 tabular-nums">
                   {lowTide ? dayjs(lowTide.fxTime).format('HH:mm') : '--'}
@@ -260,7 +263,7 @@ export function TideCard() {
         </div>
       ) : (
         <div className="min-h-[260px]">
-          <p className="text-muted-foreground text-sm">暂无潮汐数据</p>
+          <p className="text-muted text-sm">暂无潮汐数据</p>
         </div>
       )}
     </article>

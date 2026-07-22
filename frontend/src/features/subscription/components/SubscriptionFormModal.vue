@@ -2,10 +2,7 @@
 import { reactive, watch } from 'vue';
 import type { SubscriptionFormState } from '../types';
 import { ModalFadeTransition } from '@/components';
-import {
-  cycleOptions,
-  statusOptions,
-} from '../subscriptionUtils';
+import { cycleOptions, statusOptions } from '../subscriptionUtils';
 
 interface Props {
   isOpen: boolean;
@@ -97,13 +94,13 @@ watch(
               <h3 class="text-ink text-lg font-semibold">
                 {{ title }}
               </h3>
-              <p class="text-muted-foreground mt-1 text-sm">
+              <p class="text-muted mt-1 text-sm">
                 {{ description }}
               </p>
             </div>
             <button
               type="button"
-              class="border-border text-muted-foreground hover:bg-muted rounded-lg border px-3 py-1 text-xs transition"
+              class="border-border text-muted hover:bg-muted rounded-lg border px-3 py-1 text-xs transition"
               @click="emit('close')"
             >
               关闭
@@ -113,54 +110,46 @@ watch(
           <form class="space-y-4" @submit.prevent="emitSubmit">
             <div class="grid gap-3 sm:grid-cols-2">
               <label class="space-y-1">
-                <span class="text-muted-foreground text-xs font-medium"
-                  >订阅名称</span
-                >
+                <span class="text-muted text-xs font-medium">订阅名称</span>
                 <input
                   v-model="localForm.name"
                   type="text"
                   placeholder="例如：Spotify Premium"
-                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
               <label class="space-y-1">
-                <span class="text-muted-foreground text-xs font-medium"
-                  >服务商</span
-                >
+                <span class="text-muted text-xs font-medium">服务商</span>
                 <input
                   v-model="localForm.provider"
                   type="text"
                   placeholder="例如：Spotify"
-                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
             </div>
 
             <div class="grid gap-3 sm:grid-cols-[1fr_1fr_1fr]">
               <label class="space-y-1">
-                <span class="text-muted-foreground text-xs font-medium"
-                  >价格</span
-                >
+                <span class="text-muted text-xs font-medium">价格</span>
                 <input
                   v-model="localForm.price"
                   type="number"
                   min="0"
                   step="0.01"
                   placeholder="0.00"
-                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
               <label class="space-y-1">
-                <span class="text-muted-foreground text-xs font-medium"
-                  >币种</span
-                >
+                <span class="text-muted text-xs font-medium">币种</span>
                 <input
                   v-model="localForm.currency"
                   type="text"
                   :list="`subscription-currency-options-${mode}`"
                   maxlength="10"
                   placeholder="例如：USD / CNY / 元"
-                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
                 <datalist :id="`subscription-currency-options-${mode}`">
                   <option
@@ -171,9 +160,7 @@ watch(
                 </datalist>
               </label>
               <label class="space-y-1">
-                <span class="text-muted-foreground text-xs font-medium"
-                  >计费周期</span
-                >
+                <span class="text-muted text-xs font-medium">计费周期</span>
                 <select
                   v-model="localForm.billing_cycle"
                   class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
@@ -194,9 +181,7 @@ watch(
               :class="includeStatus ? 'sm:grid-cols-2' : ''"
             >
               <label class="space-y-1">
-                <span class="text-muted-foreground text-xs font-medium"
-                  >下次扣费日期</span
-                >
+                <span class="text-muted text-xs font-medium">下次扣费日期</span>
                 <input
                   v-model="localForm.next_billing_date"
                   type="date"
@@ -204,9 +189,7 @@ watch(
                 />
               </label>
               <label v-if="includeStatus" class="space-y-1">
-                <span class="text-muted-foreground text-xs font-medium"
-                  >状态</span
-                >
+                <span class="text-muted text-xs font-medium">状态</span>
                 <select
                   v-model="localForm.status"
                   class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
@@ -223,14 +206,12 @@ watch(
             </div>
 
             <label class="space-y-1">
-              <span class="text-muted-foreground text-xs font-medium"
-                >备注</span
-              >
+              <span class="text-muted text-xs font-medium">备注</span>
               <textarea
                 v-model="localForm.notes"
                 rows="3"
                 placeholder="可选备注，例如套餐人数、自动续费规则等。"
-                class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
               />
             </label>
 
@@ -244,7 +225,7 @@ watch(
             <footer class="flex justify-end gap-2">
               <button
                 type="button"
-                class="border-border text-muted-foreground hover:bg-muted rounded-xl border px-3 py-2 text-sm transition"
+                class="border-border text-muted hover:bg-muted rounded-xl border px-3 py-2 text-sm transition"
                 @click="emit('close')"
               >
                 取消

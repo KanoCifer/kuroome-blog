@@ -1,7 +1,4 @@
-import type {
-  DevTaskPriority,
-  DevTaskType,
-} from '@/features/todo/api/types';
+import type { DevTaskPriority, DevTaskType } from '@/features/todo/api/types';
 import {
   selectCompletedThisWeek,
   selectInProgress,
@@ -39,7 +36,7 @@ export function FrontierPanel({ onOpen, onCycle, onDelete }: PanelEmit) {
           <h2 className="text-ink font-serif text-lg font-medium tracking-tight">
             现在能做什么
           </h2>
-          <span className="text-muted-foreground text-xs">
+          <span className="text-muted text-xs">
             无阻塞 · 按优先级与截止日排序
           </span>
         </div>
@@ -57,9 +54,9 @@ export function FrontierPanel({ onOpen, onCycle, onDelete }: PanelEmit) {
             ))}
           </div>
         ) : (
-          <div className="text-muted-foreground/70 flex flex-col items-center justify-center py-10 text-center">
+          <div className="text-muted/70 flex flex-col items-center justify-center py-10 text-center">
             <svg
-              className="text-muted-foreground/30 mb-2 h-8 w-8"
+              className="text-muted/30 mb-2 h-8 w-8"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -82,7 +79,7 @@ export function FrontierPanel({ onOpen, onCycle, onDelete }: PanelEmit) {
           <h2 className="text-ink font-serif text-lg font-medium tracking-tight">
             进行中
           </h2>
-          <span className="text-muted-foreground text-xs">正在推进的任务</span>
+          <span className="text-muted text-xs">正在推进的任务</span>
         </div>
         {inProgress.length ? (
           <div className="space-y-2">
@@ -97,7 +94,7 @@ export function FrontierPanel({ onOpen, onCycle, onDelete }: PanelEmit) {
             ))}
           </div>
         ) : (
-          <div className="text-muted-foreground/70 flex items-center justify-center py-6 text-sm">
+          <div className="text-muted/70 flex items-center justify-center py-6 text-sm">
             暂无进行中的任务
           </div>
         )}
@@ -108,7 +105,7 @@ export function FrontierPanel({ onOpen, onCycle, onDelete }: PanelEmit) {
           <h2 className="text-ink font-serif text-lg font-medium tracking-tight">
             本周已完成
           </h2>
-          <span className="text-muted-foreground text-xs">最近关闭的任务</span>
+          <span className="text-muted text-xs">最近关闭的任务</span>
         </div>
         {completedThisWeek.length ? (
           <div className="space-y-2">
@@ -123,7 +120,7 @@ export function FrontierPanel({ onOpen, onCycle, onDelete }: PanelEmit) {
             ))}
           </div>
         ) : (
-          <div className="text-muted-foreground/70 flex items-center justify-center py-6 text-sm">
+          <div className="text-muted/70 flex items-center justify-center py-6 text-sm">
             本周还没有完成的任务
           </div>
         )}
@@ -184,7 +181,7 @@ export function PlanningPanel({ onOpen, onDelete }: PanelEmit) {
         role="group"
         aria-label="筛选条件"
       >
-        <span className="text-muted-foreground text-[10px] font-medium tracking-widest uppercase">
+        <span className="text-muted text-[10px] font-medium tracking-widest uppercase">
           类型
         </span>
         {TASK_TYPES.map((t) => (
@@ -195,7 +192,7 @@ export function PlanningPanel({ onOpen, onDelete }: PanelEmit) {
             className={`rounded-full border px-2.5 py-0.5 text-xs transition-colors ${
               filterType.has(t)
                 ? 'border-accent/40 bg-accent/10 text-accent'
-                : 'border-border text-muted-foreground hover:text-ink'
+                : 'border-border text-muted hover:text-ink'
             }`}
           >
             {t}
@@ -204,7 +201,7 @@ export function PlanningPanel({ onOpen, onDelete }: PanelEmit) {
 
         <span className="bg-border mx-1 h-4 w-px" />
 
-        <span className="text-muted-foreground text-[10px] font-medium tracking-widest uppercase">
+        <span className="text-muted text-[10px] font-medium tracking-widest uppercase">
           优先级
         </span>
         {PRIORITIES.map((p) => (
@@ -215,21 +212,21 @@ export function PlanningPanel({ onOpen, onDelete }: PanelEmit) {
             className={`rounded-full border px-2.5 py-0.5 text-xs transition-colors ${
               filterPriority.has(p)
                 ? 'border-accent/40 bg-accent/10 text-accent'
-                : 'border-border text-muted-foreground hover:text-ink'
+                : 'border-border text-muted hover:text-ink'
             }`}
           >
             {p}
           </button>
         ))}
 
-        <span className="text-muted-foreground ml-auto text-xs tabular-nums">
+        <span className="text-muted ml-auto text-xs tabular-nums">
           {filtered.length} 项
         </span>
       </div>
 
       {/* table */}
       <div className="border-border overflow-hidden rounded-xl border">
-        <div className="text-muted-foreground bg-muted border-border grid grid-cols-[1fr_80px_32px] gap-4 border-b px-4 py-2.5 text-[10px] font-medium tracking-widest uppercase sm:grid-cols-[2fr_1fr_1fr_1fr_100px_32px]">
+        <div className="text-muted bg-muted border-border grid grid-cols-[1fr_80px_32px] gap-4 border-b px-4 py-2.5 text-[10px] font-medium tracking-widest uppercase sm:grid-cols-[2fr_1fr_1fr_1fr_100px_32px]">
           <span>标题</span>
           <span className="max-sm:hidden">类型</span>
           <span className="max-sm:hidden">优先级</span>
@@ -258,7 +255,7 @@ export function PlanningPanel({ onOpen, onDelete }: PanelEmit) {
             <span className="max-sm:hidden">
               <PriorityBadge priority={task.priority} />
             </span>
-            <span className="text-muted-foreground truncate text-sm max-sm:hidden">
+            <span className="text-muted truncate text-sm max-sm:hidden">
               {task.scope || '—'}
             </span>
             <span className="max-sm:hidden">
@@ -271,7 +268,7 @@ export function PlanningPanel({ onOpen, onDelete }: PanelEmit) {
                   e.stopPropagation();
                   onDelete(task.slug);
                 }}
-                className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96]"
+                className="text-muted hover:bg-destructive/10 hover:text-destructive focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96]"
                 title="删除"
                 aria-label="删除"
               >
@@ -294,7 +291,7 @@ export function PlanningPanel({ onOpen, onDelete }: PanelEmit) {
         ))}
 
         {!filtered.length && (
-          <div className="text-muted-foreground/70 px-4 py-8 text-center text-sm">
+          <div className="text-muted/70 px-4 py-8 text-center text-sm">
             没有匹配的任务
           </div>
         )}
@@ -329,13 +326,13 @@ export function ReviewPanel({ onOpen }: Pick<PanelEmit, 'onOpen'>) {
         label: '累计任务',
         value: tasks.filter((t) => !t.is_deleted).length,
         delta: '全部生命周期',
-        deltaClass: 'text-muted-foreground',
+        deltaClass: 'text-muted',
       },
       {
         label: '进行中',
         value: selectInProgress(tasks).length,
         delta: '需要跟进',
-        deltaClass: 'text-muted-foreground',
+        deltaClass: 'text-muted',
       },
       {
         label: 'P0 紧急',
@@ -363,9 +360,7 @@ export function ReviewPanel({ onOpen }: Pick<PanelEmit, 'onOpen'>) {
           <h2 className="text-ink font-serif text-lg font-medium tracking-tight">
             本周概览
           </h2>
-          <span className="text-muted-foreground text-xs">
-            {selectWeekRangeDisplay()}
-          </span>
+          <span className="text-muted text-xs">{selectWeekRangeDisplay()}</span>
         </div>
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {stats.map((stat) => (
@@ -373,7 +368,7 @@ export function ReviewPanel({ onOpen }: Pick<PanelEmit, 'onOpen'>) {
               key={stat.label}
               className="border-border bg-paper rounded-3xl border px-5 py-4 shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent),0_18px_32px_color-mix(in_oklch,var(--ink)_8%,transparent)]"
             >
-              <div className="text-muted-foreground text-[10px] font-medium tracking-widest uppercase">
+              <div className="text-muted text-[10px] font-medium tracking-widest uppercase">
                 {stat.label}
               </div>
               <div className="text-ink font-family-averia mt-1 text-3xl leading-none font-normal tracking-tight">
@@ -392,14 +387,12 @@ export function ReviewPanel({ onOpen }: Pick<PanelEmit, 'onOpen'>) {
           <h2 className="text-ink font-serif text-lg font-medium tracking-tight">
             类型分布
           </h2>
-          <span className="text-muted-foreground text-xs">全部任务</span>
+          <span className="text-muted text-xs">全部任务</span>
         </div>
         <div className="space-y-3">
           {distributionRows.map((row) => (
             <div key={row.type} className="flex items-center gap-3">
-              <span className="text-ink w-16 shrink-0 text-sm">
-                {row.type}
-              </span>
+              <span className="text-ink w-16 shrink-0 text-sm">{row.type}</span>
               <div className="bg-muted h-2 flex-1 overflow-hidden rounded-full">
                 <div
                   className="h-full rounded-full transition-transform duration-400"
@@ -411,7 +404,7 @@ export function ReviewPanel({ onOpen }: Pick<PanelEmit, 'onOpen'>) {
                   }}
                 />
               </div>
-              <span className="text-muted-foreground w-6 shrink-0 text-right text-xs tabular-nums">
+              <span className="text-muted w-6 shrink-0 text-right text-xs tabular-nums">
                 {row.count}
               </span>
             </div>
@@ -424,7 +417,7 @@ export function ReviewPanel({ onOpen }: Pick<PanelEmit, 'onOpen'>) {
           <h2 className="text-ink font-serif text-lg font-medium tracking-tight">
             最近完成
           </h2>
-          <span className="text-muted-foreground text-xs">按完成时间倒序</span>
+          <span className="text-muted text-xs">按完成时间倒序</span>
         </div>
         <div className="space-y-0">
           {completedThisWeek.slice(0, 8).map((task) => (
@@ -437,17 +430,17 @@ export function ReviewPanel({ onOpen }: Pick<PanelEmit, 'onOpen'>) {
                 className="min-w-0 flex-1 cursor-pointer"
                 onClick={() => onOpen(task.slug)}
               >
-                <p className="text-muted-foreground truncate text-sm font-medium line-through">
+                <p className="text-muted truncate text-sm font-medium line-through">
                   {task.title}
                 </p>
-                <p className="text-muted-foreground/60 text-[11px] tabular-nums">
+                <p className="text-muted/60 text-[11px] tabular-nums">
                   {(task.updated_at ?? '').slice(0, 10)}
                 </p>
               </div>
             </div>
           ))}
           {!completedThisWeek.length && (
-            <div className="text-muted-foreground/70 px-1 py-6 text-center text-sm">
+            <div className="text-muted/70 px-1 py-6 text-center text-sm">
               本周还没有完成的任务
             </div>
           )}

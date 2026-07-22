@@ -39,7 +39,7 @@ export function SecuritySection({
       {/* Divider */}
       <div className="my-5 flex items-center justify-center text-center">
         <div className="bg-border h-px flex-1"></div>
-        <span className="text-muted-foreground px-3 text-[11px] font-bold tracking-wider uppercase">
+        <span className="text-muted px-3 text-[11px] font-bold tracking-wider uppercase">
           Security
         </span>
         <div className="bg-border h-px flex-1"></div>

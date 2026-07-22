@@ -296,7 +296,7 @@ export default function ProfileSettingView() {
           <h2 className="font-headline text-ink text-center text-[28px] font-extrabold tracking-tight">
             Profile Settings
           </h2>
-          <p className="text-muted-foreground mt-1 text-center text-[15px] font-medium">
+          <p className="text-muted mt-1 text-center text-[15px] font-medium">
             Manage your profile and preferences
           </p>
         </motion.div>

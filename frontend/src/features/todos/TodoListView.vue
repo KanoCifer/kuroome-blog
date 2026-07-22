@@ -17,7 +17,7 @@
           class="flex h-full min-h-96 flex-col items-center justify-center gap-3 text-center"
         >
           <svg
-            class="text-muted-foreground/40 h-14 w-14"
+            class="text-muted/40 h-14 w-14"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -29,10 +29,8 @@
               d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
             />
           </svg>
-          <p class="text-ink text-lg font-medium">
-            请登录后使用开发任务
-          </p>
-          <p class="text-muted-foreground max-w-xs text-sm">
+          <p class="text-ink text-lg font-medium">请登录后使用开发任务</p>
+          <p class="text-muted max-w-xs text-sm">
             开发任务看板用于管理个人的开发任务，需登录后启用。
           </p>
           <UiButton class="mt-1 px-5 py-2" @click="$router.push('/login')">

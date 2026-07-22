@@ -48,7 +48,7 @@
           <span class="text-ink text-2xl font-bold tracking-tight">{{
             displaySpots
           }}</span>
-          <span class="text-muted-foreground text-xs">个钓点</span>
+          <span class="text-muted text-xs">个钓点</span>
         </div>
       </div>
 
@@ -56,9 +56,7 @@
       <div class="mt-2 flex items-center justify-between">
         <div class="flex items-center gap-1.5">
           <Waves class="size-3 text-teal-500/60" />
-          <span class="text-muted-foreground text-[10px]">{{
-            tideStatus
-          }}</span>
+          <span class="text-muted text-[10px]">{{ tideStatus }}</span>
         </div>
         <span class="text-[10px] font-medium text-teal-600">{{
           lastRecordText

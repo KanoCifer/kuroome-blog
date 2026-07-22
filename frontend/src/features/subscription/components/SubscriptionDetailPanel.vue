@@ -30,9 +30,7 @@ const emit = defineEmits<{
 
 <template>
   <aside class="xl:sticky xl:top-24 xl:h-fit">
-    <section
-      class="border-border/80 bg-paper rounded-3xl border p-5 shadow-sm"
-    >
+    <section class="border-border/80 bg-paper rounded-3xl border p-5 shadow-sm">
       <h3 class="text-ink text-sm font-semibold tracking-wide uppercase">
         详情面板
       </h3>
@@ -43,7 +41,7 @@ const emit = defineEmits<{
             <h4 class="text-ink text-xl font-semibold">
               {{ selectedSubscription.name }}
             </h4>
-            <p class="text-muted-foreground mt-1 text-sm">
+            <p class="text-muted mt-1 text-sm">
               {{ selectedSubscription.provider }}
             </p>
           </div>
@@ -61,7 +59,7 @@ const emit = defineEmits<{
 
         <div class="grid grid-cols-2 gap-3 text-sm">
           <div class="bg-muted/80 rounded-xl px-3 py-2">
-            <p class="text-muted-foreground text-xs">价格</p>
+            <p class="text-muted text-xs">价格</p>
             <p class="text-ink mt-1 font-medium">
               {{
                 formatPrice(
@@ -72,19 +70,19 @@ const emit = defineEmits<{
             </p>
           </div>
           <div class="bg-muted/80 rounded-xl px-3 py-2">
-            <p class="text-muted-foreground text-xs">周期</p>
+            <p class="text-muted text-xs">周期</p>
             <p class="text-ink mt-1 font-medium">
               {{ getCycleLabel(selectedSubscription.billing_cycle) }}
             </p>
           </div>
           <div class="bg-muted/80 rounded-xl px-3 py-2">
-            <p class="text-muted-foreground text-xs">下次扣费</p>
+            <p class="text-muted text-xs">下次扣费</p>
             <p class="text-ink mt-1 font-medium">
               {{ toDateInputValue(selectedSubscription.next_billing_date) }}
             </p>
           </div>
           <div class="bg-muted/80 rounded-xl px-3 py-2">
-            <p class="text-muted-foreground text-xs">更新时间</p>
+            <p class="text-muted text-xs">更新时间</p>
             <p class="text-ink mt-1 font-medium">
               {{ formatDate(selectedSubscription.updated_at) }}
             </p>
@@ -92,7 +90,7 @@ const emit = defineEmits<{
         </div>
 
         <div class="border-border rounded-xl border px-3 py-2">
-          <p class="text-muted-foreground text-xs">提醒配置</p>
+          <p class="text-muted text-xs">提醒配置</p>
           <p class="text-ink mt-1 text-sm">
             渠道：{{
               getReminderChannelsText(selectedSubscription.reminder_config)
@@ -149,7 +147,7 @@ const emit = defineEmits<{
 
       <div
         v-else
-        class="border-border text-muted-foreground mt-4 rounded-xl border border-dashed px-4 py-10 text-center text-sm"
+        class="border-border text-muted mt-4 rounded-xl border border-dashed px-4 py-10 text-center text-sm"
       >
         从左侧列表中选择一条订阅以查看详情。
       </div>

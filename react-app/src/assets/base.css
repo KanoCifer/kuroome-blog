@@ -138,7 +138,7 @@ a {
 }
 
 footer {
-  @apply text-muted-foreground mx-auto w-full min-w-0 p-4 text-center text-sm;
+  @apply text-muted mx-auto w-full min-w-0 p-4 text-center text-sm;
 }
 
 :root[data-font='harmonyos'] {

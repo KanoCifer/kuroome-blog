@@ -26,7 +26,7 @@
             <h2 class="text-ink text-lg font-semibold">
               {{ form.slug ? '编辑任务' : '新建任务' }}
             </h2>
-            <p class="text-muted-foreground mt-0.5 text-xs">
+            <p class="text-muted mt-0.5 text-xs">
               记录一个待开发的需求、问题或技术债。带
               <span class="text-ink">*</span> 为必填。
             </p>
@@ -39,21 +39,19 @@
         <div class="space-y-5">
           <!-- ── 标题 ── -->
           <label class="block">
-            <span
-              class="text-muted-foreground mb-1.5 block text-xs font-medium"
-            >
+            <span class="text-muted mb-1.5 block text-xs font-medium">
               标题 <span class="text-destructive">*</span>
             </span>
             <input
               v-model="form.title"
-              class="border-border bg-paper text-ink focus:border-accent placeholder:text-muted-foreground/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+              class="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
               placeholder="例如：重构首页响应式布局"
             />
           </label>
 
           <!-- ── 类型 ── -->
           <div>
-            <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
+            <span class="text-muted mb-1.5 block text-xs font-medium"
               >类型</span
             >
             <div class="flex flex-wrap gap-2">
@@ -66,7 +64,7 @@
                 :class="
                   form.type === t
                     ? typeChipActive(t)
-                    : 'border-border text-muted-foreground hover:bg-muted'
+                    : 'border-border text-muted hover:bg-muted'
                 "
               >
                 {{ t }}
@@ -76,7 +74,7 @@
 
           <!-- ── 优先级 ── -->
           <div>
-            <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
+            <span class="text-muted mb-1.5 block text-xs font-medium"
               >优先级</span
             >
             <div class="flex flex-wrap gap-2">
@@ -89,7 +87,7 @@
                 :class="
                   form.priority === p
                     ? priorityChipActive(p)
-                    : 'border-border text-muted-foreground hover:bg-muted'
+                    : 'border-border text-muted hover:bg-muted'
                 "
               >
                 {{ p }}
@@ -100,22 +98,20 @@
           <!-- ── 范围 + 截止日 ── -->
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <span
-                class="text-muted-foreground mb-1.5 block text-xs font-medium"
+              <span class="text-muted mb-1.5 block text-xs font-medium"
                 >范围
-                <span class="text-muted-foreground/60 font-normal"
+                <span class="text-muted/60 font-normal"
                   >（自由格式 — 例: 前端-React, 后端-Go, AI-LangChain）</span
                 ></span
               >
               <input
                 v-model="form.scope"
-                class="border-border bg-paper text-ink focus:border-accent placeholder:text-muted-foreground/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+                class="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
                 placeholder="例如：前端-React"
               />
             </div>
             <label class="block">
-              <span
-                class="text-muted-foreground mb-1.5 block text-xs font-medium"
+              <span class="text-muted mb-1.5 block text-xs font-medium"
                 >截止日</span
               >
               <input
@@ -128,7 +124,7 @@
 
           <!-- ── 状态（仅编辑时显示） ── -->
           <div v-if="form.slug">
-            <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
+            <span class="text-muted mb-1.5 block text-xs font-medium"
               >状态</span
             >
             <div class="flex flex-wrap gap-1.5">
@@ -141,7 +137,7 @@
                 :class="
                   form.status === s
                     ? 'border-accent/40 bg-accent/10 text-accent'
-                    : 'border-border text-muted-foreground hover:bg-muted'
+                    : 'border-border text-muted hover:bg-muted'
                 "
               >
                 {{ s }}
@@ -151,77 +147,77 @@
 
           <!-- ── 描述 ── -->
           <label class="block">
-            <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
+            <span class="text-muted mb-1.5 block text-xs font-medium"
               >描述</span
             >
             <textarea
               v-model="form.description"
               rows="3"
-              class="border-border bg-paper text-ink focus:border-accent placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+              class="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               placeholder="一两句话说清楚要做什么、为什么..."
             ></textarea>
           </label>
 
           <!-- ── 详情 ── -->
           <label class="block">
-            <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
+            <span class="text-muted mb-1.5 block text-xs font-medium"
               >详情</span
             >
             <textarea
               v-model="form.detail"
               rows="6"
-              class="border-border bg-paper text-ink focus:border-accent placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+              class="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               placeholder="实现思路、参考链接、验收标准等，可较长..."
             ></textarea>
-            <span class="text-muted-foreground/60 mt-1 block text-[11px]"
+            <span class="text-muted/60 mt-1 block text-[11px]"
               >支持比描述更长的自由文本</span
             >
           </label>
 
           <!-- ── Spec：验收标准 ── -->
           <label class="block">
-            <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
+            <span class="text-muted mb-1.5 block text-xs font-medium"
               >验收标准
-              <span class="text-muted-foreground/60 font-normal"
+              <span class="text-muted/60 font-normal"
                 >（满足这几条算完成 — agent 会逐条自检）</span
               ></span
             >
             <textarea
               v-model="form.acceptance_criteria"
               rows="4"
-              class="border-border bg-paper text-ink focus:border-accent placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+              class="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               placeholder="- 所有接口有单测覆盖&#10;- 文档同步更新&#10;- 性能基准不降级"
             ></textarea>
           </label>
 
           <!-- ── Spec：约束 ── -->
           <label class="block">
-            <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
+            <span class="text-muted mb-1.5 block text-xs font-medium"
               >约束
-              <span class="text-muted-foreground/60 font-normal"
+              <span class="text-muted/60 font-normal"
                 >（agent 不可违反的硬性边界）</span
               ></span
             >
             <textarea
               v-model="form.constraints"
               rows="4"
-              class="border-border bg-paper text-ink focus:border-accent placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+              class="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               placeholder="- 不动 src/legacy/ 目录&#10;- 后端继续用 Gin，不换框架&#10;- API 响应格式保持不变"
             ></textarea>
           </label>
 
           <!-- ── Spec：上下文指针 ── -->
           <label class="block">
-            <span class="text-muted-foreground mb-1.5 block text-xs font-medium"
+            <span class="text-muted mb-1.5 block text-xs font-medium"
               >上下文指针
-              <span class="text-muted-foreground/60 font-normal"
+              <span class="text-muted/60 font-normal"
                 >（相关代码 / 文档路径，减少 agent 找文件的往返）</span
               ></span
             >
             <textarea
               v-model="form.context_pointers"
               rows="4"
-              class="border-border bg-paper text-ink focus:border-accent placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+              class="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               placeholder="internal/auth/, docs/adr/0003, src/middleware/session.ts"
             ></textarea>
           </label>
@@ -243,7 +239,7 @@
         <div class="flex items-center gap-2">
           <button
             @click="emit('close')"
-            class="text-muted-foreground hover:bg-muted focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+            class="text-muted hover:bg-muted focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
             取消
           </button>
@@ -305,7 +301,7 @@ const PRIORITY_ACTIVE: Record<DevTaskPriority, string> = {
   'P1 高':
     'border-orange-300/60 bg-orange-50 text-orange-700 dark:border-orange-700/60 dark:bg-orange-950/30 dark:text-orange-400',
   'P2 中': 'border-accent/40 bg-accent/10 text-accent',
-  'P3 低': 'border-border bg-muted text-muted-foreground',
+  'P3 低': 'border-border bg-muted text-muted',
 };
 
 function typeChipActive(t: DevTaskType): string {

@@ -207,8 +207,8 @@ export default function BlogListView() {
           <h1 className="text-ink max-w-6xl text-center font-serif text-7xl max-sm:text-3xl">
             {heroTitle}
           </h1>
-          <div className="text-muted-foreground mt-4 flex flex-wrap items-center justify-center gap-4 text-sm">
-            <span className="bg-secondary text-muted-foreground inline-block rounded-full px-2 py-0.5 text-xs font-medium">
+          <div className="text-muted mt-4 flex flex-wrap items-center justify-center gap-4 text-sm">
+            <span className="bg-secondary text-muted inline-block rounded-full px-2 py-0.5 text-xs font-medium">
               {heroSubtitle}
             </span>
           </div>
@@ -228,7 +228,7 @@ export default function BlogListView() {
                 viewBox="0 0 24 24"
                 strokeWidth="2"
                 stroke="currentColor"
-                className="text-muted-foreground h-4 w-4"
+                className="text-muted h-4 w-4"
                 aria-hidden="true"
               >
                 <path
@@ -245,13 +245,13 @@ export default function BlogListView() {
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder="在字里行间，寻一句心动…"
               aria-label="搜索文章"
-              className="text-ink placeholder:text-muted-foreground/70 focus:border-accent focus:ring-accent/20 border-border bg-paper w-full rounded-xl border py-3 pr-10 pl-10 font-serif text-sm placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+              className="text-ink placeholder:text-muted/70 focus:border-accent focus:ring-accent/20 border-border bg-paper w-full rounded-xl border py-3 pr-10 pl-10 font-serif text-sm placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             />
             {searchQuery && (
               <button
                 type="button"
                 aria-label="清空搜索"
-                className="text-muted-foreground hover:text-ink absolute inset-y-0 right-0 flex items-center pr-3"
+                className="text-muted hover:text-ink absolute inset-y-0 right-0 flex items-center pr-3"
                 onClick={handleClearSearch}
               >
                 <svg
@@ -278,7 +278,7 @@ export default function BlogListView() {
             {activeTag && (
               <button
                 type="button"
-                className="border-border bg-paper text-muted-foreground hover:bg-muted hover:text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+                className="border-border bg-paper text-muted hover:bg-muted hover:text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
                 onClick={handleResetFilter}
               >
                 <span className="text-accent/70 font-serif italic">#</span>
@@ -317,7 +317,7 @@ export default function BlogListView() {
             {/* ────────────────────────────────────────────────── */}
             <div className="mb-6 flex items-end justify-between gap-4 pb-3">
               <div className="flex items-baseline gap-3">
-                <span className="text-muted-foreground font-mono text-[10px] tracking-[0.4em] uppercase">
+                <span className="text-muted font-mono text-[10px] tracking-[0.4em] uppercase">
                   Volume · 壹
                 </span>
                 <h2 className="text-ink font-serif text-base font-semibold sm:text-lg">
@@ -331,7 +331,7 @@ export default function BlogListView() {
                   )}
                 </h2>
               </div>
-              <div className="text-muted-foreground/70 flex items-center gap-1.5">
+              <div className="text-muted/70 flex items-center gap-1.5">
                 <div className="bg-accent/40 h-px w-6" />
                 <span className="font-mono text-[10px] tracking-[0.2em] uppercase">
                   {activeTag ? 'Category' : 'Recent'}
@@ -398,8 +398,8 @@ export default function BlogListView() {
                       aria-disabled={!pagination?.has_prev}
                       className={`focus-visible:ring-ring inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${
                         pagination?.has_prev
-                          ? 'text-muted-foreground hover:bg-muted hover:text-ink'
-                          : 'text-muted-foreground/50 cursor-not-allowed'
+                          ? 'text-muted hover:bg-muted hover:text-ink'
+                          : 'text-muted/50 cursor-not-allowed'
                       }`}
                       onClick={() => handlePageChange(pagination!.prev_num!)}
                     >
@@ -414,7 +414,7 @@ export default function BlogListView() {
                     item === 'ellipsis' ? (
                       <li key={`ell-${i}`}>
                         <span
-                          className="text-muted-foreground/60 px-1 text-sm select-none"
+                          className="text-muted/60 px-1 text-sm select-none"
                           aria-hidden="true"
                         >
                           …
@@ -430,7 +430,7 @@ export default function BlogListView() {
                           className={`focus-visible:ring-ring inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${
                             item === pagination?.page
                               ? 'bg-accent text-accent'
-                              : 'text-muted-foreground hover:bg-muted hover:text-ink'
+                              : 'text-muted hover:bg-muted hover:text-ink'
                           }`}
                           onClick={() => handlePageChange(item)}
                         >
@@ -447,8 +447,8 @@ export default function BlogListView() {
                       aria-disabled={!pagination?.has_next}
                       className={`focus-visible:ring-ring inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${
                         pagination?.has_next
-                          ? 'text-muted-foreground hover:bg-muted hover:text-ink'
-                          : 'text-muted-foreground/50 cursor-not-allowed'
+                          ? 'text-muted hover:bg-muted hover:text-ink'
+                          : 'text-muted/50 cursor-not-allowed'
                       }`}
                       onClick={() => handlePageChange(pagination!.next_num!)}
                     >
@@ -483,7 +483,7 @@ export default function BlogListView() {
         {/* ──────────────────────────────────────────────────────────── -->
         {/* 底部装饰：ka·no·ci·fer */}
         {/* ──────────────────────────────────────────────────────────── */}
-        <div className="text-muted-foreground border-border/50 mt-12 flex items-center justify-between border-t pt-4 font-mono text-[10px] tracking-[0.2em] uppercase">
+        <div className="text-muted border-border/50 mt-12 flex items-center justify-between border-t pt-4 font-mono text-[10px] tracking-[0.2em] uppercase">
           <span>Essays · 卷一</span>
           <span className="font-serif tracking-normal normal-case italic">
             ka·no·ci·fer

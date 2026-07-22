@@ -101,10 +101,8 @@ export default function RssArticleView() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
             >
-              <h1 className="text-ink text-2xl font-bold">
-                {article.title}
-              </h1>
-              <p className="text-muted-foreground mt-1 mb-4 text-xs">
+              <h1 className="text-ink text-2xl font-bold">{article.title}</h1>
+              <p className="text-muted mt-1 mb-4 text-xs">
                 {article.author ? `作者：${article.author} · ` : ''}
                 {formatDate(article.published)}
               </p>

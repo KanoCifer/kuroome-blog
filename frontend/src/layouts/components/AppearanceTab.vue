@@ -77,12 +77,8 @@ const smallCardBase =
   <div class="space-y-6">
     <!-- 页面元素 -->
     <div>
-      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">
-        页面元素
-      </h2>
-      <p class="text-muted-foreground mb-4 text-xs italic">
-        Display the page footer
-      </p>
+      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">页面元素</h2>
+      <p class="text-muted mb-4 text-xs italic">Display the page footer</p>
 
       <button
         @click="themeStore.toggleFooter()"
@@ -90,9 +86,7 @@ const smallCardBase =
       >
         <div class="text-left">
           <div class="text-ink text-sm font-medium">显示页脚</div>
-          <div class="text-muted-foreground mt-0.5 text-xs">
-            Show footer on every page
-          </div>
+          <div class="text-muted mt-0.5 text-xs">Show footer on every page</div>
         </div>
         <div
           class="h-6 w-11 rounded-full p-0.5 transition-colors"
@@ -112,10 +106,8 @@ const smallCardBase =
 
     <!-- 主题模式 -->
     <div>
-      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">
-        主题模式
-      </h2>
-      <p class="text-muted-foreground mb-4 text-xs italic">Theme mode</p>
+      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">主题模式</h2>
+      <p class="text-muted mb-4 text-xs italic">Theme mode</p>
 
       <div class="grid grid-cols-3 gap-3">
         <button
@@ -132,9 +124,7 @@ const smallCardBase =
           <component
             :is="theme.icon"
             :class="
-              themeStore.theme === theme.value
-                ? 'text-accent'
-                : 'text-ink'
+              themeStore.theme === theme.value ? 'text-accent' : 'text-ink'
             "
           />
           <span
@@ -153,10 +143,8 @@ const smallCardBase =
 
     <!-- 字体 -->
     <div>
-      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">
-        字体
-      </h2>
-      <p class="text-muted-foreground mb-4 text-xs italic">Reading font</p>
+      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">字体</h2>
+      <p class="text-muted mb-4 text-xs italic">Reading font</p>
 
       <div class="grid grid-cols-2 gap-3">
         <button
@@ -170,15 +158,11 @@ const smallCardBase =
         >
           <span
             class="text-sm font-semibold"
-            :class="
-              themeStore.font === 'default' ? 'text-accent' : 'text-ink'
-            "
+            :class="themeStore.font === 'default' ? 'text-accent' : 'text-ink'"
           >
             默认字体
           </span>
-          <span class="text-muted-foreground font-mono text-[10px]">
-            PingFang SC
-          </span>
+          <span class="text-muted font-mono text-[10px]"> PingFang SC </span>
         </button>
         <button
           @click="themeStore.applyFont('harmonyos')"
@@ -192,29 +176,21 @@ const smallCardBase =
           <span
             class="text-sm font-semibold"
             :class="
-              themeStore.font === 'harmonyos'
-                ? 'text-accent'
-                : 'text-ink'
+              themeStore.font === 'harmonyos' ? 'text-accent' : 'text-ink'
             "
             style="font-family: 'Noto Sans SC', sans-serif; font-weight: 500"
           >
             HarmonyOS Sans
           </span>
-          <span class="text-muted-foreground font-mono text-[10px]"
-            >鸿蒙字体</span
-          >
+          <span class="text-muted font-mono text-[10px]">鸿蒙字体</span>
         </button>
       </div>
     </div>
 
     <!-- 配色方案 -->
     <div>
-      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">
-        配色方案
-      </h2>
-      <p class="text-muted-foreground mb-4 text-xs italic">
-        Color scheme · 四种调性
-      </p>
+      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">配色方案</h2>
+      <p class="text-muted mb-4 text-xs italic">Color scheme · 四种调性</p>
 
       <div class="space-y-2">
         <button
@@ -248,7 +224,7 @@ const smallCardBase =
             <div class="text-ink text-sm font-semibold">
               {{ scheme.label }}
             </div>
-            <div class="text-muted-foreground mt-0.5 text-[11px] italic">
+            <div class="text-muted mt-0.5 text-[11px] italic">
               {{ scheme.desc }}
             </div>
           </div>

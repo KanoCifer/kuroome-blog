@@ -32,7 +32,7 @@ export function QuickFeedbackBanner({
         <p className="text-ink font-family-averia text-base">
           钓完了？告诉我们今天实际如何
         </p>
-        <p className="text-muted-foreground mt-0.5 text-xs">
+        <p className="text-muted mt-0.5 text-xs">
           三个问题，三十秒 —— 您的反馈会帮系统下次更准
         </p>
       </div>
@@ -40,7 +40,7 @@ export function QuickFeedbackBanner({
         type="button"
         disabled={disabled}
         onClick={onSubmit}
-        className="bg-accent text-accent hover:bg-accent/90 disabled:bg-muted disabled:text-muted-foreground min-h-10 shrink-0 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors disabled:cursor-not-allowed sm:min-h-11 sm:px-5"
+        className="bg-accent text-accent hover:bg-accent/90 disabled:bg-muted disabled:text-muted min-h-10 shrink-0 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors disabled:cursor-not-allowed sm:min-h-11 sm:px-5"
       >
         反馈今日指数
       </button>

@@ -38,10 +38,26 @@ const ICON_SIZE = 'size-[22px]';
 const NAV_ITEM_WIDTH = 64; // px, matches NavItem link w-16
 
 const MENU_ITEMS = [
-  { path: '/bookshelf', label: 'Bookshelf', icon: <BookOpen className="h-6 w-6" /> },
-  { path: '/moments', label: 'Moments', icon: <FileText className="h-6 w-6" /> },
-  { path: '/messages', label: 'Messages', icon: <MessageCircle className="h-6 w-6" /> },
-  { path: '/settings', label: 'Settings', icon: <Settings className="h-6 w-6" /> },
+  {
+    path: '/bookshelf',
+    label: 'Bookshelf',
+    icon: <BookOpen className="h-6 w-6" />,
+  },
+  {
+    path: '/moments',
+    label: 'Moments',
+    icon: <FileText className="h-6 w-6" />,
+  },
+  {
+    path: '/messages',
+    label: 'Messages',
+    icon: <MessageCircle className="h-6 w-6" />,
+  },
+  {
+    path: '/settings',
+    label: 'Settings',
+    icon: <Settings className="h-6 w-6" />,
+  },
   { path: '/about', label: 'About', icon: <Info className="h-6 w-6" /> },
 ] as const;
 
@@ -50,7 +66,7 @@ function NavItem({ icon, to }: NavItemProps) {
     <div className="flex items-center justify-center">
       <Link
         to={to}
-        className="text-muted-foreground hover:text-accent flex h-14 w-16 items-center justify-center rounded-full transition duration-300 hover:scale-110 active:scale-[0.96]"
+        className="text-muted hover:text-accent flex h-14 w-16 items-center justify-center rounded-full transition duration-300 hover:scale-110 active:scale-[0.96]"
       >
         {icon}
       </Link>
@@ -185,7 +201,7 @@ export function BasicNav() {
               <div className="flex items-center justify-center">
                 <button
                   onClick={() => setShowMenu((v) => !v)}
-                  className="text-muted-foreground hover:text-accent flex h-14 w-16 items-center justify-center rounded-full transition duration-200 hover:scale-110 active:scale-[0.96]"
+                  className="text-muted hover:text-accent flex h-14 w-16 items-center justify-center rounded-full transition duration-200 hover:scale-110 active:scale-[0.96]"
                   aria-label="更多导航"
                   aria-expanded={showMenu}
                 >

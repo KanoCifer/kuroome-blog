@@ -4,20 +4,19 @@
     <section>
       <div class="mb-4">
         <div class="flex items-center gap-2.5">
-          <h2
-            class="text-ink font-serif text-xl font-medium tracking-tight"
-          >
+          <h2 class="text-ink font-serif text-xl font-medium tracking-tight">
             现在能做什么
           </h2>
           <span
             v-if="frontierTasks.length"
-            class="inline-block min-w-[1.25rem] rounded-full bg-accent/15 px-1.5 text-center text-[11px] font-medium text-ink tabular-nums"
+            class="bg-accent/15 text-ink inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
           >
             {{ frontierTasks.length }}
           </span>
         </div>
-        <p class="text-muted-foreground mt-1 text-xs">
-          <span class="italic">ready to pick up</span> · 无阻塞，按优先级与截止日排序
+        <p class="text-muted mt-1 text-xs">
+          <span class="italic">ready to pick up</span> ·
+          无阻塞，按优先级与截止日排序
         </p>
       </div>
 
@@ -43,10 +42,10 @@
       <!-- empty state that teaches: all-clear vs everything-blocked -->
       <div
         v-else
-        class="text-muted-foreground/70 flex flex-col items-center justify-center py-12 text-center"
+        class="text-muted/70 flex flex-col items-center justify-center py-12 text-center"
       >
         <svg
-          class="text-muted-foreground/30 mb-2 h-8 w-8"
+          class="text-muted/30 mb-2 h-8 w-8"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -63,9 +62,7 @@
           <p class="text-xs">没有待推进的任务</p>
         </template>
         <template v-else>
-          <p class="text-sm font-medium">
-            {{ blockedCount }} 个任务在等待前置
-          </p>
+          <p class="text-sm font-medium">{{ blockedCount }} 个任务在等待前置</p>
           <p class="text-xs">先去推进它们的前置，或新建一个独立任务</p>
         </template>
       </div>
@@ -84,12 +81,12 @@
             </h3>
             <span
               v-if="inProgressTasks.length"
-              class="inline-block min-w-[1.25rem] rounded-full bg-muted-foreground/10 px-1.5 text-center text-[11px] font-medium text-muted-foreground tabular-nums"
+              class="bg-muted/10 text-muted inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
             >
               {{ inProgressTasks.length }}
             </span>
           </div>
-          <span class="text-muted-foreground text-xs">正在推进的任务</span>
+          <span class="text-muted text-xs">正在推进的任务</span>
         </div>
         <div v-if="inProgressTasks.length" class="space-y-2">
           <TaskRow
@@ -103,7 +100,7 @@
         </div>
         <div
           v-else
-          class="text-muted-foreground/70 flex items-center justify-center py-6 text-sm"
+          class="text-muted/70 flex items-center justify-center py-6 text-sm"
         >
           {{
             frontierTasks.length
@@ -124,12 +121,12 @@
             </h3>
             <span
               v-if="doneThisWeek.length"
-              class="inline-block min-w-[1.25rem] rounded-full bg-muted-foreground/10 px-1.5 text-center text-[11px] font-medium text-muted-foreground tabular-nums"
+              class="bg-muted/10 text-muted inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
             >
               {{ doneThisWeek.length }}
             </span>
           </div>
-          <span class="text-muted-foreground text-xs">最近关闭的任务</span>
+          <span class="text-muted text-xs">最近关闭的任务</span>
         </div>
         <div v-if="doneThisWeek.length" class="space-y-2">
           <TaskRow
@@ -143,7 +140,7 @@
         </div>
         <div
           v-else
-          class="text-muted-foreground/70 flex items-center justify-center py-6 text-sm"
+          class="text-muted/70 flex items-center justify-center py-6 text-sm"
         >
           本周还没有完成的任务
         </div>

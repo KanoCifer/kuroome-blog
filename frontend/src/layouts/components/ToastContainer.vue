@@ -120,7 +120,7 @@ onUnmounted(() => {
         />
 
         <div
-          class="text-muted-foreground dark:text-ink flex-1 text-sm leading-snug font-semibold"
+          class="text-muted dark:text-ink flex-1 text-sm leading-snug font-semibold"
         >
           {{ t.message }}
         </div>

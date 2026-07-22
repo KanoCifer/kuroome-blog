@@ -1,12 +1,9 @@
 <template>
-  <section
-    id="rss-parse"
-    class="border-border bg-paper rounded-2xl border p-6"
-  >
+  <section id="rss-parse" class="border-border bg-paper rounded-2xl border p-6">
     <div class="mb-5 flex items-center justify-between gap-3">
       <div>
         <h2 class="text-accent text-xl font-bold">解析订阅地址</h2>
-        <p class="text-muted-foreground mt-1 text-sm">
+        <p class="text-muted mt-1 text-sm">
           支持 RSS/Atom，解析后可直接保存到我的订阅
         </p>
       </div>
@@ -17,10 +14,7 @@
       @submit.prevent="$emit('parse')"
     >
       <div class="flex-1">
-        <label
-          for="rss-url"
-          class="text-accent mb-2 block text-sm font-medium"
-        >
+        <label for="rss-url" class="text-accent mb-2 block text-sm font-medium">
           RSS/Atom 地址
         </label>
         <input
@@ -28,7 +22,7 @@
           :value="rssUrl"
           type="text"
           placeholder="https://example.com/feed.xml"
-          class="border-border bg-paper text-ink placeholder:text-muted-foreground focus:border-accent focus:ring-accent/20 w-full rounded-xl border px-4 py-3 transition-all focus:ring-2 focus:outline-none"
+          class="border-border bg-paper text-ink placeholder:text-muted focus:border-accent focus:ring-accent/20 w-full rounded-xl border px-4 py-3 transition-all focus:ring-2 focus:outline-none"
           @input="
             $emit('update:rssUrl', ($event.target as HTMLInputElement).value)
           "
@@ -53,7 +47,7 @@
     </form>
 
     <div class="mt-4 flex flex-wrap items-center gap-2">
-      <span class="text-muted-foreground text-sm">快捷尝试:</span>
+      <span class="text-muted text-sm">快捷尝试:</span>
       <button
         v-for="feed in exampleFeeds"
         :key="feed.url"
@@ -69,7 +63,7 @@
       v-if="rssHistory.length > 0"
       class="mt-3 flex flex-wrap items-center gap-2"
     >
-      <span class="text-muted-foreground text-sm">历史记录:</span>
+      <span class="text-muted text-sm">历史记录:</span>
       <button
         v-for="historyUrl in rssHistory.slice(0, 3)"
         :key="historyUrl"
@@ -88,15 +82,10 @@
       <h3 class="text-accent text-lg font-bold">
         {{ parseMetadata.title }}
       </h3>
-      <p
-        v-if="parseMetadata.description"
-        class="text-muted-foreground mt-2 text-sm"
-      >
+      <p v-if="parseMetadata.description" class="text-muted mt-2 text-sm">
         {{ parseMetadata.description }}
       </p>
-      <div
-        class="text-muted-foreground mt-3 flex flex-wrap items-center gap-3 text-xs"
-      >
+      <div class="text-muted mt-3 flex flex-wrap items-center gap-3 text-xs">
         <span v-if="parseMetadata.published"
           >更新时间: {{ formatDate(parseMetadata.published) }}</span
         >
@@ -129,13 +118,10 @@
           >
             {{ entry.title }}
           </a>
-          <p
-            v-if="entry.summary"
-            class="text-muted-foreground mt-2 line-clamp-2 text-sm"
-          >
+          <p v-if="entry.summary" class="text-muted mt-2 line-clamp-2 text-sm">
             {{ truncateSummary(entry.summary) }}
           </p>
-          <div class="text-muted-foreground mt-2 text-xs">
+          <div class="text-muted mt-2 text-xs">
             {{ formatDate(entry.published) }}
           </div>
         </li>

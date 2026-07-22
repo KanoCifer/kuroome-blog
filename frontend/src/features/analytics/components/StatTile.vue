@@ -4,7 +4,7 @@
   >
     <div class="flex items-center justify-between">
       <span
-        class="text-muted-foreground font-mono text-[10px] font-medium tracking-[0.18em] uppercase"
+        class="text-muted font-mono text-[10px] font-medium tracking-[0.18em] uppercase"
         >{{ label }}</span
       >
       <div

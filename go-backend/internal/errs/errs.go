@@ -33,6 +33,7 @@ var (
 	ErrGitHubAlreadyBound  = errors.New("该 GitHub 账户已被绑定")
 
 	// 上传 / 媒体错误
+	ErrInvalidUploadType    = errors.New("未知的上传类型")
 	ErrUnsupportedImageType = errors.New("不支持的图片类型")
 	ErrImageTooLarge        = errors.New("图片过大")
 	ErrInvalidImageData     = errors.New("无效的图片数据")

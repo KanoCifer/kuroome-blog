@@ -38,7 +38,7 @@
 
       <!-- 副标题徽章 -->
       <div
-        class="text-muted-foreground mt-6 flex flex-wrap items-center justify-center gap-3 text-sm"
+        class="text-muted mt-6 flex flex-wrap items-center justify-center gap-3 text-sm"
       >
         <span
           class="bg-paper text-ink border-border inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium tracking-wide"
@@ -84,7 +84,7 @@
       <div
         aria-hidden="true"
         :style="sectionStyle"
-        class="bg-paper/95 border-border absolute inset-0 rounded-t-[40px] border-x border-t shadow-[inset_0_0_20px_0px_color-mix(in_oklch,var(--foreground)_8%,transparent)]"
+        class="bg-paper/95 border-border absolute inset-0 rounded-t-[40px] border-x border-t shadow-[inset_0_0_20px_0px_color-mix(in_oklch,var(--muted)_8%,transparent)]"
         style="contain: layout style"
       ></div>
 

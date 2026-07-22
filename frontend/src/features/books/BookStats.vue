@@ -19,7 +19,7 @@
             :class="
               activeMode === m.key
                 ? 'bg-accent text-accent shadow-sm'
-                : 'text-muted-foreground hover:bg-muted hover:text-ink'
+                : 'text-muted hover:bg-muted hover:text-ink'
             "
             @click="switchMode(m.key)"
           >
@@ -34,7 +34,7 @@
         >
           <button
             type="button"
-            class="text-muted-foreground hover:text-ink hover:bg-muted inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+            class="text-muted hover:text-ink hover:bg-muted inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
             :disabled="statsStore.isLoading"
             @click="goPrev"
             aria-label="上一周期"
@@ -55,14 +55,12 @@
             </svg>
             上{{ unitLabel }}
           </button>
-          <span
-            class="text-ink text-sm font-medium tabular-nums sm:text-base"
-          >
+          <span class="text-ink text-sm font-medium tabular-nums sm:text-base">
             {{ periodLabel }}
           </span>
           <button
             type="button"
-            class="text-muted-foreground hover:text-ink hover:bg-muted inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+            class="text-muted hover:text-ink hover:bg-muted inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
             :disabled="statsStore.isLoading || isAtCurrent"
             @click="goNext"
             aria-label="下一周期"
@@ -115,7 +113,7 @@
         <!-- ── Empty (period has no data) ─────────────────────────── -->
         <div
           v-else-if="activeSnapshot && !hasAnyData"
-          class="text-muted-foreground py-20 text-center font-serif text-lg"
+          class="text-muted py-20 text-center font-serif text-lg"
         >
           这{{ unitLabel }}还没有阅读记录。
         </div>
@@ -123,7 +121,7 @@
         <template v-else-if="activeSnapshot">
           <!-- ── 段落一：你读了多少 ─────────────────────────────── -->
           <section class="mb-14">
-            <p class="text-muted-foreground mb-3 text-sm">
+            <p class="text-muted mb-3 text-sm">
               {{ eyebrow }}
             </p>
             <p
@@ -131,7 +129,7 @@
             >
               {{ formatDuration(activeSnapshot.totalReadTime) }}
             </p>
-            <p class="text-muted-foreground mt-4 text-base sm:text-lg">
+            <p class="text-muted mt-4 text-base sm:text-lg">
               {{ subtitle }}
             </p>
           </section>
@@ -193,7 +191,7 @@
               >
                 {{ stat.counts }}
               </p>
-              <p class="text-muted-foreground mt-1 text-xs sm:text-sm">
+              <p class="text-muted mt-1 text-xs sm:text-sm">
                 {{ stat.stat }}
               </p>
             </div>

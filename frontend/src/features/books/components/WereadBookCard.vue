@@ -97,7 +97,7 @@ function onImgError(e: Event) {
 <template>
   <button
     type="button"
-    class="group focus-visible:ring-ring focus-visible:ring-offset-background block w-full cursor-pointer rounded-xl text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+    class="group focus-visible:ring-ring focus-visible:ring-offset-paper block w-full cursor-pointer rounded-xl text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
     @click="handleSelect"
   >
     <!-- ─── List variant: 横向单行 ────────────────────────────── -->
@@ -121,7 +121,7 @@ function onImgError(e: Event) {
           class="flex h-full w-full items-center justify-center"
           :style="{ background: coverGradient }"
         >
-          <span class="text-muted-foreground/50 font-serif text-base">
+          <span class="text-muted/50 font-serif text-base">
             {{ book.title.slice(0, 1) }}
           </span>
         </div>
@@ -135,7 +135,7 @@ function onImgError(e: Event) {
           {{ book.title }}
         </p>
         <p
-          class="text-muted-foreground mt-0.5 line-clamp-1"
+          class="text-muted mt-0.5 line-clamp-1"
           :class="authorSize"
           :title="book.author"
         >
@@ -143,7 +143,7 @@ function onImgError(e: Event) {
         </p>
         <p
           v-if="showStatus"
-          class="text-muted-foreground/80 mt-1 text-[11px] tabular-nums"
+          class="text-muted/80 mt-1 text-[11px] tabular-nums"
         >
           {{ statusLine }}
         </p>
@@ -157,7 +157,7 @@ function onImgError(e: Event) {
           {{ statusLabel }}
         </span>
         <ChevronRight
-          class="text-muted-foreground/40 h-4 w-4 transition-transform group-hover:translate-x-0.5"
+          class="text-muted/40 h-4 w-4 transition-transform group-hover:translate-x-0.5"
         />
       </div>
     </div>
@@ -228,7 +228,7 @@ function onImgError(e: Event) {
           {{ book.title }}
         </p>
         <p
-          class="text-muted-foreground mt-1 truncate leading-snug"
+          class="text-muted mt-1 truncate leading-snug"
           :class="authorSize"
           :title="book.author"
         >

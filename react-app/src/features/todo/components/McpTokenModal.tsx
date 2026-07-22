@@ -71,13 +71,13 @@ export function McpTokenModal({ open, onClose }: McpTokenModalProps) {
             <h2 className="text-ink text-lg font-semibold">
               签发 MCP 服务 Token
             </h2>
-            <p className="text-muted-foreground mt-0.5 text-xs">
+            <p className="text-muted mt-0.5 text-xs">
               生成长期有效的 service-JWT，供 MCP server 调用 devtask 接口。
             </p>
           </div>
           <button
             type="button"
-            className="text-muted-foreground hover:bg-muted hover:text-ink cursor-pointer rounded-md p-1.5 transition-colors"
+            className="text-muted hover:bg-muted hover:text-ink cursor-pointer rounded-md p-1.5 transition-colors"
             aria-label="关闭"
             onClick={onClose}
           >
@@ -99,7 +99,7 @@ export function McpTokenModal({ open, onClose }: McpTokenModalProps) {
 
         <div className="px-6 py-5">
           <div className="mb-5">
-            <span className="text-muted-foreground mb-2 block text-xs font-medium">
+            <span className="text-muted mb-2 block text-xs font-medium">
               有效期
             </span>
             <div className="flex flex-wrap gap-2">
@@ -111,7 +111,7 @@ export function McpTokenModal({ open, onClose }: McpTokenModalProps) {
                   className={`cursor-pointer rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
                     days === opt.days
                       ? 'border-accent/40 bg-accent/10 text-accent'
-                      : 'border-border text-muted-foreground hover:text-ink'
+                      : 'border-border text-muted hover:text-ink'
                   }`}
                 >
                   {opt.label}
@@ -165,10 +165,10 @@ export function McpTokenModal({ open, onClose }: McpTokenModalProps) {
           {result && (
             <div className="mt-5 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground block text-xs font-medium">
+                <span className="text-muted block text-xs font-medium">
                   Token
                 </span>
-                <span className="text-muted-foreground text-[11px]">
+                <span className="text-muted text-[11px]">
                   有效期至 {formatDate(result.expires_at)}（{result.days} 天）
                 </span>
               </div>
@@ -182,7 +182,7 @@ export function McpTokenModal({ open, onClose }: McpTokenModalProps) {
                 />
                 <button
                   type="button"
-                  className="text-muted-foreground hover:bg-muted hover:text-ink absolute top-2 right-2 cursor-pointer rounded-md p-1.5 transition-colors"
+                  className="text-muted hover:bg-muted hover:text-ink absolute top-2 right-2 cursor-pointer rounded-md p-1.5 transition-colors"
                   title={copied ? '已复制' : '复制'}
                   onClick={handleCopy}
                 >
@@ -226,7 +226,7 @@ export function McpTokenModal({ open, onClose }: McpTokenModalProps) {
                 </button>
               </div>
 
-              <p className="text-muted-foreground text-[11px] leading-relaxed">
+              <p className="text-muted text-[11px] leading-relaxed">
                 Token 拥有完整的 devtask
                 读写权限。生成后请妥善保管，泄露后请尽快在服务端轮换
                 <code className="bg-muted px-1 py-0.5 font-mono text-[10px]">

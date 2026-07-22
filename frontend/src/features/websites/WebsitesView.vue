@@ -18,7 +18,7 @@
           :class="
             activeSlug === opt.slug
               ? 'bg-accent text-accent shadow-sm'
-              : 'text-muted-foreground hover:bg-muted hover:text-ink'
+              : 'text-muted hover:bg-muted hover:text-ink'
           "
           @click="setCategory(opt.slug)"
         >
@@ -26,9 +26,7 @@
           <span
             class="text-xs tabular-nums"
             :class="
-              activeSlug === opt.slug
-                ? 'text-accent/70'
-                : 'text-muted-foreground/70'
+              activeSlug === opt.slug ? 'text-accent/70' : 'text-muted/70'
             "
           >
             {{ opt.count }}
@@ -41,9 +39,9 @@
         v-if="visibleSites.length === 0"
         class="border-border bg-paper/30 flex flex-col items-center justify-center rounded-4xl border py-20"
       >
-        <IconGlobeOutline class="text-muted-foreground mb-5 h-16 w-16" />
+        <IconGlobeOutline class="text-muted mb-5 h-16 w-16" />
         <p class="text-ink font-serif text-lg">这个抽屉还没添东西。</p>
-        <p class="text-muted-foreground mt-2 text-sm">
+        <p class="text-muted mt-2 text-sm">
           试试别的分类，或者
           <button
             type="button"
@@ -75,7 +73,7 @@
             aria-hidden="true"
           ></span>
           <span
-            class="text-muted-foreground text-xs font-medium tracking-wide tabular-nums"
+            class="text-muted text-xs font-medium tracking-wide tabular-nums"
           >
             {{ group.sites.length }} 个
           </span>
@@ -106,10 +104,7 @@
                   class="h-7 w-7 object-contain"
                   @error="handleImageError"
                 />
-                <IconGlobeOutline
-                  v-else
-                  class="text-muted-foreground h-6 w-6"
-                />
+                <IconGlobeOutline v-else class="text-muted h-6 w-6" />
               </div>
               <div class="min-w-0 flex-1">
                 <h3
@@ -126,9 +121,7 @@
             </div>
 
             <!-- 中段：note（书房语气的视觉重心） -->
-            <p
-              class="text-ink/85 mb-3 text-sm leading-relaxed text-pretty"
-            >
+            <p class="text-ink/85 mb-3 text-sm leading-relaxed text-pretty">
               <span class="text-accent/70 font-serif" aria-hidden="true"
                 >「</span
               >
@@ -139,9 +132,7 @@
             </p>
 
             <!-- 底段：description + tags -->
-            <p
-              class="text-muted-foreground mb-4 line-clamp-2 text-xs leading-relaxed"
-            >
+            <p class="text-muted mb-4 line-clamp-2 text-xs leading-relaxed">
               {{ site.description }}
             </p>
 
@@ -153,7 +144,7 @@
 
             <!-- 外链箭头 -->
             <IconExternalLink
-              class="text-muted-foreground/60 group-hover:text-ink/80 absolute top-5 right-5 h-4 w-4 shrink-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              class="text-muted/60 group-hover:text-ink/80 absolute top-5 right-5 h-4 w-4 shrink-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
               aria-hidden="true"
             />
           </motion.a>

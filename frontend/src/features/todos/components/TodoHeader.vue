@@ -8,7 +8,7 @@
       >
         开发任务
       </h1>
-      <p class="text-muted-foreground mt-0.5 font-serif text-sm italic">
+      <p class="text-muted mt-0.5 font-serif text-sm italic">
         Agent-native Task Dashboard
       </p>
     </div>

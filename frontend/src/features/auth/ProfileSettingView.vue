@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { authGateway, useProfileForm } from '@/features/auth';
 import { useAuthStore } from '@/features/auth';
+import { useUpload } from '@/features/upload';
 import { AuthLayout } from './components';
 import { IconCloud } from '@/components';
 import {
@@ -45,6 +46,9 @@ const {
   handleSubmit,
 } = useProfileForm();
 
+// 头像上传：走 uploadGateway 的 avatar 分支（PUT v3/upload-pic, field=image）
+const { upload: uploadAvatar } = useUpload({ type: 'avatar' });
+
 const avatarUrl = computed(() => {
   if (authStore.user?.photo?.startsWith('http')) {
     return authStore.user.photo;
@@ -61,11 +65,8 @@ const handlePhotoUpload = async (event: Event) => {
 
   if (!file) return;
 
-  const formData = new FormData();
-  formData.append('image', file);
-
   try {
-    await authGateway.uploadAvatar(formData);
+    await uploadAvatar(file);
     await authStore.fetchUser();
     message.value = 'Avatar updated successfully!';
     messageType.value = 'success';
@@ -241,7 +242,7 @@ onMounted(() => {
           Profile Settings
         </h2>
         <p
-          class="text-muted-foreground mt-2 text-center text-[15px] font-medium lg:text-left"
+          class="text-muted mt-2 text-center text-[15px] font-medium lg:text-left"
         >
           Manage your profile and security preferences.
         </p>
@@ -273,14 +274,14 @@ onMounted(() => {
           <Camera class="size-4" />
         </label>
       </div>
-      <p class="text-muted-foreground text-xs">Click the camera to update</p>
+      <p class="text-muted text-xs">Click the camera to update</p>
     </div>
 
     <form @submit.prevent="handleSubmit" class="w-full">
       <div>
         <div class="relative my-3">
           <div
-            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
+            class="text-muted/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
           >
             <User class="size-6" />
           </div>
@@ -308,7 +309,7 @@ onMounted(() => {
       <div>
         <div class="relative my-3">
           <div
-            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
+            class="text-muted/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
           >
             <AtSign class="size-6" />
           </div>
@@ -334,7 +335,7 @@ onMounted(() => {
       </div>
 
       <div class="my-3">
-        <div class="text-muted-foreground/60 flex items-center gap-2 text-sm">
+        <div class="text-muted/60 flex items-center gap-2 text-sm">
           <ShieldUser class="size-5" />
           <span>Gender</span>
         </div>
@@ -351,7 +352,7 @@ onMounted(() => {
               class="border-border bg-muted peer-checked:border-accent peer-checked:bg-accent/10 peer-checked:shadow-accent/10 hover:border-accent/30 flex items-center justify-center rounded-xl border-2 px-4 py-2.5 transition-all duration-200 select-none group-active:scale-95"
             >
               <span
-                class="text-muted-foreground peer-checked:text-accent text-sm font-bold transition-colors"
+                class="text-muted peer-checked:text-accent text-sm font-bold transition-colors"
                 >Male</span
               >
             </div>
@@ -368,7 +369,7 @@ onMounted(() => {
               class="border-border bg-muted peer-checked:border-accent peer-checked:bg-accent/10 peer-checked:shadow-accent/10 hover:border-accent/30 flex items-center justify-center rounded-xl border-2 px-4 py-2.5 transition-all duration-200 select-none group-active:scale-95"
             >
               <span
-                class="text-muted-foreground peer-checked:text-accent text-sm font-bold transition-colors"
+                class="text-muted peer-checked:text-accent text-sm font-bold transition-colors"
                 >Female</span
               >
             </div>
@@ -379,7 +380,7 @@ onMounted(() => {
       <div>
         <div class="relative my-3">
           <div
-            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
+            class="text-muted/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
           >
             <Mail class="size-6" />
           </div>
@@ -407,7 +408,7 @@ onMounted(() => {
       <div>
         <div class="relative my-3">
           <div
-            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
+            class="text-muted/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
           >
             <Phone class="size-6" />
           </div>
@@ -435,7 +436,7 @@ onMounted(() => {
       <div>
         <div class="relative my-3">
           <div
-            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
+            class="text-muted/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
           >
             <Lock class="size-6" />
           </div>
@@ -490,7 +491,7 @@ onMounted(() => {
         <span class="border-border w-full border-t"></span>
       </div>
       <div class="relative flex justify-center text-xs uppercase">
-        <span class="bg-paper text-muted-foreground px-2"> Security </span>
+        <span class="bg-paper text-muted px-2"> Security </span>
       </div>
     </div>
 
@@ -555,9 +556,7 @@ onMounted(() => {
         <span class="border-border w-full border-t"></span>
       </div>
       <div class="relative flex justify-center text-xs uppercase">
-        <span class="bg-paper text-muted-foreground px-2">
-          Connected Accounts
-        </span>
+        <span class="bg-paper text-muted px-2"> Connected Accounts </span>
       </div>
     </div>
 

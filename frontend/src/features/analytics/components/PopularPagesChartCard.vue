@@ -2,14 +2,10 @@
   <div
     class="border-border/60 bg-paper h-full rounded-3xl border p-6 shadow-sm"
   >
-    <h2
-      class="text-ink mb-2 flex items-center gap-2 text-sm font-medium"
-    >
+    <h2 class="text-ink mb-2 flex items-center gap-2 text-sm font-medium">
       <icon-popular class="size-5" /> 热门页面
     </h2>
-    <p class="text-muted-foreground mb-4 text-xs">
-      所选时段内浏览量前 8 的页面
-    </p>
+    <p class="text-muted mb-4 text-xs">所选时段内浏览量前 8 的页面</p>
     <div
       v-if="loading && !overviewData"
       class="bg-muted h-full min-h-[14rem] animate-pulse rounded-xl"
@@ -19,9 +15,9 @@
       v-else-if="!hasPagesData"
       class="flex min-h-[14rem] flex-col items-center justify-center gap-2 px-6 text-center"
     >
-      <icon-popular class="text-muted-foreground/50 size-8" />
+      <icon-popular class="text-muted/50 size-8" />
       <p class="text-ink text-sm font-medium">暂无页面浏览数据</p>
-      <p class="text-muted-foreground max-w-xs text-xs">
+      <p class="text-muted max-w-xs text-xs">
         开始接收流量后，热门页面将显示在这里。
       </p>
     </div>

@@ -33,10 +33,8 @@ export function RouteBanner({ onClearRoute }: RouteBannerProps) {
           transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
           className="bg-secondary/60 mx-1 flex items-center gap-2 rounded-xl px-3 py-2 text-xs"
         >
-          <MapPin className="text-muted-foreground h-3.5 w-3.5 shrink-0" />
-          <span className="text-muted-foreground">
-            点击地图标记自动规划路线
-          </span>
+          <MapPin className="text-muted h-3.5 w-3.5 shrink-0" />
+          <span className="text-muted">点击地图标记自动规划路线</span>
         </motion.div>
       )}
 
@@ -49,8 +47,8 @@ export function RouteBanner({ onClearRoute }: RouteBannerProps) {
           transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
           className="bg-secondary/60 mx-1 flex items-center gap-2 rounded-xl px-3 py-2 text-xs"
         >
-          <Loader2 className="text-muted-foreground h-3.5 w-3.5 animate-spin" />
-          <span className="text-muted-foreground">正在规划路线…</span>
+          <Loader2 className="text-muted h-3.5 w-3.5 animate-spin" />
+          <span className="text-muted">正在规划路线…</span>
         </motion.div>
       )}
 
@@ -64,12 +62,10 @@ export function RouteBanner({ onClearRoute }: RouteBannerProps) {
           className="bg-secondary/60 mx-1 flex items-center justify-between gap-3 rounded-xl px-3 py-2"
         >
           <div className="min-w-0 flex-1">
-            <p className="text-muted-foreground text-[11px] font-medium">
-              路线信息
-            </p>
+            <p className="text-muted text-[11px] font-medium">路线信息</p>
             <p className="text-ink font-family-averia mt-0.5 text-lg leading-none tabular-nums">
               <span>{formatDistance(routeInfo.distance)}</span>
-              <span className="text-muted-foreground mx-1.5 text-sm">·</span>
+              <span className="text-muted mx-1.5 text-sm">·</span>
               <span>{formatDuration(routeInfo.time)}</span>
             </p>
           </div>
@@ -77,7 +73,7 @@ export function RouteBanner({ onClearRoute }: RouteBannerProps) {
             type="button"
             onClick={onClearRoute}
             aria-label="清除路线"
-            className="bg-muted text-muted-foreground hover:bg-muted/70 inline-flex h-7 w-7 items-center justify-center rounded-full"
+            className="bg-muted text-muted hover:bg-muted/70 inline-flex h-7 w-7 items-center justify-center rounded-full"
           >
             <X className="h-3.5 w-3.5" />
           </button>

@@ -5,14 +5,14 @@
         <h2 class="text-ink font-serif text-xl font-bold md:text-2xl">
           你正在读
         </h2>
-        <span class="text-muted-foreground text-xs tabular-nums">
+        <span class="text-muted text-xs tabular-nums">
           {{ books.length }} 本
         </span>
       </div>
       <button
         v-if="hasOverflow"
         type="button"
-        class="text-muted-foreground hover:text-ink text-xs font-medium"
+        class="text-muted hover:text-ink text-xs font-medium"
         @click="scrollByPage(1)"
       >
         更多 →

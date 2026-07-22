@@ -100,12 +100,12 @@ const isOther = computed(
           </span>
           <span
             v-if="isDark"
-            class="border-border text-muted-foreground rounded-full border bg-[var(--card-bg)] px-2 py-0.5 text-xs tracking-wider uppercase"
+            class="border-border text-muted rounded-full border bg-[var(--card-bg)] px-2 py-0.5 text-xs tracking-wider uppercase"
           >
             dark
           </span>
         </div>
-        <p class="text-muted-foreground mt-1 text-xs leading-relaxed">
+        <p class="text-muted mt-1 text-xs leading-relaxed">
           {{ meta.description }}
         </p>
       </div>
@@ -158,7 +158,7 @@ const isOther = computed(
     >
       <div v-for="g in tokensByGroup" :key="g.key">
         <div
-          class="text-muted-foreground mb-1.5 text-xs font-semibold tracking-wider uppercase"
+          class="text-muted mb-1.5 text-xs font-semibold tracking-wider uppercase"
         >
           {{ g.label }}
         </div>
@@ -179,7 +179,7 @@ const isOther = computed(
     <footer
       class="border-border flex items-center justify-between gap-3 border-t bg-[var(--warm-gray)] px-5 py-3"
     >
-      <span class="text-muted-foreground text-xs">
+      <span class="text-muted text-xs">
         {{ isCurrent ? '正在使用此配色' : '点击应用切换全局配色' }}
       </span>
       <button
@@ -188,7 +188,7 @@ const isOther = computed(
         :class="[
           'rounded-md px-3 py-1.5 text-xs font-semibold transition-colors',
           isCurrent
-            ? 'text-muted-foreground cursor-default border border-[var(--border-color)] bg-[var(--card-bg)]'
+            ? 'text-muted cursor-default border border-[var(--border-color)] bg-[var(--card-bg)]'
             : 'bg-[var(--accent)] text-[var(--accent)] hover:opacity-90',
         ]"
         @click="apply"

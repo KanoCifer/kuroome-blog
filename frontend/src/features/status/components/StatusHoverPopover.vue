@@ -106,12 +106,11 @@ onBeforeUnmount(() => clearTimers());
             <span class="h-2 w-2 rounded-full bg-yellow-400/70" />
             <span class="h-2 w-2 rounded-full bg-emerald-400/70" />
           </div>
-          <span
-            class="text-ink/80 font-serif text-[12px] tracking-wide italic"
+          <span class="text-ink/80 font-serif text-[12px] tracking-wide italic"
             >Service Status</span
           >
           <span
-            class="text-muted-foreground/60 ml-auto font-mono text-[10px] tracking-[0.1em] lowercase"
+            class="text-muted/60 ml-auto font-mono text-[10px] tracking-[0.1em] lowercase"
             >/status</span
           >
         </header>
@@ -119,7 +118,7 @@ onBeforeUnmount(() => clearTimers());
         <StatusMini />
 
         <footer
-          class="border-border/40 text-muted-foreground/70 flex items-center justify-between border-t px-3 py-1.5 font-mono text-[10px] tracking-[0.15em] uppercase"
+          class="border-border/40 text-muted/70 flex items-center justify-between border-t px-3 py-1.5 font-mono text-[10px] tracking-[0.15em] uppercase"
         >
           <span>live preview</span>
           <span class="inline-flex items-center gap-1.5">

@@ -16,6 +16,8 @@ func MediaCacheMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if strings.HasPrefix(c.Request.URL.Path, "/v3/media") {
 			c.Header("Cache-Control", cc)
+			// 禁止浏览器嗅探内容类型，降低上传文件触发 XSS 的风险。
+			c.Header("X-Content-Type-Options", "nosniff")
 		}
 		c.Next()
 	}

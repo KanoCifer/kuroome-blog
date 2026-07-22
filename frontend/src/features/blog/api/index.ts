@@ -9,9 +9,6 @@ export type { LlmGateway } from './llmGateway';
 export { socialGateway } from './socialGateway';
 export type { SocialGateway } from './socialGateway';
 
-export { uploadGateway } from './uploadGateway';
-export type { UploadGateway } from './uploadGateway';
-
 // 博客 / LLM 领域类型 —— 真源在 @/features/blog/types，桶重新导出以保持兼容
 export type {
   BlogListResponse,

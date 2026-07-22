@@ -9,7 +9,7 @@ export function BlogEmptyState({
     <div className="border-border bg-paper/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center">
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className="text-muted-foreground/50 mb-5 h-14 w-14"
+        className="text-muted/50 mb-5 h-14 w-14"
         fill="none"
         viewBox="0 0 24 24"
         strokeWidth="1.5"
@@ -25,7 +25,7 @@ export function BlogEmptyState({
       <h3 className="text-ink font-serif text-base font-semibold">
         {hasTag ? '此卷尚是空白' : '书页尚待落墨'}
       </h3>
-      <p className="text-muted-foreground mt-2 max-w-sm font-serif text-sm italic">
+      <p className="text-muted mt-2 max-w-sm font-serif text-sm italic">
         {hasTag
           ? '此卷尚无篇章，待你我来添一笔。'
           : '一切好故事，都从空白的扉页开始。'}
@@ -33,7 +33,7 @@ export function BlogEmptyState({
       {hasTag && onReset && (
         <button
           type="button"
-          className="border-border text-muted-foreground hover:bg-muted hover:text-ink mt-5 rounded-lg border px-4 py-2 text-sm font-medium"
+          className="border-border text-muted hover:bg-muted hover:text-ink mt-5 rounded-lg border px-4 py-2 text-sm font-medium"
           onClick={onReset}
         >
           翻看全卷

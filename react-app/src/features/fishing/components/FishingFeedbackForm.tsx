@@ -129,14 +129,12 @@ export function FishingFeedbackForm({
         <header className="shrink-0 px-5 pt-3 pb-3">
           <style>{desktopCenteringStyle}</style>
           <div className="flex items-center justify-between">
-            <h2 className="text-ink text-base font-semibold">
-              钓鱼反馈
-            </h2>
+            <h2 className="text-ink text-base font-semibold">钓鱼反馈</h2>
             <button
               type="button"
               aria-label="关闭"
               onClick={() => onCancel?.()}
-              className="hover:bg-muted text-muted-foreground inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+              className="hover:bg-muted text-muted inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
@@ -145,20 +143,14 @@ export function FishingFeedbackForm({
       )}
     >
       <div className="flex flex-col gap-4 px-5 pb-6">
-        <p className="text-muted-foreground -mt-1 text-xs">
-          你的反馈会帮助我们改进
-        </p>
+        <p className="text-muted -mt-1 text-xs">你的反馈会帮助我们改进</p>
 
         {/* Context — Apple HIG inset tile */}
         <div className="fm-tile px-3 py-2.5">
-          <p className="text-muted-foreground text-xs">
-            地点 · {locationName}
-          </p>
+          <p className="text-muted text-xs">地点 · {locationName}</p>
           <p className="text-ink mt-0.5 text-sm tabular-nums">
             当前指数 {fishingData.fishing_index}{' '}
-            <span className="text-muted-foreground">
-              ({fishingData.level})
-            </span>
+            <span className="text-muted">({fishingData.level})</span>
           </p>
         </div>
 
@@ -179,7 +171,7 @@ export function FishingFeedbackForm({
                     className={`min-h-9 flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-all duration-200 ease-out ${
                       isActive
                         ? 'bg-paper text-ink shadow-sm'
-                        : 'text-muted-foreground hover:text-ink'
+                        : 'text-muted hover:text-ink'
                     }`}
                   >
                     {option.label}

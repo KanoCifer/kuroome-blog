@@ -39,6 +39,17 @@ var allowedImageTypes = []string{
 	"image/exif",
 }
 
+// mimeToExt 把已校验的 Content-Type 映射为安全后缀。
+// 用服务端派生后缀替代用户文件名中的 filepath.Ext(filename)，
+// 防止伪造后缀（如 .php）绕过静态服务的内容处理。
+var mimeToExt = map[string]string{
+	"image/jpeg": ".jpg",
+	"image/png":  ".png",
+	"image/gif":  ".gif",
+	"image/webp": ".webp",
+	"image/exif": ".jpg",
+}
+
 // Uploader 定义 handler 依赖的上传能力集合。
 type Uploader interface {
 	// UploadFile 保存通用文件，返回相对存储根的路径（如 uploads/1/xxx.png）。
@@ -94,7 +105,8 @@ func (s *uploadService) UploadBlogImage(ctx context.Context, userID uint, filena
 		return "", errs.ErrUnsupportedImageType
 	}
 
-	ext := strings.ToLower(filepath.Ext(filename))
+	// 从已校验的 Content-Type 派生安全后缀，不信任用户文件名。
+	ext := mimeToExt[contentType]
 	name := uuid.New().String() + ext
 	rel := filepath.Join("posts", fmt.Sprint(userID), name)
 
@@ -112,7 +124,8 @@ func (s *uploadService) UploadGalleryImage(ctx context.Context, userID uint, fil
 		return "", errs.ErrUnsupportedImageType
 	}
 
-	ext := strings.ToLower(filepath.Ext(filename))
+	// 从已校验的 Content-Type 派生安全后缀，不信任用户文件名。
+	ext := mimeToExt[contentType]
 	name := uuid.New().String() + ext
 	rel := filepath.Join("gallery", fmt.Sprint(userID), name)
 

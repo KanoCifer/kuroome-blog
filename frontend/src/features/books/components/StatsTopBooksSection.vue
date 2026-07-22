@@ -30,7 +30,7 @@ const visible = computed(() => topBooks.value.length > 0);
         class="flex items-center gap-4"
       >
         <span
-          class="text-muted-foreground w-5 flex-shrink-0 text-right font-mono text-xs tabular-nums"
+          class="text-muted w-5 flex-shrink-0 text-right font-mono text-xs tabular-nums"
         >
           {{ i + 1 }}
         </span>
@@ -46,15 +46,10 @@ const visible = computed(() => topBooks.value.length > 0);
           />
         </div>
         <div class="min-w-0 flex-1">
-          <p
-            class="text-ink truncate font-serif text-base leading-tight"
-          >
+          <p class="text-ink truncate font-serif text-base leading-tight">
             {{ book.title ?? '未知书目' }}
           </p>
-          <p
-            v-if="book.author"
-            class="text-muted-foreground mt-0.5 truncate text-xs"
-          >
+          <p v-if="book.author" class="text-muted mt-0.5 truncate text-xs">
             {{ book.author }}
           </p>
           <div
@@ -78,7 +73,7 @@ const visible = computed(() => topBooks.value.length > 0);
             />
           </div>
           <span
-            class="text-muted-foreground w-16 flex-shrink-0 text-right text-sm tabular-nums"
+            class="text-muted w-16 flex-shrink-0 text-right text-sm tabular-nums"
           >
             {{ formatRead(book.readTime) }}
           </span>

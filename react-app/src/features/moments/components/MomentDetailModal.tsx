@@ -93,8 +93,8 @@ export function MomentDetailModal({
                 <span className="text-ink/70 font-serif text-sm italic">
                   {volumeLabel}
                 </span>
-                <span className="text-muted-foreground/60">·</span>
-                <span className="text-muted-foreground font-mono text-[11px] tracking-wide">
+                <span className="text-muted/60">·</span>
+                <span className="text-muted font-mono text-[11px] tracking-wide">
                   {moment.published_at
                     ? moment.published_at.replace('T', ' ').slice(0, 16)
                     : moment.created_at.replace('T', ' ').slice(0, 16)}
@@ -109,7 +109,7 @@ export function MomentDetailModal({
               </div>
               <div className="flex items-center gap-2">
                 {(hasPrev || hasNext) && (
-                  <div className="text-muted-foreground flex items-center gap-1 text-[11px]">
+                  <div className="text-muted flex items-center gap-1 text-[11px]">
                     <button
                       type="button"
                       disabled={!hasPrev}
@@ -142,7 +142,7 @@ export function MomentDetailModal({
                     <button
                       type="button"
                       onClick={() => onDelete?.(moment)}
-                      className="text-muted-foreground hover:text-destructive border-border/40 hover:border-destructive/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
+                      className="text-muted hover:text-destructive border-border/40 hover:border-destructive/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
                       aria-label="删除"
                     >
                       <span aria-hidden="true">🗑</span>
@@ -152,7 +152,7 @@ export function MomentDetailModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="text-muted-foreground hover:text-ink border-border/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
+                  className="text-muted hover:text-ink border-border/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
                   aria-label="关闭"
                 >
                   <IconClose className="h-3.5 w-3.5" />
@@ -168,7 +168,7 @@ export function MomentDetailModal({
                 style={{ maxHeight: 'calc(88vh - 64px)' }}
               >
                 {moment.mood && (
-                  <div className="text-muted-foreground mb-6 flex items-center gap-2 text-sm">
+                  <div className="text-muted mb-6 flex items-center gap-2 text-sm">
                     {isPureEmoji(moment.mood) ? (
                       <span className="text-2xl" aria-hidden="true">
                         {moment.mood}
@@ -185,28 +185,28 @@ export function MomentDetailModal({
                   {moment.content}
                 </div>
                 {moment.tags.length > 0 && (
-                  <div className="text-muted-foreground mt-8 flex flex-wrap items-center gap-2 text-[12px]">
+                  <div className="text-muted mt-8 flex flex-wrap items-center gap-2 text-[12px]">
                     {moment.tags.map((tag) => (
                       <MomentTagChip key={tag} name={tag} />
                     ))}
                   </div>
                 )}
-                <div className="text-muted-foreground border-border/40 mt-10 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-dashed pt-4 font-mono text-[11px] tracking-wide">
+                <div className="text-muted border-border/40 mt-10 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-dashed pt-4 font-mono text-[11px] tracking-wide">
                   <span>发布于 {moment.published_at ?? moment.created_at}</span>
                   {moment.source && (
                     <>
-                      <span className="text-muted-foreground/60">·</span>
+                      <span className="text-muted/60">·</span>
                       <span>来源 {moment.source}</span>
                     </>
                   )}
-                  <span className="text-muted-foreground/60">·</span>
+                  <span className="text-muted/60">·</span>
                   <span>允许评论 {moment.allow_comment ? '是' : '否'}</span>
                 </div>
               </div>
 
               {/* Right: meta */}
               <aside className="bg-muted/30 border-border/40 hidden border-l px-5 py-6 md:block">
-                <div className="text-muted-foreground sticky top-4 font-mono text-[10px] tracking-[0.18em] uppercase">
+                <div className="text-muted sticky top-4 font-mono text-[10px] tracking-[0.18em] uppercase">
                   META
                 </div>
                 <dl className="mt-4 space-y-3 text-sm">
@@ -230,10 +230,10 @@ export function MomentDetailModal({
                   <MetaRow label="状态" value={STATUS_LABEL[moment.status]} />
                 </dl>
 
-                <div className="text-muted-foreground border-border/40 mt-6 border-t border-dashed pt-4 font-mono text-[10px] tracking-[0.18em] uppercase">
+                <div className="text-muted border-border/40 mt-6 border-t border-dashed pt-4 font-mono text-[10px] tracking-[0.18em] uppercase">
                   KEYBOARD
                 </div>
-                <ul className="text-muted-foreground mt-3 space-y-1.5 text-[12px]">
+                <ul className="text-muted mt-3 space-y-1.5 text-[12px]">
                   <li className="flex items-center gap-2">
                     <Kbd label="J" />
                     <span>下一条</span>
@@ -267,7 +267,7 @@ function MetaRow({
 }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <dt className="text-muted-foreground font-mono text-[10px] tracking-[0.1em] uppercase">
+      <dt className="text-muted font-mono text-[10px] tracking-[0.1em] uppercase">
         {label}
       </dt>
       <dd

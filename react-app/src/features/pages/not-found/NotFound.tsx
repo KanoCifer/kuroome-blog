@@ -43,11 +43,11 @@ export default function NotFound() {
           页面未找到
         </h1>
 
-        <p className="text-muted-foreground mt-4 text-lg">
+        <p className="text-muted mt-4 text-lg">
           抱歉，您访问的页面不存在或已被移动。
         </p>
 
-        <div className="text-muted-foreground mt-6 space-y-2 text-sm">
+        <div className="text-muted mt-6 space-y-2 text-sm">
           <p>• 网址可能拼写错误</p>
           <p>• 页面可能已被删除</p>
           <p>• 链接可能已过期</p>
@@ -78,7 +78,7 @@ export default function NotFound() {
           <button
             type="button"
             onClick={goBack}
-            className="bg-paper text-card-foreground ring-border hover:bg-muted focus:ring-ring inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium ring-1 transition-all ring-inset focus:ring-2 focus:outline-none"
+            className="bg-paper text-muted ring-border hover:bg-muted focus:ring-ring inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium ring-1 transition-all ring-inset focus:ring-2 focus:outline-none"
           >
             <svg
               className="mr-2 h-5 w-5"
@@ -98,7 +98,7 @@ export default function NotFound() {
         </div>
       </div>
 
-      <div className="text-muted-foreground mt-16 flex gap-2">
+      <div className="text-muted mt-16 flex gap-2">
         <div className="h-1 w-1 animate-bounce rounded-full bg-current"></div>
         <div
           className="h-1 w-1 animate-bounce rounded-full bg-current"

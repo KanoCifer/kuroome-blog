@@ -1,4 +1,7 @@
-import { galleryService, type Picture } from '@/features/pic/api/galleryService';
+import {
+  galleryService,
+  type Picture,
+} from '@/features/pic/api/galleryService';
 import { useAuthStore } from '@/features/auth';
 import { useNotificationStore } from '@/stores/notificationState';
 import dayjs from 'dayjs';
@@ -254,9 +257,7 @@ export default function PicGalleryView() {
             Mobile Gallery
           </p>
           <h1 className="text-ink mt-1 text-2xl font-bold">图片墙</h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            瀑布流展示，点击查看详情
-          </p>
+          <p className="text-muted mt-1 text-sm">瀑布流展示，点击查看详情</p>
         </div>
       </div>
 
@@ -275,7 +276,7 @@ export default function PicGalleryView() {
               <h3 className="text-ink text-xl font-bold tracking-tight">
                 还没有图片
               </h3>
-              <p className="text-muted-foreground mt-2 text-sm">
+              <p className="text-muted mt-2 text-sm">
                 你的图片墙还是空白，上传第一张照片吧
               </p>
               {canEdit && (
@@ -376,7 +377,7 @@ export default function PicGalleryView() {
               <button
                 type="button"
                 onClick={closeImageDetail}
-                className="bg-paper/10 text-muted-foreground hover:bg-paper/20 absolute top-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md transition-all hover:scale-105 active:scale-95"
+                className="bg-paper/10 text-muted hover:bg-paper/20 absolute top-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md transition-all hover:scale-105 active:scale-95"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -390,14 +391,14 @@ export default function PicGalleryView() {
               </div>
 
               <div className="bg-paper/60 space-y-4 p-5">
-                <div className="text-muted-foreground flex items-center text-sm font-medium">
+                <div className="text-muted flex items-center text-sm font-medium">
                   <Calendar className="mr-1.5 h-4 w-4" />
                   {formatDate(selectedImage.uploadedAt)}
                 </div>
 
                 {canEdit && isEditMode ? (
                   <div className="space-y-3">
-                    <label className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                    <label className="text-muted text-xs font-semibold tracking-wider uppercase">
                       修改描述
                     </label>
                     <textarea
@@ -407,7 +408,7 @@ export default function PicGalleryView() {
                       }
                       rows={3}
                       placeholder="输入新的描述..."
-                      className="border-border/80 bg-paper text-ink placeholder-muted-foreground focus:border-ring focus:ring-ring w-full resize-none rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
+                      className="border-border/80 bg-paper text-ink placeholder-muted focus:border-ring focus:ring-ring w-full resize-none rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
                     />
                     <div className="flex justify-end gap-3 pt-1">
                       <button
@@ -428,7 +429,7 @@ export default function PicGalleryView() {
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-muted/80 text-card-foreground rounded-md p-4 text-base whitespace-pre-wrap">
+                  <div className="bg-muted/80 text-muted rounded-md p-4 text-base whitespace-pre-wrap">
                     {selectedImage.description || '暂无描述'}
                   </div>
                 )}
@@ -460,7 +461,7 @@ export default function PicGalleryView() {
               <button
                 type="button"
                 onClick={closeUploadModal}
-                className="text-muted-foreground hover:bg-muted hover:text-ink absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+                className="text-muted hover:bg-muted hover:text-ink absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -472,9 +473,7 @@ export default function PicGalleryView() {
                 <h3 className="text-ink text-xl font-bold tracking-tight">
                   上传新图片
                 </h3>
-                <p className="text-muted-foreground mt-1 text-sm">
-                  添加到你的照片墙
-                </p>
+                <p className="text-muted mt-1 text-sm">添加到你的照片墙</p>
               </div>
 
               <div
@@ -506,14 +505,14 @@ export default function PicGalleryView() {
                   <div className="flex flex-col items-center">
                     <div className="bg-paper ring-border mb-4 flex h-14 w-14 items-center justify-center rounded-full shadow-sm ring-1 transition-transform group-hover:scale-110">
                       <ImagePlus
-                        className="text-muted-foreground group-hover:text-accent h-6 w-6 transition-colors"
+                        className="text-muted group-hover:text-accent h-6 w-6 transition-colors"
                         strokeWidth={1.5}
                       />
                     </div>
-                    <p className="text-card-foreground text-sm font-medium">
+                    <p className="text-muted text-sm font-medium">
                       点击选择图片
                     </p>
-                    <p className="text-muted-foreground mt-2 text-xs">
+                    <p className="text-muted mt-2 text-xs">
                       支持 JPG、PNG、GIF、WebP (最大 5MB)
                     </p>
                   </div>
@@ -521,7 +520,7 @@ export default function PicGalleryView() {
               </div>
 
               <div className="mt-6">
-                <label className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
+                <label className="text-muted text-xs font-semibold tracking-wider uppercase">
                   照片描述（可选）
                 </label>
                 <input
@@ -529,14 +528,14 @@ export default function PicGalleryView() {
                   onChange={(event) => setUploadDescription(event.target.value)}
                   type="text"
                   placeholder="为这张图片添加描述..."
-                  className="border-border/80 bg-paper text-ink placeholder-muted-foreground focus:border-ring focus:ring-ring mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
+                  className="border-border/80 bg-paper text-ink placeholder-muted focus:border-ring focus:ring-ring mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
                 />
               </div>
 
               <div className="mt-8 flex gap-3">
                 <button
                   type="button"
-                  className="border-border bg-paper text-card-foreground hover:bg-muted flex-1 rounded-xl border py-3 text-sm font-medium shadow-sm transition-colors"
+                  className="border-border bg-paper text-muted hover:bg-muted flex-1 rounded-xl border py-3 text-sm font-medium shadow-sm transition-colors"
                   onClick={closeUploadModal}
                 >
                   取消

@@ -6,7 +6,7 @@
     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
       <div>
         <h2 class="text-accent text-xl font-bold">我的订阅</h2>
-        <p class="text-muted-foreground mt-1 text-sm">
+        <p class="text-muted mt-1 text-sm">
           共 {{ subscriptions.length }} 个订阅源
         </p>
       </div>
@@ -37,7 +37,7 @@
 
     <div
       v-else-if="subscriptions.length === 0"
-      class="border-border bg-muted/40 text-muted-foreground rounded-xl border border-dashed p-8 text-center text-sm"
+      class="border-border bg-muted/40 text-muted rounded-xl border border-dashed p-8 text-center text-sm"
     >
       暂无订阅，先在上方解析并保存一个 RSS 地址吧。
     </div>
@@ -67,11 +67,11 @@
                 {{ getFeedProtocol(subscription.rssUrl) }}
               </span>
             </div>
-            <p class="text-muted-foreground mt-1 text-xs break-all">
+            <p class="text-muted mt-1 text-xs break-all">
               {{ subscription.rssUrl }}
             </p>
             <div
-              class="text-muted-foreground mt-2 flex flex-wrap items-center gap-3 text-xs"
+              class="text-muted mt-2 flex flex-wrap items-center gap-3 text-xs"
             >
               <span>文章数: {{ subscription.entryCount ?? 0 }}</span>
               <span

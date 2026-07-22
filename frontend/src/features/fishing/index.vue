@@ -82,9 +82,7 @@ onMounted(dash.init);
 
       <footer class="fishing-tagline pt-6 text-center">
         <span class="fishing-tagline-rule" aria-hidden="true" />
-        <p
-          class="text-muted-foreground font-family-averia tracking-wide italic"
-        >
+        <p class="text-muted font-family-averia tracking-wide italic">
           在出钓与阅读之间，留一片安静
         </p>
       </footer>
@@ -190,7 +188,7 @@ onMounted(dash.init);
   background: linear-gradient(
     90deg,
     transparent,
-    oklch(from var(--muted-foreground) l c h / 0.5),
+    oklch(from var(--muted) l c h / 0.5),
     transparent
   );
 }

@@ -1,7 +1,7 @@
 <template>
   <!-- 一行元数据：卷序 + 心情 + 时间 -->
   <div
-    class="text-muted-foreground flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] tracking-wide"
+    class="text-muted flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] tracking-wide"
   >
     <!-- 卷序：基于 published_at 在同年内累计 -->
     <span v-if="volumeLabel" class="text-ink/60 font-serif">

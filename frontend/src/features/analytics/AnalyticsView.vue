@@ -5,22 +5,18 @@
       <div class="bg-accent/40 mb-4 h-px w-8"></div>
       <div class="flex items-center gap-3">
         <span
-          class="bg-muted text-muted-foreground inline-block rounded-full px-2.5 py-0.5 font-mono text-[10px] font-medium tracking-[0.18em] uppercase"
+          class="bg-muted text-muted inline-block rounded-full px-2.5 py-0.5 font-mono text-[10px] font-medium tracking-[0.18em] uppercase"
         >
           仅管理员
         </span>
       </div>
-      <h1
-        class="text-ink font-family-dongfang mt-3 text-3xl sm:text-4xl"
-      >
+      <h1 class="text-ink font-family-dongfang mt-3 text-3xl sm:text-4xl">
         访客 · 趋势
       </h1>
-      <p class="text-muted-foreground font-family-averia mt-1.5 text-base">
+      <p class="text-muted font-family-averia mt-1.5 text-base">
         Reading Space · Analytics
       </p>
-      <p class="text-muted-foreground mt-1 text-sm">
-        书房访客与近期阅读趋势一览
-      </p>
+      <p class="text-muted mt-1 text-sm">书房访客与近期阅读趋势一览</p>
     </header>
 
     <!-- Dashboard grid -->
@@ -46,7 +42,7 @@
               :class="
                 selectedDays === option
                   ? 'bg-paper text-ink shadow-sm'
-                  : 'text-muted-foreground hover:text-ink'
+                  : 'text-muted hover:text-ink'
               "
               @click="selectedDays = option"
             >
@@ -200,7 +196,7 @@
                 </svg>
               </template>
               <template #footer>
-                <span class="text-muted-foreground text-xs">
+                <span class="text-muted text-xs">
                   最近 {{ selectedDays }} 天
                 </span>
               </template>
@@ -243,11 +239,11 @@
               @click="showOsBrowser = !showOsBrowser"
             >
               <span class="flex items-center gap-2 text-sm font-medium">
-                <icon-analytics class="text-muted-foreground size-4" />
+                <icon-analytics class="text-muted size-4" />
                 设备 & 浏览器分布
               </span>
               <svg
-                class="text-muted-foreground h-4 w-4 transition-transform"
+                class="text-muted h-4 w-4 transition-transform"
                 :class="{ 'rotate-180': showOsBrowser }"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -300,7 +296,7 @@
             <h2
               class="text-ink mb-4 flex items-center gap-2 text-sm font-medium"
             >
-              <icon-user class="text-muted-foreground inline-block size-4" />
+              <icon-user class="text-muted inline-block size-4" />
               用户登录记录
             </h2>
 
@@ -318,7 +314,7 @@
             <!-- Empty -->
             <div
               v-else-if="loginLogsData?.list.length === 0"
-              class="text-muted-foreground py-12 text-center text-sm"
+              class="text-muted py-12 text-center text-sm"
             >
               <p>暂无登录记录</p>
             </div>
@@ -332,7 +328,7 @@
                   </caption>
                   <thead>
                     <tr
-                      class="border-border text-muted-foreground border-b text-left text-sm"
+                      class="border-border text-muted border-b text-left text-sm"
                     >
                       <th scope="col" class="pb-3 font-medium">用户</th>
                       <th scope="col" class="pb-3 font-medium">登录次数</th>
@@ -359,7 +355,7 @@
                             <p class="text-ink font-medium">
                               {{ log.name || log.username }}
                             </p>
-                            <p class="text-muted-foreground text-xs">
+                            <p class="text-muted text-xs">
                               @{{ log.username }}
                             </p>
                           </div>
@@ -379,12 +375,12 @@
                         {{ formatDateTime(log.current_login_at) }}
                       </td>
                       <td
-                        class="text-muted-foreground py-3.5 font-mono text-xs tabular-nums"
+                        class="text-muted py-3.5 font-mono text-xs tabular-nums"
                       >
                         {{ log.last_login_ip || '-' }}
                       </td>
                       <td
-                        class="text-muted-foreground py-3.5 font-mono text-xs tabular-nums"
+                        class="text-muted py-3.5 font-mono text-xs tabular-nums"
                       >
                         {{ log.current_login_ip || '-' }}
                       </td>
@@ -398,7 +394,7 @@
                 v-if="loginLogsData && loginLogsData.total_pages > 1"
                 class="border-border mt-4 flex items-center justify-between border-t pt-4"
               >
-                <p class="text-muted-foreground text-sm">
+                <p class="text-muted text-sm">
                   显示第
                   {{ (loginLogsData.page - 1) * loginLogsData.page_size + 1 }}
                   至

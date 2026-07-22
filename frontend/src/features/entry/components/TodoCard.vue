@@ -15,7 +15,7 @@
       </div>
       <span class="text-ink text-sm font-medium">开发任务</span>
       <svg
-        class="text-muted-foreground ml-auto size-4 transition-transform duration-300 group-hover:translate-x-0.5"
+        class="text-muted ml-auto size-4 transition-transform duration-300 group-hover:translate-x-0.5"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"

@@ -1,4 +1,7 @@
-import { rssService, type SubscriptionItem } from '@/features/rss/api/rssService';
+import {
+  rssService,
+  type SubscriptionItem,
+} from '@/features/rss/api/rssService';
 import { useNotificationStore } from '@/stores/notificationState';
 import type { RssArticle } from '@/types';
 import { formatDate } from '@/lib/formatdate';
@@ -137,7 +140,7 @@ export default function RssWorkspaceView() {
                   className={`flex w-full items-center rounded-lg px-3 py-2 text-sm transition-colors ${
                     !selectedFeedUrl
                       ? 'bg-accent/10 text-accent'
-                      : 'text-muted-foreground hover:bg-muted hover:text-ink'
+                      : 'text-muted hover:bg-muted hover:text-ink'
                   }`}
                 >
                   全部订阅
@@ -150,7 +153,7 @@ export default function RssWorkspaceView() {
                     className={`flex w-full items-center rounded-lg px-3 py-2 text-sm transition-colors ${
                       selectedFeedUrl === sub.rssUrl
                         ? 'bg-accent/10 text-accent'
-                        : 'text-muted-foreground hover:bg-muted hover:text-ink'
+                        : 'text-muted hover:bg-muted hover:text-ink'
                     }`}
                   >
                     {sub.feedTitle || new URL(sub.rssUrl).hostname}
@@ -174,7 +177,7 @@ export default function RssWorkspaceView() {
           </div>
         ) : subsError ? (
           <div className="flex flex-col items-center justify-center pt-16 text-center">
-            <p className="text-muted-foreground text-sm">{subsError}</p>
+            <p className="text-muted text-sm">{subsError}</p>
             <button
               type="button"
               onClick={() => void fetchSubscriptions()}
@@ -185,9 +188,9 @@ export default function RssWorkspaceView() {
           </div>
         ) : subscriptions.length === 0 ? (
           <div className="flex flex-col items-center justify-center pt-24 text-center">
-            <Rss className="text-muted-foreground/40 mb-4 h-12 w-12" />
-            <p className="text-muted-foreground text-sm">暂无订阅源</p>
-            <p className="text-muted-foreground/60 mt-1 text-xs">
+            <Rss className="text-muted/40 mb-4 h-12 w-12" />
+            <p className="text-muted text-sm">暂无订阅源</p>
+            <p className="text-muted/60 mt-1 text-xs">
               在管理后台添加 RSS 订阅后即可阅读
             </p>
           </div>
@@ -201,7 +204,7 @@ export default function RssWorkspaceView() {
           </div>
         ) : articlesError ? (
           <div className="flex flex-col items-center justify-center pt-16 text-center">
-            <p className="text-muted-foreground text-sm">{articlesError}</p>
+            <p className="text-muted text-sm">{articlesError}</p>
             <button
               type="button"
               onClick={() => void fetchArticles()}
@@ -211,9 +214,7 @@ export default function RssWorkspaceView() {
             </button>
           </div>
         ) : articles.length === 0 ? (
-          <p className="text-muted-foreground pt-16 text-center text-sm">
-            暂无文章
-          </p>
+          <p className="text-muted pt-16 text-center text-sm">暂无文章</p>
         ) : (
           <div className="space-y-3">
             {articles.map((article, index) => (
@@ -231,14 +232,14 @@ export default function RssWorkspaceView() {
                     {article.title || '无标题'}
                   </h2>
                   {article.summary && (
-                    <p className="text-muted-foreground mt-1.5 line-clamp-2 text-sm leading-relaxed">
+                    <p className="text-muted mt-1.5 line-clamp-2 text-sm leading-relaxed">
                       {article.summary}
                     </p>
                   )}
-                  <div className="text-muted-foreground/70 mt-2.5 flex items-center gap-2 text-xs">
+                  <div className="text-muted/70 mt-2.5 flex items-center gap-2 text-xs">
                     {article.author && <span>{article.author}</span>}
                     {article.author && article.published && (
-                      <span className="bg-muted-foreground/40 h-1 w-1 rounded-full" />
+                      <span className="bg-muted/40 h-1 w-1 rounded-full" />
                     )}
                     {article.published && (
                       <span>{formatDate(article.published)}</span>
@@ -257,18 +258,18 @@ export default function RssWorkspaceView() {
               type="button"
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage <= 1}
-              className="border-border text-ink disabled:text-muted-foreground flex items-center gap-1 rounded-full border px-4 py-2 font-medium transition-colors disabled:opacity-40"
+              className="border-border text-ink disabled:text-muted flex items-center gap-1 rounded-full border px-4 py-2 font-medium transition-colors disabled:opacity-40"
             >
               上一页
             </button>
-            <span className="text-muted-foreground text-xs">
+            <span className="text-muted text-xs">
               {currentPage} / {totalPages}
             </span>
             <button
               type="button"
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage >= totalPages}
-              className="border-border text-ink disabled:text-muted-foreground flex items-center gap-1 rounded-full border px-4 py-2 font-medium transition-colors disabled:opacity-40"
+              className="border-border text-ink disabled:text-muted flex items-center gap-1 rounded-full border px-4 py-2 font-medium transition-colors disabled:opacity-40"
             >
               下一页
             </button>

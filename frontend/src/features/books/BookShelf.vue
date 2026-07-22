@@ -54,12 +54,10 @@
             v-if="filter === 'all' && (showReadingRail || showRecommendRail)"
             class="mt-2 mb-3 flex items-baseline justify-between"
           >
-            <h2
-              class="text-ink font-serif text-xl font-bold md:text-2xl"
-            >
+            <h2 class="text-ink font-serif text-xl font-bold md:text-2xl">
               全部书架
             </h2>
-            <span class="text-muted-foreground text-xs tabular-nums">
+            <span class="text-muted text-xs tabular-nums">
               {{ displayedBooks.length }} 本
             </span>
           </header>
@@ -69,7 +67,7 @@
             v-if="displayedBooks.length === 0"
             class="flex flex-col items-center justify-center py-16"
           >
-            <p class="text-muted-foreground text-sm">
+            <p class="text-muted text-sm">
               {{ noResultMessage }}
             </p>
           </div>

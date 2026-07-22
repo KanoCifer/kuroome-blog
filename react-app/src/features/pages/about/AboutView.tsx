@@ -44,7 +44,7 @@ export default function AboutView() {
 
         {/* Name & Tagline */}
         <h1 className="text-ink mb-2 text-2xl font-bold">Kuroome</h1>
-        <p className="text-muted-foreground text-sm">全栈开发者 · 读书爱好者</p>
+        <p className="text-muted text-sm">全栈开发者 · 读书爱好者</p>
       </motion.div>
 
       {/* Bio Card */}
@@ -54,7 +54,7 @@ export default function AboutView() {
         transition={{ delay: 0.1, duration: 0.5, ease: 'easeOut' }}
         className="border-border/60 bg-paper/80 mb-6 w-full max-w-md rounded-2xl border p-5 shadow-sm backdrop-blur-sm"
       >
-        <p className="text-card-foreground text-sm leading-relaxed">
+        <p className="text-muted text-sm leading-relaxed">
           你好！欢迎来到我的博客。这个网站是我的第一个 Web
           项目，正在持续迭代完善中。
         </p>
@@ -67,7 +67,7 @@ export default function AboutView() {
         transition={{ delay: 0.15, duration: 0.5, ease: 'easeOut' }}
         className="mb-6 w-full max-w-md"
       >
-        <h2 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
+        <h2 className="text-muted mb-3 text-xs font-semibold tracking-wider uppercase">
           技术栈
         </h2>
         <div className="flex flex-wrap gap-2">
@@ -92,7 +92,7 @@ export default function AboutView() {
         transition={{ delay: 0.2, duration: 0.5, ease: 'easeOut' }}
         className="mb-6 w-full max-w-md"
       >
-        <h2 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
+        <h2 className="text-muted mb-3 text-xs font-semibold tracking-wider uppercase">
           技术方向
         </h2>
         <div className="flex flex-wrap gap-2">
@@ -117,10 +117,10 @@ export default function AboutView() {
         transition={{ delay: 0.25, duration: 0.5, ease: 'easeOut' }}
         className="border-border/60 bg-paper/80 mb-8 w-full max-w-md rounded-2xl border p-4 shadow-sm backdrop-blur-sm"
       >
-        <h2 className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">
+        <h2 className="text-muted mb-2 text-xs font-semibold tracking-wider uppercase">
           兴趣爱好
         </h2>
-        <p className="text-card-foreground text-sm">编程、阅读、钓鱼</p>
+        <p className="text-muted text-sm">编程、阅读、钓鱼</p>
       </motion.div>
 
       {/* Connect Section */}
@@ -130,10 +130,10 @@ export default function AboutView() {
         transition={{ delay: 0.3, duration: 0.5, ease: 'easeOut' }}
         className="w-full max-w-md text-center"
       >
-        <h2 className="text-muted-foreground mb-4 text-xs font-semibold tracking-wider uppercase">
+        <h2 className="text-muted mb-4 text-xs font-semibold tracking-wider uppercase">
           联系我
         </h2>
-        <p className="text-muted-foreground mb-6 text-sm">
+        <p className="text-muted mb-6 text-sm">
           如果你有任何建议或想法，欢迎与我交流
         </p>
         <BentoSocial />

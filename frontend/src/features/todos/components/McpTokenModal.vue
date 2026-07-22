@@ -6,15 +6,13 @@
         class="border-border flex items-start justify-between gap-3 border-b px-6 pt-5 pb-4"
       >
         <div>
-          <h2 class="text-ink text-lg font-semibold">
-            签发 MCP 服务 Token
-          </h2>
-          <p class="text-muted-foreground mt-0.5 text-xs">
+          <h2 class="text-ink text-lg font-semibold">签发 MCP 服务 Token</h2>
+          <p class="text-muted mt-0.5 text-xs">
             生成长期有效的 service-JWT，供 MCP server 调用 devtask 接口。
           </p>
         </div>
         <button
-          class="text-muted-foreground hover:bg-muted hover:text-ink cursor-pointer rounded-md p-1.5 transition-colors"
+          class="text-muted hover:bg-muted hover:text-ink cursor-pointer rounded-md p-1.5 transition-colors"
           aria-label="关闭"
           @click="emit('close')"
         >
@@ -38,9 +36,7 @@
       <div class="px-6 py-5">
         <!-- 时长选择 -->
         <div class="mb-5">
-          <span class="text-muted-foreground mb-2 block text-xs font-medium"
-            >有效期</span
-          >
+          <span class="text-muted mb-2 block text-xs font-medium">有效期</span>
           <div class="flex flex-wrap gap-2">
             <button
               v-for="opt in DAY_OPTIONS"
@@ -50,7 +46,7 @@
               :class="
                 days === opt.days
                   ? 'border-accent/40 bg-accent/10 text-accent'
-                  : 'border-border text-muted-foreground hover:text-ink'
+                  : 'border-border text-muted hover:text-ink'
               "
               @click="days = opt.days"
             >
@@ -107,10 +103,8 @@
         <!-- 结果 -->
         <div v-if="result" class="mt-5 space-y-3">
           <div class="flex items-center justify-between">
-            <span class="text-muted-foreground block text-xs font-medium"
-              >Token</span
-            >
-            <span class="text-muted-foreground text-[11px]">
+            <span class="text-muted block text-xs font-medium">Token</span>
+            <span class="text-muted text-[11px]">
               有效期至 {{ formatDate(result.expires_at) }}（{{ result.days }}
               天）
             </span>
@@ -125,7 +119,7 @@
             />
             <button
               type="button"
-              class="text-muted-foreground hover:bg-muted hover:text-ink absolute top-2 right-2 cursor-pointer rounded-md p-1.5 transition-colors"
+              class="text-muted hover:bg-muted hover:text-ink absolute top-2 right-2 cursor-pointer rounded-md p-1.5 transition-colors"
               :title="copied ? '已复制' : '复制'"
               @click="handleCopy"
             >
@@ -169,7 +163,7 @@
           </div>
 
           <!-- 安全提示 -->
-          <p class="text-muted-foreground text-[11px] leading-relaxed">
+          <p class="text-muted text-[11px] leading-relaxed">
             Token 拥有完整的 devtask
             读写权限。生成后请妥善保管，泄露后请尽快在服务端轮换
             <code class="bg-muted px-1 py-0.5 font-mono text-[10px]"

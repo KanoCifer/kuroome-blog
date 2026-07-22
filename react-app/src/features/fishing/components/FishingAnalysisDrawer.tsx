@@ -21,7 +21,10 @@ export function FishingAnalysisDrawer({
   onGenerate,
 }: FishingAnalysisDrawerProps) {
   // 桌面端 (≥sm) → 右侧抽屉样式
-  if (typeof window !== 'undefined' && window.matchMedia('(min-width: 640px)').matches) {
+  if (
+    typeof window !== 'undefined' &&
+    window.matchMedia('(min-width: 640px)').matches
+  ) {
     return (
       <BottomSheet
         open={open}
@@ -32,10 +35,8 @@ export function FishingAnalysisDrawer({
           <header className="shrink-0 px-5 pt-3 pb-4">
             <div className="border-border/60 flex items-center justify-between border-b px-0 pb-3">
               <div>
-                <h1 className="text-ink font-family-averia text-lg">
-                  AI 分析
-                </h1>
-                <p className="text-muted-foreground mt-0.5 text-xs">
+                <h1 className="text-ink font-family-averia text-lg">AI 分析</h1>
+                <p className="text-muted mt-0.5 text-xs">
                   基于当前天气与潮汐综合判断
                 </p>
               </div>
@@ -43,7 +44,7 @@ export function FishingAnalysisDrawer({
                 type="button"
                 aria-label="关闭分析"
                 onClick={onClose}
-                className="text-muted-foreground hover:bg-muted hover:text-ink inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+                className="text-muted hover:bg-muted hover:text-ink inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -87,10 +88,8 @@ export function FishingAnalysisDrawer({
         <header className="shrink-0 px-5 pt-3 pb-4">
           <div className="border-border/60 flex items-center justify-between border-b px-0 pb-3">
             <div>
-              <h2 className="text-ink text-base font-semibold">
-                AI 分析
-              </h2>
-              <p className="text-muted-foreground mt-0.5 text-xs">
+              <h2 className="text-ink text-base font-semibold">AI 分析</h2>
+              <p className="text-muted mt-0.5 text-xs">
                 基于当前天气与潮汐综合判断
               </p>
             </div>
@@ -98,7 +97,7 @@ export function FishingAnalysisDrawer({
               type="button"
               aria-label="关闭分析"
               onClick={onClose}
-              className="text-muted-foreground hover:bg-muted hover:text-ink inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+              className="text-muted hover:bg-muted hover:text-ink inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
             >
               <X className="h-4 w-4" />
             </button>

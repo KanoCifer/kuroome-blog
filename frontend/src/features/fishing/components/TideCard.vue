@@ -273,7 +273,7 @@ onMounted(() => {
     <div class="mb-4 flex items-start justify-between gap-2">
       <div class="min-w-0">
         <h3 class="text-ink text-lg font-semibold tracking-tight">潮汐预报</h3>
-        <p class="text-muted-foreground mt-0.5 truncate text-sm">
+        <p class="text-muted mt-0.5 truncate text-sm">
           {{ tideSpotName }} · {{ todayStr }}
         </p>
       </div>
@@ -315,7 +315,7 @@ onMounted(() => {
       <div
         class="border-border border-t-accent h-10 w-10 animate-spin rounded-full border-2"
       />
-      <span class="text-muted-foreground mt-3 text-sm">获取潮汐数据...</span>
+      <span class="text-muted mt-3 text-sm">获取潮汐数据...</span>
     </div>
 
     <!-- Chart -->
@@ -330,7 +330,7 @@ onMounted(() => {
         <div class="bg-warning/10 border-warning/20 rounded-xl border p-3">
           <div class="flex items-baseline justify-between gap-2">
             <p class="text-warning text-xs font-medium">最高潮</p>
-            <p class="text-muted-foreground text-xs tabular-nums">
+            <p class="text-muted text-xs tabular-nums">
               {{ highTide?.time ?? '--:--' }}
             </p>
           </div>
@@ -342,7 +342,7 @@ onMounted(() => {
         <div class="bg-accent/10 border-accent/20 rounded-xl border p-3">
           <div class="flex items-baseline justify-between gap-2">
             <p class="text-accent text-xs font-medium">最低潮</p>
-            <p class="text-muted-foreground text-xs tabular-nums">
+            <p class="text-muted text-xs tabular-nums">
               {{ lowTide?.time ?? '--:--' }}
             </p>
           </div>
@@ -360,7 +360,7 @@ onMounted(() => {
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="text-muted-foreground h-6 w-6"
+          class="text-muted h-6 w-6"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"

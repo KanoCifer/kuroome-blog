@@ -64,8 +64,8 @@ export default function BasicDetail({
             {title}
           </h1>
           {/* <!-- Info --> */}
-          <div className="text-muted-foreground mt-4 flex flex-wrap items-center justify-center gap-4 text-sm">
-            <span className="bg-secondary text-muted-foreground inline-block rounded-full px-2 py-0.5 text-xs font-medium">
+          <div className="text-muted mt-4 flex flex-wrap items-center justify-center gap-4 text-sm">
+            <span className="bg-secondary text-muted inline-block rounded-full px-2 py-0.5 text-xs font-medium">
               {subtitle}
             </span>
           </div>

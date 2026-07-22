@@ -99,7 +99,7 @@ export function SettingModal({
             </h1>
             <button
               onClick={onClose}
-              className="text-muted-foreground hover:bg-muted hover:text-ink flex h-9 w-9 items-center justify-center rounded-full transition-colors active:scale-[0.96]"
+              className="text-muted hover:bg-muted hover:text-ink flex h-9 w-9 items-center justify-center rounded-full transition-colors active:scale-[0.96]"
               aria-label="关闭"
             >
               <X className="h-5 w-5" />
@@ -182,7 +182,7 @@ export function SettingModal({
                   >
                     {o.label}
                   </span>
-                  <span className="text-muted-foreground font-mono text-[10px]">
+                  <span className="text-muted font-mono text-[10px]">
                     {o.sub}
                   </span>
                 </button>
@@ -219,7 +219,7 @@ export function SettingModal({
                     <div className="text-ink text-sm font-semibold">
                       {s.label}
                     </div>
-                    <div className="text-muted-foreground mt-0.5 text-[11px] italic">
+                    <div className="text-muted mt-0.5 text-[11px] italic">
                       {s.desc}
                     </div>
                   </div>
@@ -231,12 +231,8 @@ export function SettingModal({
 
         {/* 品牌签名 */}
         <footer className="mt-10 flex items-center justify-between font-mono text-[11px]">
-          <span className="text-muted-foreground font-sans">
-            Settings · v4.7.0
-          </span>
-          <span className="text-muted-foreground font-serif italic">
-            ka·no·ci·fer
-          </span>
+          <span className="text-muted font-sans">Settings · v4.7.0</span>
+          <span className="text-muted font-serif italic">ka·no·ci·fer</span>
         </footer>
       </div>
     </BottomSheet>

@@ -16,7 +16,11 @@ const swatchStyle = computed(() => ({
 }));
 
 const copyValue = async () => {
-  if (!props.value || typeof navigator === 'undefined' || !navigator.clipboard) {
+  if (
+    !props.value ||
+    typeof navigator === 'undefined' ||
+    !navigator.clipboard
+  ) {
     return;
   }
   try {
@@ -42,14 +46,12 @@ const copyValue = async () => {
       <span class="text-ink truncate text-xs font-semibold">
         {{ label ?? name }}
       </span>
-      <span
-        class="text-muted-foreground truncate font-mono text-xs leading-tight"
-      >
+      <span class="text-muted truncate font-mono text-xs leading-tight">
         --{{ name }}
       </span>
     </span>
     <span
-      class="text-muted-foreground/70 group-hover:text-muted-foreground hidden max-w-[180px] shrink-0 truncate text-right font-mono text-xs sm:inline-block"
+      class="text-muted/70 group-hover:text-muted hidden max-w-[180px] shrink-0 truncate text-right font-mono text-xs sm:inline-block"
       :title="value"
     >
       {{ value || '—' }}

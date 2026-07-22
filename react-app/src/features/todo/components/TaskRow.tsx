@@ -25,7 +25,7 @@ export function TaskRow({
       >
         <span
           className={`text-ink min-w-0 flex-1 truncate text-sm font-medium ${
-            done ? 'text-muted-foreground line-through opacity-70' : ''
+            done ? 'text-muted line-through opacity-70' : ''
           }`}
         >
           {task.title}
@@ -38,7 +38,7 @@ export function TaskRow({
         </span>
 
         {task.due_date && (
-          <span className="text-muted-foreground shrink-0 text-[10px] tabular-nums">
+          <span className="text-muted shrink-0 text-[10px] tabular-nums">
             {task.due_date}
           </span>
         )}
@@ -49,7 +49,7 @@ export function TaskRow({
           <button
             type="button"
             onClick={() => onCycle(task.slug)}
-            className="text-muted-foreground hover:bg-muted hover:text-accent focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96]"
+            className="text-muted hover:bg-muted hover:text-accent focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96]"
             title="推进状态"
             aria-label="推进状态"
           >
@@ -71,7 +71,7 @@ export function TaskRow({
         <button
           type="button"
           onClick={() => onDelete(task.slug)}
-          className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96]"
+          className="text-muted hover:bg-destructive/10 hover:text-destructive focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96]"
           title="删除"
           aria-label="删除"
         >

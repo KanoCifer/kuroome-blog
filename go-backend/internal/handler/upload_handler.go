@@ -17,7 +17,8 @@ import (
 // uploadStatus 把上传领域错误映射到 HTTP 状态码：校验类 400，其余 500。
 func uploadStatus(err error) int {
 	switch {
-	case errors.Is(err, errs.ErrUnsupportedImageType),
+	case errors.Is(err, errs.ErrInvalidUploadType),
+		errors.Is(err, errs.ErrUnsupportedImageType),
 		errors.Is(err, errs.ErrImageTooLarge),
 		errors.Is(err, errs.ErrInvalidImageData):
 		return http.StatusBadRequest
@@ -70,8 +71,17 @@ func (h *UploadHandler) Upload(c *gin.Context) {
 	filename := fileHeader.Filename
 	contentType := fileHeader.Header.Get("Content-Type")
 
+	uploadType := c.PostForm("type")
+
+	// 拒绝未知的非空上传类型：空串（无 type 字段）保持向后兼容走 generic，
+	// 仅 "blog" / "gallery" 被显式放行，其余（含 "avatar"、拼写错误、脏数据）返回 400。
+	if uploadType != "" && uploadType != "blog" && uploadType != "gallery" {
+		response.APIError(c, errs.ErrInvalidUploadType.Error(), uploadStatus(errs.ErrInvalidUploadType))
+		return
+	}
+
 	var rel string
-	switch c.PostForm("type") {
+	switch uploadType {
 	case "blog":
 		rel, err = h.uploadSvc.UploadBlogImage(c.Request.Context(), userID, filename, contentType, f)
 	case "gallery":
@@ -81,7 +91,7 @@ func (h *UploadHandler) Upload(c *gin.Context) {
 	}
 
 	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "upload", "type", c.PostForm("type"), "error", err)
+		slog.ErrorContext(c.Request.Context(), "upload", "type", uploadType, "error", err)
 		response.APIError(c, err.Error(), uploadStatus(err))
 		return
 	}

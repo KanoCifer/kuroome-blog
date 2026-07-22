@@ -173,7 +173,7 @@ const coverGradient = computed(() =>
                 >
                   {{ book.title }}
                 </h2>
-                <p class="text-muted-foreground text-base">
+                <p class="text-muted text-base">
                   {{ book.author }}
                 </p>
               </div>
@@ -191,7 +191,7 @@ const coverGradient = computed(() =>
                   </span>
                   <button
                     type="button"
-                    class="text-muted-foreground hover:text-ink flex items-center gap-1.5 text-xs transition-colors"
+                    class="text-muted hover:text-ink flex items-center gap-1.5 text-xs transition-colors"
                     :disabled="progressLoading"
                     @click="handleRefresh"
                   >
@@ -222,7 +222,7 @@ const coverGradient = computed(() =>
                 </p>
                 <p
                   v-else-if="!hasProgress && !progressLoading"
-                  class="text-muted-foreground text-xs"
+                  class="text-muted text-xs"
                 >
                   还没有阅读记录,打开微信读书开始第一页吧。
                 </p>
@@ -236,26 +236,20 @@ const coverGradient = computed(() =>
                 class="border-border/40 grid grid-cols-3 gap-3 border-y py-4"
               >
                 <div>
-                  <p class="text-muted-foreground text-xs">累计阅读</p>
-                  <p
-                    class="text-ink mt-1 text-lg font-semibold tabular-nums"
-                  >
+                  <p class="text-muted text-xs">累计阅读</p>
+                  <p class="text-ink mt-1 text-lg font-semibold tabular-nums">
                     {{ formatDuration(liveProgress?.readingTime) }}
                   </p>
                 </div>
                 <div>
-                  <p class="text-muted-foreground text-xs">最近阅读</p>
-                  <p
-                    class="text-ink mt-1 text-lg font-semibold tabular-nums"
-                  >
+                  <p class="text-muted text-xs">最近阅读</p>
+                  <p class="text-ink mt-1 text-lg font-semibold tabular-nums">
                     {{ formatRelative(liveProgress?.updateTime ?? null) }}
                   </p>
                 </div>
                 <div>
-                  <p class="text-muted-foreground text-xs">状态</p>
-                  <p
-                    class="text-ink mt-1 text-lg font-semibold tabular-nums"
-                  >
+                  <p class="text-muted text-xs">状态</p>
+                  <p class="text-ink mt-1 text-lg font-semibold tabular-nums">
                     {{
                       book.finishReading
                         ? '已读完'
@@ -290,7 +284,7 @@ const coverGradient = computed(() =>
                 </button>
                 <button
                   type="button"
-                  class="text-muted-foreground hover:text-ink inline-flex items-center gap-2 rounded-full px-3 py-2.5 text-sm transition-colors"
+                  class="text-muted hover:text-ink inline-flex items-center gap-2 rounded-full px-3 py-2.5 text-sm transition-colors"
                   :title="book.secret ? '取消隐藏' : '隐藏'"
                 >
                   <component :is="book.secret ? Eye : EyeOff" class="h-4 w-4" />

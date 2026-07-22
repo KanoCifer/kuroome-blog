@@ -145,8 +145,7 @@ const handlePrivacyScroll = (e: Event) => {
                   <path d="M17.33 2.93A10 10 0 0 1 22 12H12Z" />
                 </svg>
               </span>
-              <span
-                class="text-ink text-[14px] font-semibold tracking-wide"
+              <span class="text-ink text-[14px] font-semibold tracking-wide"
                 >Cookie 与隐私设置</span
               >
             </div>
@@ -172,7 +171,7 @@ const handlePrivacyScroll = (e: Event) => {
           </div>
 
           <!-- 说明文字 -->
-          <p class="text-muted-foreground mb-4 text-[13px] leading-relaxed">
+          <p class="text-muted mb-4 text-[13px] leading-relaxed">
             本站使用 Cookie 提升浏览体验。继续使用即表示您同意我们的 Cookie
             政策与隐私协议。
           </p>
@@ -180,13 +179,13 @@ const handlePrivacyScroll = (e: Event) => {
           <!-- 操作按钮 -->
           <div class="flex items-center gap-2">
             <button
-              class="border-border text-muted-foreground hover:bg-muted hover:text-ink flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-[background-color,color,transform] duration-200 active:scale-[0.97]"
+              class="border-border text-muted hover:bg-muted hover:text-ink flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-[background-color,color,transform] duration-200 active:scale-[0.97]"
               @click="openSettings"
             >
               自定义
             </button>
             <button
-              class="border-border text-muted-foreground hover:bg-muted hover:text-ink flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-[background-color,color,transform] duration-200 active:scale-[0.97]"
+              class="border-border text-muted hover:bg-muted hover:text-ink flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-[background-color,color,transform] duration-200 active:scale-[0.97]"
               @click="rejectAll"
             >
               拒绝
@@ -223,35 +222,29 @@ const handlePrivacyScroll = (e: Event) => {
         >
           <div class="space-y-4 text-[13px] leading-relaxed">
             <div>
-              <h4
-                class="text-ink mb-1 flex items-center gap-1.5 font-medium"
-              >
+              <h4 class="text-ink mb-1 flex items-center gap-1.5 font-medium">
                 <span class="bg-warning h-1.5 w-1.5 rounded-full"></span>
                 信息收集
               </h4>
-              <p class="text-muted-foreground">
+              <p class="text-muted">
                 我们收集必要的网络身份标识(IP/UA)及浏览过程数据以保障服务运行。
               </p>
             </div>
             <div>
-              <h4
-                class="text-ink mb-1 flex items-center gap-1.5 font-medium"
-              >
+              <h4 class="text-ink mb-1 flex items-center gap-1.5 font-medium">
                 <span class="bg-warning h-1.5 w-1.5 rounded-full"></span>
                 本地存储
               </h4>
-              <p class="text-muted-foreground">
+              <p class="text-muted">
                 使用 Cookie 和 LocalStorage 保存您的登录状态及界面偏好设置。
               </p>
             </div>
             <div>
-              <h4
-                class="text-ink mb-1 flex items-center gap-1.5 font-medium"
-              >
+              <h4 class="text-ink mb-1 flex items-center gap-1.5 font-medium">
                 <span class="bg-warning h-1.5 w-1.5 rounded-full"></span>
                 第三方服务
               </h4>
-              <p class="text-muted-foreground">
+              <p class="text-muted">
                 接入 Gravatar (头像) 及 GitHub OAuth
                 (快捷登录)，仅在您使用时生效。
               </p>
@@ -286,7 +279,7 @@ const handlePrivacyScroll = (e: Event) => {
 
         <AlertDialogFooter class="mt-4">
           <AlertDialogCancel
-            class="border-border text-muted-foreground hover:bg-muted hover:text-ink h-9 rounded-xl border px-4 text-[12px] font-medium"
+            class="border-border text-muted hover:bg-muted hover:text-ink h-9 rounded-xl border px-4 text-[12px] font-medium"
           >
             返回
           </AlertDialogCancel>
@@ -334,13 +327,13 @@ const handlePrivacyScroll = (e: Event) => {
               <span class="text-ink text-[13px] font-medium">{{
                 cat.label
               }}</span>
-              <p class="text-muted-foreground mt-0.5 text-[11.5px]">
+              <p class="text-muted mt-0.5 text-[11.5px]">
                 {{ cat.description }}
               </p>
             </label>
             <span
               v-if="cat.required"
-              class="border-border text-muted-foreground mt-0.5 shrink-0 rounded-md border px-2 py-0.5 text-[10px]"
+              class="border-border text-muted mt-0.5 shrink-0 rounded-md border px-2 py-0.5 text-[10px]"
             >
               必需
             </span>
@@ -349,7 +342,7 @@ const handlePrivacyScroll = (e: Event) => {
 
         <AlertDialogFooter>
           <AlertDialogCancel
-            class="border-border text-muted-foreground hover:bg-muted hover:text-ink h-9 rounded-xl border px-4 text-[12px] font-medium transition-all duration-200"
+            class="border-border text-muted hover:bg-muted hover:text-ink h-9 rounded-xl border px-4 text-[12px] font-medium transition-all duration-200"
           >
             取消
           </AlertDialogCancel>

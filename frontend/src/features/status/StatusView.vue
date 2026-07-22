@@ -117,9 +117,7 @@ const showDetails = ref(false);
                 >
                   {{ overallStatus.title }}
                 </h1>
-                <p
-                  class="text-muted-foreground max-w-[48ch] text-[15px] leading-relaxed"
-                >
+                <p class="text-muted max-w-[48ch] text-[15px] leading-relaxed">
                   {{ overallStatus.sub
                   }}<span v-if="serverStatus">
                     · 启动于
@@ -135,7 +133,7 @@ const showDetails = ref(false);
                   class="border-ink/10 mt-5 grid grid-cols-3 gap-x-6 gap-y-1 border-t pt-4 text-[13px]"
                 >
                   <div class="space-y-0.5">
-                    <div class="text-muted-foreground">API</div>
+                    <div class="text-muted">API</div>
                     <div class="flex items-baseline gap-1.5">
                       <span
                         class="text-ink font-mono text-[15px] font-semibold tabular-nums"
@@ -160,11 +158,11 @@ const showDetails = ref(false);
                           </motion.span>
                         </AnimatePresence>
                       </span>
-                      <span class="text-muted-foreground text-[11px]">ms</span>
+                      <span class="text-muted text-[11px]">ms</span>
                     </div>
                   </div>
                   <div class="space-y-0.5">
-                    <div class="text-muted-foreground">WebSocket</div>
+                    <div class="text-muted">WebSocket</div>
                     <div class="flex items-baseline gap-1.5">
                       <span
                         :class="[
@@ -192,11 +190,11 @@ const showDetails = ref(false);
                           </motion.span>
                         </AnimatePresence>
                       </span>
-                      <span class="text-muted-foreground text-[11px]">ms</span>
+                      <span class="text-muted text-[11px]">ms</span>
                     </div>
                   </div>
                   <div class="space-y-0.5">
-                    <div class="text-muted-foreground">Database</div>
+                    <div class="text-muted">Database</div>
                     <div
                       :class="[
                         'text-[15px] font-semibold',
@@ -211,13 +209,13 @@ const showDetails = ref(false);
 
               <!-- 右侧:时钟 -->
               <div class="space-y-1 text-right">
-                <div class="text-muted-foreground text-[12px]">当前时刻</div>
+                <div class="text-muted text-[12px]">当前时刻</div>
                 <div
                   class="text-ink font-mono text-[clamp(1.75rem,2.5vw+0.5rem,2.5rem)] leading-none tracking-[-0.02em] tabular-nums"
                 >
                   {{ fmtClock(now) }}
                 </div>
-                <div class="text-muted-foreground text-[12px]">
+                <div class="text-muted text-[12px]">
                   {{ fmtDate(now) }} · 最后检测 {{ fmtClock(now) }}
                 </div>
               </div>
@@ -237,15 +235,13 @@ const showDetails = ref(false);
             {{ announcement }}
           </template>
           <template v-else>
-            <span class="text-muted-foreground">暂无公告 ·</span>
+            <span class="text-muted">暂无公告 ·</span>
             一切运行平稳,变更会同步发布在此。
           </template>
         </p>
-        <p class="text-muted-foreground text-[13px] tabular-nums">
+        <p class="text-muted text-[13px] tabular-nums">
           过去 30 天 ·
-          <span
-            v-if="availability"
-            class="text-ink font-mono font-semibold"
+          <span v-if="availability" class="text-ink font-mono font-semibold"
             >{{ availability.rate.toFixed(2) }}%</span
           >
           <span v-else class="text-ink/60">—</span>
@@ -269,7 +265,7 @@ const showDetails = ref(false);
       <section>
         <button
           type="button"
-          class="text-muted-foreground hover:text-ink group inline-flex items-center gap-2 text-[13px] transition-colors"
+          class="text-muted hover:text-ink group inline-flex items-center gap-2 text-[13px] transition-colors"
           :aria-expanded="showDetails"
           aria-controls="status-details-panel"
           @click="showDetails = !showDetails"

@@ -42,12 +42,10 @@ interface MetricRowProps {
 function MetricRow({ icon, label, value, accessory }: MetricRowProps) {
   return (
     <div className="flex items-center gap-3 px-4 py-2.5">
-      <span className="text-muted-foreground inline-flex h-4 w-4 shrink-0 items-center justify-center">
+      <span className="text-muted inline-flex h-4 w-4 shrink-0 items-center justify-center">
         {icon}
       </span>
-      <span className="text-muted-foreground text-xs font-medium">
-        {label}
-      </span>
+      <span className="text-muted text-xs font-medium">{label}</span>
       {accessory}
       <span className="text-ink ml-auto text-sm font-semibold tabular-nums">
         {value}
@@ -81,7 +79,7 @@ export function WeatherCard({
           type="button"
           onClick={openQWeather}
           aria-label="查看和风天气"
-          className="text-muted-foreground hover:text-ink inline-flex items-center gap-1 text-xs transition-colors"
+          className="text-muted hover:text-ink inline-flex items-center gap-1 text-xs transition-colors"
         >
           和风天气
           <ExternalLink className="h-3 w-3" aria-hidden />
@@ -131,16 +129,14 @@ export function WeatherCard({
             <div className="flex items-center gap-3 px-4 py-2.5">
               <span
                 className={`h-2 w-2 shrink-0 rounded-full ${
-                  pressureLevel?.dot ?? 'bg-muted-foreground'
+                  pressureLevel?.dot ?? 'bg-muted'
                 }`}
                 aria-hidden
               />
-              <span className="text-muted-foreground text-xs font-medium">
-                气压状态
-              </span>
+              <span className="text-muted text-xs font-medium">气压状态</span>
               <span
                 className={`ml-auto text-sm font-semibold ${
-                  pressureLevel?.tone ?? 'text-muted-foreground'
+                  pressureLevel?.tone ?? 'text-muted'
                 }`}
               >
                 {pressureLevel?.label ?? '--'}
@@ -150,17 +146,17 @@ export function WeatherCard({
 
           {/* 3-day forecast strip — flat horizontal cells, no card chrome */}
           {!!forecasts.length && (
-            <div className="flex items-stretch divide-x divide-border/40">
+            <div className="divide-border/40 flex items-stretch divide-x">
               {forecasts.slice(0, 3).map((day, i) => (
                 <div
                   key={day.fxDate}
                   className="flex flex-1 flex-col items-center gap-1.5 py-2"
                 >
-                  <p className="text-muted-foreground text-xs font-medium">
+                  <p className="text-muted text-xs font-medium">
                     {i === 0 ? '今天' : dayjs(day.fxDate).format('MM/DD')}
                   </p>
                   <i
-                    className={`qi-${day.iconDay} text-2xl text-ink/85`}
+                    className={`qi-${day.iconDay} text-ink/85 text-2xl`}
                     aria-hidden
                   />
                   <p className="text-ink text-xs font-semibold tabular-nums">
@@ -172,7 +168,7 @@ export function WeatherCard({
           )}
         </div>
       ) : (
-        <p className="text-muted-foreground text-sm">暂无天气数据</p>
+        <p className="text-muted text-sm">暂无天气数据</p>
       )}
     </article>
   );

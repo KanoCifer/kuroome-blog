@@ -46,7 +46,7 @@ const forecastIconClass = (textDay: string): string => {
         <h3 class="text-ink text-lg font-semibold tracking-tight">
           {{ locationName || '钓鱼地点' }}
         </h3>
-        <p class="text-muted-foreground mt-0.5 truncate text-sm">和风天气</p>
+        <p class="text-muted mt-0.5 truncate text-sm">和风天气</p>
       </div>
       <div
         class="bg-accent/90 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-white shadow-sm transition-all duration-300 group-hover:rounded-xl"
@@ -82,7 +82,7 @@ const forecastIconClass = (textDay: string): string => {
       <div
         class="border-border border-t-accent h-10 w-10 animate-spin rounded-full border-2"
       />
-      <span class="text-muted-foreground mt-3 text-sm">获取天气数据...</span>
+      <span class="text-muted mt-3 text-sm">获取天气数据...</span>
     </div>
 
     <!-- Error (仅初次无数据时示,有数据时静默失败保留旧值) -->
@@ -149,8 +149,7 @@ const forecastIconClass = (textDay: string): string => {
         class="mx-1 flex items-stretch justify-around py-3"
       >
         <div class="flex flex-1 flex-col items-center">
-          <span
-            class="text-muted-foreground text-[10px] tracking-[0.18em] uppercase"
+          <span class="text-muted text-[10px] tracking-[0.18em] uppercase"
             >风向</span
           >
           <span class="text-ink mt-1 text-sm font-semibold tabular-nums">
@@ -159,8 +158,7 @@ const forecastIconClass = (textDay: string): string => {
         </div>
         <div class="metric-sep my-1" />
         <div class="flex flex-1 flex-col items-center">
-          <span
-            class="text-muted-foreground text-[10px] tracking-[0.18em] uppercase"
+          <span class="text-muted text-[10px] tracking-[0.18em] uppercase"
             >风力</span
           >
           <span class="text-ink mt-1 text-sm font-semibold tabular-nums">
@@ -169,8 +167,7 @@ const forecastIconClass = (textDay: string): string => {
         </div>
         <div class="metric-sep my-1" />
         <div class="flex flex-1 flex-col items-center">
-          <span
-            class="text-muted-foreground text-[10px] tracking-[0.18em] uppercase"
+          <span class="text-muted text-[10px] tracking-[0.18em] uppercase"
             >湿度</span
           >
           <span class="text-ink mt-1 text-sm font-semibold tabular-nums">
@@ -183,9 +180,7 @@ const forecastIconClass = (textDay: string): string => {
       <div class="metric-divider" />
 
       <div v-if="forecasts.length > 0" class="flex-1">
-        <p
-          class="text-muted-foreground mb-2 text-[10px] tracking-[0.18em] uppercase"
-        >
+        <p class="text-muted mb-2 text-[10px] tracking-[0.18em] uppercase">
           未来 3 天
         </p>
         <div class="grid grid-cols-3 gap-1">
@@ -197,9 +192,7 @@ const forecastIconClass = (textDay: string): string => {
             :transition="{ ...EASE, delay: 0.18 + i * 0.06 }"
             class="flex flex-col items-center py-2"
           >
-            <span
-              class="text-muted-foreground text-[10px] tracking-[0.12em] uppercase"
-            >
+            <span class="text-muted text-[10px] tracking-[0.12em] uppercase">
               {{ day.fxDate.slice(5) }}
             </span>
             <i
@@ -209,7 +202,7 @@ const forecastIconClass = (textDay: string): string => {
             <span class="text-ink text-xs font-semibold tabular-nums">
               {{ day.tempMax }}°
             </span>
-            <span class="text-muted-foreground text-[10px] tabular-nums">
+            <span class="text-muted text-[10px] tabular-nums">
               {{ day.tempMin }}°
             </span>
           </motion.div>
@@ -217,7 +210,7 @@ const forecastIconClass = (textDay: string): string => {
       </div>
 
       <p
-        class="text-muted-foreground mt-4 text-center text-[10px] tracking-[0.18em] uppercase"
+        class="text-muted mt-4 text-center text-[10px] tracking-[0.18em] uppercase"
       >
         更新于 {{ formatDate(liveWeather.obsTime) }}
       </p>
@@ -233,7 +226,7 @@ const forecastIconClass = (textDay: string): string => {
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="text-muted-foreground h-6 w-6"
+          class="text-muted h-6 w-6"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -247,7 +240,7 @@ const forecastIconClass = (textDay: string): string => {
         </svg>
       </div>
       <p class="text-ink text-sm">查看实时天气情况</p>
-      <p class="text-muted-foreground mt-1 text-xs">选择最佳钓鱼时间</p>
+      <p class="text-muted mt-1 text-xs">选择最佳钓鱼时间</p>
     </div>
   </DashboardCard>
 </template>

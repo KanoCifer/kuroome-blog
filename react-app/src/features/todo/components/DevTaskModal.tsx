@@ -34,7 +34,7 @@ const PRIORITY_ACTIVE: Record<DevTaskPriority, string> = {
   'P1 高':
     'border-orange-300/60 bg-orange-50 text-orange-700 dark:border-orange-700/60 dark:bg-orange-950/30 dark:text-orange-400',
   'P2 中': 'border-accent/40 bg-accent/10 text-accent',
-  'P3 低': 'border-border bg-muted text-muted-foreground',
+  'P3 低': 'border-border bg-muted text-muted',
 };
 
 interface FormState {
@@ -165,7 +165,7 @@ export function DevTaskModal({
               <h2 className="text-ink text-lg font-semibold">
                 {form.slug ? '编辑任务' : '新建任务'}
               </h2>
-              <p className="text-muted-foreground mt-0.5 text-xs">
+              <p className="text-muted mt-0.5 text-xs">
                 记录一个待开发的需求、问题或技术债。带{' '}
                 <span className="text-ink">*</span> 为必填。
               </p>
@@ -177,7 +177,7 @@ export function DevTaskModal({
         <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
           <div className="space-y-5">
             <label className="block">
-              <span className="text-muted-foreground mb-1.5 block text-xs font-medium">
+              <span className="text-muted mb-1.5 block text-xs font-medium">
                 标题 <span className="text-destructive">*</span>
               </span>
               <input
@@ -185,12 +185,12 @@ export function DevTaskModal({
                 onChange={(e) => set('title', e.target.value)}
                 type="text"
                 placeholder="例如：重构首页响应式布局"
-                className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted-foreground/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+                className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
               />
             </label>
 
             <div>
-              <span className="text-muted-foreground mb-1.5 block text-xs font-medium">
+              <span className="text-muted mb-1.5 block text-xs font-medium">
                 类型
               </span>
               <div className="flex flex-wrap gap-2">
@@ -202,7 +202,7 @@ export function DevTaskModal({
                     className={`cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                       form.type === t
                         ? TYPE_ACTIVE[t]
-                        : 'border-border text-muted-foreground hover:bg-muted'
+                        : 'border-border text-muted hover:bg-muted'
                     }`}
                   >
                     {t}
@@ -212,7 +212,7 @@ export function DevTaskModal({
             </div>
 
             <div>
-              <span className="text-muted-foreground mb-1.5 block text-xs font-medium">
+              <span className="text-muted mb-1.5 block text-xs font-medium">
                 优先级
               </span>
               <div className="flex flex-wrap gap-2">
@@ -224,7 +224,7 @@ export function DevTaskModal({
                     className={`cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                       form.priority === p
                         ? PRIORITY_ACTIVE[p]
-                        : 'border-border text-muted-foreground hover:bg-muted'
+                        : 'border-border text-muted hover:bg-muted'
                     }`}
                   >
                     {p}
@@ -235,9 +235,9 @@ export function DevTaskModal({
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <span className="text-muted-foreground mb-1.5 block text-xs font-medium">
+                <span className="text-muted mb-1.5 block text-xs font-medium">
                   范围{' '}
-                  <span className="text-muted-foreground/60 font-normal">
+                  <span className="text-muted/60 font-normal">
                     （自由格式 — 例: 前端-React, 后端-Go, AI-LangChain）
                   </span>
                 </span>
@@ -246,11 +246,11 @@ export function DevTaskModal({
                   onChange={(e) => set('scope', e.target.value)}
                   type="text"
                   placeholder="例如：前端-React"
-                  className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted-foreground/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+                  className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
                 />
               </div>
               <label className="block">
-                <span className="text-muted-foreground mb-1.5 block text-xs font-medium">
+                <span className="text-muted mb-1.5 block text-xs font-medium">
                   截止日
                 </span>
                 <input
@@ -264,7 +264,7 @@ export function DevTaskModal({
 
             {form.slug && (
               <div>
-                <span className="text-muted-foreground mb-1.5 block text-xs font-medium">
+                <span className="text-muted mb-1.5 block text-xs font-medium">
                   状态
                 </span>
                 <div className="flex flex-wrap gap-1.5">
@@ -276,7 +276,7 @@ export function DevTaskModal({
                       className={`cursor-pointer rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors ${
                         form.status === s
                           ? 'border-accent/40 bg-accent/10 text-accent'
-                          : 'border-border text-muted-foreground hover:bg-muted'
+                          : 'border-border text-muted hover:bg-muted'
                       }`}
                     >
                       {s}
@@ -287,7 +287,7 @@ export function DevTaskModal({
             )}
 
             <label className="block">
-              <span className="text-muted-foreground mb-1.5 block text-xs font-medium">
+              <span className="text-muted mb-1.5 block text-xs font-medium">
                 描述
               </span>
               <textarea
@@ -295,12 +295,12 @@ export function DevTaskModal({
                 onChange={(e) => set('description', e.target.value)}
                 rows={3}
                 placeholder="一两句话说清楚要做什么、为什么..."
-                className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+                className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               />
             </label>
 
             <label className="block">
-              <span className="text-muted-foreground mb-1.5 block text-xs font-medium">
+              <span className="text-muted mb-1.5 block text-xs font-medium">
                 详情
               </span>
               <textarea
@@ -308,17 +308,17 @@ export function DevTaskModal({
                 onChange={(e) => set('detail', e.target.value)}
                 rows={6}
                 placeholder="实现思路、参考链接、验收标准等，可较长..."
-                className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+                className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               />
-              <span className="text-muted-foreground/60 mt-1 block text-[11px]">
+              <span className="text-muted/60 mt-1 block text-[11px]">
                 支持比描述更长的自由文本
               </span>
             </label>
 
             <label className="block">
-              <span className="text-muted-foreground mb-1.5 block text-xs font-medium">
+              <span className="text-muted mb-1.5 block text-xs font-medium">
                 验收标准{' '}
-                <span className="text-muted-foreground/60 font-normal">
+                <span className="text-muted/60 font-normal">
                   （满足这几条算完成 — agent 会逐条自检）
                 </span>
               </span>
@@ -329,14 +329,14 @@ export function DevTaskModal({
                 placeholder={
                   '- 所有接口有单测覆盖\n- 文档同步更新\n- 性能基准不降级'
                 }
-                className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+                className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               />
             </label>
 
             <label className="block">
-              <span className="text-muted-foreground mb-1.5 block text-xs font-medium">
+              <span className="text-muted mb-1.5 block text-xs font-medium">
                 约束{' '}
-                <span className="text-muted-foreground/60 font-normal">
+                <span className="text-muted/60 font-normal">
                   （agent 不可违反的硬性边界）
                 </span>
               </span>
@@ -347,14 +347,14 @@ export function DevTaskModal({
                 placeholder={
                   '- 不动 src/legacy/ 目录\n- 后端继续用 Gin，不换框架\n- API 响应格式保持不变'
                 }
-                className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+                className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               />
             </label>
 
             <label className="block">
-              <span className="text-muted-foreground mb-1.5 block text-xs font-medium">
+              <span className="text-muted mb-1.5 block text-xs font-medium">
                 上下文指针{' '}
-                <span className="text-muted-foreground/60 font-normal">
+                <span className="text-muted/60 font-normal">
                   （相关代码 / 文档路径，减少 agent 找文件的往返）
                 </span>
               </span>
@@ -363,7 +363,7 @@ export function DevTaskModal({
                 onChange={(e) => set('context_pointers', e.target.value)}
                 rows={4}
                 placeholder="internal/auth/, docs/adr/0003, src/middleware/session.ts"
-                className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted-foreground/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+                className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               />
             </label>
           </div>
@@ -386,7 +386,7 @@ export function DevTaskModal({
             <button
               type="button"
               onClick={onClose}
-              className="text-muted-foreground hover:bg-muted focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+              className="text-muted hover:bg-muted focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
             >
               取消
             </button>

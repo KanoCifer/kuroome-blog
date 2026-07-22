@@ -14,7 +14,7 @@
 - Use `<script setup lang="ts">` + Composition API
 - Type safety: avoid `any`; use `unknown` + narrowing for external inputs; keep props/emits/store types explicit
 - Naming: variables/functions `camelCase`, components/types `PascalCase`, component file `PascalCase.vue`, utility file `camelCase.ts`
-- Styling: **Tailwind semantic tokens only** (`bg-background`, `text-foreground`, `bg-primary`, `bg-muted`...). No custom CSS, no hardcoded colors
+- Styling: **Tailwind semantic tokens only** (`bg-paper`, `text-muted`, `bg-accent`, `bg-muted`...). No custom CSS, no hardcoded colors
 - Package manager: `pnpm` only (Node ^26.4)
 - Error handling: async flows use try/catch; narrow caught values before property access; route user-visible failures to notification flows
 - Lint/format: Oxlint (`pnpm run lint:fix`) + Prettier (with `prettier-plugin-tailwindcss` auto-sort); no ESLint
@@ -52,6 +52,7 @@ src/
 ```
 
 **规则**：
+
 - 新增业务域 → 在 `features/<domain>/` 下建域，把 api/composables/stores/types/components 收拢进来，禁止散落在顶层
 - **扁平原则**：`components/`、`composables/`、`api/` 内禁止嵌套子目录（如 `components/article/`、`composables/weread/`）；所有 .vue/.ts 平铺在对应目录根部，通过 `index.ts` 桶导出。视图文件直接放在域根（`<View>.vue`），禁止新建 `views/` 子目录
 - 跨域复用（被 3+ 域使用）→ 放 `shared/`，不放进任何 `features/` 域

@@ -58,7 +58,7 @@ const heroStyle = computed(() => ({
         class="mx-auto max-w-6xl px-6 pt-16 pb-12 md:px-10 md:pt-24 md:pb-16"
       >
         <div
-          class="text-muted-foreground mb-3 font-mono text-xs tracking-widest uppercase"
+          class="text-muted mb-3 font-mono text-xs tracking-widest uppercase"
         >
           Color Scheme Lab · 配色工坊
         </div>
@@ -68,7 +68,7 @@ const heroStyle = computed(() => ({
           四个方案 · 同一套语义
         </h1>
         <p
-          class="text-muted-foreground mt-4 max-w-2xl text-base leading-relaxed md:text-lg"
+          class="text-muted mt-4 max-w-2xl text-base leading-relaxed md:text-lg"
         >
           每个配色都共享同一组 CSS 变量（<code
             class="bg-muted rounded px-1.5 py-0.5 font-mono text-sm"
@@ -87,7 +87,7 @@ const heroStyle = computed(() => ({
           >
             {{ activeScheme }} · 当前
           </span>
-          <span class="text-muted-foreground text-sm">
+          <span class="text-muted text-sm">
             ·
             {{ SCHEME_META.find((s) => s.id === activeScheme)?.description }}
           </span>
@@ -95,9 +95,7 @@ const heroStyle = computed(() => ({
 
         <!-- 主题切换器：light / dark / system -->
         <div class="mt-5 flex flex-wrap items-center gap-3">
-          <span
-            class="text-muted-foreground font-mono text-xs tracking-wider uppercase"
-          >
+          <span class="text-muted font-mono text-xs tracking-wider uppercase">
             Theme
           </span>
           <div
@@ -115,7 +113,7 @@ const heroStyle = computed(() => ({
                 'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
                 currentTheme === opt.value
                   ? 'bg-[var(--accent)] text-[var(--accent)] shadow-sm'
-                  : 'text-muted-foreground hover:text-ink',
+                  : 'text-muted hover:text-ink',
               ]"
               @click="setTheme(opt.value)"
             >
@@ -123,7 +121,7 @@ const heroStyle = computed(() => ({
               <span>{{ opt.label }}</span>
             </button>
           </div>
-          <span class="text-muted-foreground text-xs">
+          <span class="text-muted text-xs">
             · 切换后全站生效，可在浅/深两态对比 4 个配色
           </span>
         </div>
@@ -132,12 +130,8 @@ const heroStyle = computed(() => ({
 
     <!-- 主体：4 张预览卡 -->
     <section class="mx-auto max-w-6xl px-6 pt-10 md:px-10 md:pt-14">
-      <div
-        class="text-muted-foreground mb-5 flex items-baseline justify-between"
-      >
-        <h2 class="text-ink text-xl font-semibold">
-          Schemes · 配色清单
-        </h2>
+      <div class="text-muted mb-5 flex items-baseline justify-between">
+        <h2 class="text-ink text-xl font-semibold">Schemes · 配色清单</h2>
         <span class="font-mono text-xs">
           {{ COLOR_SCHEMES.length }} 个 · sources:
           <code>packages/brand/themes/</code>
@@ -158,7 +152,7 @@ const heroStyle = computed(() => ({
     <!-- 提示：暗色态 -->
     <section class="mx-auto mt-12 max-w-6xl px-6 md:px-10">
       <div
-        class="border-border bg-card/40 text-muted-foreground rounded-lg border px-5 py-4 text-sm leading-relaxed backdrop-blur"
+        class="border-border bg-card/40 text-muted rounded-lg border px-5 py-4 text-sm leading-relaxed backdrop-blur"
       >
         💡
         <strong class="text-ink">暗色态预览</strong>

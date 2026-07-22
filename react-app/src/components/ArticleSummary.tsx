@@ -80,7 +80,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.25 }}
-                className="text-muted-foreground ml-2 text-sm"
+                className="text-muted ml-2 text-sm"
               >
                 {textShimmer[0]}
               </motion.span>
@@ -130,7 +130,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
                 strokeWidth={2}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-muted-foreground"
+                className="text-muted"
               >
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
                 <path d="M14 2v6h6" />
@@ -139,7 +139,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
                 <path d="M10 9H8" />
               </svg>
             </div>
-            <p className="text-muted-foreground text-base leading-relaxed">
+            <p className="text-muted text-base leading-relaxed">
               点击「生成总结」，快速提炼文章核心要点
             </p>
           </div>

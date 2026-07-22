@@ -74,7 +74,7 @@
         </svg>
       </div>
       <h3 class="text-ink font-serif text-xl font-bold">书架加载失败</h3>
-      <p class="text-muted-foreground mt-2 text-sm">
+      <p class="text-muted mt-2 text-sm">
         {{ errorMessage }}
       </p>
       <div class="mt-6 flex justify-center">
@@ -104,7 +104,7 @@
     >
       <svg
         viewBox="0 0 88 64"
-        class="text-muted-foreground/50 mx-auto mb-6 h-20"
+        class="text-muted/50 mx-auto mb-6 h-20"
         fill="none"
         stroke="currentColor"
         stroke-width="1.5"
@@ -131,7 +131,7 @@
         <rect x="68" y="16" width="10" height="44" rx="1.2" />
       </svg>
       <h3 class="text-ink font-serif text-xl font-bold">暂无书籍</h3>
-      <p class="text-muted-foreground mt-2 text-sm">你的微信读书书架还是空的</p>
+      <p class="text-muted mt-2 text-sm">你的微信读书书架还是空的</p>
       <div v-if="$slots['empty-action']" class="mt-6 flex justify-center">
         <slot name="empty-action" />
       </div>

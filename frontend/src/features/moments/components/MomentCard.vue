@@ -44,7 +44,7 @@
       >
         <button
           type="button"
-          class="text-muted-foreground hover:text-accent border-border/40 bg-paper/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
+          class="text-muted hover:text-accent border-border/40 bg-paper/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
           :aria-label="`编辑 ${moment.id}`"
           @click="emit('edit', moment)"
         >
@@ -52,7 +52,7 @@
         </button>
         <button
           type="button"
-          class="text-muted-foreground hover:text-destructive border-border/40 bg-paper/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
+          class="text-muted hover:text-destructive border-border/40 bg-paper/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
           :aria-label="`删除 ${moment.id}`"
           @click="emit('delete', moment)"
         >
@@ -81,7 +81,7 @@
       <!-- 标签 chip 行 -->
       <div
         v-if="moment.tags.length"
-        class="text-muted-foreground relative mt-4 flex flex-wrap items-center gap-x-2 gap-y-1.5 pl-3 text-[11px]"
+        class="text-muted relative mt-4 flex flex-wrap items-center gap-x-2 gap-y-1.5 pl-3 text-[11px]"
         @click.stop
       >
         <MomentTagChip v-for="tag in moment.tags" :key="tag" :name="tag" />

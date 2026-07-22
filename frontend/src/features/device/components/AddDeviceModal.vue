@@ -24,12 +24,8 @@
           >
             <div class="flex items-start justify-between gap-3">
               <div>
-                <h2 class="text-ink font-serif text-2xl font-bold">
-                  添加设备
-                </h2>
-                <p class="text-muted-foreground mt-1 text-xs">
-                  记录你的电子设备资产
-                </p>
+                <h2 class="text-ink font-serif text-2xl font-bold">添加设备</h2>
+                <p class="text-muted mt-1 text-xs">记录你的电子设备资产</p>
               </div>
               <span
                 class="bg-accent/15 text-accent shrink-0 rounded-full px-3 py-1 text-xs font-semibold"
@@ -40,13 +36,10 @@
           </div>
 
           <!-- Form -->
-          <form
-            @submit.prevent="handleSubmit"
-            class="bg-paper space-y-5 p-6"
-          >
+          <form @submit.prevent="handleSubmit" class="bg-paper space-y-5 p-6">
             <!-- Name -->
             <label class="block space-y-1.5">
-              <span class="text-muted-foreground ml-1 text-xs font-semibold">
+              <span class="text-muted ml-1 text-xs font-semibold">
                 设备名称 *
               </span>
               <input
@@ -54,13 +47,13 @@
                 type="text"
                 placeholder="例如：iPhone 15 Pro Max"
                 maxlength="100"
-                class="border-border bg-paper text-ink placeholder:text-muted-foreground focus:border-accent focus:ring-accent/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                class="border-border bg-paper text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
               />
             </label>
 
             <!-- Purchase Date -->
             <label class="block space-y-1.5">
-              <span class="text-muted-foreground ml-1 text-xs font-semibold">
+              <span class="text-muted ml-1 text-xs font-semibold">
                 购买日期 *
               </span>
               <input
@@ -73,7 +66,7 @@
             <!-- Currency & Price -->
             <div class="grid grid-cols-[0.4fr_0.6fr] gap-4">
               <label class="block space-y-1.5">
-                <span class="text-muted-foreground ml-1 text-xs font-semibold">
+                <span class="text-muted ml-1 text-xs font-semibold">
                   货币
                 </span>
                 <select
@@ -87,7 +80,7 @@
               </label>
 
               <label class="block space-y-1.5">
-                <span class="text-muted-foreground ml-1 text-xs font-semibold">
+                <span class="text-muted ml-1 text-xs font-semibold">
                   价格
                 </span>
                 <input
@@ -96,27 +89,27 @@
                   min="0"
                   step="0.01"
                   placeholder="0.00"
-                  class="border-border bg-paper text-ink placeholder:text-muted-foreground focus:border-accent focus:ring-accent/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                  class="border-border bg-paper text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
             </div>
 
             <!-- Notes -->
             <label class="block space-y-1.5">
-              <span class="text-muted-foreground ml-1 text-xs font-semibold">
+              <span class="text-muted ml-1 text-xs font-semibold">
                 备注（可选）
               </span>
               <input
                 v-model="form.notes"
                 type="text"
                 placeholder="例如：256GB 银色、国行版本"
-                class="border-border bg-paper text-ink placeholder:text-muted-foreground focus:border-accent focus:ring-accent/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                class="border-border bg-paper text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
               />
             </label>
 
             <!-- Status Toggle -->
             <div class="space-y-2">
-              <span class="text-muted-foreground ml-1 text-xs font-semibold">
+              <span class="text-muted ml-1 text-xs font-semibold">
                 设备状态
               </span>
               <div class="bg-muted flex rounded-full p-1 backdrop-blur-sm">
@@ -129,7 +122,7 @@
                     'flex-1 rounded-full px-3 py-2.5 text-xs font-semibold transition-all duration-200',
                     form.status === option.value
                       ? 'bg-accent text-accent shadow-accent/25 shadow-lg'
-                      : 'text-muted-foreground hover:bg-muted',
+                      : 'text-muted hover:bg-muted',
                   ]"
                 >
                   {{ option.label }}
@@ -144,9 +137,7 @@
             >
               {{ formError }}
             </p>
-            <p v-else class="text-muted-foreground text-center text-[10px]">
-              * 为必填项
-            </p>
+            <p v-else class="text-muted text-center text-[10px]">* 为必填项</p>
 
             <!-- Submit Button -->
             <button

@@ -15,7 +15,7 @@ export function MomentEmptyState({
     <div className="border-border/40 bg-paper/60 mx-auto flex max-w-md flex-col items-center gap-4 rounded-2xl border border-dashed px-6 py-12 text-center">
       <div
         aria-hidden="true"
-        className="bg-muted text-muted-foreground flex h-12 w-12 items-center justify-center rounded-full"
+        className="bg-muted text-muted flex h-12 w-12 items-center justify-center rounded-full"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -34,7 +34,7 @@ export function MomentEmptyState({
       </div>
       <div>
         <h3 className="text-ink font-serif text-lg">{title}</h3>
-        <p className="text-muted-foreground mt-1 text-sm">{description}</p>
+        <p className="text-muted mt-1 text-sm">{description}</p>
       </div>
       {action}
     </div>

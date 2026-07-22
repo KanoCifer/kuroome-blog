@@ -96,11 +96,11 @@ function DelayStatus({ ms, onClick }: { ms: number; onClick?: () => void }) {
       <button
         type="button"
         onClick={onClick}
-        className="text-muted-foreground inline-flex items-center gap-1.5 text-xs"
+        className="text-muted inline-flex items-center gap-1.5 text-xs"
       >
         <span className="relative flex h-2 w-2">
-          <span className="bg-muted-foreground absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
-          <span className="bg-muted-foreground relative inline-flex h-2 w-2 rounded-full" />
+          <span className="bg-muted absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
+          <span className="bg-muted relative inline-flex h-2 w-2 rounded-full" />
         </span>
         延迟 -- ms
         <ExternalLink className="h-3 w-3 opacity-60" />
@@ -114,7 +114,7 @@ function DelayStatus({ ms, onClick }: { ms: number; onClick?: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="text-muted-foreground inline-flex items-center gap-1.5 text-xs"
+      className="text-muted inline-flex items-center gap-1.5 text-xs"
     >
       <span className="relative flex h-2 w-2">
         <span
@@ -306,7 +306,7 @@ export const BentoNavSidebar: React.FC = () => {
         </ul>
 
         {/* 状态栏：在线人数 + 延迟 */}
-        <div className="text-muted-foreground flex items-center justify-between px-3 text-xs">
+        <div className="text-muted flex items-center justify-between px-3 text-xs">
           <span className="inline-flex items-center gap-1.5">
             <span className="relative flex h-2 w-2">
               <span className="bg-success absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />

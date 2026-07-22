@@ -27,10 +27,9 @@ const BASE = [
 
 const VARIANTS: Record<ButtonVariant, string> = {
   default: 'bg-accent text-accent hover:bg-accent/90',
-  outline:
-    'border-border text-muted-foreground hover:bg-muted hover:text-ink border',
+  outline: 'border-border text-muted hover:bg-muted hover:text-ink border',
   destructive: 'bg-destructive text-white hover:bg-destructive/90',
-  ghost: 'text-muted-foreground hover:bg-muted hover:text-ink',
+  ghost: 'text-muted hover:bg-muted hover:text-ink',
 };
 
 const SIZES: Record<ButtonSize, string> = {

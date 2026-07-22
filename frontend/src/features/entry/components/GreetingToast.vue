@@ -46,7 +46,7 @@ const goToChangelog = () => {
           <!-- 关闭按钮 -->
           <button
             @click="closeToast"
-            class="text-muted-foreground/60 hover:bg-muted hover:text-ink absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full transition-all duration-200 hover:scale-110"
+            class="text-muted/60 hover:bg-muted hover:text-ink absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full transition-all duration-200 hover:scale-110"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -112,7 +112,7 @@ const goToChangelog = () => {
               >
                 {{ greeting }}
               </h3>
-              <p class="text-muted-foreground mt-0.5 truncate text-xs">
+              <p class="text-muted mt-0.5 truncate text-xs">
                 {{ changelogHint }}
               </p>
             </div>

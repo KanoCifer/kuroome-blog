@@ -106,14 +106,14 @@ function RecommendSection({
     <div className="bg-paper mb-6 rounded-xl p-4 sm:p-6">
       <div className="mb-4 flex items-end justify-between gap-4">
         <div>
-          <p className="text-muted-foreground mb-1 text-xs">读完这些之后</p>
+          <p className="text-muted mb-1 text-xs">读完这些之后</p>
           <h3 className="text-ink font-serif text-lg font-semibold tracking-tight sm:text-xl">
             接下来读什么
           </h3>
         </div>
         <button
           type="button"
-          className="text-muted-foreground hover:text-ink hover:bg-muted inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          className="text-muted hover:text-ink hover:bg-muted inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40"
           disabled={loading}
           onClick={onRefresh}
           aria-label="换一批"
@@ -139,7 +139,7 @@ function RecommendSection({
           ))}
         </div>
       ) : error && books.length === 0 ? (
-        <div className="text-muted-foreground flex flex-col items-center justify-center rounded-xl border border-dashed py-8 text-center text-sm">
+        <div className="text-muted flex flex-col items-center justify-center rounded-xl border border-dashed py-8 text-center text-sm">
           <p className="text-destructive mb-2">{error}</p>
           <button
             type="button"
@@ -150,7 +150,7 @@ function RecommendSection({
           </button>
         </div>
       ) : !loading && books.length === 0 ? (
-        <div className="text-muted-foreground rounded-xl border border-dashed py-8 text-center text-sm">
+        <div className="text-muted rounded-xl border border-dashed py-8 text-center text-sm">
           暂时没有推荐
         </div>
       ) : (
@@ -186,17 +186,15 @@ function RecommendSection({
                 {book.title}
               </p>
               {book.author && (
-                <p className="text-muted-foreground truncate text-[11px]">
-                  {book.author}
-                </p>
+                <p className="text-muted truncate text-[11px]">{book.author}</p>
               )}
               {book.reason && (
-                <p className="text-muted-foreground line-clamp-2 text-[11px] leading-relaxed">
+                <p className="text-muted line-clamp-2 text-[11px] leading-relaxed">
                   {book.reason}
                 </p>
               )}
               {book.readingCount > 0 && (
-                <p className="text-muted-foreground/80 mt-auto text-[10px] tabular-nums">
+                <p className="text-muted/80 mt-auto text-[10px] tabular-nums">
                   {readingCountLabel(book.readingCount)}
                 </p>
               )}
@@ -206,7 +204,7 @@ function RecommendSection({
           {hasMore && (
             <button
               type="button"
-              className="text-muted-foreground hover:text-ink hover:border-accent/40 flex w-28 flex-shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-xl border border-dashed text-xs transition-colors disabled:opacity-50"
+              className="text-muted hover:text-ink hover:border-accent/40 flex w-28 flex-shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-xl border border-dashed text-xs transition-colors disabled:opacity-50"
               disabled={loading}
               onClick={onLoadMore}
             >
@@ -726,7 +724,7 @@ export default function BookStats() {
                     className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
                       activeMode === mode.key
                         ? 'bg-accent text-accent shadow-sm'
-                        : 'text-muted-foreground hover:bg-muted hover:text-ink'
+                        : 'text-muted hover:bg-muted hover:text-ink'
                     }`}
                     onClick={() => setActiveMode(mode.key)}
                   >
@@ -738,30 +736,26 @@ export default function BookStats() {
               {/* Summary Cards */}
               <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
                 <div className="bg-paper rounded-xl p-4">
-                  <p className="text-muted-foreground mb-1 text-xs">
-                    总阅读时长
-                  </p>
+                  <p className="text-muted mb-1 text-xs">总阅读时长</p>
                   <p className="text-ink text-2xl font-bold">
                     {formatDuration(activeSnapshot.totalReadTime)}
                   </p>
                 </div>
                 <div className="bg-paper rounded-xl p-4">
-                  <p className="text-muted-foreground mb-1 text-xs">阅读天数</p>
+                  <p className="text-muted mb-1 text-xs">阅读天数</p>
                   <p className="text-ink text-2xl font-bold">
                     {activeSnapshot.readDays ?? 0}
-                    <span className="text-muted-foreground text-sm font-normal">
-                      天
-                    </span>
+                    <span className="text-muted text-sm font-normal">天</span>
                   </p>
                 </div>
                 <div className="bg-paper rounded-xl p-4">
-                  <p className="text-muted-foreground mb-1 text-xs">日均时长</p>
+                  <p className="text-muted mb-1 text-xs">日均时长</p>
                   <p className="text-ink text-2xl font-bold">
                     {formatDuration(activeSnapshot.dayAverageReadTime)}
                   </p>
                 </div>
                 <div className="bg-paper rounded-xl p-4">
-                  <p className="text-muted-foreground mb-1 text-xs">环比变化</p>
+                  <p className="text-muted mb-1 text-xs">环比变化</p>
                   <p
                     className={`text-2xl font-bold ${
                       (activeSnapshot.compare ?? 0) >= 0
@@ -797,9 +791,7 @@ export default function BookStats() {
                   <h3 className="text-ink mb-1 text-sm font-medium">
                     本年的阅读足迹
                   </h3>
-                  <p className="text-muted-foreground mb-4 text-xs">
-                    本年每日的阅读时长
-                  </p>
+                  <p className="text-muted mb-4 text-xs">本年每日的阅读时长</p>
                   <div className="h-44 sm:h-48">
                     <ReactEChartsCore
                       echarts={echarts}
@@ -876,9 +868,7 @@ export default function BookStats() {
                   <div className="flex items-center gap-6">
                     <div className="flex-1">
                       <div className="mb-2 flex items-center justify-between">
-                        <span className="text-muted-foreground text-xs">
-                          文字阅读
-                        </span>
+                        <span className="text-muted text-xs">文字阅读</span>
                         <span className="text-ink text-sm font-medium">
                           {formatDuration(activeSnapshot!.wrReadTime)}
                         </span>
@@ -892,9 +882,7 @@ export default function BookStats() {
                     </div>
                     <div className="flex-1">
                       <div className="mb-2 flex items-center justify-between">
-                        <span className="text-muted-foreground text-xs">
-                          听书
-                        </span>
+                        <span className="text-muted text-xs">听书</span>
                         <span className="text-ink text-sm font-medium">
                           {formatDuration(activeSnapshot!.wrListenTime)}
                         </span>
@@ -923,9 +911,7 @@ export default function BookStats() {
                           <p className="text-ink text-2xl font-bold">
                             {stat.counts}
                           </p>
-                          <p className="text-muted-foreground text-xs">
-                            {stat.stat}
-                          </p>
+                          <p className="text-muted text-xs">{stat.stat}</p>
                         </div>
                       ))}
                     </div>
@@ -948,14 +934,14 @@ export default function BookStats() {
                             className="flex items-center justify-between"
                           >
                             <div className="flex items-center gap-3">
-                              <span className="bg-muted text-muted-foreground flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium">
+                              <span className="bg-muted text-muted flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium">
                                 {index + 1}
                               </span>
                               <span className="text-ink text-sm font-medium">
                                 {author.name ?? '未知作者'}
                               </span>
                             </div>
-                            <span className="text-muted-foreground text-sm">
+                            <span className="text-muted text-sm">
                               {author.readTime ?? '--'}
                             </span>
                           </div>
@@ -980,14 +966,14 @@ export default function BookStats() {
                             className="flex items-center justify-between"
                           >
                             <div className="flex items-center gap-3">
-                              <span className="bg-muted text-muted-foreground flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium">
+                              <span className="bg-muted text-muted flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium">
                                 {index + 1}
                               </span>
                               <span className="text-ink text-sm font-medium">
                                 {pub.name ?? '未知出版社'}
                               </span>
                             </div>
-                            <span className="text-muted-foreground text-sm">
+                            <span className="text-muted text-sm">
                               {pub.count} 本
                             </span>
                           </div>

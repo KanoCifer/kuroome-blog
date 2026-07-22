@@ -345,7 +345,7 @@ onUnmounted(() => {
     <div class="mx-auto max-w-[42rem] px-6 pt-10 sm:pt-14">
       <router-link
         to="/blog"
-        class="text-muted-foreground hover:text-accent group inline-flex items-center gap-1.5 text-[13px] font-medium tracking-wide transition-colors"
+        class="text-muted hover:text-accent group inline-flex items-center gap-1.5 text-[13px] font-medium tracking-wide transition-colors"
       >
         <span
           class="transition-transform duration-200 group-hover:-translate-x-0.5"
@@ -392,7 +392,7 @@ onUnmounted(() => {
           />
         </svg>
         <p class="text-destructive text-lg font-medium">加载失败</p>
-        <p class="text-muted-foreground mt-1 text-sm">{{ errorMessage }}</p>
+        <p class="text-muted mt-1 text-sm">{{ errorMessage }}</p>
         <button
           @click="handleRetry"
           class="bg-destructive/90 hover:bg-destructive mt-4 cursor-pointer rounded-lg px-4 py-2 text-sm font-medium text-white transition-all duration-150 active:scale-[0.96]"
@@ -441,9 +441,7 @@ onUnmounted(() => {
             "
           />
         </div>
-        <figcaption
-          class="text-muted-foreground mt-2.5 text-[11px] tracking-[0.04em]"
-        >
+        <figcaption class="text-muted mt-2.5 text-[11px] tracking-[0.04em]">
           封面 · {{ post.tags?.[0] || 'ReadingList' }}
         </figcaption>
       </figure>
@@ -452,10 +450,10 @@ onUnmounted(() => {
       <header class="mb-12">
         <!-- 刊号式元信息带：出版物气质，mono 大字距 -->
         <div
-          class="text-muted-foreground mb-6 flex items-center justify-between border-b pb-3 font-mono text-[10px] tracking-[0.18em] uppercase"
+          class="text-muted mb-6 flex items-center justify-between border-b pb-3 font-mono text-[10px] tracking-[0.18em] uppercase"
         >
           <span>Vol · 随笔录</span>
-          <span class="text-muted-foreground/70"
+          <span class="text-muted/70"
             >No · {{ post._id?.slice(-6) || '——' }}</span
           >
         </div>
@@ -476,7 +474,7 @@ onUnmounted(() => {
 
         <!-- Deck / standfirst — 阅读时长 + 字数 + 阅读量 + 可点击喜欢 -->
         <p
-          class="text-muted-foreground mt-5 text-[15px] leading-relaxed tracking-[0.01em] tabular-nums"
+          class="text-muted mt-5 text-[15px] leading-relaxed tracking-[0.01em] tabular-nums"
         >
           约 {{ stats.minutes }} 分钟阅读 ·
           {{ stats.count.toLocaleString() }} 字
@@ -497,11 +495,7 @@ onUnmounted(() => {
               "
               :disabled="isLiked || isLiking"
               class="inline-flex cursor-pointer items-center gap-1 rounded transition-colors duration-150 active:scale-[0.96] disabled:cursor-default"
-              :class="
-                isLiked
-                  ? 'text-accent'
-                  : 'text-muted-foreground hover:text-ink'
-              "
+              :class="isLiked ? 'text-accent' : 'text-muted hover:text-ink'"
               @click="handleLike"
             >
               <Heart
@@ -515,7 +509,7 @@ onUnmounted(() => {
 
         <!-- Byline / dateline -->
         <div
-          class="text-muted-foreground mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[13px] tracking-[0.02em]"
+          class="text-muted mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[13px] tracking-[0.02em]"
         >
           <span v-if="post.author" class="text-ink/80 font-medium">
             {{ post.author }}
@@ -542,7 +536,7 @@ onUnmounted(() => {
           v-if="post.body"
           v-html="renderedBodyWithOrigin"
         />
-        <div v-else class="text-muted-foreground italic">暂无内容</div>
+        <div v-else class="text-muted italic">暂无内容</div>
       </div>
 
       <!-- 文章脚：作者署名块 + 复制链接 -->
@@ -554,14 +548,10 @@ onUnmounted(() => {
               >{{ (post.author || 'K').slice(0, 1) }}</span
             >
             <div class="min-w-0">
-              <div
-                class="text-ink text-[14px] font-medium tracking-wide"
-              >
+              <div class="text-ink text-[14px] font-medium tracking-wide">
                 {{ post.author || 'Kurroome' }}
               </div>
-              <div
-                class="text-muted-foreground mt-0.5 text-[12px] tracking-[0.02em]"
-              >
+              <div class="text-muted mt-0.5 text-[12px] tracking-[0.02em]">
                 {{
                   hasUpdate
                     ? `最后更新于 ${formatDate(post.updated_at)}`
@@ -575,7 +565,7 @@ onUnmounted(() => {
           <button
             type="button"
             @click="handleCopyLink"
-            class="text-muted-foreground hover:text-accent inline-flex cursor-pointer items-center gap-1.5 text-[12px] font-medium tracking-[0.02em] transition-all duration-150 active:scale-[0.96]"
+            class="text-muted hover:text-accent inline-flex cursor-pointer items-center gap-1.5 text-[12px] font-medium tracking-[0.02em] transition-all duration-150 active:scale-[0.96]"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

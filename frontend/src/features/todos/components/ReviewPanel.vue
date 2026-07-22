@@ -3,19 +3,15 @@
     <!-- ── 本周复盘：单张 lifted-paper 汇总，不再是四张同构指标卡 ── -->
     <section>
       <div class="mb-3 flex items-baseline justify-between">
-        <h2
-          class="text-ink font-serif text-lg font-medium tracking-tight"
-        >
+        <h2 class="text-ink font-serif text-lg font-medium tracking-tight">
           本周复盘
         </h2>
-        <span class="text-muted-foreground text-xs tabular-nums">{{
-          weekRange
-        }}</span>
+        <span class="text-muted text-xs tabular-nums">{{ weekRange }}</span>
       </div>
 
       <div class="border-border bg-surface rounded-3xl border px-6 py-5">
         <!-- 主图：本周完成数 + 真实同比 -->
-        <div class="text-muted-foreground font-serif text-xs tracking-widest">
+        <div class="text-muted font-serif text-xs tracking-widest">
           本周完成
         </div>
         <div class="mt-1.5 flex items-baseline gap-3">
@@ -55,7 +51,7 @@
           <template v-for="(s, i) in supporting" :key="s.label">
             <span v-if="i" class="text-border" aria-hidden="true">·</span>
             <span class="flex items-baseline gap-1.5">
-              <span class="text-muted-foreground">{{ s.label }}</span>
+              <span class="text-muted">{{ s.label }}</span>
               <span class="font-medium tabular-nums" :class="s.valueClass">{{
                 s.value
               }}</span>
@@ -68,12 +64,10 @@
     <!-- ── 类型分布：横向条形，用 chart token 着色 ── -->
     <section>
       <div class="mb-3 flex items-baseline justify-between">
-        <h2
-          class="text-ink font-serif text-lg font-medium tracking-tight"
-        >
+        <h2 class="text-ink font-serif text-lg font-medium tracking-tight">
           类型分布
         </h2>
-        <span class="text-muted-foreground text-xs">全部任务</span>
+        <span class="text-muted text-xs">全部任务</span>
       </div>
       <div class="space-y-3">
         <div
@@ -81,9 +75,7 @@
           :key="row.type"
           class="flex items-center gap-3"
         >
-          <span class="text-ink w-16 shrink-0 text-sm">{{
-            row.type
-          }}</span>
+          <span class="text-ink w-16 shrink-0 text-sm">{{ row.type }}</span>
           <div class="bg-muted h-2 flex-1 overflow-hidden rounded-full">
             <div
               class="animate-progress h-full rounded-full transition-transform"
@@ -96,7 +88,7 @@
             />
           </div>
           <span
-            class="text-muted-foreground w-6 shrink-0 text-right text-xs tabular-nums"
+            class="text-muted w-6 shrink-0 text-right text-xs tabular-nums"
             >{{ row.count }}</span
           >
         </div>
@@ -107,19 +99,17 @@
     <section>
       <div class="mb-3 flex items-baseline justify-between">
         <div class="flex items-center gap-2">
-          <h2
-            class="text-ink font-serif text-lg font-medium tracking-tight"
-          >
+          <h2 class="text-ink font-serif text-lg font-medium tracking-tight">
             最近完成
           </h2>
           <span
             v-if="doneThisWeek.length"
-            class="text-muted-foreground bg-muted-foreground/10 inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
+            class="text-muted bg-muted/10 inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
           >
             {{ doneThisWeek.length }}
           </span>
         </div>
-        <span class="text-muted-foreground text-xs">按完成时间倒序</span>
+        <span class="text-muted text-xs">按完成时间倒序</span>
       </div>
 
       <div v-if="doneThisWeek.length" class="space-y-2">
@@ -133,15 +123,12 @@
         />
         <p
           v-if="doneThisWeek.length > 8"
-          class="text-muted-foreground/70 px-1 pt-1 text-xs"
+          class="text-muted/70 px-1 pt-1 text-xs"
         >
           共 {{ doneThisWeek.length }} 个，仅显示最近 8 个
         </p>
       </div>
-      <div
-        v-else
-        class="text-muted-foreground/70 px-1 py-6 text-center text-sm"
-      >
+      <div v-else class="text-muted/70 px-1 py-6 text-center text-sm">
         本周还没有完成的任务
       </div>
     </section>
@@ -229,7 +216,7 @@ const delta = computed(() => {
   }
   return {
     dir: 'flat' as const,
-    class: 'text-muted-foreground',
+    class: 'text-muted',
     label: '与上周持平',
   };
 });

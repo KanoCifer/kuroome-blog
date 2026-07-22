@@ -16,7 +16,7 @@ export function HourlyWeather() {
     <section className="px-1 pt-2 pb-6" aria-label="逐时预报">
       <div className="mb-3 flex items-baseline justify-between">
         <h3 className="text-ink text-sm font-semibold">逐时预报</h3>
-        <span className="text-muted-foreground text-xs">未来 24 小时</span>
+        <span className="text-muted text-xs">未来 24 小时</span>
       </div>
 
       {weatherHourly ? (
@@ -28,7 +28,7 @@ export function HourlyWeather() {
               <div
                 key={h.fxTime}
                 className={`flex w-[54px] shrink-0 snap-start flex-col items-center gap-1.5 py-2 ${
-                  isNow ? 'text-ink' : 'text-muted-foreground'
+                  isNow ? 'text-ink' : 'text-muted'
                 }`}
               >
                 <span
@@ -38,11 +38,8 @@ export function HourlyWeather() {
                 >
                   {isNow ? '现在' : dayjs(h.fxTime).format('HH:mm')}
                 </span>
-                <i
-                  className={`qi-${h.icon} text-ink/85 text-xl`}
-                  aria-hidden
-                />
-                <span className="text-muted-foreground/80 flex h-3 items-center gap-0.5 text-[10px] tabular-nums">
+                <i className={`qi-${h.icon} text-ink/85 text-xl`} aria-hidden />
+                <span className="text-muted/80 flex h-3 items-center gap-0.5 text-[10px] tabular-nums">
                   {pop > 0 && (
                     <>
                       <Droplets className="h-2.5 w-2.5" aria-hidden />
@@ -64,9 +61,9 @@ export function HourlyWeather() {
               key={i}
               className="flex w-[54px] shrink-0 flex-col items-center gap-2 py-2"
             >
-              <div className="bg-muted-foreground/15 skeleton-pulse h-3 w-8 rounded" />
-              <div className="bg-muted-foreground/15 skeleton-pulse h-5 w-5 rounded-full" />
-              <div className="bg-muted-foreground/15 skeleton-pulse h-3.5 w-6 rounded" />
+              <div className="bg-muted/15 skeleton-pulse h-3 w-8 rounded" />
+              <div className="bg-muted/15 skeleton-pulse h-5 w-5 rounded-full" />
+              <div className="bg-muted/15 skeleton-pulse h-3.5 w-6 rounded" />
             </div>
           ))}
         </div>

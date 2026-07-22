@@ -94,12 +94,8 @@ const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
   <div class="space-y-6">
     <!-- 滑块组 — 统一卡式外观，跟随切换 -->
     <div>
-      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">
-        背景调整
-      </h2>
-      <p class="text-muted-foreground mb-4 text-xs italic">
-        Adjust background appearance
-      </p>
+      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">背景调整</h2>
+      <p class="text-muted mb-4 text-xs italic">Adjust background appearance</p>
 
       <div class="border-border/60 bg-paper rounded-xl border p-5">
         <!-- 滑块行 -->
@@ -112,7 +108,7 @@ const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
               >
                 <!-- 模糊图标 -->
                 <svg
-                  class="text-muted-foreground h-4 w-4"
+                  class="text-muted h-4 w-4"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -152,7 +148,7 @@ const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
               >
                 <!-- 亮度图标 -->
                 <svg
-                  class="text-muted-foreground h-4 w-4"
+                  class="text-muted h-4 w-4"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -193,7 +189,7 @@ const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
               >
                 <!-- 缩放图标 -->
                 <svg
-                  class="text-muted-foreground h-4 w-4"
+                  class="text-muted h-4 w-4"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -228,7 +224,7 @@ const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
       <!-- 重置为默认 -->
       <button
         @click="resetBackground"
-        class="text-muted-foreground hover:text-ink hover:bg-muted mt-3 flex w-full items-center justify-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+        class="text-muted hover:text-ink hover:bg-muted mt-3 flex w-full items-center justify-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
       >
         <svg
           class="h-3.5 w-3.5"
@@ -248,10 +244,8 @@ const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
 
     <!-- 背景模式 -->
     <div>
-      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">
-        背景模式
-      </h2>
-      <p class="text-muted-foreground mb-4 text-xs italic">Background mode</p>
+      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">背景模式</h2>
+      <p class="text-muted mb-4 text-xs italic">Background mode</p>
 
       <div class="grid grid-cols-2 gap-3">
         <button
@@ -272,9 +266,7 @@ const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
             stroke-width="1.5"
             stroke-linecap="round"
             :class="
-              backgroundStore.mode === 'random'
-                ? 'text-accent'
-                : 'text-ink'
+              backgroundStore.mode === 'random' ? 'text-accent' : 'text-ink'
             "
           >
             <polyline points="16 3 21 3 21 8" />
@@ -286,9 +278,7 @@ const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
           <span
             class="text-sm font-medium"
             :class="
-              backgroundStore.mode === 'random'
-                ? 'text-accent'
-                : 'text-ink'
+              backgroundStore.mode === 'random' ? 'text-accent' : 'text-ink'
             "
           >
             随机切换
@@ -312,9 +302,7 @@ const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
             stroke-width="1.5"
             stroke-linecap="round"
             :class="
-              backgroundStore.mode === 'fixed'
-                ? 'text-accent'
-                : 'text-ink'
+              backgroundStore.mode === 'fixed' ? 'text-accent' : 'text-ink'
             "
           >
             <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -324,9 +312,7 @@ const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
           <span
             class="text-sm font-medium"
             :class="
-              backgroundStore.mode === 'fixed'
-                ? 'text-accent'
-                : 'text-ink'
+              backgroundStore.mode === 'fixed' ? 'text-accent' : 'text-ink'
             "
           >
             固定背景
@@ -337,12 +323,8 @@ const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
 
     <!-- 自动切换间隔（仅 random 模式） -->
     <div v-if="backgroundStore.mode === 'random'">
-      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">
-        自动切换
-      </h2>
-      <p class="text-muted-foreground mb-4 text-xs italic">
-        Auto-switch interval
-      </p>
+      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">自动切换</h2>
+      <p class="text-muted mb-4 text-xs italic">Auto-switch interval</p>
       <div class="flex flex-wrap gap-2">
         <button
           v-for="opt in autoSwitchOptions"
@@ -362,12 +344,8 @@ const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
 
     <!-- 固定背景选择（仅 fixed 模式） -->
     <div v-if="backgroundStore.mode === 'fixed'">
-      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">
-        选择背景
-      </h2>
-      <p class="text-muted-foreground mb-4 text-xs italic">
-        Choose a fixed background
-      </p>
+      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">选择背景</h2>
+      <p class="text-muted mb-4 text-xs italic">Choose a fixed background</p>
       <ImageGrid
         :images="backgroundStore.backgrounds"
         :selected="backgroundStore.fixedIndex"

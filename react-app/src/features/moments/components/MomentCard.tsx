@@ -65,7 +65,7 @@ export function MomentCard({
           <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100">
             <button
               type="button"
-              className="text-muted-foreground hover:text-accent border-border/40 bg-paper/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
+              className="text-muted hover:text-accent border-border/40 bg-paper/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
               aria-label={`编辑 ${moment.id}`}
               onClick={(e) => {
                 e.stopPropagation();
@@ -76,7 +76,7 @@ export function MomentCard({
             </button>
             <button
               type="button"
-              className="text-muted-foreground hover:text-destructive border-border/40 bg-paper/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
+              className="text-muted hover:text-destructive border-border/40 bg-paper/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
               aria-label={`删除 ${moment.id}`}
               onClick={(e) => {
                 e.stopPropagation();
@@ -104,7 +104,7 @@ export function MomentCard({
 
         {moment.tags.length > 0 && (
           <div
-            className="text-muted-foreground relative mt-4 flex flex-wrap items-center gap-x-2 gap-y-1.5 pl-3 text-[11px]"
+            className="text-muted relative mt-4 flex flex-wrap items-center gap-x-2 gap-y-1.5 pl-3 text-[11px]"
             onClick={(e) => e.stopPropagation()}
           >
             {moment.tags.map((tag) => (

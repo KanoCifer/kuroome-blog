@@ -7,7 +7,7 @@
       autoresize
     />
     <div v-else class="flex h-64 items-center justify-center">
-      <span class="text-muted-foreground">正在加载潮汐数据...</span>
+      <span class="text-muted">正在加载潮汐数据...</span>
     </div>
   </div>
 </template>

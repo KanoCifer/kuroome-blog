@@ -226,7 +226,7 @@ export default function MomentListView() {
                   'rounded-full px-3 py-1 font-medium transition-colors',
                   publicActiveTag === null
                     ? 'bg-accent text-accent shadow-sm'
-                    : 'bg-paper text-muted-foreground hover:bg-muted border-border/60 border',
+                    : 'bg-paper text-muted hover:bg-muted border-border/60 border',
                 ].join(' ')}
                 onClick={() => setTag(null)}
               >
@@ -240,7 +240,7 @@ export default function MomentListView() {
                     'rounded-full px-3 py-1 font-medium transition-colors',
                     publicActiveTag === tag
                       ? 'bg-accent text-accent shadow-sm'
-                      : 'bg-paper text-muted-foreground hover:bg-muted border-border/60 border',
+                      : 'bg-paper text-muted hover:bg-muted border-border/60 border',
                   ].join(' ')}
                   onClick={() => setTag(tag)}
                 >
@@ -316,7 +316,7 @@ export default function MomentListView() {
 
           {publicTotal > publicPageSize && (
             <nav
-              className="text-muted-foreground mt-10 flex items-center justify-between text-xs"
+              className="text-muted mt-10 flex items-center justify-between text-xs"
               aria-label="碎碎念分页"
             >
               <button
@@ -436,7 +436,7 @@ export default function MomentListView() {
             <h3 className="text-ink font-serif text-lg font-medium">
               删除这条碎碎念？
             </h3>
-            <p className="text-muted-foreground mt-2 text-sm">
+            <p className="text-muted mt-2 text-sm">
               将软删除该条记录（deleted_at 置位），列表中将不再展示。
             </p>
             <div className="mt-5 flex justify-end gap-2">

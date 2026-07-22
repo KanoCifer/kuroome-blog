@@ -185,7 +185,7 @@ export default function Register() {
             Join kanocifer
             <span className="text-accent">.chat</span>
           </h2>
-          <p className="text-muted-foreground mt-1 text-center text-[15px] font-medium">
+          <p className="text-muted mt-1 text-center text-[15px] font-medium">
             Create your account to start managing your reading list!
           </p>
         </div>
@@ -199,11 +199,11 @@ export default function Register() {
           <form className="flex flex-col" onSubmit={handleSubmit}>
             {/* Username Field */}
             <div className="mb-5">
-              <label className="text-muted-foreground mb-2 block pl-1 text-[13px] font-bold">
+              <label className="text-muted mb-2 block pl-1 text-[13px] font-bold">
                 Username
               </label>
               <div className="relative">
-                <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                <div className="text-muted pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                   <ShieldUser className="size-6" />
                 </div>
                 <input
@@ -214,7 +214,7 @@ export default function Register() {
                   onChange={(e) =>
                     setForm((prev) => ({ ...prev, username: e.target.value }))
                   }
-                  className="bg-secondary text-ink placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
+                  className="bg-secondary text-ink placeholder:text-muted focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
                 />
               </div>
               {errors.username && (
@@ -226,11 +226,11 @@ export default function Register() {
 
             {/* Email Field */}
             <div className="mb-5">
-              <label className="text-muted-foreground mb-2 block pl-1 text-[13px] font-bold">
+              <label className="text-muted mb-2 block pl-1 text-[13px] font-bold">
                 Email
               </label>
               <div className="relative">
-                <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                <div className="text-muted pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                   <svg
                     className="size-5"
                     fill="none"
@@ -253,7 +253,7 @@ export default function Register() {
                   onChange={(e) =>
                     setForm((prev) => ({ ...prev, email: e.target.value }))
                   }
-                  className="bg-secondary text-ink placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
+                  className="bg-secondary text-ink placeholder:text-muted focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
                 />
               </div>
               {errors.email && (
@@ -265,11 +265,11 @@ export default function Register() {
 
             {/* Password Field */}
             <div className="mb-5">
-              <label className="text-muted-foreground mb-2 block pl-1 text-[13px] font-bold">
+              <label className="text-muted mb-2 block pl-1 text-[13px] font-bold">
                 Password
               </label>
               <div className="relative">
-                <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                <div className="text-muted pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                   <svg
                     className="size-5"
                     fill="none"
@@ -292,11 +292,11 @@ export default function Register() {
                   onChange={(e) =>
                     setForm((prev) => ({ ...prev, password: e.target.value }))
                   }
-                  className="bg-secondary text-ink placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-12 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
+                  className="bg-secondary text-ink placeholder:text-muted focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-12 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
                 />
                 <button
                   type="button"
-                  className="text-muted-foreground hover:text-accent absolute inset-y-0 right-0 flex items-center pr-4 transition-all duration-200"
+                  className="text-muted hover:text-accent absolute inset-y-0 right-0 flex items-center pr-4 transition-all duration-200"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -315,11 +315,11 @@ export default function Register() {
 
             {/* Confirm Password Field */}
             <div className="mb-5">
-              <label className="text-muted-foreground mb-2 block pl-1 text-[13px] font-bold">
+              <label className="text-muted mb-2 block pl-1 text-[13px] font-bold">
                 Confirm Password
               </label>
               <div className="relative">
-                <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                <div className="text-muted pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                   <svg
                     className="size-5"
                     fill="none"
@@ -345,11 +345,11 @@ export default function Register() {
                       confirmPassword: e.target.value,
                     }))
                   }
-                  className="bg-secondary text-ink placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-12 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
+                  className="bg-secondary text-ink placeholder:text-muted focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-12 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
                 />
                 <button
                   type="button"
-                  className="text-muted-foreground hover:text-accent absolute inset-y-0 right-0 flex items-center pr-4 transition-all duration-200"
+                  className="text-muted hover:text-accent absolute inset-y-0 right-0 flex items-center pr-4 transition-all duration-200"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? (
@@ -368,12 +368,12 @@ export default function Register() {
 
             {/* Email Code Field */}
             <div className="mb-5">
-              <label className="text-muted-foreground mb-2 block pl-1 text-[13px] font-bold">
+              <label className="text-muted mb-2 block pl-1 text-[13px] font-bold">
                 Email Code
               </label>
               <div className="flex gap-3">
                 <div className="relative flex-1">
-                  <div className="text-muted-foreground pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                  <div className="text-muted pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
                     <svg
                       className="size-5"
                       fill="none"
@@ -399,7 +399,7 @@ export default function Register() {
                         emailCode: e.target.value,
                       }))
                     }
-                    className="bg-secondary text-ink placeholder:text-muted-foreground focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
+                    className="bg-secondary text-ink placeholder:text-muted focus:ring-ring/20 w-full rounded-2xl border-0 py-3.5 pr-4 pl-11 text-[15px] font-medium transition-all outline-none focus:ring-2"
                   />
                 </div>
                 <button
@@ -437,7 +437,7 @@ export default function Register() {
 
           {/* Login Link */}
           <div className="mt-8 text-center">
-            <p className="text-muted-foreground text-[14.5px] font-medium">
+            <p className="text-muted text-[14.5px] font-medium">
               Already have an account?
               <Link
                 to="/login"

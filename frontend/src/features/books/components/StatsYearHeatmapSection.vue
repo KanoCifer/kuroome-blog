@@ -84,7 +84,7 @@ function onCellLeave() {
     >
       本年的阅读足迹
     </h2>
-    <p class="text-muted-foreground mt-2 mb-5 text-sm">
+    <p class="text-muted mt-2 mb-5 text-sm">
       {{ subtitle }}
     </p>
 
@@ -116,7 +116,7 @@ function onCellLeave() {
           <div
             v-for="m in view.monthLabels"
             :key="`m-${m.month}`"
-            class="text-muted-foreground h-3 text-[10px] leading-3"
+            class="text-muted h-3 text-[10px] leading-3"
             :style="{ gridColumn: m.weekIdx + 2, gridRow: 1 }"
           >
             {{ m.month }}月
@@ -126,7 +126,7 @@ function onCellLeave() {
           <div
             v-for="(l, i) in WEEKDAY_LABELS"
             :key="`wlabel-${i}`"
-            class="text-muted-foreground flex items-center justify-end pr-1.5 text-[10px] leading-3"
+            class="text-muted flex items-center justify-end pr-1.5 text-[10px] leading-3"
             :style="{ gridColumn: 1, gridRow: i + 2 }"
           >
             {{ l }}
@@ -149,7 +149,7 @@ function onCellLeave() {
 
         <!-- 图例:行尾右对齐,5 个色块配 少/多 文字 -->
         <div
-          class="text-muted-foreground mt-3 flex items-center justify-end gap-2 text-[10px] sm:text-xs"
+          class="text-muted mt-3 flex items-center justify-end gap-2 text-[10px] sm:text-xs"
         >
           <span>少</span>
           <div class="flex items-center gap-[2px]">
@@ -187,10 +187,8 @@ function onCellLeave() {
             {{ formatTooltipDate(tooltipCell.date) }}
           </div>
           <div
-            class="text-muted-foreground mt-0.5 text-[11px] tabular-nums"
-            :class="
-              tooltipCell.secs > 0 ? '' : 'text-muted-foreground/70 italic'
-            "
+            class="text-muted mt-0.5 text-[11px] tabular-nums"
+            :class="tooltipCell.secs > 0 ? '' : 'text-muted/70 italic'"
           >
             {{
               tooltipCell.secs > 0 ? formatDuration(tooltipCell.secs) : '未读'
@@ -200,10 +198,7 @@ function onCellLeave() {
       </Transition>
     </Teleport>
 
-    <p
-      v-if="totalActiveDays > 0"
-      class="text-muted-foreground mt-3 text-xs sm:text-sm"
-    >
+    <p v-if="totalActiveDays > 0" class="text-muted mt-3 text-xs sm:text-sm">
       共
       <span class="text-ink font-medium tabular-nums">
         {{ totalActiveDays }}

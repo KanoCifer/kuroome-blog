@@ -10,7 +10,7 @@
     >
       <span
         class="text-ink min-w-0 flex-1 truncate text-sm font-medium"
-        :class="{ 'text-muted-foreground line-through opacity-70': done }"
+        :class="{ 'text-muted line-through opacity-70': done }"
       >
         {{ task.title }}
       </span>
@@ -23,7 +23,7 @@
 
       <span
         v-if="task.due_date"
-        class="text-muted-foreground shrink-0 text-[10px] tabular-nums"
+        class="text-muted shrink-0 text-[10px] tabular-nums"
       >
         {{ task.due_date }}
       </span>
@@ -36,7 +36,7 @@
       <button
         v-if="!done"
         type="button"
-        class="text-muted-foreground hover:bg-muted hover:text-accent focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
+        class="text-muted hover:bg-muted hover:text-accent focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
         title="推进状态"
         aria-label="推进状态"
         @click="$emit('cycle', task.slug)"
@@ -57,7 +57,7 @@
       </button>
       <button
         type="button"
-        class="text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
+        class="text-muted hover:bg-destructive/10 hover:text-destructive focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
         title="删除"
         aria-label="删除"
         @click="$emit('delete', task.slug)"

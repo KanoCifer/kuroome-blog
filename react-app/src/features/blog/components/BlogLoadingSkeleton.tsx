@@ -14,7 +14,7 @@ export function BlogLoadingSkeleton() {
             <div className="bg-muted h-3.5 w-full rounded" />
             <div className="bg-muted h-3.5 w-5/6 rounded" />
           </div>
-          <div className="text-muted-foreground/30 mt-4 flex gap-2 text-xs">
+          <div className="text-muted/30 mt-4 flex gap-2 text-xs">
             <div className="bg-muted h-3 w-20 rounded" />
             <div className="bg-muted h-3 w-16 rounded" />
           </div>

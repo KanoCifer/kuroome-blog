@@ -16,7 +16,7 @@ const LEVEL_COLORS: Record<string, string> = {
   好: 'text-accent',
   一般: 'text-warning',
   差: 'text-destructive',
-  空军: 'text-muted-foreground',
+  空军: 'text-muted',
 };
 
 /**
@@ -46,7 +46,7 @@ export function FishingIndexCard({
   }, [indexData, onDetailClick]);
 
   const levelColor = indexData
-    ? (LEVEL_COLORS[indexData.level] ?? 'text-muted-foreground')
+    ? (LEVEL_COLORS[indexData.level] ?? 'text-muted')
     : '';
 
   return (
@@ -54,7 +54,7 @@ export function FishingIndexCard({
       <div className="mb-4 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="text-ink text-sm font-semibold">钓鱼指数</h3>
-          <p className="text-muted-foreground mt-0.5 text-xs">
+          <p className="text-muted mt-0.5 text-xs">
             基于实时天气、潮汐综合计算
           </p>
         </div>
@@ -62,7 +62,7 @@ export function FishingIndexCard({
           onClick={() => void refetch()}
           aria-label="刷新钓鱼指数"
           disabled={loading}
-          className="text-muted-foreground hover:text-ink hover:bg-muted inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+          className="text-muted hover:text-ink hover:bg-muted inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60"
         >
           <RotateCw
             className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`}
@@ -84,13 +84,11 @@ export function FishingIndexCard({
           {/* Hero number — Apple Weather 大数字风格 */}
           <div className="flex items-end gap-3 px-1">
             <span
-              className={`text-[56px] leading-none font-light tabular-nums tracking-tight ${levelColor}`}
+              className={`text-[56px] leading-none font-light tracking-tight tabular-nums ${levelColor}`}
             >
               {indexData.fishing_index}
             </span>
-            <span
-              className={`mb-1.5 text-base font-medium ${levelColor}`}
-            >
+            <span className={`mb-1.5 text-base font-medium ${levelColor}`}>
               {indexData.level}
             </span>
           </div>
@@ -130,7 +128,7 @@ export function FishingIndexCard({
         </div>
       ) : (
         <div className="flex min-h-[200px] items-center">
-          <p className="text-muted-foreground text-sm">暂无数据</p>
+          <p className="text-muted text-sm">暂无数据</p>
         </div>
       )}
     </article>
@@ -146,9 +144,7 @@ interface DataRowProps {
 function DataRow({ label, value, emphasis = false }: DataRowProps) {
   return (
     <div className="flex items-baseline justify-between px-4 py-2.5">
-      <span className="text-muted-foreground text-xs font-medium">
-        {label}
-      </span>
+      <span className="text-muted text-xs font-medium">{label}</span>
       <span
         className={`tabular-nums ${
           emphasis ? 'text-base font-semibold' : 'text-sm font-semibold'

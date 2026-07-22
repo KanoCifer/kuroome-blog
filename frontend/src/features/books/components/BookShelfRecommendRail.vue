@@ -21,11 +21,11 @@
           >
             接下来读什么
           </h2>
-          <span class="text-muted-foreground text-xs">按你的偏好挑的</span>
+          <span class="text-muted text-xs">按你的偏好挑的</span>
         </div>
         <button
           type="button"
-          class="text-muted-foreground hover:text-ink inline-flex items-center gap-1 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-40"
+          class="text-muted hover:text-ink inline-flex items-center gap-1 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-40"
           :disabled="isLoading"
           @click="onRefresh"
           aria-label="换一批"
@@ -61,7 +61,7 @@
             v-else
             class="bg-muted flex h-full w-full items-center justify-center"
           >
-            <span class="text-muted-foreground/40 font-serif text-2xl">
+            <span class="text-muted/40 font-serif text-2xl">
               {{ book.title.slice(0, 1) }}
             </span>
           </div>
@@ -82,14 +82,14 @@
         </p>
         <p
           v-if="book.author"
-          class="text-muted-foreground mt-0.5 truncate px-1 text-[11px]"
+          class="text-muted mt-0.5 truncate px-1 text-[11px]"
           :title="book.author"
         >
           {{ book.author }}
         </p>
         <p
           v-if="book.reason"
-          class="text-muted-foreground/70 mt-1 line-clamp-2 px-1 text-[10.5px] leading-snug"
+          class="text-muted/70 mt-1 line-clamp-2 px-1 text-[10.5px] leading-snug"
           :title="book.reason"
         >
           {{ book.reason }}
@@ -100,7 +100,7 @@
     <template #load-more="{ loading: isLoading, onLoadMore }">
       <button
         type="button"
-        class="border-border/60 text-muted-foreground hover:border-accent/40 hover:text-ink flex w-28 flex-shrink-0 snap-start flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed text-xs transition-colors disabled:opacity-50 sm:w-32 md:w-36"
+        class="border-border/60 text-muted hover:border-accent/40 hover:text-ink flex w-28 flex-shrink-0 snap-start flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed text-xs transition-colors disabled:opacity-50 sm:w-32 md:w-36"
         :disabled="isLoading"
         @click="onLoadMore"
         aria-label="加载更多推荐"

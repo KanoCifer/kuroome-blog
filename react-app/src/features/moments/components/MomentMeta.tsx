@@ -16,7 +16,7 @@ export function MomentMeta({ moment, volumeLabel }: MomentMetaProps) {
   const moodIsEmoji = isPureEmoji(mood);
 
   return (
-    <div className="text-muted-foreground flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] tracking-wide">
+    <div className="text-muted flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] tracking-wide">
       {volumeLabel && (
         <span className="text-ink/60 font-serif">{volumeLabel}</span>
       )}
@@ -24,9 +24,7 @@ export function MomentMeta({ moment, volumeLabel }: MomentMetaProps) {
       {mood && (
         <span className="inline-flex items-center gap-1">
           <span aria-hidden="true">{moodIsEmoji ? mood : '·'}</span>
-          {!moodIsEmoji && (
-            <span className="text-ink/70 italic">{mood}</span>
-          )}
+          {!moodIsEmoji && <span className="text-ink/70 italic">{mood}</span>}
         </span>
       )}
 

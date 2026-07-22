@@ -28,21 +28,19 @@
           aria-hidden="true"
         />
 
-        <span
-          class="text-ink min-w-0 flex-1 truncate font-serif text-base"
-        >
+        <span class="text-ink min-w-0 flex-1 truncate font-serif text-base">
           {{ task.title }}
         </span>
 
         <span
-          class="text-muted-foreground hidden text-xs tabular-nums whitespace-nowrap sm:inline"
+          class="text-muted hidden text-xs whitespace-nowrap tabular-nums sm:inline"
         >
           {{ task.type }} · {{ task.priority }} · {{ task.status }}
         </span>
 
         <button
           type="button"
-          class="text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:ring-ring rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
+          class="text-muted hover:bg-destructive/10 hover:text-destructive focus-visible:ring-ring rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
           title="删除"
           aria-label="删除"
           @click.stop="$emit('delete', task.slug)"
@@ -65,10 +63,10 @@
 
       <div
         v-if="!filteredPlanning.length"
-        class="text-muted-foreground/70 flex flex-col items-center justify-center px-4 py-12 text-center"
+        class="text-muted/70 flex flex-col items-center justify-center px-4 py-12 text-center"
       >
         <svg
-          class="text-muted-foreground/30 mb-3 h-7 w-7"
+          class="text-muted/30 mb-3 h-7 w-7"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -92,19 +90,17 @@
 import { computed, ref } from 'vue';
 import { useV3DevTaskStore } from '@/features/todos/stores/v3devtasks';
 import type { DevTaskPriority, DevTaskType } from '@/features/todos/api';
-import TodoFilterBar, {
-  type MemberChip,
-} from './TodoFilterBar.vue';
+import TodoFilterBar, { type MemberChip } from './TodoFilterBar.vue';
 
 const store = useV3DevTaskStore();
 
 // 左缘 type-color 细线 — Layer 3 语义 token 映射，不引入新颜色。
-// 技术债用 muted-foreground（中性灰），对位"结构性、非紧急"的语义。
+// 技术债用 muted-muted（中性灰），对位"结构性、非紧急"的语义。
 const TYPE_BAR_CLASS: Record<DevTaskType, string> = {
   功能需求: 'bg-warning',
   问题: 'bg-destructive',
   优化: 'bg-success',
-  技术债: 'bg-muted-foreground',
+  技术债: 'bg-muted',
 };
 
 function typeBarClass(type: DevTaskType): string {

@@ -114,7 +114,7 @@ export function BentoProfile() {
           <h2 className="text-ink font-serif text-2xl font-extrabold tracking-tight">
             Kuroome
           </h2>
-          <p className="text-muted-foreground font-medium">Developer</p>
+          <p className="text-muted font-medium">Developer</p>
         </div>
 
         {/* 点赞按钮 */}

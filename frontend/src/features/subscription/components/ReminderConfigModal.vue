@@ -2,10 +2,7 @@
 import { reactive, watch } from 'vue';
 import type { ReminderFormState } from '../types';
 import { ModalFadeTransition } from '@/components';
-import {
-  channelOptions,
-  reminderPointOptions,
-} from '../subscriptionUtils';
+import { channelOptions, reminderPointOptions } from '../subscriptionUtils';
 
 interface Props {
   isOpen: boolean;
@@ -112,16 +109,14 @@ watch(
         >
           <header class="mb-4 flex items-start justify-between gap-4">
             <div>
-              <h3 class="text-ink text-lg font-semibold">
-                通知渠道配置
-              </h3>
-              <p class="text-muted-foreground mt-1 text-sm">
+              <h3 class="text-ink text-lg font-semibold">通知渠道配置</h3>
+              <p class="text-muted mt-1 text-sm">
                 选择通知渠道和提醒触发时间点，可先发送测试通知。
               </p>
             </div>
             <button
               type="button"
-              class="border-border text-muted-foreground hover:bg-muted rounded-lg border px-3 py-1 text-xs transition"
+              class="border-border text-muted hover:bg-muted rounded-lg border px-3 py-1 text-xs transition"
               @click="emit('close')"
             >
               关闭
@@ -131,7 +126,7 @@ watch(
           <div class="space-y-4">
             <section>
               <p
-                class="text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase"
+                class="text-muted mb-2 text-xs font-semibold tracking-wide uppercase"
               >
                 通知渠道
               </p>
@@ -155,7 +150,7 @@ watch(
 
             <section>
               <p
-                class="text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase"
+                class="text-muted mb-2 text-xs font-semibold tracking-wide uppercase"
               >
                 提醒时间点
               </p>
@@ -180,42 +175,42 @@ watch(
                 v-if="localForm.channels.includes('email')"
                 class="space-y-1"
               >
-                <span class="text-muted-foreground text-xs font-medium"
+                <span class="text-muted text-xs font-medium"
                   >邮箱地址（Email）</span
                 >
                 <input
                   v-model="localForm.email"
                   type="email"
                   placeholder="name@example.com"
-                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
               <label
                 v-if="localForm.channels.includes('feishu')"
                 class="space-y-1"
               >
-                <span class="text-muted-foreground text-xs font-medium"
+                <span class="text-muted text-xs font-medium"
                   >飞书 Webhook URL</span
                 >
                 <input
                   v-model="localForm.feishu_webhook_url"
                   type="text"
                   placeholder="https://open.feishu.cn/open-apis/bot/v2/hook/..."
-                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
               <label
                 v-if="localForm.channels.includes('bark')"
                 class="space-y-1"
               >
-                <span class="text-muted-foreground text-xs font-medium"
+                <span class="text-muted text-xs font-medium"
                   >Bark Device Key</span
                 >
                 <input
                   v-model="localForm.bark_device_key"
                   type="text"
                   placeholder="请输入 Bark 设备 Key"
-                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted-foreground w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
             </section>
@@ -251,7 +246,7 @@ watch(
             <footer class="flex flex-wrap justify-end gap-2">
               <button
                 type="button"
-                class="border-border text-muted-foreground hover:bg-muted rounded-xl border px-3 py-2 text-sm transition"
+                class="border-border text-muted hover:bg-muted rounded-xl border px-3 py-2 text-sm transition"
                 @click="emit('close')"
               >
                 取消

@@ -12,7 +12,7 @@
     <template #header="{ loading: isLoading, onRefresh }">
       <div class="mb-6 flex items-end justify-between gap-4">
         <div>
-          <p class="text-muted-foreground mb-1 text-sm">读完这些之后</p>
+          <p class="text-muted mb-1 text-sm">读完这些之后</p>
           <h2
             class="text-ink font-serif text-2xl font-semibold tracking-tight sm:text-3xl"
           >
@@ -21,7 +21,7 @@
         </div>
         <button
           type="button"
-          class="text-muted-foreground hover:text-ink hover:bg-muted inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          class="text-muted hover:text-ink hover:bg-muted inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
           :disabled="isLoading"
           @click="onRefresh"
           aria-label="换一批"
@@ -101,27 +101,22 @@
           </span>
         </Motion>
         <div class="min-w-0">
-          <p
-            class="text-ink line-clamp-2 font-serif text-base leading-tight"
-          >
+          <p class="text-ink line-clamp-2 font-serif text-base leading-tight">
             {{ book.title }}
           </p>
-          <p
-            v-if="book.author"
-            class="text-muted-foreground mt-1 truncate text-xs"
-          >
+          <p v-if="book.author" class="text-muted mt-1 truncate text-xs">
             {{ book.author }}
           </p>
         </div>
         <p
           v-if="book.reason"
-          class="text-muted-foreground line-clamp-2 text-xs leading-relaxed"
+          class="text-muted line-clamp-2 text-xs leading-relaxed"
         >
           {{ book.reason }}
         </p>
         <p
           v-if="book.readingCount"
-          class="text-muted-foreground/80 mt-auto text-[11px] tabular-nums"
+          class="text-muted/80 mt-auto text-[11px] tabular-nums"
         >
           {{ readingCountLabel(book.readingCount) }}
         </p>
@@ -131,7 +126,7 @@
     <template #load-more="{ loading: isLoading, onLoadMore }">
       <button
         type="button"
-        class="text-muted-foreground hover:text-ink hover:border-accent/40 flex w-40 flex-shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-2xl border border-dashed text-sm transition-colors disabled:opacity-50 sm:w-44"
+        class="text-muted hover:text-ink hover:border-accent/40 flex w-40 flex-shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-2xl border border-dashed text-sm transition-colors disabled:opacity-50 sm:w-44"
         :disabled="isLoading"
         @click="onLoadMore"
       >

@@ -59,7 +59,7 @@ const showPassword = ref<boolean>(false);
           Log in to your account
         </h2>
         <p
-          class="text-muted-foreground mt-2 text-center text-[15px] font-medium lg:text-left"
+          class="text-muted mt-2 text-center text-[15px] font-medium lg:text-left"
         >
           Welcome back! Please enter your details.
         </p>
@@ -72,7 +72,7 @@ const showPassword = ref<boolean>(false);
       <div>
         <div class="relative my-4">
           <div
-            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
+            class="text-muted/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
           >
             <ShieldUser class="size-6" />
           </div>
@@ -111,7 +111,7 @@ const showPassword = ref<boolean>(false);
       <div>
         <div class="relative my-4">
           <div
-            class="text-muted-foreground/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
+            class="text-muted/60 pointer-events-none absolute top-1/2 left-0 z-10 flex -translate-y-1/2 items-center pl-4"
           >
             <IconLock class="size-6" />
           </div>
@@ -132,7 +132,7 @@ const showPassword = ref<boolean>(false);
             type="button"
             @click="showPassword = !showPassword"
             :aria-label="showPassword ? '隐藏密码' : '显示密码'"
-            class="text-muted-foreground hover:text-ink absolute top-1/2 right-4 z-10 flex -translate-y-1/2 items-center justify-center rounded-md"
+            class="text-muted hover:text-ink absolute top-1/2 right-4 z-10 flex -translate-y-1/2 items-center justify-center rounded-md"
           >
             <!-- eye (显示) -->
             <svg
@@ -276,9 +276,7 @@ const showPassword = ref<boolean>(false);
           <span class="border-border w-full border-t"></span>
         </div>
         <div class="relative flex justify-center text-xs uppercase">
-          <span class="bg-paper text-muted-foreground px-2">
-            Or continue with
-          </span>
+          <span class="bg-paper text-muted px-2"> Or continue with </span>
         </div>
       </div>
 
@@ -301,7 +299,7 @@ const showPassword = ref<boolean>(false);
 
     <template #footer>
       <!-- 注册链接 -->
-      <div class="text-muted-foreground mt-8 text-center text-sm">
+      <div class="text-muted mt-8 text-center text-sm">
         Don't have an account?
         <RouterLink
           to="/register"

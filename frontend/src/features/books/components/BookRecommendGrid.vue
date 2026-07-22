@@ -100,7 +100,7 @@ function ratingScore(v: number): string {
       :on-retry="() => emit('refresh')"
     >
       <div
-        class="border-border/60 text-muted-foreground flex flex-col items-center justify-center rounded-2xl border border-dashed py-8 text-center text-sm"
+        class="border-border/60 text-muted flex flex-col items-center justify-center rounded-2xl border border-dashed py-8 text-center text-sm"
       >
         <p class="text-destructive mb-3 text-xs">{{ error }}</p>
         <button
@@ -116,7 +116,7 @@ function ratingScore(v: number): string {
     <!-- Empty(默认占位;wrapper 可用 #empty 整段覆盖) -->
     <slot v-else-if="!loading && books.length === 0" name="empty">
       <div
-        class="border-border/60 text-muted-foreground rounded-2xl border border-dashed py-8 text-center text-xs"
+        class="border-border/60 text-muted rounded-2xl border border-dashed py-8 text-center text-xs"
       >
         暂时没有推荐
       </div>
@@ -142,7 +142,7 @@ function ratingScore(v: number): string {
       >
         <button
           type="button"
-          class="border-border/60 text-muted-foreground hover:border-accent/40 hover:text-ink flex w-28 flex-shrink-0 snap-start flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed text-xs transition-colors disabled:opacity-50 sm:w-32 md:w-36"
+          class="border-border/60 text-muted hover:border-accent/40 hover:text-ink flex w-28 flex-shrink-0 snap-start flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed text-xs transition-colors disabled:opacity-50 sm:w-32 md:w-36"
           :disabled="loading"
           @click="emit('loadMore')"
           aria-label="加载更多推荐"

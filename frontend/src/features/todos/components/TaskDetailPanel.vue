@@ -36,7 +36,7 @@
           </h2>
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted hover:text-ink focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
+            class="text-muted hover:bg-muted hover:text-ink focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
             aria-label="关闭"
             @click="$emit('close')"
           >
@@ -64,7 +64,7 @@
             class="flex h-full min-h-72 flex-col items-center justify-center gap-3 text-center"
           >
             <svg
-              class="text-muted-foreground/40 h-10 w-10"
+              class="text-muted/40 h-10 w-10"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -77,9 +77,7 @@
               />
             </svg>
             <p class="text-ink text-sm font-medium">找不到这个任务</p>
-            <p
-              class="text-muted-foreground max-w-[260px] text-xs leading-relaxed"
-            >
+            <p class="text-muted max-w-[260px] text-xs leading-relaxed">
               它可能已被删除，或链接错误。
             </p>
           </div>
@@ -111,7 +109,7 @@
                         ? 'border-success bg-success/10 text-success'
                         : i === statusIndex
                           ? 'border-accent/40 bg-accent/10 text-accent'
-                          : 'border-border text-muted-foreground opacity-60'
+                          : 'border-border text-muted opacity-60'
                     "
                     :aria-pressed="task.status === s"
                     @click="
@@ -145,14 +143,14 @@
               <button
                 v-if="task.status !== '已完成' && task.status !== '已搁置'"
                 type="button"
-                class="text-muted-foreground hover:bg-muted focus-visible:ring-ring hover:text-ink mx-auto mt-2 block max-w-xs cursor-pointer rounded-md px-2 py-2 text-center text-[11px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
+                class="text-muted hover:bg-muted focus-visible:ring-ring hover:text-ink mx-auto mt-2 block max-w-xs cursor-pointer rounded-md px-2 py-2 text-center text-[11px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
                 @click="$emit('set-status', task.slug, '已搁置')"
               >
                 搁置此任务
               </button>
               <p
                 v-else-if="task.status === '已搁置'"
-                class="text-muted-foreground mt-2 text-center text-[11px]"
+                class="text-muted mt-2 text-center text-[11px]"
               >
                 已搁置 — 从上面选择一个状态恢复
               </p>
@@ -167,7 +165,7 @@
                 <KindBadge :kind="task.kind" />
                 <span
                   v-if="task.scope"
-                  class="text-muted-foreground border-border rounded-full border px-1.5 py-px text-[10px]"
+                  class="text-muted border-border rounded-full border px-1.5 py-px text-[10px]"
                 >
                   {{ task.scope }}
                 </span>
@@ -188,7 +186,7 @@
                 "
                 class="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs"
               >
-                <span v-if="task.parent_slug" class="text-muted-foreground">
+                <span v-if="task.parent_slug" class="text-muted">
                   归属
                   <span class="text-ink font-mono font-medium">{{
                     task.parent_slug
@@ -198,9 +196,7 @@
                   v-if="task.due_date"
                   class="flex items-center gap-1"
                   :class="
-                    isOverdue(task.due_date)
-                      ? 'text-destructive'
-                      : 'text-muted-foreground'
+                    isOverdue(task.due_date) ? 'text-destructive' : 'text-muted'
                   "
                 >
                   <svg class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
@@ -241,12 +237,12 @@
               <!-- 验收标准 -->
               <div v-if="task.acceptance_criteria">
                 <span
-                  class="text-muted-foreground mb-1 block font-serif text-xs tracking-widest"
+                  class="text-muted mb-1 block font-serif text-xs tracking-widest"
                 >
                   验收标准
                 </span>
                 <div
-                  class="prose prose-sm text-muted-foreground max-w-none"
+                  class="prose prose-sm text-muted max-w-none"
                   v-html="renderMarkdown(task.acceptance_criteria)"
                 />
               </div>
@@ -254,12 +250,12 @@
               <!-- 约束 -->
               <div v-if="task.constraints">
                 <span
-                  class="text-muted-foreground mb-1 block font-serif text-xs tracking-widest"
+                  class="text-muted mb-1 block font-serif text-xs tracking-widest"
                 >
                   约束
                 </span>
                 <div
-                  class="prose prose-sm text-muted-foreground max-w-none"
+                  class="prose prose-sm text-muted max-w-none"
                   v-html="renderMarkdown(task.constraints)"
                 />
               </div>
@@ -267,25 +263,23 @@
               <!-- 上下文指针 -->
               <div v-if="task.context_pointers">
                 <span
-                  class="text-muted-foreground mb-1 block font-serif text-xs tracking-widest"
+                  class="text-muted mb-1 block font-serif text-xs tracking-widest"
                 >
                   上下文指针
                 </span>
                 <pre
-                  class="text-muted-foreground font-mono text-[12px] leading-relaxed break-words whitespace-pre-wrap"
+                  class="text-muted font-mono text-[12px] leading-relaxed break-words whitespace-pre-wrap"
                   >{{ task.context_pointers }}</pre>
               </div>
 
               <!-- 元数据 -->
               <div>
                 <span
-                  class="text-muted-foreground mb-1 block font-serif text-xs tracking-widest"
+                  class="text-muted mb-1 block font-serif text-xs tracking-widest"
                 >
                   元数据
                 </span>
-                <p
-                  class="text-muted-foreground font-mono text-[11px] leading-relaxed"
-                >
+                <p class="text-muted font-mono text-[11px] leading-relaxed">
                   ID: {{ task.id }}<br />
                   创建于 {{ (task.created_at || '').slice(0, 10) }} · 更新于
                   {{ (task.updated_at || '').slice(0, 10) }}
@@ -307,7 +301,7 @@
           </button>
           <div class="flex items-center gap-2">
             <button
-              class="text-muted-foreground hover:bg-muted focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+              class="text-muted hover:bg-muted focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
               @click="$emit('close')"
             >
               关闭

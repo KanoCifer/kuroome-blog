@@ -23,16 +23,12 @@ const emit = defineEmits<{
     <div class="flex flex-wrap items-start justify-between gap-5">
       <div class="max-w-3xl">
         <p
-          class="text-muted-foreground mb-2 text-xs font-semibold tracking-[0.2em] uppercase"
+          class="text-muted mb-2 text-xs font-semibold tracking-[0.2em] uppercase"
         >
           Subscription
         </p>
-        <h2 class="text-ink font-serif text-3xl font-semibold">
-          桌面订阅看板
-        </h2>
-        <p
-          class="text-muted-foreground dark:text-muted-foreground mt-2 text-sm"
-        >
+        <h2 class="text-ink font-serif text-3xl font-semibold">桌面订阅看板</h2>
+        <p class="text-muted dark:text-muted mt-2 text-sm">
           参考移动端订阅卡片设计，重构为更适合桌面端的双栏结构，支持高密度信息查看与快速操作。
         </p>
       </div>
@@ -78,7 +74,7 @@ const emit = defineEmits<{
 
     <div class="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
       <article class="border-border/80 bg-paper/70 rounded-2xl border p-4">
-        <p class="text-muted-foreground text-xs">总订阅数</p>
+        <p class="text-muted text-xs">总订阅数</p>
         <p class="text-ink mt-2 text-2xl font-semibold">
           {{ totalCount }}
         </p>

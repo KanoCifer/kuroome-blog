@@ -95,15 +95,10 @@ const ResourceBar = defineComponent({
     <!-- 资源 -->
     <section class="space-y-5" aria-label="系统资源">
       <header class="flex items-baseline justify-between">
-        <h2
-          class="text-ink font-serif text-[20px] tracking-[-0.01em]"
-        >
+        <h2 class="text-ink font-serif text-[20px] tracking-[-0.01em]">
           系统资源
         </h2>
-        <span
-          v-if="serverStatus"
-          class="text-muted-foreground text-[12px] tabular-nums"
-        >
+        <span v-if="serverStatus" class="text-muted text-[12px] tabular-nums">
           {{ serverStatus.system.os_name }}
         </span>
       </header>
@@ -161,12 +156,10 @@ const ResourceBar = defineComponent({
     <!-- 延迟图 -->
     <section class="space-y-5" aria-label="API 延迟趋势">
       <header class="flex items-baseline justify-between">
-        <h2
-          class="text-ink font-serif text-[20px] tracking-[-0.01em]"
-        >
+        <h2 class="text-ink font-serif text-[20px] tracking-[-0.01em]">
           API 延迟趋势
         </h2>
-        <span class="text-muted-foreground text-[12px] tabular-nums">
+        <span class="text-muted text-[12px] tabular-nums">
           最近 60s · 毫秒
         </span>
       </header>
@@ -178,7 +171,7 @@ const ResourceBar = defineComponent({
         />
         <div
           v-else
-          class="text-muted-foreground flex h-full items-center justify-center text-[13px]"
+          class="text-muted flex h-full items-center justify-center text-[13px]"
         >
           等待数据…
         </div>

@@ -33,7 +33,7 @@ function gaugeClass(p: number): string {
   if (p >= 70) return 'bg-accent';
   if (p >= 50) return 'bg-warning';
   if (p <= 30) return 'bg-destructive';
-  return 'bg-muted-foreground';
+  return 'bg-muted';
 }
 
 // SnapSheet 档位: 初始 1/3, 中档 60vh, 大档 4/5 (80vh)
@@ -50,11 +50,9 @@ export function FishingIndexDetailSheet({ open, data, onClose }: Props) {
         <header className="shrink-0 px-5 pb-3">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-ink text-base font-semibold">
-                特征详情
-              </h2>
+              <h2 className="text-ink text-base font-semibold">特征详情</h2>
               {data && (
-                <p className="text-muted-foreground mt-0.5 text-xs">
+                <p className="text-muted mt-0.5 text-xs">
                   9 项子特征 · 综合指数 {data.fishing_index} · {data.level}
                 </p>
               )}
@@ -63,7 +61,7 @@ export function FishingIndexDetailSheet({ open, data, onClose }: Props) {
               type="button"
               onClick={onClose}
               aria-label="关闭"
-              className="hover:bg-muted text-muted-foreground inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+              className="hover:bg-muted text-muted inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
@@ -72,7 +70,7 @@ export function FishingIndexDetailSheet({ open, data, onClose }: Props) {
       )}
     >
       {data && (
-        <div className="grid grid-cols-2 gap-2 px-5 pb-8 pt-1">
+        <div className="grid grid-cols-2 gap-2 px-5 pt-1 pb-8">
           {Object.entries(data.feature_breakdown).map(
             ([key, value]: [string, number]) => {
               const vals = Object.values(data.feature_breakdown);
@@ -82,7 +80,7 @@ export function FishingIndexDetailSheet({ open, data, onClose }: Props) {
               return (
                 <div key={key} className="fm-tile p-3">
                   <div className="mb-2 flex items-baseline justify-between">
-                    <span className="text-muted-foreground text-xs font-medium">
+                    <span className="text-muted text-xs font-medium">
                       {label}
                     </span>
                     <span className="text-ink text-sm font-semibold tabular-nums">

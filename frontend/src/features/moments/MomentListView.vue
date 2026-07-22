@@ -19,7 +19,7 @@
             'rounded-full px-3 py-1 font-medium transition-colors',
             activeTag === null
               ? 'bg-accent text-accent shadow-sm'
-              : 'bg-paper text-muted-foreground hover:bg-muted border-border/60 border',
+              : 'bg-paper text-muted hover:bg-muted border-border/60 border',
           ]"
           @click="setTag(null)"
         >
@@ -33,7 +33,7 @@
             'rounded-full px-3 py-1 font-medium transition-colors',
             activeTag === tag
               ? 'bg-accent text-accent shadow-sm'
-              : 'bg-paper text-muted-foreground hover:bg-muted border-border/60 border',
+              : 'bg-paper text-muted hover:bg-muted border-border/60 border',
           ]"
           @click="setTag(tag)"
         >
@@ -103,7 +103,7 @@
       <!-- 分页 -->
       <nav
         v-if="publicTotal > publicPageSize"
-        class="text-muted-foreground mt-10 flex items-center justify-between text-xs"
+        class="text-muted mt-10 flex items-center justify-between text-xs"
         aria-label="碎碎念分页"
       >
         <button
@@ -222,7 +222,7 @@
         <h2 class="text-ink font-serif text-lg font-medium italic">
           删除这条碎碎念？
         </h2>
-        <p class="text-muted-foreground mt-2 text-sm leading-relaxed">
+        <p class="text-muted mt-2 text-sm leading-relaxed">
           将软删除该条记录（deleted_at 置位），列表中将不再展示。
         </p>
       </div>

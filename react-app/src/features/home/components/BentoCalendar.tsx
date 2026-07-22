@@ -25,18 +25,14 @@ export function BentoCalendar() {
       <BentoCard className="flex flex-col">
         {/* 标题行 */}
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-ink text-lg font-semibold">
-            {monthLabel}
-          </h3>
+          <h3 className="text-ink text-lg font-semibold">{monthLabel}</h3>
           <div className="flex items-center gap-2">
-            <span className="text-muted-foreground text-sm tabular-nums">
-              {yearLabel}
-            </span>
+            <span className="text-muted text-sm tabular-nums">{yearLabel}</span>
             <motion.button
               whileTap={{ scale: 0.94 }}
               transition={SPRING.snappy}
               onClick={() => setExpanded(true)}
-              className="text-muted-foreground hover:bg-muted rounded-full p-1.5 transition-colors"
+              className="text-muted hover:bg-muted rounded-full p-1.5 transition-colors"
               aria-label="展开日历"
             >
               <svg
@@ -61,7 +57,7 @@ export function BentoCalendar() {
           {weekdayLabels.map((label, idx) => (
             <span
               key={idx}
-              className="text-muted-foreground py-1 text-xs font-medium tabular-nums"
+              className="text-muted py-1 text-xs font-medium tabular-nums"
             >
               {label}
             </span>
@@ -78,7 +74,7 @@ export function BentoCalendar() {
                 className={`mx-auto flex aspect-square w-full max-w-8 items-center justify-center rounded-full text-sm transition-colors ${
                   isToday
                     ? 'bg-accent text-accent font-bold'
-                    : 'text-card-foreground hover:bg-accent/10'
+                    : 'text-muted hover:bg-accent/10'
                 }`}
               >
                 {day.date()}
@@ -101,7 +97,7 @@ export function BentoCalendar() {
               {weekdayLabels.map((label, idx) => (
                 <span
                   key={idx}
-                  className="text-muted-foreground py-1 text-xs font-medium tabular-nums"
+                  className="text-muted py-1 text-xs font-medium tabular-nums"
                 >
                   {label}
                 </span>
@@ -137,9 +133,7 @@ export function BentoCalendar() {
                     }}
                     transition={SPRING.reveal}
                     className={`mx-auto flex aspect-square w-full max-w-8 items-center justify-center rounded-full text-sm ${
-                      isToday
-                        ? 'bg-accent text-accent font-bold'
-                        : 'text-ink'
+                      isToday ? 'bg-accent text-accent font-bold' : 'text-ink'
                     }`}
                   >
                     {dayNum}

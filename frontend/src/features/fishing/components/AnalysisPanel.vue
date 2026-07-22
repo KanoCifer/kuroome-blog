@@ -101,18 +101,14 @@ watch(
           class="border-border flex items-start justify-between gap-3 border-b px-6 pt-6 pb-5"
         >
           <div class="min-w-0">
-            <h2
-              class="text-ink font-family-averia text-2xl leading-snug"
-            >
+            <h2 class="text-ink font-family-averia text-2xl leading-snug">
               AI 分析
             </h2>
-            <p class="text-muted-foreground mt-0.5 text-xs">
-              基于当前天气与潮汐综合判断
-            </p>
+            <p class="text-muted mt-0.5 text-xs">基于当前天气与潮汐综合判断</p>
           </div>
           <button
             type="button"
-            class="text-muted-foreground hover:bg-muted hover:text-ink inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors"
+            class="text-muted hover:bg-muted hover:text-ink inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors"
             aria-label="关闭分析"
             @click="emit('close')"
           >

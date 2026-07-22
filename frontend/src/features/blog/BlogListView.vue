@@ -19,7 +19,7 @@
               viewBox="0 0 24 24"
               stroke-width="2"
               stroke="currentColor"
-              class="text-muted-foreground h-4 w-4"
+              class="text-muted h-4 w-4"
               aria-hidden="true"
             >
               <path
@@ -34,14 +34,14 @@
             type="search"
             placeholder="在字里行间，寻一句心动…"
             aria-label="搜索文章"
-            class="text-ink placeholder:text-muted-foreground/70 focus:border-accent focus:ring-accent/20 border-border bg-paper w-full rounded-xl border py-3 pr-10 pl-10 font-serif text-sm placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="text-ink placeholder:text-muted/70 focus:border-accent focus:ring-accent/20 border-border bg-paper w-full rounded-xl border py-3 pr-10 pl-10 font-serif text-sm placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             @keyup.enter="handleSearch"
           />
           <button
             v-if="searchQuery"
             type="button"
             aria-label="清空搜索"
-            class="text-muted-foreground hover:text-ink absolute inset-y-0 right-0 flex items-center pr-3"
+            class="text-muted hover:text-ink absolute inset-y-0 right-0 flex items-center pr-3"
             @click="clearSearch"
           >
             <svg
@@ -67,7 +67,7 @@
           <button
             v-if="activeTag"
             type="button"
-            class="border-border bg-paper text-muted-foreground hover:bg-muted hover:text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+            class="border-border bg-paper text-muted hover:bg-muted hover:text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
             @click="handleResetFilter"
           >
             <span class="text-accent/70 font-serif italic">#</span>
@@ -127,7 +127,7 @@
           >
             <div class="flex items-baseline gap-3">
               <span
-                class="text-muted-foreground font-mono text-[10px] tracking-[0.4em] uppercase"
+                class="text-muted font-mono text-[10px] tracking-[0.4em] uppercase"
                 >Volume · 壹</span
               >
               <h2
@@ -136,7 +136,7 @@
                 近期文章
               </h2>
             </div>
-            <div class="text-muted-foreground/70 flex items-center gap-1.5">
+            <div class="text-muted/70 flex items-center gap-1.5">
               <div class="bg-accent/40 h-px w-6" />
               <span class="font-mono text-[10px] tracking-[0.2em] uppercase"
                 >Recent</span
@@ -150,7 +150,7 @@
           <div v-else class="mb-6 flex items-end justify-between gap-4 pb-3">
             <div class="flex items-baseline gap-3">
               <span
-                class="text-muted-foreground font-mono text-[10px] tracking-[0.4em] uppercase"
+                class="text-muted font-mono text-[10px] tracking-[0.4em] uppercase"
                 >Volume · 壹</span
               >
               <h2
@@ -159,7 +159,7 @@
                 <span class="text-accent/70 mr-1">#</span>{{ activeTag }}
               </h2>
             </div>
-            <div class="text-muted-foreground/70 flex items-center gap-1.5">
+            <div class="text-muted/70 flex items-center gap-1.5">
               <div class="bg-accent/40 h-px w-6" />
               <span class="font-mono text-[10px] tracking-[0.2em] uppercase"
                 >Category</span
@@ -177,10 +177,8 @@
             <div
               class="border-accent/20 border-t-accent mb-5 h-12 w-12 animate-spin rounded-full border-4"
             ></div>
-            <h3 class="text-ink text-base font-semibold">
-              正在翻开新的一页…
-            </h3>
-            <p class="text-muted-foreground mt-2 font-serif text-sm italic">
+            <h3 class="text-ink text-base font-semibold">正在翻开新的一页…</h3>
+            <p class="text-muted mt-2 font-serif text-sm italic">
               Loading the latest pages
             </p>
           </div>
@@ -224,7 +222,7 @@
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              class="text-muted-foreground/50 mb-5 h-14 w-14"
+              class="text-muted/50 mb-5 h-14 w-14"
               fill="none"
               viewBox="0 0 24 24"
               stroke-width="1.5"
@@ -240,9 +238,7 @@
             <h3 class="text-ink font-serif text-base font-semibold">
               {{ activeTag ? '此卷尚是空白' : '书页尚待落墨' }}
             </h3>
-            <p
-              class="text-muted-foreground mt-2 max-w-sm font-serif text-sm italic"
-            >
+            <p class="text-muted mt-2 max-w-sm font-serif text-sm italic">
               {{
                 activeTag
                   ? '此卷尚无篇章，待你我来添一笔。'
@@ -253,7 +249,7 @@
               <button
                 v-if="activeTag"
                 type="button"
-                class="border-border text-muted-foreground hover:bg-muted hover:text-ink rounded-lg border px-4 py-2 text-sm font-medium"
+                class="border-border text-muted hover:bg-muted hover:text-ink rounded-lg border px-4 py-2 text-sm font-medium"
                 @click="handleResetFilter"
               >
                 翻看全卷
@@ -304,8 +300,8 @@
                   class="focus-visible:ring-ring inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                   :class="
                     pagination?.has_prev
-                      ? 'text-muted-foreground hover:bg-muted hover:text-ink'
-                      : 'text-muted-foreground/50 cursor-not-allowed'
+                      ? 'text-muted hover:bg-muted hover:text-ink'
+                      : 'text-muted/50 cursor-not-allowed'
                   "
                   @click="goToPage(pagination!.prev_num!)"
                 >
@@ -331,7 +327,7 @@
               <template v-for="(item, i) in pageSegments" :key="`seg-${i}`">
                 <li v-if="item === 'ellipsis'">
                   <span
-                    class="text-muted-foreground/60 px-1 text-sm select-none"
+                    class="text-muted/60 px-1 text-sm select-none"
                     aria-hidden="true"
                     >…</span
                   >
@@ -346,7 +342,7 @@
                     :class="
                       item === pagination?.page
                         ? 'bg-accent text-accent'
-                        : 'text-muted-foreground hover:bg-muted hover:text-ink'
+                        : 'text-muted hover:bg-muted hover:text-ink'
                     "
                     @click="goToPage(item)"
                   >
@@ -363,8 +359,8 @@
                   class="focus-visible:ring-ring inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                   :class="
                     pagination?.has_next
-                      ? 'text-muted-foreground hover:bg-muted hover:text-ink'
-                      : 'text-muted-foreground/50 cursor-not-allowed'
+                      ? 'text-muted hover:bg-muted hover:text-ink'
+                      : 'text-muted/50 cursor-not-allowed'
                   "
                   @click="goToPage(pagination!.next_num!)"
                 >
@@ -407,7 +403,7 @@
       <!--  底部装饰：与 SettingsModal · ka·no·ci·fer 对齐              -->
       <!-- ──────────────────────────────────────────────────────────── -->
       <div
-        class="text-muted-foreground border-border/50 mt-12 flex items-center justify-between border-t pt-4 font-mono text-[10px] tracking-[0.2em] uppercase"
+        class="text-muted border-border/50 mt-12 flex items-center justify-between border-t pt-4 font-mono text-[10px] tracking-[0.2em] uppercase"
       >
         <span>Essays · 卷一</span>
         <span class="font-serif tracking-normal normal-case italic"

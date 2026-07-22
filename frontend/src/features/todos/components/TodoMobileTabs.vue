@@ -13,7 +13,7 @@
       :class="
         activeTab === tab.id
           ? 'bg-paper text-ink shadow-[0_1px_2px_color-mix(in_oklch,var(--ink)_6%,transparent),inset_0_1px_0_0_oklch(from_var(--paper)_l_c_h_/_0.6)]'
-          : 'text-muted-foreground hover:text-ink'
+          : 'text-muted hover:text-ink'
       "
       @click="activeTab = tab.id"
     >
@@ -23,7 +23,7 @@
         :class="
           activeTab === tab.id
             ? 'text-ink bg-accent/15'
-            : 'text-muted-foreground bg-muted-foreground/10'
+            : 'text-muted bg-muted/10'
         "
       >
         {{ tab.count }}

@@ -20,7 +20,7 @@ defineOptions({
   <p
     data-slot="alert-dialog-description"
     :id="describedBy"
-    :class="['text-muted-foreground text-sm', props.class]"
+    :class="['text-muted text-sm', props.class]"
   >
     <slot />
   </p>

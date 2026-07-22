@@ -20,7 +20,7 @@
         <h3 class="text-ink text-lg font-semibold">
           {{ monthLabel }}
         </h3>
-        <span class="text-muted-foreground text-sm">{{ yearLabel }}</span>
+        <span class="text-muted text-sm">{{ yearLabel }}</span>
       </div>
     </div>
 
@@ -33,7 +33,7 @@
         v-for="(label, idx) in weekdays"
         :key="idx"
         class="py-1 text-xs font-medium"
-        :class="idx === weekdayToday ? 'text-accent' : 'text-muted-foreground'"
+        :class="idx === weekdayToday ? 'text-accent' : 'text-muted'"
       >
         {{ label }}
       </span>
@@ -55,7 +55,7 @@
         :class="
           day === today
             ? 'bg-accent text-accent font-bold'
-            : 'text-muted-foreground hover:bg-accent/10'
+            : 'text-muted hover:bg-accent/10'
         "
       >
         {{ day }}

@@ -18,19 +18,17 @@
       </div>
 
       <!-- 标题 -->
-      <h1
-        class="text-ink mt-8 font-serif text-3xl font-bold sm:text-4xl"
-      >
+      <h1 class="text-ink mt-8 font-serif text-3xl font-bold sm:text-4xl">
         页面未找到
       </h1>
 
       <!-- 描述 -->
-      <p class="text-muted-foreground mt-4 text-lg">
+      <p class="text-muted mt-4 text-lg">
         抱歉，您访问的页面不存在或已被移动。
       </p>
 
       <!-- 可能的原因 -->
-      <div class="text-muted-foreground mt-6 space-y-2 text-sm">
+      <div class="text-muted mt-6 space-y-2 text-sm">
         <p>• 网址可能拼写错误</p>
         <p>• 页面可能已被删除</p>
         <p>• 链接可能已过期</p>
@@ -82,7 +80,7 @@
     </div>
 
     <!-- 装饰元素 -->
-    <div class="text-muted-foreground mt-16 flex gap-2">
+    <div class="text-muted mt-16 flex gap-2">
       <div class="h-1 w-1 animate-bounce rounded-full bg-current"></div>
       <div
         class="h-1 w-1 animate-bounce rounded-full bg-current"

@@ -130,7 +130,7 @@ onUnmounted(() => {
 
                 <button
                   type="button"
-                  class="text-muted-foreground hover:bg-muted hover:text-ink -mt-1 -mr-1 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-colors"
+                  class="text-muted hover:bg-muted hover:text-ink -mt-1 -mr-1 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-colors"
                   aria-label="关闭"
                   @click="emit('close')"
                 >
@@ -159,7 +159,7 @@ onUnmounted(() => {
               </h2>
               <p
                 v-if="book.author"
-                class="text-muted-foreground mt-1 text-sm sm:text-base"
+                class="text-muted mt-1 text-sm sm:text-base"
               >
                 {{ book.author }}
               </p>
@@ -167,7 +167,7 @@ onUnmounted(() => {
               <!-- Meta line -->
               <p
                 v-if="book.readingCount"
-                class="text-muted-foreground/80 mt-2 text-xs tabular-nums"
+                class="text-muted/80 mt-2 text-xs tabular-nums"
               >
                 {{ readingCountLabel(book.readingCount) }}
               </p>
@@ -175,7 +175,7 @@ onUnmounted(() => {
               <!-- Reason — italicized editorial blurb -->
               <p
                 v-if="book.reason"
-                class="text-muted-foreground border-border mt-5 border-l-2 pl-3 text-sm leading-relaxed italic sm:text-base"
+                class="text-muted border-border mt-5 border-l-2 pl-3 text-sm leading-relaxed italic sm:text-base"
               >
                 {{ book.reason }}
               </p>

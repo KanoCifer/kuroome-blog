@@ -174,7 +174,7 @@ watch(
         <div
           class="border-border border-t-accent mx-auto h-8 w-8 animate-spin rounded-full border-2"
         ></div>
-        <p class="text-muted-foreground mt-2">Loading...</p>
+        <p class="text-muted mt-2">Loading...</p>
       </div>
 
       <!-- Error State -->

@@ -25,7 +25,7 @@
           <!-- Close Button -->
           <button
             @click="$emit('close')"
-            class="text-muted-foreground hover:bg-muted hover:text-ink absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+            class="text-muted hover:bg-muted hover:text-ink absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
           >
             <X class="h-5 w-5" />
           </button>
@@ -40,37 +40,26 @@
             <h3 class="text-ink text-xl font-bold tracking-tight">
               上传新图片
             </h3>
-            <p class="text-muted-foreground mt-1 text-sm">添加到你的照片墙</p>
+            <p class="text-muted mt-1 text-sm">添加到你的照片墙</p>
           </div>
 
           <!-- Upload Area -->
-          <div
-            class="group border-border/80 bg-muted/50 hover:border-muted-foreground hover:bg-muted relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-all"
-            @click="triggerFileInput"
-            @dragover.prevent="isDragging = true"
-            @dragleave.prevent="isDragging = false"
-            @drop.prevent="handleDrop"
-            :class="{
-              'border-ink bg-muted scale-[0.98]': isDragging,
-            }"
+          <UploadDropzone
+            accept="image/*"
+            :disabled="isUploading"
+            prompt="点击或拖拽图片到此处"
+            hint="支持 JPG、PNG、GIF、WebP (最大 5MB)"
+            @select="handleSelect"
           >
-            <input
-              ref="fileInputRef"
-              type="file"
-              accept="image/*"
-              class="hidden"
-              @change="handleFileSelect"
-            />
-
-            <!-- Preview -->
-            <div v-if="previewUrl" class="relative w-full">
+            <!-- Preview (shown inside dropzone once a file is selected) -->
+            <div v-if="previewUrl" class="group/preview relative w-full">
               <img
                 :src="previewUrl"
                 alt="Preview"
                 class="mx-auto max-h-48 rounded-xl object-contain shadow-md"
               />
               <div
-                class="absolute inset-0 flex items-center justify-center rounded-xl bg-black/40 opacity-0 transition-opacity group-hover:opacity-100"
+                class="absolute inset-0 flex items-center justify-center rounded-xl bg-black/40 opacity-0 transition-opacity group-hover/preview:opacity-100"
               >
                 <span
                   class="bg-paper/30 rounded-full px-3 py-1.5 text-sm font-medium text-white backdrop-blur-md"
@@ -78,30 +67,12 @@
                 >
               </div>
             </div>
-
-            <!-- Placeholder -->
-            <div v-else class="flex flex-col items-center">
-              <div
-                class="bg-paper ring-border/5 mb-4 flex h-14 w-14 items-center justify-center rounded-full shadow-sm ring-1 transition-transform group-hover:scale-110"
-              >
-                <ImagePlus
-                  class="text-muted-foreground group-hover:text-accent h-6 w-6 transition-colors"
-                  stroke-width="1.5"
-                />
-              </div>
-              <p class="text-ink text-sm font-medium">
-                点击或拖拽图片到此处
-              </p>
-              <p class="text-muted-foreground mt-2 text-xs">
-                支持 JPG、PNG、GIF、WebP (最大 5MB)
-              </p>
-            </div>
-          </div>
+          </UploadDropzone>
 
           <!-- Description Input -->
           <div class="mt-6">
             <label
-              class="text-muted-foreground text-xs font-semibold tracking-wider uppercase"
+              class="text-muted text-xs font-semibold tracking-wider uppercase"
             >
               照片描述（可选）
             </label>
@@ -109,9 +80,17 @@
               v-model="uploadDescription"
               type="text"
               placeholder="为这张图片添加描述..."
-              class="text-ink placeholder:text-muted-foreground focus:border-ink focus:ring-ink border-border/80 bg-paper mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
+              class="text-ink placeholder:text-muted focus:border-ink focus:ring-ink border-border/80 bg-paper mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
             />
           </div>
+
+          <!-- Upload Progress -->
+          <div v-if="isUploading" class="mt-4">
+            <UploadProgress :progress="progress" />
+          </div>
+
+          <!-- Upload Error -->
+          <p v-if="error" class="text-danger mt-2 text-xs">{{ error.message }}</p>
 
           <!-- Actions -->
           <div class="mt-8 flex gap-3">
@@ -140,10 +119,15 @@
 <script setup lang="ts">
 import { Button } from '@/components';
 import { ModalFadeTransition } from '@/components';
-import { ImagePlus, Loader2, UploadCloud, X } from '@lucide/vue';
+import { Loader2, UploadCloud, X } from '@lucide/vue';
 import { motion } from 'motion-v';
-import { useGalleryUpload } from '@/features/pic/composables';
-import type { Picture } from '@/features/pic/composables';
+import { useUpload } from '@/features/upload/composables';
+import { UploadDropzone, UploadProgress } from '@/features/upload/components';
+import { newPictureId, type Picture } from '@/features/pic/composables';
+import { rewriteMediaUrl } from '@/composables';
+import dayjs from 'dayjs';
+import { computed, ref, watch } from 'vue';
+import { useNotificationStore } from '@/stores';
 
 defineProps<{
   visible: boolean;
@@ -154,24 +138,50 @@ const emit = defineEmits<{
   uploaded: [image: Picture];
 }>();
 
-const {
-  fileInputRef,
-  previewUrl,
-  uploadDescription,
-  isUploading,
-  isDragging,
-  canSubmit,
-  triggerFileInput,
-  handleFileSelect,
-  handleDrop,
-  uploadImage,
-} = useGalleryUpload();
+// 统一上传 composable —— 校验 + 上传 + 进度，返回服务端 URL。
+const { upload, isUploading, progress, error } = useUpload({
+  type: 'gallery',
+  maxSize: 5 * 1024 * 1024,
+  allowedTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+});
+
+const selectedFile = ref<File | null>(null);
+const previewUrl = ref<string | null>(null);
+const uploadDescription = ref('');
+
+const canSubmit = computed(() => !!selectedFile.value && !isUploading.value);
+
+// 从 UploadDropzone 收到文件后，记录文件并生成预览 blob URL。
+const handleSelect = (files: File[]) => {
+  const file = files[0];
+  if (!file) return;
+  selectedFile.value = file;
+  previewUrl.value = URL.createObjectURL(file);
+};
+
+// 预览 URL 变化 / 卸载时释放旧 blob URL，避免内存泄漏。
+watch(previewUrl, (_, prev) => {
+  if (prev) URL.revokeObjectURL(prev);
+});
 
 const onConfirm = async () => {
-  const image = await uploadImage();
-  if (image) {
+  if (!selectedFile.value) return;
+
+  try {
+    const url = await upload(selectedFile.value);
+    useNotificationStore().success('图片上传成功');
+
+    const image: Picture = {
+      id: newPictureId(),
+      uploadedAt: dayjs().toISOString(),
+      url: rewriteMediaUrl(url),
+      description: uploadDescription.value || '',
+    };
+
     emit('uploaded', image);
     emit('close');
+  } catch {
+    useNotificationStore().error('图片上传失败');
   }
 };
 </script>

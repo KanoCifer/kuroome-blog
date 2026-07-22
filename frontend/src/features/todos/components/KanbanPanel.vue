@@ -39,13 +39,11 @@
               :class="col.dotClass"
               aria-hidden="true"
             />
-            <h3
-              class="text-ink font-serif text-sm font-medium tracking-tight"
-            >
+            <h3 class="text-ink font-serif text-sm font-medium tracking-tight">
               {{ col.label }}
             </h3>
             <span
-              class="text-muted-foreground bg-paper rounded-full px-1.5 py-px text-[10px] tabular-nums"
+              class="text-muted bg-paper rounded-full px-1.5 py-px text-[10px] tabular-nums"
             >
               {{ columnCount(col.id) }}
             </span>
@@ -62,12 +60,12 @@
             class="flex flex-col gap-2"
           >
             <div
-              class="text-muted-foreground flex items-center gap-1.5 px-1 font-serif text-xs tracking-widest"
+              class="text-muted flex items-center gap-1.5 px-1 font-serif text-xs tracking-widest"
             >
               <MemberAvatar :user-id="lane.userId" size="xs" />
               {{ lane.label }}
-              <span class="text-muted-foreground/60 tabular-nums">·</span>
-              <span class="text-muted-foreground/60 tabular-nums">{{
+              <span class="text-muted/60 tabular-nums">·</span>
+              <span class="text-muted/60 tabular-nums">{{
                 lane.tasks.length
               }}</span>
             </div>
@@ -88,14 +86,14 @@
           <!-- 空列提示 -->
           <div
             v-if="!swimlanesFor(col.id).length"
-            class="text-muted-foreground/60 flex flex-1 flex-col items-center justify-center gap-1.5 py-6 text-center text-xs"
+            class="text-muted/60 flex flex-1 flex-col items-center justify-center gap-1.5 py-6 text-center text-xs"
           >
             <template v-if="dragOverColumn === col.id">
               <span class="font-serif text-sm">松开以放置</span>
             </template>
             <template v-else>
               <svg
-                class="text-muted-foreground/30 h-5 w-5"
+                class="text-muted/30 h-5 w-5"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -109,7 +107,7 @@
                 />
               </svg>
               <span class="font-serif text-sm">此列暂无任务</span>
-              <span class="text-muted-foreground/50">从待办拖一个过来</span>
+              <span class="text-muted/50">从待办拖一个过来</span>
             </template>
           </div>
         </div>
@@ -160,7 +158,7 @@ const KANBAN_COLUMNS: KanbanColumn[] = [
     label: '待办',
     statuses: ['待评估', '待排期'],
     targetStatus: '待评估',
-    dotClass: 'bg-muted-foreground',
+    dotClass: 'bg-muted',
   },
   {
     id: 'doing',

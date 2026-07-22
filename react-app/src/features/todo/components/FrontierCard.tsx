@@ -35,7 +35,7 @@ export function FrontierCard({
           <PriorityBadge priority={task.priority} />
           <KindBadge kind={task.kind} />
           {task.scope && (
-            <span className="text-muted-foreground border-border rounded-full border px-1.5 py-px text-[10px]">
+            <span className="text-muted border-border rounded-full border px-1.5 py-px text-[10px]">
               {task.scope}
             </span>
           )}
@@ -46,9 +46,7 @@ export function FrontierCard({
           )}
         </span>
 
-        <span className="text-ink text-sm font-medium">
-          {task.title}
-        </span>
+        <span className="text-ink text-sm font-medium">{task.title}</span>
 
         {task.description && (
           <span
@@ -64,9 +62,7 @@ export function FrontierCard({
         {task.due_date ? (
           <span
             className={`flex items-center gap-1 text-[10px] ${
-              overdue(task.due_date)
-                ? 'text-destructive'
-                : 'text-muted-foreground'
+              overdue(task.due_date) ? 'text-destructive' : 'text-muted'
             }`}
           >
             <svg
@@ -93,7 +89,7 @@ export function FrontierCard({
               e.stopPropagation();
               onCycle(task.slug);
             }}
-            className="text-muted-foreground hover:bg-muted hover:text-accent focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
+            className="text-muted hover:bg-muted hover:text-accent focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
             title="推进状态"
             aria-label="推进状态"
           >
@@ -117,7 +113,7 @@ export function FrontierCard({
               e.stopPropagation();
               onDelete(task.slug);
             }}
-            className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
+            className="text-muted hover:bg-destructive/10 hover:text-destructive focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
             title="删除"
             aria-label="删除"
           >

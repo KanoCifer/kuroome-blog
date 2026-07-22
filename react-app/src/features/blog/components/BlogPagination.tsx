@@ -41,8 +41,8 @@ export function BlogPagination({
             onClick={() => onPageChange(pagination.prev_num || 1)}
             className={`focus-visible:ring-ring inline-flex h-10 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${
               pagination.has_prev
-                ? 'text-muted-foreground hover:bg-muted hover:text-ink'
-                : 'text-muted-foreground/50 cursor-not-allowed'
+                ? 'text-muted hover:bg-muted hover:text-ink'
+                : 'text-muted/50 cursor-not-allowed'
             }`}
           >
             <span aria-hidden="true">&laquo;</span>
@@ -59,7 +59,7 @@ export function BlogPagination({
                 className={`focus-visible:ring-ring inline-flex h-10 min-w-10 items-center justify-center rounded-xl px-3 text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${
                   p === currentPage
                     ? 'bg-accent text-accent'
-                    : 'text-muted-foreground hover:bg-muted hover:text-ink'
+                    : 'text-muted hover:bg-muted hover:text-ink'
                 }`}
               >
                 {p}
@@ -67,7 +67,7 @@ export function BlogPagination({
             </li>
           ) : (
             <li key={i}>
-              <span className="text-muted-foreground/60 px-1 text-sm">{p}</span>
+              <span className="text-muted/60 px-1 text-sm">{p}</span>
             </li>
           ),
         )}
@@ -81,8 +81,8 @@ export function BlogPagination({
             }
             className={`focus-visible:ring-ring inline-flex h-10 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${
               pagination.has_next
-                ? 'text-muted-foreground hover:bg-muted hover:text-ink'
-                : 'text-muted-foreground/50 cursor-not-allowed'
+                ? 'text-muted hover:bg-muted hover:text-ink'
+                : 'text-muted/50 cursor-not-allowed'
             }`}
           >
             <span className="hidden sm:inline">下一页</span>

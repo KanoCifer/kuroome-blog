@@ -30,7 +30,7 @@ const levelTextColor: Record<string, string> = {
   好: 'text-accent',
   一般: 'text-warning',
   差: 'text-destructive',
-  空军: 'text-muted-foreground',
+  空军: 'text-muted',
 };
 
 /**
@@ -71,16 +71,12 @@ const handleFeedback = () => {
     <!-- 标题 + 刷新 + 图标 -->
     <div class="mb-4 flex items-start justify-between gap-3">
       <div>
-        <h3 class="text-ink text-lg font-semibold tracking-tight">
-          钓鱼指数
-        </h3>
-        <p class="text-muted-foreground mt-0.5 text-sm">
-          基于实时天气、潮汐综合计算
-        </p>
+        <h3 class="text-ink text-lg font-semibold tracking-tight">钓鱼指数</h3>
+        <p class="text-muted mt-0.5 text-sm">基于实时天气、潮汐综合计算</p>
       </div>
       <div class="flex shrink-0 items-center gap-2">
         <button
-          class="text-muted-foreground hover:bg-muted hover:text-ink inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+          class="text-muted hover:bg-muted hover:text-ink inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           type="button"
           :disabled="loading"
           @click="emit('refresh')"
@@ -97,9 +93,7 @@ const handleFeedback = () => {
     </div>
 
     <!-- 主数据 / loading / error -->
-    <p v-if="loading && !indexData" class="text-muted-foreground text-sm">
-      加载中...
-    </p>
+    <p v-if="loading && !indexData" class="text-muted text-sm">加载中...</p>
     <p v-else-if="error && !indexData" class="text-destructive text-sm">
       {{ error }}
     </p>
@@ -107,13 +101,13 @@ const handleFeedback = () => {
       <div class="mb-4 flex items-end gap-3">
         <span
           class="text-5xl leading-none font-bold tabular-nums"
-          :class="levelTextColor[indexData.level] || 'text-muted-foreground'"
+          :class="levelTextColor[indexData.level] || 'text-muted'"
         >
           {{ indexData.fishing_index }}
         </span>
         <span
           class="mb-1 text-lg font-medium"
-          :class="levelTextColor[indexData.level] || 'text-muted-foreground'"
+          :class="levelTextColor[indexData.level] || 'text-muted'"
         >
           {{ indexData.level }}
         </span>
@@ -122,19 +116,19 @@ const handleFeedback = () => {
       <!-- 三联指标 -->
       <div class="mb-4 grid grid-cols-3 gap-2 text-center text-xs">
         <div class="bg-muted/40 rounded-lg px-2 py-2">
-          <p class="text-muted-foreground">默认权重</p>
+          <p class="text-muted">默认权重</p>
           <p class="text-ink mt-1 font-medium tabular-nums">
             {{ indexData.expert_score }}
           </p>
         </div>
         <div class="bg-muted/40 rounded-lg px-2 py-2">
-          <p class="text-muted-foreground">权重调整</p>
+          <p class="text-muted">权重调整</p>
           <p class="text-ink mt-1 font-medium tabular-nums">
             {{ indexData.residual > 0 ? '+' : '' }}{{ indexData.residual }}
           </p>
         </div>
         <div class="bg-muted/40 rounded-lg px-2 py-2">
-          <p class="text-muted-foreground">综合</p>
+          <p class="text-muted">综合</p>
           <p class="text-ink mt-1 font-medium tabular-nums">
             {{ indexData.fishing_index }}
           </p>
@@ -147,9 +141,7 @@ const handleFeedback = () => {
         open
         class="text-xs"
       >
-        <summary
-          class="text-muted-foreground hover:text-ink cursor-pointer select-none"
-        >
+        <summary class="text-muted hover:text-ink cursor-pointer select-none">
           特征详情
         </summary>
         <div class="mt-2 grid grid-cols-3 gap-2">
@@ -180,6 +172,6 @@ const handleFeedback = () => {
         提交钓鱼反馈
       </button>
     </template>
-    <p v-else class="text-muted-foreground text-sm">暂无数据</p>
+    <p v-else class="text-muted text-sm">暂无数据</p>
   </DashboardCard>
 </template>

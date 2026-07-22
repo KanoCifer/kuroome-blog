@@ -7,10 +7,8 @@ const { cardIndex, cardImages, setCardIndex } = useCardImage();
 <template>
   <div class="space-y-6">
     <div>
-      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">
-        卡片配图
-      </h2>
-      <p class="text-muted-foreground mb-4 text-xs italic">Card cover image</p>
+      <h2 class="text-ink mb-1 font-serif text-lg font-semibold">卡片配图</h2>
+      <p class="text-muted mb-4 text-xs italic">Card cover image</p>
 
       <!-- 当前选中卡片预览 — 横版 -->
       <div

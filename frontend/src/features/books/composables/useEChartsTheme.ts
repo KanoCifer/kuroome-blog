@@ -31,7 +31,7 @@ export function useEChartsTheme() {
   // 显式 touch themeVersion 让 computed 跟随主题切换重算
   const subtextColor = computed(() => {
     void themeVersion.value;
-    return resolveCssColor('--muted-foreground');
+    return resolveCssColor('--muted');
   });
   const axisColor = computed(() => {
     void themeVersion.value;
@@ -43,7 +43,7 @@ export function useEChartsTheme() {
   });
   const primaryColor = computed(() => {
     void themeVersion.value;
-    return resolveCssColor('--primary');
+    return resolveCssColor('--accent');
   });
   const mutedFillColor = computed(() => {
     void themeVersion.value;

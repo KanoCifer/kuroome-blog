@@ -99,10 +99,8 @@ export function ConfirmDialog({
                 </svg>
               </span>
               <div className="min-w-0 flex-1">
-                <h2 className="text-ink text-base font-semibold">
-                  {title}
-                </h2>
-                <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
+                <h2 className="text-ink text-base font-semibold">{title}</h2>
+                <p className="text-muted mt-1 text-sm leading-relaxed">
                   {message}
                 </p>
               </div>
@@ -112,7 +110,7 @@ export function ConfirmDialog({
               <button
                 type="button"
                 onClick={onClose}
-                className="text-muted-foreground hover:bg-muted focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                className="text-muted hover:bg-muted focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
               >
                 {cancelText}
               </button>

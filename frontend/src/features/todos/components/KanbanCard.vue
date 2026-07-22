@@ -16,7 +16,7 @@
       @click="$emit('open', task.slug)"
     >
       <svg
-        class="text-muted-foreground/50 group-hover:text-muted-foreground mt-0.5 h-3.5 w-3.5 shrink-0 transition-colors"
+        class="text-muted/50 group-hover:text-muted mt-0.5 h-3.5 w-3.5 shrink-0 transition-colors"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -31,7 +31,7 @@
       </svg>
       <span
         class="text-ink line-clamp-2 flex-1 text-sm font-medium"
-        :class="{ 'text-muted-foreground line-through': done }"
+        :class="{ 'text-muted line-through': done }"
         >{{ task.title }}</span
       >
     </button>
@@ -43,7 +43,7 @@
       <KindBadge v-if="task.kind === 'subtask'" :kind="task.kind" />
       <span
         v-if="task.scope"
-        class="text-muted-foreground border-border rounded-full border px-1.5 py-px text-[10px]"
+        class="text-muted border-border rounded-full border px-1.5 py-px text-[10px]"
       >
         {{ task.scope }}
       </span>
@@ -63,9 +63,7 @@
           v-if="task.due_date"
           class="flex items-center gap-1 text-[10px]"
           :class="
-            overdue(task.due_date) && !done
-              ? 'text-destructive'
-              : 'text-muted-foreground'
+            overdue(task.due_date) && !done ? 'text-destructive' : 'text-muted'
           "
         >
           <svg class="h-2.5 w-2.5" viewBox="0 0 20 20" fill="currentColor">
@@ -85,7 +83,7 @@
         <button
           v-if="!done"
           type="button"
-          class="text-muted-foreground hover:bg-muted hover:text-accent focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
+          class="text-muted hover:bg-muted hover:text-accent focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
           title="推进状态"
           aria-label="推进状态"
           @click="$emit('cycle', task.slug)"
@@ -106,7 +104,7 @@
         </button>
         <button
           type="button"
-          class="text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
+          class="text-muted hover:bg-destructive/10 hover:text-destructive focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
           title="删除"
           aria-label="删除"
           @click="$emit('delete', task.slug)"
