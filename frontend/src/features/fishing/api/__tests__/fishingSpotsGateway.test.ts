@@ -10,7 +10,7 @@ vi.mock('@/utils/apiClient', () => ({
   },
 }));
 
-import { apiClient } from '@/lib';
+import { apiClient } from '@/api/request';
 import { fishingSpotsGateway } from '@/features/fishing/api/fishingSpotsGateway';
 import type { FishingSpot } from '@/features/fishing/types';
 

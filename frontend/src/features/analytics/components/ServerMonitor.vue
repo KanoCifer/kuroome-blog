@@ -336,7 +336,7 @@ import dayjs from 'dayjs';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import VChart from 'vue-echarts';
 import { useOrigin } from '@/composables';
-import { getAccessToken } from '@/lib/auth';
+import { getAccessToken } from '@/api/auth';
 
 // Types
 interface ServerStatus {

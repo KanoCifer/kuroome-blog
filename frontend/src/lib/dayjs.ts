@@ -1,8 +1,12 @@
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 import utc from 'dayjs/plugin/utc';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
+dayjs.extend(relativeTime);
 dayjs.extend(utc);
+
+export default dayjs;
 
 // ── date.ts ──────────────────────────────────────────────────────────
 
@@ -21,9 +25,7 @@ export interface WeekRangeOptions {
 }
 
 /** 本周起止日期范围 "YYYY-MM-DD ~ YYYY-MM-DD"。 */
-export function formatCurrentWeekRange(
-  opts: WeekRangeOptions = {},
-): string {
+export function formatCurrentWeekRange(opts: WeekRangeOptions = {}): string {
   const { weekStartsOn = 1 } = opts;
   const now = new Date();
   const start = new Date(now);

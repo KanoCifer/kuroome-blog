@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib';
+import { apiClient } from '@/api/request';
 
 export interface MapGateway {
   getSecurityKey(): Promise<{ securityJsCode: string }>;

@@ -14,7 +14,7 @@ vi.mock('@/features/blog/composables/useSseStream', () => ({
   consumeSseStream: vi.fn(),
 }));
 
-import { apiClient } from '@/lib';
+import { apiClient } from '@/api/request';
 import { consumeSseStream } from '@/features/blog/composables/useSseStream';
 
 describe('llmGateway', () => {

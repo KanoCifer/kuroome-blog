@@ -1,4 +1,4 @@
-import { apiClient, type ApiResponse } from '@/lib';
+import { apiClient, type ApiResponse } from '@/api/request';
 
 import type {
   BookRecommendItem,

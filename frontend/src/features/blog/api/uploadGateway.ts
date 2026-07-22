@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib';
+import { apiClient } from '@/api/request';
 
 export interface UploadGateway {
   uploadEditorImage(formData: FormData): Promise<{ url: string }>;

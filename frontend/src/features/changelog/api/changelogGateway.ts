@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib';
+import { apiClient } from '@/api/request';
 
 import type { Changelog } from '@/features/changelog/types';
 

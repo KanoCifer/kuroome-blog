@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib';
+import { apiClient } from '@/api/request';
 
 export interface SocialGateway {
   getLikes(): Promise<{ likes_count: number }>;

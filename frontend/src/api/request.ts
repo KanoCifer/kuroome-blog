@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import { getAccessToken } from '@/lib/auth';
+import { getAccessToken } from '@/api/auth';
 
 export interface ApiResponse<T = unknown> {
   message: string;

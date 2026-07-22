@@ -1,7 +1,4 @@
 import { createHead } from '@vueuse/head';
-import dayjs from 'dayjs';
-import 'dayjs/locale/zh-cn';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import 'highlight.js/styles/atom-one-dark.css';
 import { createPinia, setActivePinia } from 'pinia';
 import { createApp } from 'vue';
@@ -13,6 +10,7 @@ import './styles/base.scss'; // font-face sass
 import './styles/route-transitions.css'; // 路由过渡动画 keyframes
 import './styles/squircle.css';
 import './lib/echarts';
+import './lib/dayjs';
 import { initVisitorWebSocket } from './lib';
 import router from './router';
 
@@ -26,8 +24,6 @@ if (typeof document !== 'undefined') {
   document.documentElement.setAttribute('data-color-scheme', scheme);
 }
 
-dayjs.extend(relativeTime);
-dayjs.locale('zh-cn');
 const app = createApp(App);
 const pinia = createPinia();
 const head = createHead();

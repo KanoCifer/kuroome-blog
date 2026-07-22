@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib';
+import { apiClient } from '@/api/request';
 import { type ApiResponse } from '@/lib';
 
 import type {

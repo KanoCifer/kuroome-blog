@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib';
+import { apiClient } from '@/api/request';
 
 import type { Device, DeviceInput } from '@/features/device/types';
 

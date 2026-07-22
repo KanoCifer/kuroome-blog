@@ -11,7 +11,7 @@ vi.mock('@/utils/apiClient', () => ({
   },
 }));
 
-import { apiClient } from '@/lib';
+import { apiClient } from '@/api/request';
 
 describe('blogGateway (tags migration)', () => {
   beforeEach(() => {
