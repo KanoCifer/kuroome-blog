@@ -1,5 +1,5 @@
 import { apiClient } from '@/api/request';
-import { getAccessToken } from '@/api/auth';
+import { tokenService } from '@/api/tokenService';
 
 // ── devtask service-JWT 缓存 ──
 // /v3/dev-tasks/* 走 DevTaskMiddleware（service-JWT 鉴权），与用户 JWT 是两套体系。
@@ -34,7 +34,7 @@ export function clearDevTaskToken(): void {
 export async function getDevTaskToken(): Promise<string> {
   // 未登录时直接短路：无用户 access-token 就不应发起任何 devtask 请求，
   // 否则 devtaskRequest 拦截器会反复打 v3/dev-task/token 形成循环。
-  if (!getAccessToken()) {
+  if (!tokenService.get()) {
     return Promise.reject(new Error('未登录，无法获取 devtask token'));
   }
   if (cache && isUsable(cache)) return cache.token;

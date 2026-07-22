@@ -336,7 +336,7 @@ import dayjs from 'dayjs';
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
 import VChart from 'vue-echarts';
 import { useOrigin } from '@/composables';
-import { getAccessToken } from '@/api/auth';
+import { tokenService } from '@/api/tokenService';
 
 // Types
 interface ServerStatus {
@@ -658,7 +658,7 @@ const fetchStatusSSE = async () => {
     await fetchEventSource(useOrigin('/v3/status/server/status/stream'), {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${getAccessToken()}`,
+        Authorization: `Bearer ${tokenService.get()}`,
       },
       signal: ctrl.signal,
       async onopen() {

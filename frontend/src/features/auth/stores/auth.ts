@@ -1,7 +1,7 @@
 import { createAuthGateway } from '@/features/auth/api/authGateway';
 import { registerTokenRefresher } from '@/lib';
 import { refreshAccessToken } from '@/features/auth/helper/refresh';
-import { getAccessToken as getToken, setAccessToken } from '@/api/auth';
+import { tokenService } from '@/api/tokenService';
 import { reconnectWs } from '@/lib';
 import type { UserInfo } from '@/features/auth/types';
 import { userCache } from '@/features/auth/helper/userCache';
@@ -27,7 +27,7 @@ export const useAuthStore = defineStore('auth', () => {
   //
   // 获取accessToken
   const getAccessToken = () => {
-    return getToken();
+    return tokenService.get();
   };
 
   // 2. 获取当前登录用户信息
@@ -99,7 +99,7 @@ export const useAuthStore = defineStore('auth', () => {
       const userData = res.user;
       user.value = userData;
       accessToken.value = res.accessToken;
-      setAccessToken(res.accessToken);
+      tokenService.save(res.accessToken);
       userCache.set(userData);
       // 启动心跳上报
       reconnectWs();
@@ -123,7 +123,7 @@ export const useAuthStore = defineStore('auth', () => {
       const userData = res.user;
       user.value = userData;
       accessToken.value = res.accessToken;
-      setAccessToken(res.accessToken);
+      tokenService.save(res.accessToken);
       userCache.set(userData);
 
       reconnectWs();
@@ -153,7 +153,7 @@ export const useAuthStore = defineStore('auth', () => {
     } finally {
       user.value = null;
       accessToken.value = '';
-      setAccessToken('');
+      tokenService.clear();
       userCache.clear();
 
       // 停止心跳上报

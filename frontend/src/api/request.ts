@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import { getAccessToken } from '@/api/auth';
+import { tokenService } from '@/api/tokenService';
 
 export interface ApiResponse<T = unknown> {
   message: string;
@@ -19,7 +19,7 @@ export const apiClient = axios.create({
 
 // 动态注入 Authorization header
 apiClient.interceptors.request.use((config) => {
-  const token = getAccessToken();
+  const token = tokenService.get();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

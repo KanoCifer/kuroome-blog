@@ -1,5 +1,5 @@
 export * from './dayjs';
-export * from '../api/auth';
+export { tokenService } from '../api/tokenService';
 export * from '../api/request';
 export * from './websocket';
 export * from './color';

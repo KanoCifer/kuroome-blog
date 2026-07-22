@@ -2,7 +2,7 @@ import axios, {
   type CreateAxiosDefaults,
   type InternalAxiosRequestConfig,
 } from 'axios';
-import { setAccessToken } from '@/api/auth';
+import { tokenService } from '@/api/tokenService';
 
 const refreshTokenEndpoint = 'v3/refresh-token';
 
@@ -45,7 +45,7 @@ export async function refreshToken(): Promise<void> {
   } as RefreshRequestConfig);
   const accessToken = res.data?.data?.access_token;
   if (accessToken) {
-    setAccessToken(accessToken);
+    tokenService.save(accessToken);
   }
 }
 

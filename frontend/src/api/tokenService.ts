@@ -1,3 +1,5 @@
+// access-JWT 内存存储（模块级单例）。
+
 let accessToken = '';
 
 export const tokenService = {
