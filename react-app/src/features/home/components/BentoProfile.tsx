@@ -5,18 +5,7 @@ import { useNotificationStore } from '@/stores/notificationState';
 import { useLottie } from 'lottie-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-
-const VUE_SITE_URL = 'https://kanocifer.chat';
-
-function setCookie(name: string, value: string, days: number) {
-  const expires = new Date(Date.now() + days * 864e5).toUTCString();
-  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
-}
-
-function switchToVue() {
-  setCookie('device_force', 'vue', 30);
-  window.location.href = VUE_SITE_URL;
-}
+import { switchToVue } from '@/lib/deviceSwitch';
 
 function LikeAnimation() {
   const style = {

@@ -8,18 +8,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { SPRING, EASE } from '@/constants/springs';
-
-const VUE_SITE_URL = 'https://kanocifer.chat';
-
-function setCookie(name: string, value: string, days: number) {
-  const expires = new Date(Date.now() + days * 864e5).toUTCString();
-  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
-}
-
-function switchToVue() {
-  setCookie('device_force', 'vue', 30);
-  window.location.href = VUE_SITE_URL;
-}
+import { switchToVue } from '@/lib/deviceSwitch';
 
 function LikeAnimation() {
   const style = {

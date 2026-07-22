@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react';
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useCallback, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/features/auth';
 import { BottomSheet } from '@/components';
+import { switchToVue } from '@/lib/deviceSwitch';
 import { useNavVisibility } from './NavVisibilityContext';
 
 interface MenuItemProps {
@@ -36,16 +37,13 @@ interface NavItemProps {
 const ICON_SIZE = 'size-[22px]';
 const NAV_ITEM_WIDTH = 64; // px, matches NavItem link w-16
 
-function setCookie(name: string, value: string, days: number = 30) {
-  const expires = new Date();
-  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
-  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;domain=.kanocifer.chat`;
-}
-
-function switchToVue() {
-  setCookie('device_force', 'vue', 30);
-  window.location.href = 'https://kanocifer.chat';
-}
+const MENU_ITEMS = [
+  { path: '/bookshelf', label: 'Bookshelf', icon: <BookOpen className="h-6 w-6" /> },
+  { path: '/moments', label: 'Moments', icon: <FileText className="h-6 w-6" /> },
+  { path: '/messages', label: 'Messages', icon: <MessageCircle className="h-6 w-6" /> },
+  { path: '/settings', label: 'Settings', icon: <Settings className="h-6 w-6" /> },
+  { path: '/about', label: 'About', icon: <Info className="h-6 w-6" /> },
+] as const;
 
 function NavItem({ icon, to }: NavItemProps) {
   return (
@@ -78,15 +76,17 @@ function MenuItem({ icon, label, onClick }: MenuItemProps) {
 }
 
 export function BasicNav() {
-  const auth = useAuthStore();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
   const { hidden } = useNavVisibility();
 
   const handleLogout = () => {
-    auth.logout();
+    logout();
     navigate('/');
   };
   const [showMenu, setShowMenu] = useState(false);
+  const onClose = useCallback(() => setShowMenu(false), []);
 
   const handleNav = (path: string) => {
     setShowMenu(false);
@@ -94,11 +94,6 @@ export function BasicNav() {
   };
 
   const location = useLocation();
-
-  // 判断当前路径是否属于"更多"范畴
-  const isMore = useMemo(() => {
-    return !['/', '/blog', '/rss', '/moments'].includes(location.pathname);
-  }, [location.pathname]);
 
   // 当前激活的导航索引（0-2 为主线，3 为「更多」）
   const activeIndex = useMemo(() => {
@@ -114,7 +109,7 @@ export function BasicNav() {
       {/* More Menu — 底部抽屉 */}
       <BottomSheet
         open={showMenu}
-        onClose={() => setShowMenu(false)}
+        onClose={onClose}
         renderHeader={() => (
           <div className="shrink-0 px-5 pt-3 pb-2">
             <div className="bg-muted mx-auto h-1.5 w-10 rounded-full" />
@@ -123,33 +118,16 @@ export function BasicNav() {
       >
         <div className="px-5 pb-8">
           <div className="grid grid-cols-1 gap-2">
-            <MenuItem
-              icon={<BookOpen className="h-6 w-6" />}
-              label="Bookshelf"
-              onClick={() => handleNav('/bookshelf')}
-            />
-            <MenuItem
-              icon={<FileText className="h-6 w-6" />}
-              label="Moments"
-              onClick={() => handleNav('/moments')}
-            />
-            <MenuItem
-              icon={<MessageCircle className="h-6 w-6" />}
-              label="Messages"
-              onClick={() => handleNav('/messages')}
-            />
-            <MenuItem
-              icon={<Settings className="h-6 w-6" />}
-              label="Settings"
-              onClick={() => handleNav('/settings')}
-            />
-            <MenuItem
-              icon={<Info className="h-6 w-6" />}
-              label="About"
-              onClick={() => handleNav('/about')}
-            />
+            {MENU_ITEMS.map((item) => (
+              <MenuItem
+                key={item.path}
+                icon={item.icon}
+                label={item.label}
+                onClick={() => handleNav(item.path)}
+              />
+            ))}
             {/* Auth section */}
-            {!auth.isAuthenticated ? (
+            {!isAuthenticated ? (
               <>
                 <MenuItem
                   icon={<LogIn className="h-6 w-6" />}
@@ -211,7 +189,7 @@ export function BasicNav() {
                   aria-label="更多导航"
                   aria-expanded={showMenu}
                 >
-                  {showMenu || isMore ? (
+                  {activeIndex === 3 ? (
                     <Grid2x2 className={ICON_SIZE} />
                   ) : (
                     <MoreHorizontal className={ICON_SIZE} />
