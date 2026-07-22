@@ -58,25 +58,14 @@ export function SettingModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const {
-    theme,
-    font,
-    scheme,
-    showFooter,
-    setTheme,
-    setFont,
-    setScheme,
-    toggleFooter,
-  } = useThemeState(
+  const { theme, font, scheme, setTheme, setFont, setScheme } = useThemeState(
     useShallow((s) => ({
       theme: s.theme,
       font: s.font,
       scheme: s.scheme,
-      showFooter: s.showFooter,
       setTheme: s.setTheme,
       setFont: s.setFont,
       setScheme: s.setScheme,
-      toggleFooter: s.toggleFooter,
     })),
   );
 
@@ -121,33 +110,6 @@ export function SettingModal({
     >
       <div className="px-5 pb-8">
         <div className="space-y-8">
-          {/* 页面元素 */}
-          <section>
-            <h2 className="text-foreground mb-3 font-serif text-base font-semibold">
-              页面元素
-            </h2>
-            <button
-              onClick={toggleFooter}
-              className="border-border hover:border-primary bg-background flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-3 transition-colors"
-            >
-              <div className="text-left">
-                <div className="text-foreground text-sm font-medium">
-                  显示页脚
-                </div>
-                <div className="text-muted-foreground mt-0.5 text-xs">
-                  Show footer on every page
-                </div>
-              </div>
-              <div
-                className={`h-6 w-11 shrink-0 rounded-full p-0.5 transition-colors ${showFooter ? 'bg-primary' : 'bg-muted'}`}
-              >
-                <div
-                  className={`bg-background h-5 w-5 rounded-full shadow-md transition-transform ${showFooter ? 'translate-x-5' : ''}`}
-                />
-              </div>
-            </button>
-          </section>
-
           {/* 主题模式 */}
           <section>
             <h2 className="text-foreground mb-3 font-serif text-base font-semibold">

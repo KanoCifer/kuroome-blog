@@ -14,13 +14,11 @@ import {
   Monitor,
   MoreHorizontal,
   Newspaper,
-  Palette,
   Rss,
   Settings,
   UserPlus,
 } from 'lucide-react';
-import { useAuthStore } from '../../features/auth';
-import { useThemeState } from '../../stores/themeState';
+import { useAuthStore } from '@/features/auth';
 import { BottomSheet } from '@/components';
 import { useNavVisibility } from './NavVisibilityContext';
 
@@ -81,12 +79,8 @@ function MenuItem({ icon, label, onClick }: MenuItemProps) {
 
 export function BasicNav() {
   const auth = useAuthStore();
-  const themeStore = useThemeState();
   const navigate = useNavigate();
   const { hidden } = useNavVisibility();
-  const toggleTheme = (e: React.MouseEvent) => {
-    themeStore.toggleThemeWithAnimation(e);
-  };
 
   const handleLogout = () => {
     auth.logout();
@@ -148,11 +142,6 @@ export function BasicNav() {
               icon={<Settings className="h-6 w-6" />}
               label="Settings"
               onClick={() => handleNav('/settings')}
-            />
-            <MenuItem
-              icon={<Palette className="h-6 w-6" />}
-              label="Theme"
-              onClick={(e) => toggleTheme(e)}
             />
             <MenuItem
               icon={<Info className="h-6 w-6" />}

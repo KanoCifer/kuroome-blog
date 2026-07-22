@@ -18,11 +18,11 @@ const isColorScheme = (v: unknown): v is ColorScheme =>
 
 const safeScheme = (v: unknown): ColorScheme =>
   isColorScheme(v) ? v : 'paper';
+
 interface ThemeState {
   theme: Theme;
   font: FontFamily;
   scheme: ColorScheme;
-  showFooter: boolean;
   bgBlur: number;
   bgBrightness: number;
   bgScale: number;
@@ -40,7 +40,6 @@ interface ThemeState {
     clientX: number;
     clientY: number;
   }) => void;
-  toggleFooter: () => void;
 }
 
 const BG_DEFAULTS = { blur: 8, brightness: 1.0, scale: 1.05 } as const;
@@ -80,7 +79,6 @@ export const useThemeState = create<ThemeState>()(
       theme: 'system',
       font: 'default',
       scheme: 'paper',
-      showFooter: localStorage.getItem('show-footer') !== 'false',
       bgBlur: Number(localStorage.getItem('bg-blur')) || BG_DEFAULTS.blur,
       bgBrightness:
         Number(localStorage.getItem('bg-brightness')) || BG_DEFAULTS.brightness,
@@ -117,12 +115,6 @@ export const useThemeState = create<ThemeState>()(
         playThemeTransition(event, nextTheme, undefined, () => {
           get().setTheme(nextTheme);
         });
-      },
-
-      toggleFooter: () => {
-        const next = !get().showFooter;
-        set({ showFooter: next });
-        localStorage.setItem('show-footer', String(next));
       },
 
       setBgBlur: (val) => {
@@ -169,7 +161,6 @@ export const useThemeState = create<ThemeState>()(
         theme: state.theme,
         font: state.font,
         scheme: state.scheme,
-        showFooter: state.showFooter,
         bgBlur: state.bgBlur,
         bgBrightness: state.bgBrightness,
         bgScale: state.bgScale,

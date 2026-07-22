@@ -31,7 +31,7 @@ export function BasicLayout() {
         <main className="relative max-w-dvw scroll-smooth">
           <Outlet />
         </main>
-        <BackToTop className="fixed right-4 bottom-[calc(7.5rem+env(safe-area-inset-bottom,0px))]" />
+        <BackToTop />
       </div>
 
       <CookieConsent />
