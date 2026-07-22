@@ -44,70 +44,14 @@ func NewUploadHandler(uploadSvc service.Uploader, avatarView avatarViewer) *Uplo
 	return &UploadHandler{uploadSvc: uploadSvc, avatarView: avatarView}
 }
 
-// UploadBlogImage POST /upload-image 和 POST /blog/upload-image —— 博客文章图片上传。
-// 校验图片类型后保存到 posts/{userID}/，返回公开访问 URL。需登录。
-// multipart form field: file。
-func (h *UploadHandler) UploadBlogImage(c *gin.Context) {
-	fileHeader, err := c.FormFile("file")
-	if err != nil {
-		response.APIError(c, "未收到上传图片", http.StatusBadRequest)
-		return
-	}
-
-	f, err := fileHeader.Open()
-	if err != nil {
-		response.APIError(c, "读取图片失败", http.StatusBadRequest)
-		return
-	}
-	defer f.Close()
-
-	userID := uint(c.GetInt("user_id"))
-	rel, err := h.uploadSvc.UploadBlogImage(c.Request.Context(), userID, fileHeader.Filename, fileHeader.Header.Get("Content-Type"), f)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "upload blog image", "error", err)
-		response.APIError(c, err.Error(), uploadStatus(err))
-		return
-	}
-
-	response.Success(c, gin.H{
-		"url":      "/v3/media/" + rel,
-		"filename": rel,
-	}, "图片上传成功")
-}
-
-// UploadGalleryImage POST /upload-gallery-image —— 图片墙上传。
-// 校验图片类型后保存到 gallery/{userID}/，返回公开访问 URL。需登录。
-// multipart form field: file。
-func (h *UploadHandler) UploadGalleryImage(c *gin.Context) {
-	fileHeader, err := c.FormFile("file")
-	if err != nil {
-		response.APIError(c, "未收到上传图片", http.StatusBadRequest)
-		return
-	}
-
-	f, err := fileHeader.Open()
-	if err != nil {
-		response.APIError(c, "读取图片失败", http.StatusBadRequest)
-		return
-	}
-	defer f.Close()
-
-	userID := uint(c.GetInt("user_id"))
-	rel, err := h.uploadSvc.UploadGalleryImage(c.Request.Context(), userID, fileHeader.Filename, fileHeader.Header.Get("Content-Type"), f)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "upload gallery image", "error", err)
-		response.APIError(c, err.Error(), uploadStatus(err))
-		return
-	}
-
-	response.Success(c, gin.H{
-		"url":      "/v3/media/" + rel,
-		"filename": rel,
-	}, "图片上传成功")
-}
-
-// Upload POST /upload —— 通用文件上传（任意类型），保存到 uploads/{userID}/。
-// multipart form field: file。
+// Upload POST /upload —— 统一文件 / 图片上传入口。
+//
+// 通过 multipart form 的 type 字段区分处理路径：
+//   - blog：博客文章图片，校验类型后保存到 posts/{userID}/
+//   - gallery：图片墙图片，校验类型后保存到 gallery/{userID}/
+//   - generic 或空：通用文件，仅限大小，保存到 uploads/{userID}/
+//
+// multipart form field: file, type。返回公开访问 URL。需登录。
 func (h *UploadHandler) Upload(c *gin.Context) {
 	fileHeader, err := c.FormFile("file")
 	if err != nil {
@@ -122,9 +66,22 @@ func (h *UploadHandler) Upload(c *gin.Context) {
 	}
 	defer f.Close()
 
-	rel, err := h.uploadSvc.UploadFile(c.Request.Context(), uint(c.GetInt("user_id")), fileHeader.Filename, f)
+	userID := uint(c.GetInt("user_id"))
+	filename := fileHeader.Filename
+	contentType := fileHeader.Header.Get("Content-Type")
+
+	var rel string
+	switch c.PostForm("type") {
+	case "blog":
+		rel, err = h.uploadSvc.UploadBlogImage(c.Request.Context(), userID, filename, contentType, f)
+	case "gallery":
+		rel, err = h.uploadSvc.UploadGalleryImage(c.Request.Context(), userID, filename, contentType, f)
+	default:
+		rel, err = h.uploadSvc.UploadFile(c.Request.Context(), userID, filename, f)
+	}
+
 	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "upload file", "error", err)
+		slog.ErrorContext(c.Request.Context(), "upload", "type", c.PostForm("type"), "error", err)
 		response.APIError(c, err.Error(), uploadStatus(err))
 		return
 	}
@@ -132,7 +89,7 @@ func (h *UploadHandler) Upload(c *gin.Context) {
 	response.Success(c, gin.H{
 		"url":      "/v3/media/" + rel,
 		"filename": rel,
-	}, "文件上传成功")
+	}, "上传成功")
 }
 
 // UploadPic POST /upload-pic —— 头像图片上传（校验类型 + 256px 缩略图 + 回写 profile.photo）。
@@ -170,13 +127,13 @@ func (h *UploadHandler) UploadPic(c *gin.Context) {
 }
 
 // RegisterRoutes 挂载上传端点，全部需要 AuthMiddleware。
+//
+// /upload 通过 type 字段统一处理 generic/blog/gallery（对齐前端 useUpload composable）；
+// /upload-pic 独立处理头像（缩略图 + 回写 profile.photo）。
 // 同时注册 POST / PUT：前端头像上传沿用 PUT（对齐 Python 端），通用上传为 POST。
 func (h *UploadHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFunc) {
 	r.POST("/upload", authMW, h.Upload)
 	r.PUT("/upload", authMW, h.Upload)
-	r.POST("/upload-image", authMW, h.UploadBlogImage)
-	r.POST("/blog/upload-image", authMW, h.UploadBlogImage)
-	r.POST("/upload-gallery-image", authMW, h.UploadGalleryImage)
 	r.POST("/upload-pic", authMW, h.UploadPic)
 	r.PUT("/upload-pic", authMW, h.UploadPic)
 }

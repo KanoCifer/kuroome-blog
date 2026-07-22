@@ -85,11 +85,21 @@ func setupUpload(t *testing.T, up service.Uploader, view avatarViewer) *gin.Engi
 	return r
 }
 
-// buildMultipart 构造 multipart/form-data 请求体，携带单个文件字段。
-func buildMultipart(t *testing.T, field, filename, contentType string, body []byte) (*bytes.Buffer, string) {
+// buildMultipart 构造 multipart/form-data 请求体，携带单个文件字段和可选的额外表单字段。
+func buildMultipart(t *testing.T, field, filename, contentType string, body []byte, extra ...map[string]string) (*bytes.Buffer, string) {
 	t.Helper()
 	var buf bytes.Buffer
 	boundary := "BOUNDARY"
+
+	// 额外表单字段（如 type），放在文件字段之前。
+	if len(extra) > 0 {
+		for k, v := range extra[0] {
+			buf.WriteString("--" + boundary + "\r\n")
+			buf.WriteString("Content-Disposition: form-data; name=\"" + k + "\"\r\n\r\n")
+			buf.WriteString(v + "\r\n")
+		}
+	}
+
 	buf.WriteString("--" + boundary + "\r\n")
 	buf.WriteString("Content-Disposition: form-data; name=\"" + field + "\"; filename=\"" + filename + "\"\r\n")
 	buf.WriteString("Content-Type: " + contentType + "\r\n\r\n")
@@ -98,9 +108,9 @@ func buildMultipart(t *testing.T, field, filename, contentType string, body []by
 	return &buf, "multipart/form-data; boundary=" + boundary
 }
 
-func requestUpload(t *testing.T, r *gin.Engine, path, field, filename, contentType string, body []byte) *httptest.ResponseRecorder {
+func requestUpload(t *testing.T, r *gin.Engine, path, field, filename, contentType string, body []byte, extra ...map[string]string) *httptest.ResponseRecorder {
 	t.Helper()
-	buf, ct := buildMultipart(t, field, filename, contentType, body)
+	buf, ct := buildMultipart(t, field, filename, contentType, body, extra...)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, path, buf)
 	req.Header.Set("Content-Type", ct)
@@ -153,6 +163,56 @@ func TestUpload_SvcError(t *testing.T) {
 	w := requestUpload(t, r, "/v3/upload", "file", "a.png", "image/png", mustPNG(t))
 	if w.Code != http.StatusInternalServerError {
 		t.Fatalf("expected 500, got %d", w.Code)
+	}
+}
+
+// type=blog 分发到 UploadBlogImage，校验类型失败应返回 400。
+func TestUpload_BlogType(t *testing.T) {
+	up := &mockUpload{
+		blogFn: func(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
+			return "", errs.ErrUnsupportedImageType
+		},
+	}
+	r := setupUpload(t, up, nil)
+	w := requestUpload(t, r, "/v3/upload", "file", "a.bmp", "image/bmp", mustPNG(t), map[string]string{"type": "blog"})
+	if w.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400 for unsupported blog image type, got %d: %s", w.Code, w.Body.String())
+	}
+}
+
+// type=gallery 分发到 UploadGalleryImage，成功应返回 URL。
+func TestUpload_GalleryType(t *testing.T) {
+	up := &mockUpload{
+		galleryFn: func(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
+			return "gallery/1/xyz.png", nil
+		},
+	}
+	r := setupUpload(t, up, nil)
+	w := requestUpload(t, r, "/v3/upload", "file", "g.png", "image/png", mustPNG(t), map[string]string{"type": "gallery"})
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
+	}
+	if !strings.Contains(w.Body.String(), `"url":"/v3/media/gallery/1/xyz.png"`) {
+		t.Fatalf("unexpected url in body: %s", w.Body.String())
+	}
+}
+
+// type 为空（或未知）走 generic UploadFile 路径，不限类型。
+func TestUpload_GenericFallback(t *testing.T) {
+	up := &mockUpload{
+		fileFn: func(ctx context.Context, userID uint, filename string, src io.Reader) (string, error) {
+			return "uploads/1/data.bin", nil
+		},
+	}
+	r := setupUpload(t, up, nil)
+
+	// 无 type 字段 → generic
+	w := requestUpload(t, r, "/v3/upload", "file", "data.bin", "application/octet-stream", []byte("binary"))
+	if w.Code != http.StatusOK {
+		t.Fatalf("expected 200 for generic upload, got %d: %s", w.Code, w.Body.String())
+	}
+	if !strings.Contains(w.Body.String(), `"url":"/v3/media/uploads/1/data.bin"`) {
+		t.Fatalf("unexpected url in body: %s", w.Body.String())
 	}
 }
 
