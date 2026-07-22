@@ -16,7 +16,7 @@
   --surface-foreground: oklch(0.2 0.018 50);
   --chart-1: oklch(0.6 0.14 50);
   --chart-2: oklch(0.55 0.08 145);
-  --chart-3: oklch(0.55 0.025 245);
+  --chart-3: oklch(0.55 0.1 245);
   --chart-4: oklch(0.58 0.13 28);
   --chart-5: oklch(0.7 0.13 85);
   --gradient-primary-from: oklch(0.5 0.08 50);
@@ -41,7 +41,7 @@
   --surface-foreground: oklch(0.94 0.012 50);
   --chart-1: oklch(0.74 0.1 50);
   --chart-2: oklch(0.72 0.1 145);
-  --chart-3: oklch(0.72 0.04 245);
+  --chart-3: oklch(0.72 0.1 245);
   --chart-4: oklch(0.74 0.14 28);
   --chart-5: oklch(0.78 0.12 85);
   --gradient-primary-from: oklch(0.74 0.1 50);

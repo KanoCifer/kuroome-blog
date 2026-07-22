@@ -15,4 +15,7 @@ export { default as ReviewPanel } from './ReviewPanel.vue';
 export { default as StatusChip } from './StatusChip.vue';
 export { default as TaskDetailPanel } from './TaskDetailPanel.vue';
 export { default as TaskRow } from './TaskRow.vue';
+export { default as TodoHeader } from './TodoHeader.vue';
+export { default as TodoMobileTabs } from './TodoMobileTabs.vue';
+export { default as TodoSidebar } from './TodoSidebar.vue';
 export { default as TypeBadge } from './TypeBadge.vue';

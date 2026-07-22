@@ -1,105 +1,15 @@
 <template>
   <div class="flex flex-col gap-4">
     <!-- ── 顶部筛选栏 ── -->
-    <div
-      class="bg-muted flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl px-4 py-3"
-      role="group"
-      aria-label="看板筛选条件"
-    >
-      <span
-        class="text-muted-foreground text-[10px] font-medium tracking-widest uppercase"
-        >类型</span
-      >
-      <button
-        v-for="t in TASK_TYPES"
-        :key="t"
-        class="rounded-full border px-2.5 py-0.5 text-xs transition-colors"
-        :class="
-          filterType.has(t)
-            ? 'border-primary/40 bg-primary/10 text-primary'
-            : 'border-border text-muted-foreground hover:text-foreground'
-        "
-        :aria-pressed="filterType.has(t)"
-        @click="toggleFilter('type', t)"
-      >
-        {{ t }}
-      </button>
-
-      <span class="bg-border mx-1 hidden h-4 w-px sm:inline-block" />
-
-      <span
-        class="text-muted-foreground text-[10px] font-medium tracking-widest uppercase"
-        >优先级</span
-      >
-      <button
-        v-for="p in PRIORITIES"
-        :key="p"
-        class="rounded-full border px-2.5 py-0.5 text-xs transition-colors"
-        :class="
-          filterPriority.has(p)
-            ? 'border-primary/40 bg-primary/10 text-primary'
-            : 'border-border text-muted-foreground hover:text-foreground'
-        "
-        :aria-pressed="filterPriority.has(p)"
-        @click="toggleFilter('priority', p)"
-      >
-        {{ p }}
-      </button>
-
-      <span class="bg-border mx-1 hidden h-4 w-px sm:inline-block" />
-
-      <template>
-        <span
-          class="text-muted-foreground text-[10px] font-medium tracking-widest uppercase"
-          >成员</span
-        >
-        <button
-          v-for="m in memberChips"
-          :key="m.userId"
-          class="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs transition-colors"
-          :class="
-            filterMember.has(m.userId)
-              ? 'border-primary/40 bg-primary/10 text-primary'
-              : 'border-border text-muted-foreground hover:text-foreground'
-          "
-          :aria-pressed="filterMember.has(m.userId)"
-          :title="`仅看 ${m.label}`"
-          @click="toggleFilter('member', m.userId)"
-        >
-          <MemberAvatar :user-id="m.userId" size="xs" />
-          {{ m.label }}
-        </button>
-      </template>
-
-      <!-- 搜索框 -->
-      <label class="ml-auto flex items-center gap-1.5">
-        <span class="sr-only">搜索任务标题</span>
-        <svg
-          class="text-muted-foreground h-3.5 w-3.5"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          aria-hidden="true"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"
-          />
-        </svg>
-        <input
-          v-model="searchTerm"
-          type="search"
-          placeholder="搜索标题…"
-          class="border-border bg-background text-foreground placeholder:text-muted-foreground/60 focus-visible:ring-ring w-32 rounded-md border px-2 py-1 text-xs focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none sm:w-40"
-        />
-      </label>
-
-      <span class="text-muted-foreground text-xs tabular-nums">
-        {{ visibleTasks.length }} 项
-      </span>
-    </div>
+    <TodoFilterBar
+      :filter-type="filterType"
+      :filter-priority="filterPriority"
+      :filter-member="filterMember"
+      :member-chips="memberChips"
+      v-model:search-term="searchTerm"
+      :count="visibleTasks.length"
+      @toggle="(p) => toggleFilter(p.key, p.value)"
+    />
 
     <!-- ── 四列看板 ── -->
     <div
@@ -143,14 +53,16 @@
         </header>
 
         <!-- 泳道 + 卡片 -->
-        <div class="flex flex-1 flex-col gap-3 overflow-y-auto">
+        <div
+          class="flex max-h-[calc(200vh)] min-h-0 flex-1 flex-col gap-3 overflow-y-auto"
+        >
           <div
             v-for="lane in swimlanesFor(col.id)"
             :key="lane.userId"
             class="flex flex-col gap-2"
           >
             <div
-              class="text-muted-foreground flex items-center gap-1.5 px-1 text-[10px] font-medium tracking-widest uppercase"
+              class="text-muted-foreground flex items-center gap-1.5 px-1 font-serif text-xs tracking-widest"
             >
               <MemberAvatar :user-id="lane.userId" size="xs" />
               {{ lane.label }}
@@ -176,11 +88,29 @@
           <!-- 空列提示 -->
           <div
             v-if="!swimlanesFor(col.id).length"
-            class="text-muted-foreground/60 flex flex-1 items-center justify-center py-6 text-center text-xs"
+            class="text-muted-foreground/60 flex flex-1 flex-col items-center justify-center gap-1.5 py-6 text-center text-xs"
           >
-            <span>
-              {{ dragOverColumn === col.id ? '松开以放置' : '此列暂无任务' }}
-            </span>
+            <template v-if="dragOverColumn === col.id">
+              <span class="font-serif text-sm">松开以放置</span>
+            </template>
+            <template v-else>
+              <svg
+                class="text-muted-foreground/30 h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                />
+              </svg>
+              <span class="font-serif text-sm">此列暂无任务</span>
+              <span class="text-muted-foreground/50">从待办拖一个过来</span>
+            </template>
           </div>
         </div>
       </section>
@@ -197,9 +127,9 @@ import type {
   DevTaskStatus,
   DevTaskType,
 } from '@/features/todos/api';
-import { PRIORITIES } from '@/features/todos/composables';
 import KanbanCard from './KanbanCard.vue';
 import MemberAvatar from './MemberAvatar.vue';
+import TodoFilterBar, { type MemberChip } from './TodoFilterBar.vue';
 
 // ── 看板列定义（与后端 DevTaskStatus 一一对应，仅"待办"合并两个未启动状态） ──
 //
@@ -244,18 +174,16 @@ const KANBAN_COLUMNS: KanbanColumn[] = [
     label: '已搁置',
     statuses: ['已搁置'],
     targetStatus: '已搁置',
-    dotClass: 'bg-amber-500',
+    dotClass: 'bg-warning',
   },
   {
     id: 'done',
     label: '已完成',
     statuses: ['已完成'],
     targetStatus: '已完成',
-    dotClass: 'bg-emerald-500',
+    dotClass: 'bg-success',
   },
 ];
-
-const TASK_TYPES: DevTaskType[] = ['功能需求', '问题', '优化', '技术债'];
 
 const store = useV3DevTaskStore();
 
@@ -329,7 +257,7 @@ function toggleFilter(
 }
 
 /** 成员 chip —— 从任务 user_id 聚合，始终显示（含仅 1 成员场景）。 */
-const memberChips = computed(() => {
+const memberChips = computed<MemberChip[]>(() => {
   const map = new Map<number, { count: number }>();
   for (const t of store.tasks) {
     if (t.is_deleted) continue;

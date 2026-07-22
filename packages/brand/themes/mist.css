@@ -20,7 +20,7 @@
   --chart-4: oklch(0.58 0.1 18);
   --chart-5: oklch(0.6 0.1 290);
   --gradient-primary-from: oklch(0.5 0.06 225);
-  --gradient-primary-to: oklch(0.5 0.04 245);
+  --gradient-primary-to: oklch(0.5 0.04 235);
   --gradient-decorative-from: oklch(0.9 0.025 225);
   --gradient-decorative-to: oklch(0.72 0.05 225);
 }
@@ -45,7 +45,7 @@
   --chart-4: oklch(0.74 0.12 18);
   --chart-5: oklch(0.7 0.12 290);
   --gradient-primary-from: oklch(0.74 0.08 225);
-  --gradient-primary-to: oklch(0.72 0.05 245);
+  --gradient-primary-to: oklch(0.72 0.05 235);
   --gradient-decorative-from: oklch(0.34 0.04 225 / 0.35);
   --gradient-decorative-to: oklch(0.4 0.04 245 / 0.25);
 }

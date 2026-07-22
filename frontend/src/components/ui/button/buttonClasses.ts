@@ -1,40 +1,48 @@
-export type ButtonVariant =
-  'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
-export type ButtonSize =
-  'default' | 'sm' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg';
+// UiButton 变体 / 尺寸样式映射（设计系统三层 token，全部用 Tailwind 语义类）
+// 参考 docs/rules/design-system.md 按钮章节：default / outline / destructive / ghost。
+//
+// 注意：未引入 class-variance-authority / tailwind-merge —— 项目 deps 里没有。
+// 类合并靠 Vue 3 单根元素自动继承父 class 即可；如需覆盖同名类（如把 base 的
+// `rounded-md` 换成 `rounded-full`），用 Tailwind v4 的 `!` 前缀（`!rounded-full`）。
 
-export type ButtonVariants = {
+export type ButtonVariant = 'default' | 'outline' | 'destructive' | 'ghost';
+
+export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
+
+export interface ButtonVariants {
   variant?: ButtonVariant;
   size?: ButtonSize;
-};
+}
 
-const BASE =
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-[background-color,color,text-decoration] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive";
+// 基础样式：布局 + 焦点环 + 过渡 + 按下反馈 + 禁用态。
+// 所有变体共享这套"骨架"，变体只负责配色和边框，尺寸只负责高/宽/间距。
+const BASE = [
+  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium',
+  'transition-[color,transform]',
+  'focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
+  'active:scale-[0.96]',
+  'disabled:cursor-not-allowed disabled:opacity-50',
+  'rounded-xl',
+];
 
-const VARIANT: Record<ButtonVariant, string> = {
+const VARIANTS: Record<ButtonVariant, string> = {
   default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-  destructive:
-    'bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
   outline:
-    'border bg-background shadow-xs hover:bg-muted hover:text-foreground dark:bg-input/30 dark:border-input dark:bg-input/30',
-  secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-  ghost: 'hover:bg-muted hover:text-foreground dark:hover:bg-muted/50',
-  link: 'text-primary underline-offset-4 hover:underline',
+    'border-border text-muted-foreground hover:bg-muted hover:text-foreground border',
+  destructive: 'bg-destructive text-white hover:bg-destructive/90',
+  ghost: 'text-muted-foreground hover:bg-muted hover:text-foreground',
 };
 
-const SIZE: Record<ButtonSize, string> = {
-  default: 'h-9 px-4 py-2 has-[>svg]:px-3',
-  sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
-  lg: 'h-10 rounded-md px-6 has-[>svg]:px-5',
-  icon: 'size-9',
-  'icon-sm': 'size-8',
-  'icon-lg': 'size-10',
+const SIZES: Record<ButtonSize, string> = {
+  sm: 'h-8 gap-1.5 px-3',
+  md: 'h-9 gap-2 px-4',
+  lg: 'h-10 gap-2 px-6',
+  icon: 'h-9 w-9',
 };
 
-export function buttonClasses(
-  variant: ButtonVariant = 'default',
-  size: ButtonSize = 'default',
-  extra?: string,
-): string {
-  return [BASE, VARIANT[variant], SIZE[size], extra].filter(Boolean).join(' ');
+export function buttonClasses(options: ButtonVariants = {}): string {
+  const { variant = 'default', size } = options;
+  return [...BASE, VARIANTS[variant], size ? SIZES[size] : '']
+    .filter(Boolean)
+    .join(' ');
 }

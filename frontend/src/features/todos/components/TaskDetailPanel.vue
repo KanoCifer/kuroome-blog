@@ -241,7 +241,7 @@
               <!-- 验收标准 -->
               <div v-if="task.acceptance_criteria">
                 <span
-                  class="text-muted-foreground mb-1 block text-[10px] font-medium tracking-widest uppercase"
+                  class="text-muted-foreground mb-1 block font-serif text-xs tracking-widest"
                 >
                   验收标准
                 </span>
@@ -254,7 +254,7 @@
               <!-- 约束 -->
               <div v-if="task.constraints">
                 <span
-                  class="text-muted-foreground mb-1 block text-[10px] font-medium tracking-widest uppercase"
+                  class="text-muted-foreground mb-1 block font-serif text-xs tracking-widest"
                 >
                   约束
                 </span>
@@ -267,7 +267,7 @@
               <!-- 上下文指针 -->
               <div v-if="task.context_pointers">
                 <span
-                  class="text-muted-foreground mb-1 block text-[10px] font-medium tracking-widest uppercase"
+                  class="text-muted-foreground mb-1 block font-serif text-xs tracking-widest"
                 >
                   上下文指针
                 </span>
@@ -279,7 +279,7 @@
               <!-- 元数据 -->
               <div>
                 <span
-                  class="text-muted-foreground mb-1 block text-[10px] font-medium tracking-widest uppercase"
+                  class="text-muted-foreground mb-1 block font-serif text-xs tracking-widest"
                 >
                   元数据
                 </span>

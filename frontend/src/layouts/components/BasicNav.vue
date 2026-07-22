@@ -420,12 +420,11 @@ const avatarUrl = computed(() => {
 /* 深色模式：基底由"白色光雾"换成"深色玻璃"，
    边框翻转为浅色高光边，浮起阴影换成发光晕 */
 .dark .liquid-glass {
-  background: color-mix(in oklch, var(--color-background) 40%, transparent);
+  backdrop-filter: url(#nav-liquid-glass) blur(1px) saturate(1.4);
+  background: rgba(255 255 255 / 0.01);
   border-color: rgb(255 255 255 / 0.08);
   box-shadow:
-    inset 0 0 2px 1px rgb(255 255 255 / 0.1),
-    inset 0 0 10px 4px rgb(255 255 255 / 0.04),
-    0 0 24px -4px rgb(255 255 255 / 0.12),
-    0 0 8px -2px rgb(255 255 255 / 0.08);
+    0 6px 24px rgb(17 17 26 / 0.06),
+    0 12px 40px rgb(17 17 26 / 0.05);
 }
 </style>

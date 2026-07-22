@@ -1,123 +1,88 @@
 <template>
   <div class="space-y-4">
-    <!-- filter bar -->
-    <div
-      class="bg-muted flex flex-wrap items-center gap-2 rounded-xl px-4 py-3"
-      role="group"
-      aria-label="筛选条件"
-    >
-      <span
-        class="text-muted-foreground text-[10px] font-medium tracking-widest uppercase"
-        >类型</span
-      >
-      <button
-        v-for="t in TASK_TYPES"
-        :key="t"
-        class="rounded-full border px-2.5 py-0.5 text-xs transition-colors"
-        :class="
-          filterType.has(t)
-            ? 'border-primary/40 bg-primary/10 text-primary'
-            : 'border-border text-muted-foreground hover:text-foreground'
-        "
-        :aria-pressed="filterType.has(t)"
-        @click="toggleFilter('type', t)"
-      >
-        {{ t }}
-      </button>
+    <TodoFilterBar
+      :filter-type="filterType"
+      :filter-priority="filterPriority"
+      :filter-member="filterMember"
+      :member-chips="memberChips"
+      v-model:search-term="searchTerm"
+      :count="filteredPlanning.length"
+      @toggle="(p) => toggleFilter(p.key, p.value)"
+    />
 
-      <span class="bg-border mx-1 h-4 w-px" />
-
-      <span
-        class="text-muted-foreground text-[10px] font-medium tracking-widest uppercase"
-        >优先级</span
-      >
-      <button
-        v-for="p in PRIORITIES"
-        :key="p"
-        class="rounded-full border px-2.5 py-0.5 text-xs transition-colors"
-        :class="
-          filterPriority.has(p)
-            ? 'border-primary/40 bg-primary/10 text-primary'
-            : 'border-border text-muted-foreground hover:text-foreground'
-        "
-        :aria-pressed="filterPriority.has(p)"
-        @click="toggleFilter('priority', p)"
-      >
-        {{ p }}
-      </button>
-
-      <span class="text-muted-foreground ml-auto text-xs tabular-nums">
-        {{ filteredPlanning.length }} 项
-      </span>
-    </div>
-
-    <!-- table -->
+    <!-- index list -->
     <div class="border-border overflow-hidden rounded-xl border">
-      <div
-        class="text-muted-foreground bg-muted border-border grid grid-cols-[2fr_1fr_1fr_1fr_100px_32px] gap-4 border-b px-4 py-2.5 text-[10px] font-medium tracking-widest uppercase max-sm:grid-cols-[1fr_80px_32px]"
-      >
-        <span>标题</span>
-        <span class="max-sm:hidden">类型</span>
-        <span class="max-sm:hidden">优先级</span>
-        <span class="max-sm:hidden">范围</span>
-        <span class="max-sm:hidden">状态</span>
-        <span></span>
-      </div>
-
       <div
         v-for="task in filteredPlanning"
         :key="task.slug"
-        class="hover:bg-muted/40 border-border grid cursor-pointer grid-cols-[2fr_1fr_1fr_1fr_100px_32px] items-center gap-4 border-t px-4 py-2.5 transition-colors max-sm:grid-cols-[1fr_80px_32px]"
+        class="hover:bg-primary/5 border-border group relative flex cursor-pointer items-center gap-3 border-b px-4 py-3 transition-colors last:border-b-0"
         role="button"
         tabindex="0"
+        :aria-label="`任务: ${task.title}`"
         @click="$emit('open', task.slug)"
         @keydown.enter="$emit('open', task.slug)"
       >
-        <span class="text-foreground truncate text-sm font-medium">{{
-          task.title
-        }}</span>
-        <span class="max-sm:hidden">
-          <TypeBadge :type="task.type" />
+        <span
+          class="absolute inset-y-0 left-0 w-[2px]"
+          :class="typeBarClass(task.type)"
+          aria-hidden="true"
+        />
+
+        <span
+          class="text-foreground min-w-0 flex-1 truncate font-serif text-base"
+        >
+          {{ task.title }}
         </span>
-        <span class="max-sm:hidden">
-          <PriorityBadge :priority="task.priority" />
+
+        <span
+          class="text-muted-foreground hidden text-xs tabular-nums whitespace-nowrap sm:inline"
+        >
+          {{ task.type }} · {{ task.priority }} · {{ task.status }}
         </span>
-        <span class="text-muted-foreground truncate text-sm max-sm:hidden">
-          {{ task.scope || '—' }}
-        </span>
-        <span class="max-sm:hidden">
-          <StatusChip :status="task.status" />
-        </span>
-        <span class="flex justify-end">
-          <button
-            type="button"
-            class="text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
-            title="删除"
-            aria-label="删除"
-            @click.stop="$emit('delete', task.slug)"
+
+        <button
+          type="button"
+          class="text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:ring-ring rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
+          title="删除"
+          aria-label="删除"
+          @click.stop="$emit('delete', task.slug)"
+        >
+          <svg
+            class="h-4 w-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
           >
-            <svg
-              class="h-4 w-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-              />
-            </svg>
-          </button>
-        </span>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            />
+          </svg>
+        </button>
       </div>
 
       <div
         v-if="!filteredPlanning.length"
-        class="text-muted-foreground/70 px-4 py-8 text-center text-sm"
+        class="text-muted-foreground/70 flex flex-col items-center justify-center px-4 py-12 text-center"
       >
-        没有匹配的任务
+        <svg
+          class="text-muted-foreground/30 mb-3 h-7 w-7"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.5"
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+          />
+        </svg>
+        <p class="font-serif text-sm">没有匹配的任务</p>
+        <p class="text-xs">去新建一个，或放宽筛选条件</p>
       </div>
     </div>
   </div>
@@ -127,41 +92,85 @@
 import { computed, ref } from 'vue';
 import { useV3DevTaskStore } from '@/features/todos/stores/v3devtasks';
 import type { DevTaskPriority, DevTaskType } from '@/features/todos/api';
-import { PRIORITIES } from '@/features/todos/composables';
-import TypeBadge from './TypeBadge.vue';
-import PriorityBadge from './PriorityBadge.vue';
-import StatusChip from './StatusChip.vue';
+import TodoFilterBar, {
+  type MemberChip,
+} from './TodoFilterBar.vue';
 
 const store = useV3DevTaskStore();
 
-const TASK_TYPES: DevTaskType[] = ['功能需求', '问题', '优化', '技术债'];
+// 左缘 type-color 细线 — Layer 3 语义 token 映射，不引入新颜色。
+// 技术债用 muted-foreground（中性灰），对位"结构性、非紧急"的语义。
+const TYPE_BAR_CLASS: Record<DevTaskType, string> = {
+  功能需求: 'bg-warning',
+  问题: 'bg-destructive',
+  优化: 'bg-success',
+  技术债: 'bg-muted-foreground',
+};
+
+function typeBarClass(type: DevTaskType): string {
+  return TYPE_BAR_CLASS[type];
+}
 
 const filterType = ref<Set<DevTaskType>>(new Set());
 const filterPriority = ref<Set<DevTaskPriority>>(new Set());
+const filterMember = ref<Set<number>>(new Set());
+const searchTerm = ref('');
 
-const filteredPlanning = computed(() =>
-  store.tasks
+/** 成员 chip —— 从任务 user_id 聚合，始终展示（含仅 1 成员场景）。
+ *  与 KanbanPanel 的同名 computed 完全一致；PlanningPanel 也支持成员筛选
+ *  以便 multi-user 场景下"只看我的待规划任务"。 */
+const memberChips = computed<MemberChip[]>(() => {
+  const map = new Map<number, { count: number }>();
+  for (const t of store.tasks) {
+    if (t.is_deleted) continue;
+    const e = map.get(t.user_id) ?? { count: 0 };
+    e.count += 1;
+    map.set(t.user_id, e);
+  }
+  return Array.from(map.entries())
+    .sort((a, b) => b[1].count - a[1].count)
+    .map(([userId, { count }]) => ({
+      userId,
+      label: `用户 ${userId}`,
+      count,
+    }));
+});
+
+const filteredPlanning = computed(() => {
+  const q = searchTerm.value.trim().toLowerCase();
+  return store.tasks
     .filter((t) => !t.is_deleted && t.status !== '已完成')
     .filter((t) =>
       filterType.value.size ? filterType.value.has(t.type) : true,
     )
     .filter((t) =>
       filterPriority.value.size ? filterPriority.value.has(t.priority) : true,
-    ),
-);
+    )
+    .filter((t) =>
+      filterMember.value.size ? filterMember.value.has(t.user_id) : true,
+    )
+    .filter((t) => (q ? (t.title ?? '').toLowerCase().includes(q) : true));
+});
 
 function toggleFilter(
-  key: 'type' | 'priority',
-  val: DevTaskType | DevTaskPriority,
+  key: 'type' | 'priority' | 'member',
+  val: DevTaskType | DevTaskPriority | number,
 ) {
   if (key === 'type') {
-    const set = filterType.value;
-    if (set.has(val as DevTaskType)) set.delete(val as DevTaskType);
-    else set.add(val as DevTaskType);
+    const v = val as DevTaskType;
+    const s = filterType.value;
+    if (s.has(v)) s.delete(v);
+    else s.add(v);
+  } else if (key === 'priority') {
+    const v = val as DevTaskPriority;
+    const s = filterPriority.value;
+    if (s.has(v)) s.delete(v);
+    else s.add(v);
   } else {
-    const set = filterPriority.value;
-    if (set.has(val as DevTaskPriority)) set.delete(val as DevTaskPriority);
-    else set.add(val as DevTaskPriority);
+    const v = val as number;
+    const s = filterMember.value;
+    if (s.has(v)) s.delete(v);
+    else s.add(v);
   }
 }
 
