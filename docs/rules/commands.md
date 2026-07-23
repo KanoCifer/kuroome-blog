@@ -32,16 +32,16 @@ uv run pytest --tb=short                      # short traceback
 cd go-backend
 
 go run ./cmd/server          # 启动 -> 127.0.0.1:5555
-go test ./...                # 全量单测
-go test ./internal/handler/... -v   # 子集测试
-go test -run TestAdmin       # 按名称过滤
+go test ./...                # 全量单测（子集/过滤同 Go 标准用法）
 gofmt -w .                   # 格式化
 go vet ./...                 # 静态检查
 
-# Docker
+# Docker（多阶段构建 golang-alpine → alpine）
 docker build -t go-backend -f Dockerfile .
 docker run -p 5555:5555 --env-file ../.env go-backend
 ```
+
+> Go 端架构与分层详见 [go-backend.md](go-backend.md)。
 
 ## Desktop (Vue)
 

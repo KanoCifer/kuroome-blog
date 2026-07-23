@@ -3,23 +3,8 @@
 ## 工具链
 
 - **运行器**：Vitest 4.x
-- **DOM 环境**：happy-dom（比 jsdom 快，覆盖足够）
-- **组件工具**：@vue/test-utils 2.x (Vue) / @testing-library/react 16.x (React)
-- **后端**：pytest (backend/)
-
-## 命令
-
-```bash
-# Desktop (Vue)
-cd frontend && pnpm run test:unit           # watch mode
-cd frontend && pnpm run test:unit -- --run  # single run
-
-# Mobile (React)
-cd react-app && pnpm run test:unit          # single run (vitest run)
-
-# Backend (Python)
-cd backend && uv run pytest                 # all tests
-```
+- **DOM 环境**：happy-dom
+- **后端**：pytest
 
 ## 文件约定 (Vue + React 通用)
 
@@ -30,16 +15,16 @@ cd backend && uv run pytest                 # all tests
 ## 测试风格 (Vue)
 
 ```ts
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useXxx } from '../useXxx';
-import { flushRAF } from '@/test/setup';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { useXxx } from "../useXxx";
+import { flushRAF } from "@/test/setup";
 
-describe('useXxx', () => {
+describe("useXxx", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('描述行为', () => {
+  it("描述行为", () => {
     // arrange → act → assert
   });
 });
@@ -52,15 +37,15 @@ describe('useXxx', () => {
 ## 测试风格 (React)
 
 ```tsx
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { renderHook } from "@testing-library/react";
 
-describe('useXxx', () => {
+describe("useXxx", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('描述行为', () => {
+  it("描述行为", () => {
     const { result } = renderHook(() => useXxx());
     // assert on result.current
   });
@@ -76,21 +61,16 @@ describe('useXxx', () => {
 - `IntersectionObserver` / `ResizeObserver` — 空实现
 
 ```ts
-import { flushRAF } from '@/test/setup';
+import { flushRAF } from "@/test/setup";
 
 flushRAF(0); // 推进一帧，时间戳 0
 ```
 
 ## 分层策略
 
-| 层级 | 对象 (Vue) | 对象 (React) | 工具 | 优先级 |
-|------|-----------|-------------|------|--------|
-| 纯函数 | utils/ | utils/ | 直接 import | 🔴 高 |
-| Hooks/Composables | composables/ | hooks/ | `vi.spyOn` + `flushRAF` / `renderHook` | 🔴 高 |
-| Store | stores/ (Pinia) | stores/ (Zustand) | `setActivePinia` / `act()` | 🟡 中 |
-| 组件 | components/ | components/ | `@vue/test-utils` / `@testing-library/react` | 🟢 低 |
-
-## 类型检查
-
-- Vue 测试文件纳入 `vue-tsc` 类型检查（`tsconfig.vitest.json` 包含 `src/**/__tests__/*`）
-- React 测试文件纳入 `tsc --noEmit` 类型检查
+| 层级              | 对象 (Vue)      | 对象 (React)      | 工具                                         | 优先级 |
+| ----------------- | --------------- | ----------------- | -------------------------------------------- | ------ |
+| 纯函数            | utils/          | utils/            | 直接 import                                  | 🔴 高  |
+| Hooks/Composables | composables/    | hooks/            | `vi.spyOn` + `flushRAF` / `renderHook`       | 🔴 高  |
+| Store             | stores/ (Pinia) | stores/ (Zustand) | `setActivePinia` / `act()`                   | 🟡 中  |
+| 组件              | components/     | components/       | `@vue/test-utils` / `@testing-library/react` | 🟢 低  |

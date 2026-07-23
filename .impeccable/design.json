@@ -1,187 +1,314 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-07-22T00:00:00.000Z",
+  "generatedAt": "2026-07-23T00:00:00.000Z",
   "title": "Design System: kanocifer.chat",
   "extensions": {
     "colorMeta": {
-      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "oklch(0.2 0.018 50)", "tonalRamp": ["oklch(0.15 0.018 50)","oklch(0.25 0.018 50)","oklch(0.35 0.016 50)","oklch(0.45 0.015 50)","oklch(0.55 0.014 50)","oklch(0.65 0.013 50)","oklch(0.78 0.012 50)","oklch(0.9 0.011 50)"] },
-      "paper": { "role": "neutral", "displayName": "Paper", "canonical": "oklch(0.97 0.013 50)", "tonalRamp": ["oklch(0.3 0.01 50)","oklch(0.45 0.01 50)","oklch(0.6 0.01 50)","oklch(0.72 0.01 50)","oklch(0.82 0.011 50)","oklch(0.9 0.012 50)","oklch(0.95 0.012 50)","oklch(0.99 0.008 50)"] },
-      "surface": { "role": "neutral", "displayName": "Surface (translucent)", "canonical": "oklch(0.97 0.013 50 / 0.75)" },
-      "warm-gray": { "role": "neutral", "displayName": "Warm Gray", "canonical": "oklch(0.95 0.018 50)", "tonalRamp": ["oklch(0.3 0.012 50)","oklch(0.45 0.012 50)","oklch(0.58 0.012 50)","oklch(0.7 0.014 50)","oklch(0.8 0.015 50)","oklch(0.88 0.016 50)","oklch(0.93 0.017 50)","oklch(0.97 0.014 50)"] },
-      "secondary": { "role": "neutral", "displayName": "Secondary", "canonical": "oklch(0.92 0.022 50)" },
-      "muted-text": { "role": "neutral", "displayName": "Muted Text", "canonical": "oklch(0.42 0.015 50)" },
-      "border": { "role": "neutral", "displayName": "Border", "canonical": "oklch(0.88 0.02 50)" },
-      "card-bg": { "role": "neutral", "displayName": "Card Bg", "canonical": "oklch(0.99 0.008 50)" },
-      "accent": { "role": "primary", "displayName": "Warm Copper", "canonical": "oklch(0.5 0.08 50)", "tonalRamp": ["oklch(0.2 0.06 50)","oklch(0.3 0.07 50)","oklch(0.4 0.075 50)","oklch(0.5 0.08 50)","oklch(0.6 0.1 50)","oklch(0.7 0.11 50)","oklch(0.8 0.1 50)","oklch(0.9 0.07 50)"] },
-      "accent-slate": { "role": "secondary", "displayName": "Slate Blue", "canonical": "oklch(0.55 0.025 245)" },
-      "accent-rose": { "role": "tertiary", "displayName": "Vermillion Rose", "canonical": "oklch(0.58 0.13 28)" },
-      "destructive": { "role": "tertiary", "displayName": "Destructive", "canonical": "oklch(0.644 0.21 25)" },
-      "success": { "role": "neutral", "displayName": "Success", "canonical": "oklch(0.696 0.17 162)" },
-      "warning": { "role": "neutral", "displayName": "Warning", "canonical": "oklch(0.769 0.188 70)" },
-      "chart-1": { "role": "neutral", "displayName": "Chart 1", "canonical": "oklch(0.6 0.14 50)" },
-      "chart-2": { "role": "neutral", "displayName": "Chart 2", "canonical": "oklch(0.55 0.08 145)" },
-      "chart-3": { "role": "neutral", "displayName": "Chart 3", "canonical": "oklch(0.55 0.1 245)" },
-      "chart-4": { "role": "neutral", "displayName": "Chart 4", "canonical": "oklch(0.58 0.13 28)" },
-      "chart-5": { "role": "neutral", "displayName": "Chart 5", "canonical": "oklch(0.7 0.13 85)" }
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "oklch(20% 0.018 50)",
+        "tonalRamp": [
+          "oklch(15% 0.018 50)",
+          "oklch(25% 0.018 50)",
+          "oklch(35% 0.017 50)",
+          "oklch(45% 0.016 50)",
+          "oklch(55% 0.015 50)",
+          "oklch(65% 0.014 50)",
+          "oklch(78% 0.013 50)",
+          "oklch(90% 0.012 50)"
+        ]
+      },
+      "page": {
+        "role": "neutral",
+        "displayName": "Page",
+        "canonical": "oklch(97% 0.013 50)",
+        "tonalRamp": [
+          "oklch(30% 0.01 50)",
+          "oklch(45% 0.01 50)",
+          "oklch(60% 0.01 50)",
+          "oklch(75% 0.011 50)",
+          "oklch(85% 0.011 50)",
+          "oklch(90% 0.012 50)",
+          "oklch(94% 0.012 50)",
+          "oklch(98% 0.013 50)"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Warm Earth",
+        "canonical": "oklch(50% 0.08 50)",
+        "tonalRamp": [
+          "oklch(20% 0.06 50)",
+          "oklch(30% 0.07 50)",
+          "oklch(40% 0.075 50)",
+          "oklch(50% 0.08 50)",
+          "oklch(60% 0.08 50)",
+          "oklch(70% 0.075 50)",
+          "oklch(80% 0.07 50)",
+          "oklch(90% 0.05 50)"
+        ]
+      },
+      "accent-rose": {
+        "role": "primary",
+        "displayName": "Rose",
+        "canonical": "oklch(58% 0.13 28)",
+        "tonalRamp": [
+          "oklch(20% 0.10 28)",
+          "oklch(30% 0.11 28)",
+          "oklch(40% 0.12 28)",
+          "oklch(50% 0.125 28)",
+          "oklch(60% 0.13 28)",
+          "oklch(70% 0.12 28)",
+          "oklch(80% 0.10 28)",
+          "oklch(90% 0.07 28)"
+        ]
+      },
+      "card": {
+        "role": "neutral",
+        "displayName": "Card",
+        "canonical": "oklch(93% 0.015 50)",
+        "tonalRamp": [
+          "oklch(30% 0.012 50)",
+          "oklch(45% 0.012 50)",
+          "oklch(60% 0.013 50)",
+          "oklch(75% 0.013 50)",
+          "oklch(85% 0.014 50)",
+          "oklch(90% 0.014 50)",
+          "oklch(94% 0.015 50)",
+          "oklch(97% 0.015 50)"
+        ]
+      },
+      "muted-text": {
+        "role": "neutral",
+        "displayName": "Muted Text",
+        "canonical": "oklch(42% 0.015 50)",
+        "tonalRamp": [
+          "oklch(20% 0.015 50)",
+          "oklch(30% 0.015 50)",
+          "oklch(42% 0.015 50)",
+          "oklch(55% 0.015 50)",
+          "oklch(65% 0.015 50)",
+          "oklch(75% 0.016 50)",
+          "oklch(85% 0.016 50)",
+          "oklch(93% 0.016 50)"
+        ]
+      }
     },
     "typographyMeta": {
-      "display": { "displayName": "Averia Display", "purpose": "Latin display headings and literary moments." },
-      "body": { "displayName": "HarmonyOS Body", "purpose": "Body copy including CJK; the system default." },
-      "serif": { "displayName": "Editorial Serif", "purpose": "Prose h1–h6, drop caps, blockquote marks." },
-      "mono": { "displayName": "Mono", "purpose": "Code blocks, language tags, § section counter, tabular readouts." },
-      "display-cn": { "displayName": "Alibaba Display", "purpose": "阿里妈妈方圆体 — deliberate Chinese display only." },
-      "brush-cn": { "displayName": "Brush Chinese", "purpose": "阿里妈妈东方大楷 — deliberate Chinese display only." }
+      "display": { "displayName": "Display", "purpose": "H1 — article titles, hero headings. System serif, weight 700." },
+      "headline": { "displayName": "Headline", "purpose": "H2 — major section headings with § counter. System serif." },
+      "title": { "displayName": "Title", "purpose": "H3 — sub-sections, card titles. System serif." },
+      "body": { "displayName": "Body", "purpose": "Article body, UI text. System sans, 1.65 line-height for CJK." },
+      "label": { "displayName": "Label", "purpose": "Timestamps, tags, nav items. Sans, weight 500, slightly tracked." }
     },
     "shadows": [
-      { "name": "border-as-shadow", "value": "0px 0px 0px 1px rgba(0,0,0,0.06), 0px 1px 2px -1px rgba(0,0,0,0.06), 0px 2px 4px 0px rgba(0,0,0,0.04)", "purpose": "Global: every element with a Tailwind border class gets this layered, theme-adaptive outline." },
-      { "name": "card-ambient", "value": "0 1px 1px color-mix(in oklch, var(--ink) 6%, transparent), 0 6px 14px color-mix(in oklch, var(--ink) 10%, transparent), 0 18px 32px color-mix(in oklch, var(--ink) 8%, transparent)", "purpose": "Standard / Polaroid cards at rest and hover lift." },
-      { "name": "bento-card", "value": "color-mix(in srgb, var(--ink) 12%, transparent) 0px 40px 50px -32px, color-mix(in srgb, var(--ink) 8%, transparent) 0px 60px 80px -48px, rgba(255,255,255,0.35) 0px 0px 20px 0px inset", "purpose": "Home-page bento card — layered ambient plus inset white sheen." },
-      { "name": "modal-panel", "value": "0 12px 32px color-mix(in oklch, var(--ink) 10%, transparent)", "purpose": "Default modal lift." },
-      { "name": "nav-liquid-glass", "value": "inset 0 0 2px 1px rgb(255 255 255 / 0.55), inset 0 0 10px 4px rgb(255 255 255 / 0.22), 0 6px 24px rgb(17 17 26 / 0.06), 0 12px 40px rgb(17 17 26 / 0.05)", "purpose": "Floating nav pill glass (the one sanctioned glass surface)." },
-      { "name": "drawer-settings", "value": "0 -1px 1px color-mix(in oklch, var(--ink) 6%, transparent), 0 -8px 18px color-mix(in oklch, var(--ink) 8%, transparent), 0 -24px 40px color-mix(in oklch, var(--ink) 5%, transparent), inset 0 1px 0 0 oklch(from var(--paper) l c h / 0.6)", "purpose": "Settings drawer: 3-layer right/up ambient + top paper highlight." }
+      {
+        "name": "border-rest",
+        "value": "0 0 0 1px color-mix(in oklch, var(--ink) 7%, transparent), 0 1px 2px -1px color-mix(in oklch, var(--ink) 8%, transparent), 0 2px 4px 0 color-mix(in oklch, var(--ink) 5%, transparent)",
+        "purpose": "Default border-as-shadow on any element with the border class. Resting state."
+      },
+      {
+        "name": "border-hover",
+        "value": "0 0 0 1px color-mix(in oklch, var(--ink) 12%, transparent), 0 1px 2px -1px color-mix(in oklch, var(--ink) 14%, transparent), 0 2px 4px 0 color-mix(in oklch, var(--ink) 8%, transparent)",
+        "purpose": "Elevated border-as-shadow on hover — alpha increases for subtle lift."
+      },
+      {
+        "name": "card-rest",
+        "value": "0 1px 2px color-mix(in oklch, var(--ink) 4%, transparent), 0 4px 12px color-mix(in oklch, var(--ink) 3%, transparent)",
+        "purpose": "Card resting shadow — flat, barely-there tonal depth."
+      },
+      {
+        "name": "card-hover",
+        "value": "0 4px 16px -2px oklch(from var(--color-accent) l c h / 0.08), 0 1px 4px oklch(from var(--color-accent) l c h / 0.04)",
+        "purpose": "Card hover shadow — pairs with translateY(-1px) lift."
+      },
+      {
+        "name": "glass-nav",
+        "value": "inset 0 0 2px 1px rgb(255 255 255 / 0.55), inset 0 0 10px 4px rgb(255 255 255 / 0.22), 0 6px 24px rgb(17 17 26 / 0.06), 0 12px 40px rgb(17 17 26 / 0.05)",
+        "purpose": "Liquid-glass nav — dual inner highlights + outer ambient. The only surface that gets this treatment."
+      }
     ],
     "motion": [
-      { "name": "SPRING_SNUG", "value": "{ type:'spring', stiffness:320, damping:32, mass:0.8 }", "purpose": "Modal / Drawer / TaskDetail panel entrance — restrained, no overshoot." },
-      { "name": "SPRING_BOUNCE", "value": "{ type:'spring', stiffness:320, damping:28 }", "purpose": "Nav hover / decorative card entrance — slight overshoot." },
-      { "name": "SPRING_CRISP", "value": "{ type:'spring', stiffness:400, damping:30, bounce:0 }", "purpose": "Dynamic Island — Apple-style, zero bounce." },
-      { "name": "SPRING_REVEAL", "value": "{ type:'spring', duration:1, stiffness:100, damping:20 }", "purpose": "Scroll reveal — restrained but sustained." },
-      { "name": "FADE_FAST", "value": "{ duration:0.18 }", "purpose": "Backdrop / overlay fade." },
-      { "name": "FADE", "value": "{ duration:0.25 }", "purpose": "Content fade-in / blur handoff." },
-      { "name": "EASE", "value": "{ duration:0.24, ease:[0.22,1,0.36,1] }", "purpose": "Card hover / group entrance — snap in, soft rest." },
-      { "name": "EASE_SLOW", "value": "{ duration:0.4, ease:[0.16,1,0.3,1] }", "purpose": "Progress bars / status pages." },
-      { "name": "EASE_INOUT", "value": "{ duration:0.25, ease:'easeOut' }", "purpose": "Page / pagination transitions." }
+      {
+        "name": "spring-snug",
+        "value": "{ type: 'spring', stiffness: 320, damping: 32, mass: 0.8 }",
+        "purpose": "Modal / drawer / panel entrance — controlled, no overshoot."
+      },
+      {
+        "name": "spring-bounce",
+        "value": "{ type: 'spring', stiffness: 320, damping: 28 }",
+        "purpose": "Nav floating / decorative entrance — slight overshoot for playfulness."
+      },
+      {
+        "name": "spring-reveal",
+        "value": "{ type: 'spring', duration: 1, stiffness: 100, damping: 20 }",
+        "purpose": "Scroll reveal — slow, sustained, restrained."
+      },
+      {
+        "name": "ease-standard",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Card hover, grouped entrance — snap in, soft rest."
+      },
+      {
+        "name": "ease-nav",
+        "value": "cubic-bezier(0.32, 0.72, 0, 1)",
+        "purpose": "Nav indicator pill tween — snap in, soft out."
+      },
+      {
+        "name": "duration-fast",
+        "value": "180ms",
+        "purpose": "Backdrop / fade transitions."
+      },
+      {
+        "name": "duration-press",
+        "value": "280ms",
+        "purpose": "Button color/transform feedback, pill slide."
+      }
     ],
     "breakpoints": [
       { "name": "sm", "value": "640px" },
       { "name": "md", "value": "768px" },
       { "name": "lg", "value": "1024px" },
-      { "name": "xl", "value": "1280px" },
-      { "name": "2xl", "value": "1536px" }
+      { "name": "xl", "value": "1280px" }
     ]
   },
   "components": [
     {
-      "name": "Button (primary)",
+      "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Single accent CTA per screen — copper fill, paper text, scale-on-press.",
-      "html": "<button class=\"ds-btn-primary\">Continue Reading</button>",
-      "css": ".ds-btn-primary { display:inline-flex; align-items:center; justify-content:center; padding:0.5rem 1rem; background:var(--accent); color:var(--paper); border-radius:0.625rem; font-size:0.875rem; font-weight:500; transition:background 180ms ease-out, transform 180ms ease-out; } .ds-btn-primary:hover { background:color-mix(in oklch, var(--accent) 90%, transparent); } .ds-btn-primary:active { transform:scale(0.96); } .ds-btn-primary:focus-visible { outline:none; box-shadow:0 0 0 2px var(--accent-slate), 0 0 0 4px var(--paper); } .ds-btn-primary:disabled { opacity:0.5; cursor:not-allowed; }"
+      "description": "Accent-filled action button. Use once per screen for the primary action.",
+      "html": "<button class=\"ds-btn-primary\">Save Changes</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; height: 2.25rem; padding: 0rem 1.5rem; border-radius: 0.625rem; background: var(--accent); color: var(--contrast); font-size: 0.875rem; font-weight: 500; border: none; cursor: pointer; transition: color 280ms, background-color 280ms, transform 280ms; } .ds-btn-primary:hover { background: oklch(from var(--accent) l c h / 0.9); } .ds-btn-primary:active { transform: scale(0.96); } .ds-btn-primary:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }"
     },
     {
-      "name": "Button (outline)",
+      "name": "Outline Button",
       "kind": "button",
       "refersTo": "button-outline",
-      "description": "Secondary action — hairline border, muted text, muted fill on hover.",
+      "description": "Bordered secondary action. Uses border-as-shadow system.",
       "html": "<button class=\"ds-btn-outline\">Cancel</button>",
-      "css": ".ds-btn-outline { display:inline-flex; align-items:center; justify-content:center; padding:0.5rem 1rem; background:transparent; color:var(--muted-text); border:1px solid var(--border); border-radius:0.625rem; font-size:0.875rem; font-weight:500; transition:background 180ms ease-out, color 180ms ease-out; } .ds-btn-outline:hover { background:var(--warm-gray); color:var(--ink); } .ds-btn-outline:focus-visible { outline:none; box-shadow:0 0 0 2px var(--accent-slate), 0 0 0 4px var(--paper); }"
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; height: 2.25rem; padding: 0rem 1.5rem; border-radius: 0.625rem; background: transparent; color: var(--muted-text); font-size: 0.875rem; font-weight: 500; border: 1px solid transparent; box-shadow: 0 0 0 1px color-mix(in oklch, var(--ink) 7%, transparent), 0 1px 2px -1px color-mix(in oklch, var(--ink) 8%, transparent), 0 2px 4px 0 color-mix(in oklch, var(--ink) 5%, transparent); cursor: pointer; transition: color 280ms, background-color 280ms, transform 280ms; } .ds-btn-outline:hover { background: var(--surface); color: var(--ink); } .ds-btn-outline:active { transform: scale(0.96); } .ds-btn-outline:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }"
     },
     {
-      "name": "Button (ghost)",
+      "name": "Ghost Button",
       "kind": "button",
       "refersTo": "button-ghost",
-      "description": "Tertiary / icon-adjacent action — no border, muted fill on hover.",
-      "html": "<button class=\"ds-btn-ghost\">More</button>",
-      "css": ".ds-btn-ghost { display:inline-flex; align-items:center; justify-content:center; padding:0.5rem 1rem; background:transparent; color:var(--muted-text); border-radius:0.625rem; font-size:0.875rem; font-weight:500; transition:background 180ms ease-out, color 180ms ease-out; } .ds-btn-ghost:hover { background:var(--warm-gray); color:var(--ink); }"
+      "description": "Minimal text button for toolbars and icon contexts.",
+      "html": "<button class=\"ds-btn-ghost\">Edit</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; height: 2.25rem; padding: 0rem 1.5rem; border-radius: 0.625rem; background: transparent; color: var(--muted-text); font-size: 0.875rem; font-weight: 500; border: none; cursor: pointer; transition: color 280ms, background-color 280ms, transform 280ms; } .ds-btn-ghost:hover { background: var(--surface); color: var(--ink); } .ds-btn-ghost:active { transform: scale(0.96); } .ds-btn-ghost:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }"
     },
     {
-      "name": "Button (destructive)",
+      "name": "Destructive Button",
       "kind": "button",
       "refersTo": "button-destructive",
-      "description": "Delete / irreversible action — vermillion rose fill.",
+      "description": "Rose-filled danger action for delete/destroy operations.",
       "html": "<button class=\"ds-btn-destructive\">Delete</button>",
-      "css": ".ds-btn-destructive { display:inline-flex; align-items:center; justify-content:center; padding:0.5rem 1rem; background:var(--accent-rose); color:var(--paper); border-radius:0.625rem; font-size:0.875rem; font-weight:500; transition:background 180ms ease-out, transform 180ms ease-out; } .ds-btn-destructive:hover { background:color-mix(in oklch, var(--accent-rose) 90%, transparent); } .ds-btn-destructive:active { transform:scale(0.96); }"
+      "css": ".ds-btn-destructive { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; height: 2.25rem; padding: 0rem 1.5rem; border-radius: 0.625rem; background: oklch(58% 0.13 28); color: oklch(97% 0.018 50); font-size: 0.875rem; font-weight: 500; border: none; cursor: pointer; transition: color 280ms, background-color 280ms, transform 280ms; } .ds-btn-destructive:hover { background: oklch(from oklch(58% 0.13 28) l c h / 0.9); } .ds-btn-destructive:active { transform: scale(0.96); } .ds-btn-destructive:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; } .ds-btn-destructive:disabled { opacity: 0.5; cursor: not-allowed; }"
     },
     {
       "name": "Tag Pill",
       "kind": "chip",
       "refersTo": "tag-pill",
-      "description": "Muted rounded pill for categories / status. NOT uppercase.",
+      "description": "Rounded metadata pill for categories, tags, and filter indicators.",
       "html": "<span class=\"ds-tag-pill\">Reading</span>",
-      "css": ".ds-tag-pill { display:inline-block; padding:0.25rem 0.625rem; background:var(--warm-gray); color:var(--muted-text); border-radius:9999px; font-size:0.75rem; font-weight:500; }"
+      "css": ".ds-tag-pill { display: inline-flex; align-items: center; padding: 0.25rem 0.625rem; border-radius: 9999px; background: oklch(from var(--surface) l c h); color: var(--muted-text); font-size: 0.75rem; font-weight: 500; line-height: 1; }"
     },
     {
       "name": "Card",
       "kind": "card",
       "refersTo": "card",
-      "description": "Standard surface — paper ground, hairline border, flat at rest (border-as-shadow).",
-      "html": "<div class=\"ds-card\"><div class=\"ds-card-content\">Content</div></div>",
-      "css": ".ds-card { background:var(--paper); color:var(--ink); border:1px solid var(--border); border-radius:0.625rem; padding:1.5rem; box-shadow:0px 0px 0px 1px rgba(0,0,0,0.06), 0px 1px 2px -1px rgba(0,0,0,0.06), 0px 2px 4px 0px rgba(0,0,0,0.04); }.ds-card-content { display:flex; flex-direction:column; gap:1.5rem; }"
+      "description": "Default content container with tonal background, border-as-shadow, and hover lift.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-header\"><h3 class=\"ds-card-title\">Card Title</h3><p class=\"ds-card-desc\">A short description of this card's content.</p></div><div class=\"ds-card-content\">Body content goes here.</div></div>",
+      "css": ".ds-card { display: flex; flex-direction: column; gap: 1.5rem; padding: 1.5rem; border-radius: 0.625rem; background: var(--card); color: var(--ink); border: 1px solid transparent; box-shadow: 0 0 0 1px color-mix(in oklch, var(--ink) 7%, transparent), 0 1px 2px -1px color-mix(in oklch, var(--ink) 8%, transparent), 0 2px 4px 0 color-mix(in oklch, var(--ink) 5%, transparent); transition: transform 200ms ease, box-shadow 200ms ease; } .ds-card:hover { transform: translateY(-1px); box-shadow: 0 4px 16px -2px oklch(from var(--accent) l c h / 0.08), 0 1px 4px oklch(from var(--accent) l c h / 0.04); } .ds-card-header { display: grid; gap: 0.375rem; padding-inline: 1.5rem; } .ds-card-title { margin: 0; font-size: 1rem; font-weight: 600; line-height: 1.2; } .ds-card-desc { margin: 0; font-size: 0.875rem; color: var(--muted-text); } .ds-card-content { padding-inline: 1.5rem; }"
     },
     {
-      "name": "Bento Card (signature)",
-      "kind": "card",
-      "refersTo": "bento-card",
-      "description": "Squircle home-page card — layered ambient + inset white sheen. 48px base / 64px @supports.",
-      "html": "<div class=\"ds-bento-card\">Home</div>",
-      "css": ".ds-bento-card { padding:1.25rem; background:var(--paper); color:var(--ink); border-radius:48px; box-shadow:color-mix(in srgb, var(--ink) 12%, transparent) 0px 40px 50px -32px, color-mix(in srgb, var(--ink) 8%, transparent) 0px 60px 80px -48px, rgba(255,255,255,0.35) 0px 0px 20px 0px inset; } @supports (corner-shape: squircle) { .ds-bento-card { corner-shape:squircle; border-radius:64px; } }"
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Default text field with surface background and border-as-shadow.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Search...\" />",
+      "css": ".ds-input { display: flex; height: 2.25rem; width: 100%; padding: 0 1rem; border-radius: 0.625rem; background: oklch(from var(--surface) l c h / 0.3); color: var(--ink); font-size: 0.875rem; border: 1px solid transparent; box-shadow: 0 0 0 1px color-mix(in oklch, var(--ink) 7%, transparent), 0 1px 2px -1px color-mix(in oklch, var(--ink) 8%, transparent), 0 2px 4px 0 color-mix(in oklch, var(--ink) 5%, transparent); transition: box-shadow 200ms ease-out; outline: none; } .ds-input::placeholder { color: var(--muted-text); } .ds-input:focus-visible { box-shadow: 0 0 0 2px color-mix(in oklch, var(--ring) 40%, transparent), 0 1px 2px -1px color-mix(in oklch, var(--ink) 8%, transparent); } .ds-input:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Range Slider",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Custom-styled range slider with accent-bordered thumb.",
+      "html": "<input class=\"ds-slider\" type=\"range\" min=\"0\" max=\"100\" value=\"60\" />",
+      "css": ".ds-slider { -webkit-appearance: none; appearance: none; background: transparent; height: 24px; width: 100%; cursor: pointer; } .ds-slider::-webkit-slider-runnable-track { height: 6px; border-radius: 9999px; background: var(--surface); } .ds-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; margin-top: -6px; border-radius: 9999px; background: var(--page); border: 2px solid var(--accent); box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 12%, transparent); transition: box-shadow 150ms ease-out, transform 150ms ease-out; } .ds-slider::-webkit-slider-thumb:hover { transform: scale(1.12); box-shadow: 0 2px 6px color-mix(in oklch, var(--ink) 16%, transparent), 0 0 0 4px color-mix(in oklch, var(--accent) 15%, transparent); } .ds-slider:focus-visible { outline: none; } .ds-slider:focus-visible::-webkit-slider-thumb { box-shadow: 0 2px 6px color-mix(in oklch, var(--ink) 16%, transparent), 0 0 0 4px color-mix(in oklch, var(--accent) 30%, transparent); } .ds-slider::-moz-range-track { height: 6px; border-radius: 9999px; background: var(--surface); } .ds-slider::-moz-range-thumb { width: 18px; height: 18px; border-radius: 9999px; background: var(--page); border: 2px solid var(--accent); box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 12%, transparent); }"
+    },
+    {
+      "name": "Nav Indicator Pill",
+      "kind": "nav",
+      "refersTo": "button-primary",
+      "description": "The sliding glass pill that highlights the active nav item. Liquid-glass treatment.",
+      "html": "<nav class=\"ds-nav\"><button class=\"ds-nav-item ds-nav-active\"><span>Home</span></button><button class=\"ds-nav-item\"><span>Blog</span></button><button class=\"ds-nav-item\"><span>Books</span></button></nav>",
+      "css": ".ds-nav { display: inline-flex; align-items: center; gap: 0.125rem; padding: 0.25rem; border-radius: 9999px; background: rgb(255 255 255 / 0.06); backdrop-filter: blur(6px) saturate(1.4); border: 1px solid rgb(255 255 255 / 0.08); box-shadow: inset 0 0 2px 1px rgb(255 255 255 / 0.55), inset 0 0 10px 4px rgb(255 255 255 / 0.22), 0 6px 24px rgb(17 17 26 / 0.06); } .ds-nav-item { display: inline-flex; align-items: center; gap: 0.375rem; height: 2.75rem; padding: 0 1rem; border-radius: 9999px; background: transparent; color: black; font-size: 0.8125rem; font-weight: 600; border: none; cursor: pointer; transition: opacity 150ms ease-out, transform 150ms ease-out; } .ds-nav-item:active { transform: scale(0.96); } .ds-nav-item:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--ring); } .ds-nav-active { background: rgb(255 255 255 / 0.28); border: 1px solid rgb(255 255 255 / 0.4); box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.6), inset 0 -1px 2px rgb(0 0 0 / 0.04), 0 2px 6px rgb(0 0 0 / 0.06); }"
     },
     {
       "name": "Modal Panel",
       "kind": "card",
-      "refersTo": "modal-panel",
-      "description": "Standard centered modal — rounded-2xl, single-layer shadow, spring entrance.",
-      "html": "<div class=\"ds-modal-panel\"><h2>Settings</h2><p>Choose a theme.</p></div>",
-      "css": ".ds-modal-panel { width:100%; max-width:560px; padding:1.5rem; background:var(--paper); color:var(--ink); border:1px solid color-mix(in oklch, var(--border) 60%, transparent); border-radius:1.125rem; box-shadow:0 12px 32px color-mix(in oklch, var(--ink) 10%, transparent); }"
-    },
-    {
-      "name": "Dynamic Island (nav)",
-      "kind": "nav",
-      "refersTo": "nav-island",
-      "description": "Bottom-fixed status pill — springs open (220x28 -> 260x96) with SPRING_CRISP. Latency dot, visitor count, task count.",
-      "html": "<div class=\"ds-island\"><span class=\"ds-island-dot ds-online\"></span><span class=\"ds-island-label\">42 ms</span><span class=\"ds-island-sep\">·</span><span class=\"ds-island-dot ds-success\"></span><span class=\"ds-island-label\">3 在线</span></div>",
-      "css": ".ds-island { display:flex; align-items:center; gap:0.375rem; padding:0.4375rem 0.75rem; background:var(--ink); color:var(--paper); border-radius:14px; font-size:0.625rem; font-weight:500; letter-spacing:0.05em; box-shadow:0 4px 12px rgba(0,0,0,0.2); cursor:pointer; }.ds-island-dot { width:0.375rem; height:0.375rem; border-radius:9999px; }.ds-island-dot.ds-online { background:oklch(0.696 0.17 162); }.ds-island-dot.ds-success { background:oklch(0.696 0.17 162); }.ds-island-sep { color:rgba(255,255,255,0.3); }.ds-island-label { font-variant-numeric:tabular-nums; }"
-    },
-    {
-      "name": "Slider (custom)",
-      "kind": "custom",
-      "description": "Themed range — accent track-fill, paper thumb ringed in accent, live value chip.",
-      "html": "<div class=\"ds-slider-row\"><span class=\"ds-slider-label\"><svg class=\"ds-ico\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><circle cx=\"12\" cy=\"12\" r=\"10\"/></svg>背景模糊</span><span class=\"ds-value-chip\">8 px</span></div><input type=\"range\" min=\"5\" max=\"70\" class=\"ds-slider\" />",
-      "css": ".ds-slider-row { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:0.5rem; }.ds-slider-label { display:flex; align-items:center; gap:0.375rem; font-size:0.875rem; font-weight:500; }.ds-ico { width:1rem; height:1rem; color:var(--muted-text); }.ds-value-chip { font-family:ui-monospace, monospace; font-size:0.75rem; font-weight:500; background:var(--warm-gray); color:var(--ink); padding:0.125rem 0.5rem; border-radius:9999px; font-variant-numeric:tabular-nums; }.ds-slider { -webkit-appearance:none; appearance:none; background:transparent; width:100%; height:24px; }.ds-slider::-webkit-slider-runnable-track { height:6px; border-radius:9999px; background:linear-gradient(to right, var(--accent) 0%, var(--accent) 50%, var(--warm-gray) 50%, var(--warm-gray) 100%); }.ds-slider::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:18px; height:18px; margin-top:-6px; border-radius:9999px; background:var(--paper); border:2px solid var(--accent); box-shadow:0 1px 2px color-mix(in oklch, var(--ink) 12%, transparent); transition:transform 150ms ease-out, box-shadow 150ms ease-out; cursor:pointer; }.ds-slider::-webkit-slider-thumb:hover { transform:scale(1.12); box-shadow:0 2px 6px color-mix(in oklch, var(--ink) 16%, transparent), 0 0 0 4px color-mix(in oklch, var(--accent) 15%, transparent); }.ds-slider:focus-visible::-webkit-slider-thumb { box-shadow:0 0 0 4px color-mix(in oklch, var(--accent) 30%, transparent); }.ds-slider::-moz-range-track { height:6px; border-radius:9999px; background:linear-gradient(to right, var(--accent) 0%, var(--accent) 50%, var(--warm-gray) 50%, var(--warm-gray) 100%); }.ds-slider::-moz-range-thumb { width:18px; height:18px; border-radius:9999px; background:var(--paper); border:2px solid var(--accent); }"
-    },
-    {
-      "name": "Drawer Panel (settings)",
-      "kind": "custom",
-      "refersTo": "drawer-settings",
-      "description": "Right-side settings drawer — flagship panel. Slides from right with spring, 4-layer asymmetric shadow, rounded-3xl.",
-      "html": "<div class=\"ds-drawer\"><header><h1>偏好设置</h1><p>Customize your reading experience</p></header><nav class=\"ds-segmented\"><button class=\"ds-active\">外观</button><button>背景</button><button>卡片</button></nav></div>",
-      "css": ".ds-drawer { background:var(--paper); border:1px solid color-mix(in oklch, var(--border) 60%, transparent); border-radius:1.5rem; box-shadow:0 -1px 1px color-mix(in oklch, var(--ink) 6%, transparent), 0 -8px 18px color-mix(in oklch, var(--ink) 8%, transparent), 0 -24px 40px color-mix(in oklch, var(--ink) 5%, transparent), inset 0 1px 0 0 oklch(from var(--paper) l c h / 0.6); }.ds-drawer header { padding:3rem 2rem 1.25rem; text-align:center; }.ds-drawer h1 { font-family:ui-serif, Georgia, serif; font-size:1.75rem; font-weight:600; }.ds-segmented { display:flex; gap:0.25rem; background:var(--warm-gray); padding:0.25rem; border-radius:0.75rem; margin:0 2rem; }.ds-segmented button { flex:1; padding:0.5rem 0.75rem; border-radius:0.5rem; font-size:0.875rem; font-weight:500; color:color-mix(in oklch, var(--ink) 55%, transparent); transition:all 200ms ease-out; }.ds-segmented .ds-active { background:var(--paper); color:var(--accent); box-shadow:0 1px 2px color-mix(in oklch, var(--ink) 8%, transparent); }"
+      "refersTo": "card",
+      "description": "Elevated modal/dialog panel with backdrop blur and spring entrance.",
+      "html": "<div class=\"ds-modal-backdrop\"><div class=\"ds-modal\"><h2 class=\"ds-modal-title\">Confirm</h2><p class=\"ds-modal-body\">Are you sure you want to proceed?</p><div class=\"ds-modal-actions\"><button class=\"ds-btn-outline\">Cancel</button><button class=\"ds-btn-primary\">Confirm</button></div></div></div>",
+      "css": ".ds-modal-backdrop { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 1rem; background: rgb(0 0 0 / 0.45); backdrop-filter: blur(10px); } .ds-modal { width: 100%; max-width: 560px; padding: 1.5rem; border-radius: 1rem; background: oklch(from var(--card) l c h / 0.6); border: 1px solid transparent; box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25); } .ds-modal-title { margin: 0 0 0.5rem; font-size: 1.125rem; font-weight: 600; } .ds-modal-body { margin: 0 0 1.5rem; font-size: 0.875rem; color: var(--muted-text); } .ds-modal-actions { display: flex; justify-content: flex-end; gap: 0.75rem; }"
     }
   ],
   "narrative": {
-    "northStar": "The Black Cat's Study",
-    "overview": "This is one person's private study, opened to visitors — a site that reads as a personal library and workshop, not a product dashboard. The design is Chinese-first and literary in register (书卷气): warm paper grounds, committed copper accents, serif headings with tightened tracking, and a black cat (kuro neko / 黒猫) as the quiet brand animal. Every visual decision is encoded as code — a three-layer token architecture, four named color schemes, and an explicit 禁止事項 (bans) list — because the site's taste lives in its design system, not in its prose.\n\nThe system spans two frontends that share one visual brain: a Vue desktop client and a React mobile web client both import the same theme files from packages/brand/themes/ and bridge them to Tailwind semantic classes through an identical @theme inline layer. The result is one design language expressed across two independent codebases, so a visitor moving between phone and desktop feels continuity, not duplication.",
+    "northStar": "The Curated Shelf",
+    "overview": "Like a well-kept personal bookshelf where every object has its place — not a museum, not a showroom, but a lived-in surface that reflects one person's daily reading, writing, and making. The design stays quiet and warm so the content (words, books, photos, fishing logs) can be the voice. Each surface is a shelf in the same room: related, coherent, but with its own small role.\n\nThe palette is intentionally low-saturation and high-lightness — paper, sage, mist, blush — four moods of the same quiet room rather than competing accents. Depth comes from tonal layering and a signature border-as-shadow technique rather than heavy drop shadows, keeping the world flat and readable while letting key surfaces (modals, hover states, the glass nav) lift gently when they need attention. Spring-physics motion gives the interface a subtle \"alive\" quality — the nav pill slides and stretches, panels snap in with a soft settle, cards lift on hover — without ever performing.\n\nRounded, friendly, everyday: corners are generous (10px default, full pills for tags and nav), touch targets are soft, and the liquid-glass nav bar is the one place the system lets itself be a little magical. The result feels less like \"a web app\" and more like a personal object you return to.",
     "keyCharacteristics": [
-      "Literary, not commercial — no CTAs, no growth copy, no social proof.",
-      "Four themed rooms — Paper, Sage, Mist, Blush — one study with four moods.",
-      "Theme as infrastructure — 3-layer token architecture; hardcoded colors are a code review red flag.",
-      "Squircle form language — 48px superellipse marks the home bento; restrained 0.625rem radius elsewhere.",
-      "Measured motion — spring primitives (snug/bounce/crisp/reveal); prefers-reduced-motion honored.",
-      "Editorial prose system — drop caps, § section counters, ink-tinted code blocks, language-label headers."
+      "Four hue themes (paper / sage / mist / blush) share one structural skeleton — only the hue pivot changes",
+      "Border-as-shadow: transparent borders replaced with layered box-shadow in color-mix(in oklch, var(--ink) N%)",
+      "Spring-physics motion (stiffness 320 / damping 32 family) for panels, nav, cards",
+      "Editorial serif for headings, CJK-optimized sans for body, decorative Chinese display for branding",
+      "Liquid-glass nav as the single expressive surface; everything else stays matte and quiet",
+      "OKLCH throughout for perceptually uniform theming and smooth gradients"
     ],
     "rules": [
-      { "name": "The One Accent Rule", "section": "colors", "body": "The warm copper accent is used on ≤10% of any screen. Its rarity is the point." },
-      { "name": "The Flat-By-Default Rule", "section": "elevation", "body": "Surfaces rest flat (border-as-shadow). Shadows appear only on hover, focus, or lift." },
-      { "name": "The Drop Cap Rule", "section": "typography", "body": "The opening paragraph of a prose article begins with a 3.4em serif drop cap in accent; collapses below 30rem." },
-      { "name": "The Hairline Rule", "section": "shapes", "body": "Dividers, card outlines, and table borders are a 1px border-border hairline — never thick, never colored." },
-      { "name": "The Squircle Signature", "section": "shapes", "body": "A 48px superellipse (corner-shape: squircle) is the home entry's signature — the one moment the system curves decisively." },
-      { "name": "The CJK-First Rule", "section": "typography", "body": "Body stack must be CJK-capable (HarmonyOS Sans); Averia and 阿里妈妈 display fonts never render body text." }
+      {
+        "name": "The One Voice Rule",
+        "body": "Each theme has exactly one chromatic accent. It appears on ≤10% of any given screen. Its rarity is what gives it weight. Never introduce a second chromatic accent to \"make things pop.\"",
+        "section": "colors"
+      },
+      {
+        "name": "The Hue-Pivot Rule",
+        "body": "Switching theme changes only hue — never saturation strategy, never token roles. If you add a fifth theme, pick a new hue and reuse every token's lightness/chroma exactly.",
+        "section": "colors"
+      },
+      {
+        "name": "The Serif-Is-For-Headings Rule",
+        "body": "System serif appears only at h1–h6 and the drop cap. Body text, UI, buttons, inputs — always sans.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-By-Default Rule",
+        "body": "Surfaces are flat at rest. Shadows appear only as a response to state (hover, elevation, focus) or on genuinely elevated surfaces (modals, drawers, the glass nav).",
+        "section": "elevation"
+      },
+      {
+        "name": "The Glass-Is-The-Exception Rule",
+        "body": "The liquid-glass nav is the only surface that uses backdrop-filter, SVG color-dispersion, and inner highlights. This technique does not spread to cards, modals, or panels.",
+        "section": "elevation"
+      }
     ],
     "dos": [
-      "Do build every surface from the three-layer token stack — raw oklch → theme activation → semantic Tailwind class.",
-      "Do keep the accent rare — copper on ≤10% of any screen.",
-      "Do use color-mix(in oklch, var(--ink) X%, var(--paper)) for tinted surfaces rather than new hex values.",
-      "Do honor prefers-reduced-motion: reduce on every animation.",
-      "Do reserve Averia, 阿里妈妈方圆体, and 东方大楷 for display moments only."
+      "Do use semantic Tailwind classes (bg-card, text-muted, border-input) — never hardcode hex/oklch in components",
+      "Do keep the accent rare — one primary action per screen, one active nav state",
+      "Do use the border-as-shadow system (the border class) for card/input outlines",
+      "Do animate with spring physics for panels and nav (stiffness: 320, damping: 32 family)",
+      "Do respect prefers-reduced-motion — all animations have a :reduce guard",
+      "Do use color-mix(in oklch, var(--ink) N%) for any shadow that must adapt to both light and dark themes"
     ],
     "donts": [
-      "Don't hardcode colors (bg-black/75, text-white/90, from-violet-500…) — hardcoded color is a code review red flag.",
-      "Don't reference tokens across layers — no var(--ink) in a component template, no bg-amber-400 in a card.",
-      "Don't add decorative blur glows, traffic-light code headers, glass-card backdrops, or eyebrow labels.",
-      "Don't override component built-in styles on dialogs or modals.",
-      "Don't use text-white for body text — use text-foreground.",
-      "Don't ship identical-card grids unless uniformity is genuinely required.",
-      "Don't promote a single surface's composition into a system-wide pattern — the bento is the kitchen, not the wallpaper."
+      "Don't introduce a second chromatic accent — no blue + orange, no purple + green. One voice per theme",
+      "Don't use the liquid-glass technique outside the nav bar — it's the room's one window",
+      "Don't add heavy drop shadows to static surfaces — no shadow-lg on resting cards",
+      "Don't use decorative Chinese font for anything other than the nav wordmark",
+      "Don't use Tailwind's prose prose-slate (it breaks theme switching)",
+      "Don't use traffic-light dots on code blocks — explicitly rejected as AI default slop",
+      "Don't split the source of truth: tokens live in theme CSS and DESIGN.md frontmatter — don't redefine in component code"
     ]
   }
 }

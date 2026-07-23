@@ -2,18 +2,14 @@
 
 ## 1) Rules (Highest Priority)
 
-- **代码质量检查已自动化**：per-edit 触发 prettier / oxlint / ruff format / ruff check / gofmt / go vet（见 `.claude/settings.json` 的 PostToolUse hook），commit 时跑 `pnpm type-check` / `ruff check` / `go vet` / `go build`（见 `.git/hooks/pre-commit`）。Claude 不必主动运行这些命令。
-- 样式必须使用语义化 Tailwind class，禁止硬编码颜色。
+- 使用语义化 Tailwind class，禁止硬编码颜色。
 - 用户没有特殊要求，禁止执行 `pnpm build`
 - 后端使用 `uv` 管理依赖。
 
 ## 2) Project Overview
 
-- kanocifer.chat 个人网站（"kuro neko" / 黑猫）。技术栈、数据层、分层、API 约定见 [architecture.md](docs/rules/architecture.md)。
+- kanocifer.chat 个人网站（"kuro neko" / 黑猫）。
 - **双前端架构**：Vue (`frontend/`) + React (`react-app/`) 共享后端、各自独立状态 Store。
-  - API 契约 / `backend/app/schemas/` 变更 → 必须同步 `frontend/src/api/` 与 `react-app/src/services/`。
-- **缓存**：`app/plugins/cache/` 的 `@redis_cache(ttl=N, exclude=[...])`；`exclude` 跳过 Depends 参数（不参与 cache key）。
-- **`composables/` 按域分目录**（`shared/ card/ article/ pic/ rss/ weread/ comment/ todo/`）含 `index.ts` 桶导出；跨域 import 走桶，不直接指向文件。详见 [code-style.md](docs/rules/code-style.md)。
 
 ## 3) Documentation Index
 
@@ -22,40 +18,9 @@
 - [architecture.md](docs/rules/architecture.md) — 后端分层、数据层、API 约定、双端分流
 - [code-style.md](docs/rules/code-style.md) — 后端/ Vue/ React 代码风格
 - [commands.md](docs/rules/commands.md) — 常用命令速查
-- [design-system.md](docs/rules/design-system.md) — 3 层 token 架构、组件规则、禁止事项
 - [domain.md](docs/rules/domain.md) — 领域词汇表
 - [environment.md](docs/rules/environment.md) — 环境变量、端口、工具链版本
 - [go-backend.md](docs/rules/go-backend.md) — Go 重构的分层、鉴权差异、测试、已知遗留
 - [auth.md](docs/rules/auth.md) — **双后端认证统一契约**(JWT/Refresh/Password/Admin)
 - [logging.md](docs/rules/logging.md) — 日志编排规约 (structlog + Taskiq 落库)
 - [testing.md](docs/rules/testing.md) — 前端测试规范 (Vue + React + Vitest 4)
-
-设计系统：
-
-- [DESIGN.md](DESIGN.md) — 完整设计系统参考（色彩/排版/主题/组件，由 `.impeccable/` 生成）
-
-## Module Boundaries (react-app)
-
-`react-app/src/` top-level dirs are deep modules — see [src/packages/README.md](react-app/src/packages/README.md) before adding or importing one. Run `pnpm run lint:boundaries` (in `react-app/`) to verify.
-
-## Module Boundaries (frontend)
-
-`frontend/src/` top-level dirs (`features/*`, `shared/*`, `utils/*`, `layouts/*`, `router`) are deep modules — see [src/README.md](frontend/src/README.md) before adding or importing one. Each immediate child is a package; import only through its root entry points. Run `pnpm run lint:boundaries` (in `frontend/`) to verify.
-
-## Agent skills
-
-### Design Context
-
-See [PRODUCT.md](PRODUCT.md) for register, audience, brand personality, anti-references, and design principles. The 3-layer token contract and 禁止事项 list live in [design-system.md](docs/rules/design-system.md); the canonical color/typography/visual system lives in [DESIGN.md](DESIGN.md).
-
-### Issue tracker
-
-GitHub — issues live in the repo's GitHub Issues (`gh` CLI); PRs are not a triage surface. See `docs/agents/issue-tracker.md`.
-
-### Triage labels
-
-Five canonical labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
-
-### Domain docs
-
-Single-context — `CONTEXT.md` + `docs/adr/` at repo root. See `docs/agents/domain.md`.

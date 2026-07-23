@@ -1,9 +1,0 @@
-{
-  "detector": {
-    "ignoreRules": [],
-    "ignoreFiles": [
-      "src/views/blog/BlogPostView.vue"
-    ],
-    "ignoreValues": []
-  }
-}

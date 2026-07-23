@@ -1,39 +1,23 @@
-# Environment & Key Files
+# Environment
 
-## Key Files
-
-- Backend entry: `backend/app/main.py` — FastAPI app, lifespan manager, Beanie registration
-- Desktop entry: `frontend/src/main.ts` — Vue 3 app mount (Pinia + router + head)
-- Mobile entry: `react-app/src/main.tsx` — React 19 app mount
+- Backend: `backend/` — FastAPI
+- Desktop: `frontend/`
+- Mobile: `react-app/`
 - Brand themes: `packages/brand/themes/` — shared CSS variables (4 schemes: paper / sage / mist / blush)
 - Brand prose: `packages/brand/prose.css` — `.prose` article styles (shared across both frontends)
-- Go backend: `go-backend/` — Python 后端的 Go 重构（核心功能已实现，持续完善中）。详见 [go-backend.md](go-backend.md)
-- Config: `config/` (migration, deployment scripts)
-
-## Ports
-
-| Service     | Dev     | Prod                     |
-| ----------- | ------- | ------------------------ |
-| Backend API | `:5555` | same                     |
-| Vue App     | `:5173` | Nginx served             |
-| React App   | `:5174` | Nginx served (mobile UA) |
-
-## Docker
-
-- `go-backend/Dockerfile` — 多阶段构建（golang-alpine → alpine），EXPOSE 5555
+- Go backend: `go-backend/` — Python 后端的 Go 重构。
 
 ## Required Env Vars
 
-| Variable         | Description                                                                                   |
-| ---------------- | --------------------------------------------------------------------------------------------- |
-| `DATABASE_URL`   | PostgreSQL **async** connection string (app runtime + Alembic 迁移均使用，异步引擎)           |
-| `DB_MIGRATE_URL` | 已定义但 **Alembic 实际读 `DATABASE_URL`**（`psycopg` 非依赖项）；迁移时只关注 `DATABASE_URL` |
-| `SECRET_KEY`     | JWT signing key (`openssl rand -hex 32`)                                                      |
-| `MONGO_URI`      | MongoDB connection string                                                                     |
-| `REDIS_URL`      | Redis connection string                                                                       |
-| `RABBITMQ_URL`   | RabbitMQ connection string (Taskiq broker)                                                    |
-| `MEDIA_PATH`     | 上传文件存储根目录（绝对路径或相对路径）。默认 `./media`；设成同一绝对路径可使 Python / Go 端共享同一份上传文件 |
-| `MAX_UPLOAD_MB`  | 单文件上传上限（MB），默认 `10`；超出返回 413                                                  |
+| Variable        | Description                                                                         |
+| --------------- | ----------------------------------------------------------------------------------- |
+| `DATABASE_URL`  | PostgreSQL **async** connection string (app runtime + Alembic 迁移均使用，异步引擎) |
+| `SECRET_KEY`    | JWT signing key (`openssl rand -hex 32`)                                            |
+| `MONGO_URI`     | MongoDB connection string                                                           |
+| `REDIS_URL`     | Redis connection string                                                             |
+| `RABBITMQ_URL`  | RabbitMQ connection string (Taskiq broker)                                          |
+| `MEDIA_PATH`    | 上传文件存储根目录（绝对路径或相对路径）。                                          |
+| `MAX_UPLOAD_MB` | 单文件上传上限（MB），默认 `10`；超出返回 413                                       |
 
 ### Go 端额外变量
 
@@ -45,14 +29,3 @@
 | `ADMIN_USER_IDS`                                                    | 逗号分隔的管理员 user ID 列表（如 `1,2`） |
 | `WEBAUTHN_RP_ID` / `WEBAUTHN_ORIGIN`                                | Passkey 认证（默认 `kanocifer.chat`）     |
 | `AMAP_SECURITY_CODE` / `AMAP_WEB_KEY`                               | 高德地图天气                              |
-
-## Tools & Versions
-
-| Tool       | Version | Manager |
-| ---------- | ------- | ------- |
-| Python     | 3.14+   | uv      |
-| Node       | ^26.4   | pnpm    |
-| Go         | 1.26    | —       |
-| PostgreSQL | 18      | —       |
-| MongoDB    | 8       | —       |
-| Redis      | 8       | —       |

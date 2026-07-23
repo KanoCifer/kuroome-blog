@@ -1,17 +1,9 @@
-# 双后端认证统一契约
+# 后端认证统一契约
 
 > 状态: active | 更新: 2026-07-09
-> 适用范围: Python `backend/` (`/api/v1`) 与 Go `go-backend/` (`/api/v3`) 共享
+> 适用范围: Go `go-backend/`
 
-## 1. 概述
-
-双后端共享同一 Postgres 用户库与 Redis,认证机制必须在两端保持一致,确保:
-
-- 任一端签发的 **access token** 另一端可解析并识别 `sub`
-- 任一端 **logout / refresh 轮换**后,旧 refresh token 在另一端也失效
-- admin 用户在两端都能访问 admin 接口,非 admin 均返回 403
-
-## 2. Token 格式
+## Token 格式
 
 | 项                | 值                       |
 | ----------------- | ------------------------ |
@@ -20,7 +12,7 @@
 | Access token TTL  | **24 小时**              |
 | Refresh token TTL | **7 天**                 |
 
-### 2.1 JWT Claims
+### JWT Claims
 
 ```json
 {
@@ -36,7 +28,7 @@
 
 > **为何需要 jti**: 没有 `jti` 时,相同 `sub` + 相同 `exp` 会产出完全相同的 JWT,refresh 轮换后旧 token 与新 token 无法区分,白名单校验形同虚设。
 
-### 2.2 Token 传输
+### Token 传输
 
 | Token   | 位置                                   | 说明                                                |
 | ------- | -------------------------------------- | --------------------------------------------------- |
@@ -44,9 +36,7 @@
 | Refresh | JSON response body                     | 主路径                                              |
 | Refresh | HttpOnly cookie                        | `secure`, `samesite=strict`, `domain=COOKIE_DOMAIN` |
 
-## 3. Refresh Token 白名单(Redis)
-
-### 3.1 Key 设计
+### Key 设计
 
 ```
 refresh:{user_id}  →  "<jwt_string>"   TTL=7d
@@ -55,7 +45,7 @@ refresh:{user_id}  →  "<jwt_string>"   TTL=7d
 - **单设备模型**: 同一用户同时只有一个有效 refresh token;新登录覆盖旧值。
 - 未来如需多设备,改为 `refresh:{user_id}:{jti}` 的哈希结构(二期)。
 
-### 3.2 生命周期
+### 生命周期
 
 ```
 login / refresh / passkey-login / github-login
@@ -72,19 +62,9 @@ logout
     → redis.delete(f"refresh:{uid}")
 ```
 
-### 3.3 降级策略
+## Admin 校验
 
-| 场景                   | Python 行为                            | Go 行为                       |
-| ---------------------- | -------------------------------------- | ----------------------------- |
-| Redis 可用             | 正常写 / 校验 / 删除                   | 正常写 / 校验 / 删除          |
-| Redis 不可用           | `redis=None`, 回退 stateless(向后兼容) | `redis=nil` 时**跳过**白名单校验(刷新放行,等同 stateless 回退),不拒绝 |
-| 旧 token(无白名单条目) | `ENFORCE_REDIS_REFRESH` 开关控制       | 默认拒绝(当前实现)            |
-
-> **Python 配置项**: `ENFORCE_REDIS_REFRESH`(bool,默认 `False`)。部署稳定后置 `True`,强制所有 refresh 走 Redis 校验。
-
-## 4. Admin 校验
-
-ADMIN_USER_IDS="1,2"
+`ADMIN_USER_IDS="1,2"`
 
 | 项               | 值                                    |
 | ---------------- | ------------------------------------- |
@@ -93,17 +73,14 @@ ADMIN_USER_IDS="1,2"
 | 已认证但非 admin | 403 `"Admin access required"`         |
 | 中间件组合       | 必先 Auth 再 Admin                    |
 
-## 5. Password 哈希
+## Password 哈希
 
-| 项        | 值                                                                |
-| --------- | ----------------------------------------------------------------- |
-| 算法      | `bcrypt`(golang.org/x/crypto/bcrypt / Python bcrypt)              |
-| Cost      | `bcrypt.DefaultCost`(=10)                                         |
-| Hash 前缀 | `$2a$`(Go) / `$2b$`(Python 默认) / `$2y$`(旧实现) — 三种都识别    |
-| 验证分流  | 前缀匹配 → bcrypt;否则 → werkzeug `check_password_hash`(兼容存量) |
-| 静默升级  | Python 登录成功且 `needs_hash_upgrade()` 时重哈希为 bcrypt        |
+| 项   | 值                                                   |
+| ---- | ---------------------------------------------------- |
+| 算法 | `bcrypt`(golang.org/x/crypto/bcrypt / Python bcrypt) |
+| Cost | `bcrypt.DefaultCost`(=10)                            |
 
-## 6. Passkey / WebAuthn
+## Passkey / WebAuthn
 
 | 项            | 值                          |
 | ------------- | --------------------------- |
@@ -112,54 +89,3 @@ ADMIN_USER_IDS="1,2"
 | 限额          | 每用户 1 个凭证             |
 | Challenge TTL | 5 分钟(Redis `passkey:*`)   |
 | 注册登录后    | 发放 access + refresh token |
-
-## 7. 错误格式
-
-统一响应信封:
-
-```json
-{ "message": "...", "data": <any|null> }
-```
-
-| 场景                               | HTTP | message                                        |
-| ---------------------------------- | ---- | ---------------------------------------------- |
-| 缺 / 无效 Authorization            | 401  | `"Invalid token"`                              |
-| 用户已删除(token 有效但 DB 无用户) | 401  | `"User not found"`                             |
-| 非 admin 访问 admin 接口           | 403  | `"Admin access required"`                      |
-| refresh token 白名单不匹配         | 401  | `"无效的刷新令牌或已过期"` / `"Invalid token"` |
-| 密码错误                           | 401  | `"用户名或密码错误"` / `"Invalid credentials"` |
-
-> Python 额外返回 `WWW-Authenticate: Bearer` header;Go 可选补齐(见 `go-cors-ratelimit.md`)。
-
-## 8. 路由对照
-
-| 功能             | Python `/api/v1/auth`                 | Go `/api/v3`                                      | 中间件              |
-| ---------------- | ------------------------------------- | ------------------------------------------------- | ------------------- |
-| 密码登录         | `POST /login`                         | `POST /login`(已切到 Go)                          | 公开                |
-| 注册             | `POST /register`                      | —(暂留 Python,缺邮箱码)                           | 公开 + 邮箱码       |
-| 刷新             | `GET /refresh-token`(cookie)          | `POST /refresh-token`(cookie/body,已切到 Go)      | 公开(refresh token) |
-| 登出             | `POST /logout`                        | `POST /logout`(已切到 Go,清 cookie)               | Auth                |
-| 当前用户         | `GET /me`                             | `GET /me`(已切到 Go)                              | Auth                |
-| 设置             | `PUT /settings`                       | —(暂留 Python)                                    | Auth                |
-| 头像上传         | `POST /upload-pic`                    | —(暂留 Python)                                    | Auth                |
-| Passkey 注册选项 | `GET /passkey/registration-options`   | `GET /passkey/registration-options`(已切到 Go)    | Auth                |
-| Passkey 注册完成 | `POST /passkey/register`              | `POST /passkey/register`(已切到 Go)               | Auth                |
-| Passkey 登录选项 | `GET /passkey/authentication-options` | `GET /passkey/authentication-options`(已切到 Go)  | 公开                |
-| Passkey 登录完成 | `POST /passkey/authenticate`          | `POST /passkey/authenticate`(已切到 Go,发 cookie) | 公开                |
-| Passkey 删除     | `DELETE /passkey/delete`              | `DELETE /passkey/delete`(已切到 Go)               | Auth                |
-| GitHub 登录      | `GET /github`                         | `GET /auth/github`(已切到 Go)                     | 公开                |
-| GitHub 绑定      | `GET /github/bind`                    | `GET /github/bind`(已切到 Go)                     | Auth                |
-| GitHub 回调      | `GET /github/callback`                | `GET /auth/github/callback`(已切到 Go)            | 公开                |
-| GitHub 解绑      | `POST /github/unbind`                 | `POST /github/unbind`(已切到 Go)                  | Auth                |
-| 邮箱验证码       | `POST /email/code`                    | `POST /email/code`(已切到 Go)                     | 公开                |
-
-> **前端分流现状(2026-07-09)**: Vue(`frontend`)与 React(`react-app`)的
-> 登录 / 刷新 / 登出 / me / passkey(全套) / GitHub(登录·绑定·解绑·回调) /
-> 后台 post 增删改 / visitor track 均已指向 Go `/api/v3`;
-> 设置 / 头像上传仍走 Python `/api/v1/auth`。
->
-> **Go 端契约对齐**:登录 / 刷新 / passkey 登录 / GitHub 登录均会下发
-> HttpOnly `refresh_token` cookie(与 Python 一致);前端静默刷新走
-> `POST /v3/refresh-token`,token 优先取 body、缺失时回退 cookie。响应用
-> 户字段铺平到 `data` 顶层(含 `github_bound` / `has_passkey` / `gender` /
-> `email` / `mobile` / `photo`),与 Python `user_to_dict` 形状一致。

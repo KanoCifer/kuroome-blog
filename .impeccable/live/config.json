@@ -1,7 +1,0 @@
-{
-  "files": ["frontend/index.html", "react-app/index.html"],
-  "exclude": [],
-  "insertBefore": "</body>",
-  "commentSyntax": "html",
-  "cspChecked": true
-}
