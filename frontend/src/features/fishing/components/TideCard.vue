@@ -4,6 +4,8 @@ import {
   HARBOR_OPTIONS,
   useTidePanelStore,
 } from '@/features/fishing/stores/tidePanel';
+import { HoverDropdown } from '@/components';
+import { Check, ChevronDown } from '@lucide/vue';
 import DashboardCard from './DashboardCard.vue';
 import dayjs from 'dayjs';
 import { storeToRefs } from 'pinia';
@@ -50,6 +52,22 @@ const todayStr = computed(() => {
   const opt = dateOptions.value.find((o) => o.value === selectedDate.value);
   return opt ? `${opt.label} ${opt.weekday}` : dayjs().format('YYYY-MM-DD');
 });
+
+const selectedHarborName = computed(() => {
+  const opt = HARBOR_OPTIONS.find((o) => o.code === selectedHarbor.value);
+  return opt?.name ?? '选择港口';
+});
+
+/** 选完之后立刻关闭 dropdown — slot 暴露的 close() 在两个 picker 都要 */
+function pickHarbor(code: string, close: () => void) {
+  selectedHarbor.value = code;
+  close();
+}
+
+function pickDate(value: string, close: () => void) {
+  selectedDate.value = value;
+  close();
+}
 
 const highTide = computed(() => {
   if (!tideData.value) return null;
@@ -147,7 +165,7 @@ const tideOptions = computed(() => {
     tooltip: {
       trigger: 'axis',
       backgroundColor: p.card,
-      borderColor: p.border,
+      borderColor: withAlpha(p.border, 0.08),
       borderWidth: 1,
       borderRadius: 10,
       padding: [10, 14],
@@ -278,32 +296,79 @@ onMounted(() => {
         </p>
       </div>
       <div class="flex shrink-0 items-center gap-1.5">
-        <select
-          v-model="selectedHarbor"
-          aria-label="选择港口"
-          class="bg-page text-ink focus:ring-accent cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
+        <HoverDropdown
+          panel-class="bg-page absolute top-full right-0 z-50 mt-2 w-44 rounded-2xl p-1.5 ring-1 ring-black/5 backdrop-blur-xs dark:ring-white/10"
         >
-          <option
-            v-for="opt in HARBOR_OPTIONS"
-            :key="opt.code"
-            :value="opt.code"
-          >
-            {{ opt.name }}
-          </option>
-        </select>
-        <select
-          v-model="selectedDate"
-          aria-label="选择日期"
-          class="bg-page text-ink focus:ring-accent cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
+          <template #trigger="{ isOpen }">
+            <button
+              type="button"
+              aria-label="选择港口"
+              :aria-expanded="isOpen || undefined"
+              aria-haspopup="true"
+              class="bg-page text-ink hover:ring-accent focus:ring-accent flex cursor-pointer items-center gap-1 rounded-lg border px-1.5 py-1 text-xs transition-shadow focus:ring-1 focus:outline-none"
+            >
+              <span>{{ selectedHarborName }}</span>
+              <ChevronDown
+                :size="12"
+                class="transition-transform duration-150"
+                :class="{ 'rotate-180': isOpen }"
+              />
+            </button>
+          </template>
+          <template #default="{ close }">
+            <button
+              v-for="opt in HARBOR_OPTIONS"
+              :key="opt.code"
+              type="button"
+              @click="pickHarbor(opt.code, close)"
+              class="hover:bg-surface text-ink flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs"
+            >
+              <span>{{ opt.name }}</span>
+              <Check
+                v-if="opt.code === selectedHarbor"
+                :size="14"
+                class="text-accent"
+              />
+            </button>
+          </template>
+        </HoverDropdown>
+
+        <HoverDropdown
+          panel-class="bg-page absolute top-full right-0 z-50 mt-2 w-36 rounded-2xl p-1.5 ring-1 ring-black/5 backdrop-blur-xs dark:ring-white/10"
         >
-          <option
-            v-for="opt in dateOptions"
-            :key="opt.value"
-            :value="opt.value"
-          >
-            {{ opt.label }} {{ opt.weekday }}
-          </option>
-        </select>
+          <template #trigger="{ isOpen }">
+            <button
+              type="button"
+              aria-label="选择日期"
+              :aria-expanded="isOpen || undefined"
+              aria-haspopup="true"
+              class="bg-page text-ink hover:ring-accent focus:ring-accent flex cursor-pointer items-center gap-1 rounded-lg border px-1.5 py-1 text-xs transition-shadow focus:ring-1 focus:outline-none"
+            >
+              <span>{{ todayStr }}</span>
+              <ChevronDown
+                :size="12"
+                class="transition-transform duration-150"
+                :class="{ 'rotate-180': isOpen }"
+              />
+            </button>
+          </template>
+          <template #default="{ close }">
+            <button
+              v-for="opt in dateOptions"
+              :key="opt.value"
+              type="button"
+              @click="pickDate(opt.value, close)"
+              class="hover:bg-surface text-ink flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs"
+            >
+              <span>{{ opt.label }} {{ opt.weekday }}</span>
+              <Check
+                v-if="opt.value === selectedDate"
+                :size="14"
+                class="text-accent"
+              />
+            </button>
+          </template>
+        </HoverDropdown>
       </div>
     </div>
 

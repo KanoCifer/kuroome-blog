@@ -6,7 +6,9 @@
  * - 头部 4 列度量 (Time window / Peak rain / Δ Temp / Best window)
  *   数字用 tabular-nums 衬出"测量仪表"感,标签全大写小字 + 0.08em tracking
  * - 图表区:1px 虚线水平网格 + 0px 垂直网格;温度线 2px solid,锚点空心圆 hover 显
- * - 单焦点:温度暖橙,降水冷蓝;Hover 时副线降透明度,主线 + 锚点突出
+ * - 单焦点:温度暖橙,降水冷蓝;Hover 时主线 + 锚点突出 (echarts 6 默认会把
+ *   其他 series 推到 blur 态,这里 focus: 'none' 保持副线全可见,避免 tooltip 期间
+ *   图形"消失")
  * - 无圆角重影 / 无渐变 / 无图标:让数据自己说话
  *
  * 契约(不可改):无 props / 无 emit;数据从 useFishingMapStore().weatherHourly
@@ -128,9 +130,8 @@ const chartOption = computed(() => {
 
       tooltip: {
         trigger: 'axis',
-        confine: true,
         backgroundColor: p.card,
-        borderColor: withAlpha(p.foreground, 0.08),
+        borderColor: p.foreground,
         borderWidth: 1,
         borderRadius: 8,
         padding: [10, 12],
@@ -255,15 +256,18 @@ const chartOption = computed(() => {
             borderWidth: 0,
             borderRadius: [2, 2, 0, 0],
           },
+          // echarts 6 默认 emphasis.focus: 'self' 会把其他 series 推到 blur 态
+          // (opacity 拉到 0.25),tooltip 一出整图看似变白消失。改 'none' 让
+          // 其他 series 保持原样,blur 锁 opacity: 1 兜底。— 与 TideCard 同源
           emphasis: {
-            focus: 'self',
+            focus: 'none',
             itemStyle: {
               color: rainColor,
               borderColor: rainColor,
               borderWidth: 0,
             },
           },
-          blur: { itemStyle: { opacity: 0.25 } },
+          blur: { itemStyle: { opacity: 1 } },
           z: 2,
         },
         /* 温度线 —— 单一焦点;hover 显空心锚点 */
@@ -288,7 +292,7 @@ const chartOption = computed(() => {
             borderWidth: 1.6,
           },
           emphasis: {
-            focus: 'self',
+            focus: 'none',
             scale: 1.4,
             itemStyle: {
               color: tempColor,
@@ -298,8 +302,8 @@ const chartOption = computed(() => {
             lineStyle: { width: 2.5 },
           },
           blur: {
-            lineStyle: { opacity: 0.35 },
-            itemStyle: { opacity: 0.35 },
+            lineStyle: { opacity: 1 },
+            itemStyle: { opacity: 1 },
           },
           z: 3,
         },

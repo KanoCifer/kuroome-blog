@@ -8,6 +8,7 @@ import type {
 } from '@/features/fishing/types';
 import dayjs from 'dayjs';
 import { nextTick, ref, watch } from 'vue';
+import { Button } from '@/components';
 
 interface Props {
   isOpen: boolean;
@@ -144,7 +145,7 @@ const handleSubmit = async () => {
               >您的钓鱼体验</label
             >
             <div class="grid grid-cols-3 gap-2">
-              <button
+              <Button
                 v-for="option in FEEDBACK_OPTIONS"
                 :key="option.value"
                 type="button"
@@ -157,27 +158,26 @@ const handleSubmit = async () => {
                 @click="selectedFeedback = option.value"
               >
                 {{ option.label }}
-              </button>
+              </Button>
             </div>
           </div>
 
-          <div class="flex gap-3 pt-2">
-            <button
-              type="button"
-              class="text-ink hover:bg-surface flex-1 rounded-lg border px-4 py-2 text-sm font-medium"
+          <div class="grid grid-cols-2 gap-3">
+            <Button
+              size="md"
+              variant="outline"
               :disabled="loading"
               @click="$emit('cancel')"
             >
               取消
-            </button>
-            <button
-              type="button"
-              class="bg-accent text-ink hover:bg-accent/90 flex-1 rounded-lg px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+            </Button>
+            <Button
+              size="md"
               :disabled="!selectedFeedback || loading"
               @click="handleSubmit"
             >
               {{ loading ? '提交中...' : '确认提交' }}
-            </button>
+            </Button>
           </div>
         </div>
       </div>

@@ -15,13 +15,9 @@ export let isConnected: ReturnType<typeof useWebSocket>['isConnected'] | null =
   null;
 
 function buildWsUrl(): string {
-  const apiBase = import.meta.env.VITE_API_BASE || '/';
-  if (apiBase.startsWith('http')) {
-    return apiBase.replace(/^http/, 'ws') + '/v3/public/ws';
-  }
+  const apiBase = import.meta.env.VITE_API_BASE || '';
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const host = window.location.host;
-  // console.log('WebSocket URL:', `${protocol}//${host}${apiBase}/v3/public/ws`);
   return `${protocol}//${host}${apiBase}/v3/public/ws`;
 }
 

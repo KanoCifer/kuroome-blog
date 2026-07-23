@@ -5,6 +5,7 @@ export * from './ui/button';
 export * from './ui/card';
 export * from './ui/confirm-dialog';
 export * from './ui/dropdown-transition';
+export * from './ui/hover-dropdown';
 export * from './ui/modal';
 export * from './ui/modal-fade-transition';
 export * from './ui/modal-scale-transition';

@@ -48,39 +48,37 @@
         </RouterLink>
       </li>
       <!-- Others: hover dropdown — routes not shown in the pill strip -->
-      <li class="relative flex items-center">
-        <button
-          type="button"
-          @mouseenter="openOthers"
-          @mouseleave="closeOthers"
-          :aria-expanded="isOthersOpen || undefined"
-          aria-haspopup="true"
-          class="nav-text nav-link liquid-glass-button relative flex h-11 items-center gap-1.5 rounded-full px-4 text-[13px] leading-none transition-[transform,background-color,color] duration-150 ease-out active:scale-[0.96]"
-          :class="{
-            'opacity-100': isOthersActive,
-            'opacity-40 hover:opacity-70': !isOthersActive,
-          }"
+      <li>
+        <HoverDropdown
+          panel-class="bg-page/80 absolute top-full right-0 z-50 mt-2 w-52 rounded-2xl p-1.5 ring-1 ring-black/5 backdrop-blur-xs dark:ring-white/10"
+          class="flex items-center"
         >
-          <Ellipsis :size="18" stroke-width="1.75" />
-          <span>Others</span>
-          <ChevronDown
-            :size="12"
-            class="transition-transform duration-150"
-            :class="{ 'rotate-180': isOthersOpen }"
-          />
-        </button>
-        <DropdownTransition>
-          <div
-            v-if="isOthersOpen"
-            @mouseenter="openOthers"
-            @mouseleave="closeOthers"
-            class="bg-page/80 absolute top-full right-0 z-50 mt-2 w-52 rounded-2xl p-1.5 ring-1 ring-black/5 backdrop-blur-xs dark:ring-white/10"
-          >
+          <template #trigger="{ isOpen }">
+            <button
+              type="button"
+              :aria-expanded="isOpen || undefined"
+              aria-haspopup="true"
+              class="nav-text nav-link liquid-glass-button relative flex h-11 items-center gap-1.5 rounded-full px-4 text-[13px] leading-none transition-[transform,background-color,color] duration-150 ease-out active:scale-[0.96]"
+              :class="{
+                'opacity-100': isOthersActive,
+                'opacity-40 hover:opacity-70': !isOthersActive,
+              }"
+            >
+              <Ellipsis :size="18" stroke-width="1.75" />
+              <span>Others</span>
+              <ChevronDown
+                :size="12"
+                class="transition-transform duration-150"
+                :class="{ 'rotate-180': isOpen }"
+              />
+            </button>
+          </template>
+          <template #default="{ close }">
             <RouterLink
               v-for="item in othersRouteItems"
               :key="item.to"
               :to="item.to"
-              @click="closeOthersImmediately"
+              @click="close"
               class="nav-text flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition-colors duration-150 hover:bg-black/5 dark:hover:bg-white/10"
             >
               <component :is="item.icon" :size="16" stroke-width="1.75" />
@@ -96,15 +94,15 @@
               <component :is="item.icon" :size="16" stroke-width="1.75" />
               <span>{{ item.label }}</span>
             </button>
-          </div>
-        </DropdownTransition>
+          </template>
+        </HoverDropdown>
       </li>
     </ul>
   </motion.nav>
 </template>
 
 <script setup lang="ts">
-import { DropdownTransition } from '@/components';
+import { HoverDropdown } from '@/components';
 import { useAuthStore } from '@/features/auth';
 import {
   BookOpenText,
@@ -224,10 +222,7 @@ function positionIndicator(index: number, animate = true) {
   pill.style.transform = `translateX(${tab.offsetLeft}px)`;
 }
 
-// Others dropdown state
-const isOthersOpen = ref(false);
-let othersCloseTimeout: ReturnType<typeof setTimeout> | null = null;
-
+// Others dropdown state (open/close 委托给 HoverDropdown,此处只关心 active 高亮)
 const isOthersActive = computed(() =>
   othersItems.some((item) => item.to && isActive(item.to)),
 );
@@ -245,34 +240,11 @@ const othersActionItems = computed(() =>
 // 切换到移动版：写 device_force=react cookie 后跳转到 m.kanocifer.chat
 // 与 FloatingActionButtons.switchToMobile 保持同源逻辑
 function switchToMobile() {
-  closeOthersImmediately();
   const expires = new Date();
   expires.setTime(expires.getTime() + 30 * 24 * 60 * 60 * 1000);
   document.cookie = `device_force=react;expires=${expires.toUTCString()};path=/;domain=.kanocifer.chat`;
   window.location.href = 'https://m.kanocifer.chat';
 }
-
-const openOthers = () => {
-  if (othersCloseTimeout) {
-    clearTimeout(othersCloseTimeout);
-    othersCloseTimeout = null;
-  }
-  isOthersOpen.value = true;
-};
-
-const closeOthers = () => {
-  othersCloseTimeout = setTimeout(() => {
-    isOthersOpen.value = false;
-  }, 150);
-};
-
-const closeOthersImmediately = () => {
-  if (othersCloseTimeout) {
-    clearTimeout(othersCloseTimeout);
-    othersCloseTimeout = null;
-  }
-  isOthersOpen.value = false;
-};
 
 // Check if route is active
 const isActive = (path: string) => {
@@ -317,9 +289,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  if (othersCloseTimeout) {
-    clearTimeout(othersCloseTimeout);
-  }
   resizeObserver?.disconnect();
 });
 

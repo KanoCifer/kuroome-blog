@@ -4,6 +4,7 @@ import type { FishingIndexData } from '@/features/fishing/types';
 import DashboardCard from '@/features/fishing/components/DashboardCard.vue';
 import { FishingRod, Loader } from '@lucide/vue';
 import { storeToRefs } from 'pinia';
+import { Button } from '@/components';
 
 /**
  * Hero 钓鱼指数卡。
@@ -164,13 +165,9 @@ const handleFeedback = () => {
         </div>
       </details>
 
-      <button
-        class="bg-accent text-ink hover:bg-accent/90 mt-auto w-full rounded-lg px-3 py-2 text-sm font-medium transition-colors"
-        type="button"
-        @click="handleFeedback"
-      >
+      <Button size="lg" class="mt-4 w-full" @click="handleFeedback">
         提交钓鱼反馈
-      </button>
+      </Button>
     </template>
     <p v-else class="text-muted text-sm">暂无数据</p>
   </DashboardCard>

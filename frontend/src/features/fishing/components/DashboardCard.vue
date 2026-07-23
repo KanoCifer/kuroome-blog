@@ -1,23 +1,6 @@
 <script setup lang="ts">
-/**
- * 统一的卡片 chrome wrapper。
- *
- * Dashboard 中所有 tile (Index / Weather / Tide / Hourly / Map / banner) 共享:
- * - bg-page /  语义 token (无 dark: 手写)
- * - 圆角 + 阴影 + overflow hidden
- *
- * 区分:
- * - tone='default': 普通卡片,hover 时 -2px 浮起 + 软阴影
- * - tone='hero': 主视觉,加渐变描边 + 斜向扫光 + 更明显的浮起
- * - interactive: 鼠标悬停浮起 + cursor-pointer (强调可点击)
- * - padding: 6 (默认) / 4 (紧凑) / 0 (例如 map 这种内容铺满,padding 自行控制)
- *
- * 动效统一走 motion-v (项目 §Dependencies 已有 motion-v ^2.3.0);
- * Hero 专属的渐变描边/扫光是装饰层,父级 hover 触发,继续用 CSS :hover 串联。
- */
 import { motion } from 'motion-v';
 import { EASE } from '@/constants';
-import { computed } from 'vue';
 
 interface Props {
   tone?: 'default' | 'hero';
@@ -42,40 +25,11 @@ const motionMap = {
   section: motion.section,
   div: motion.div,
 } as const;
-
-/**
- * 按 tone / interactive 计算 whileHover 的目标态
- * boxShadow 写在这里,而不是 CSS,这样 motion-v 可以 GPU 加速插值
- */
-const whileHover = computed(() => {
-  if (props.tone === 'hero') {
-    return {
-      y: -3,
-      scale: 1.005,
-      boxShadow:
-        '0 12px 32px -8px oklch(from var(--color-accent) l c h / 0.22), 0 4px 12px -4px oklch(0% 0 0 / 0.08)',
-    };
-  }
-  if (props.interactive) {
-    return {
-      y: -3,
-      scale: 1.005,
-      boxShadow:
-        '0 10px 28px -8px oklch(from var(--color-accent) l c h / 0.18), 0 4px 10px -4px oklch(0% 0 0 / 0.08)',
-    };
-  }
-  return {
-    y: -2,
-    boxShadow:
-      '0 8px 22px -8px oklch(0% 0 0 / 0.14), 0 2px 6px -2px oklch(0% 0 0 / 0.06)',
-  };
-});
 </script>
 
 <template>
   <component
     :is="motionMap[as]"
-    :while-hover="whileHover"
     :transition="EASE"
     class="group fishing-card bg-page relative flex h-full flex-col overflow-hidden rounded-3xl border shadow-sm"
     :class="[

@@ -5,6 +5,7 @@
  * 放在 dashboard 顶部 (Map / Index 之上),没有 routeInfo 时显示。
  * 不再用 warning 色调,改成 muted + 主按钮,跟 dashboard 网格协调。
  */
+import { Button } from '@/components';
 import { SlideFadeTransition } from '@/components';
 
 defineProps<{
@@ -33,14 +34,7 @@ defineEmits<{
           三个问题，三十秒——您的反馈会帮系统下次更准
         </p>
       </div>
-      <button
-        v-if="!disabled"
-        class="bg-accent text-ink hover:bg-accent/90 rounded-lg px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors"
-        type="button"
-        @click="$emit('submit')"
-      >
-        反馈今日指数
-      </button>
+      <Button size="lg" @click="$emit('submit')"> 反馈今日指数 </Button>
     </section>
   </SlideFadeTransition>
 </template>

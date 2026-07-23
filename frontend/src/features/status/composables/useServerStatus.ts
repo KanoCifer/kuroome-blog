@@ -94,10 +94,12 @@ export function useServerStatus(): UseServerStatusReturn {
   const apiHealthy = ref(true);
 
   async function pingApi() {
-    const base = import.meta.env.VITE_API_BASE || '/';
+    const base = import.meta.env.VITE_API_BASE || '';
+    const protocol = window.location.protocol;
+    const host = window.location.host;
     const start = performance.now();
     try {
-      const res = await fetch(`${base}/v3/status/detail`, {
+      const res = await fetch(`${protocol}//${host}${base}/v3/status/detail`, {
         method: 'GET',
         cache: 'no-store',
         signal: AbortSignal.timeout(5000),

@@ -16,7 +16,9 @@
 import { useNotificationStore } from '@/stores';
 import { formatDate } from '@/lib/dayjs';
 import { llmGateway } from '@/features/blog';
+import { HoverDropdown } from '@/components';
 import { renderMarkdown } from '@/composables';
+import { Check, ChevronDown } from '@lucide/vue';
 import dayjs from 'dayjs';
 import { AnimatePresence, motion } from 'motion-v';
 import { computed, onUnmounted, ref, watch } from 'vue';
@@ -76,6 +78,17 @@ const textShimmer = ref<string[]>([
 ]);
 
 const selectedModel = ref(AI_MODELS[0].id);
+
+const selectedModelName = computed(() => {
+  const m = AI_MODELS.find((m) => m.id === selectedModel.value);
+  return m?.name ?? '选择模型';
+});
+
+/** 选完即关 — slot 暴露的 close() 在 picker 类场景下比 150ms grace 更合适 */
+function pickModel(id: string, close: () => void) {
+  selectedModel.value = id;
+  close();
+}
 
 let shimmerTimer: ReturnType<typeof setInterval> | null = null;
 let abortController: AbortController | null = null;
@@ -260,16 +273,43 @@ onUnmounted(() => {
         >
           {{ statusLabel }}
         </span>
-        <select
+        <HoverDropdown
           v-if="!loading"
-          v-model="selectedModel"
-          class="bg-surface text-ink min-w-0 truncate rounded-lg border px-2 py-1 text-xs"
-          aria-label="选择模型"
+          panel-class="bg-page absolute top-full left-0 z-50 mt-2 w-40 rounded-2xl p-1.5 ring-1 ring-black/5 backdrop-blur-xs dark:ring-white/10"
         >
-          <option v-for="model in AI_MODELS" :key="model.id" :value="model.id">
-            {{ model.name }}
-          </option>
-        </select>
+          <template #trigger="{ isOpen }">
+            <button
+              type="button"
+              aria-label="选择模型"
+              :aria-expanded="isOpen || undefined"
+              aria-haspopup="true"
+              class="bg-surface text-ink hover:ring-accent focus:ring-accent flex min-w-0 cursor-pointer items-center gap-1 truncate rounded-lg border px-2 py-1 text-xs transition-shadow focus:ring-1 focus:outline-none"
+            >
+              <span class="truncate">{{ selectedModelName }}</span>
+              <ChevronDown
+                :size="12"
+                class="shrink-0 transition-transform duration-150"
+                :class="{ 'rotate-180': isOpen }"
+              />
+            </button>
+          </template>
+          <template #default="{ close }">
+            <button
+              v-for="model in AI_MODELS"
+              :key="model.id"
+              type="button"
+              @click="pickModel(model.id, close)"
+              class="hover:bg-surface text-ink flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs"
+            >
+              <span>{{ model.name }}</span>
+              <Check
+                v-if="model.id === selectedModel"
+                :size="14"
+                class="text-accent"
+              />
+            </button>
+          </template>
+        </HoverDropdown>
       </div>
 
       <button
