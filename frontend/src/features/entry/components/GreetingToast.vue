@@ -40,7 +40,7 @@ const goToChangelog = () => {
     >
       <div
         v-if="showToast"
-        class="group border-border bg-paper/95 fixed bottom-6 left-4 z-50 w-[300px] overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-xl sm:bottom-8 sm:left-8"
+        class="group border-border bg-page/95 fixed bottom-6 left-4 z-50 w-[300px] overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-xl sm:bottom-8 sm:left-8"
       >
         <div class="relative px-4 py-4">
           <!-- 关闭按钮 -->

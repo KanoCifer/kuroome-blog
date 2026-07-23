@@ -55,7 +55,7 @@ export function playThemeTransition(
   const targetColor = getCssVar(
     isDark,
     scheme,
-    '--paper',
+    '--page',
     isDark ? '#0f172a' : '#ffffff',
   );
   const inkColor = getCssVar(

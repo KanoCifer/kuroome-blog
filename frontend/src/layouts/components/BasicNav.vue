@@ -74,7 +74,7 @@
             v-if="isOthersOpen"
             @mouseenter="openOthers"
             @mouseleave="closeOthers"
-            class="bg-paper/80 absolute top-full right-0 z-50 mt-2 w-52 rounded-2xl p-1.5 ring-1 ring-black/5 backdrop-blur-xs dark:ring-white/10"
+            class="bg-page/80 absolute top-full right-0 z-50 mt-2 w-52 rounded-2xl p-1.5 ring-1 ring-black/5 backdrop-blur-xs dark:ring-white/10"
           >
             <RouterLink
               v-for="item in othersRouteItems"
@@ -393,7 +393,7 @@ const avatarUrl = computed(() => {
 
 /* 液态玻璃效果：SVG 色散 + 毛玻璃 + 饱和度补偿 + 双层内阴影模拟玻璃厚度
    详见 index.html 中 #nav-liquid-glass filter 定义
-   浅色模式用半透白做光雾，深色模式切到半透 paper (var(--paper)/40) 透出深色背景
+   浅色模式用半透白做光雾，深色模式切到半透 paper (var(--page)/40) 透出深色背景
    — 跟随主题自动切基色，深/浅都通透 */
 
 .liquid-glass {

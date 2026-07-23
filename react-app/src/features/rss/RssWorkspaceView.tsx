@@ -102,9 +102,9 @@ export default function RssWorkspaceView() {
   };
 
   return (
-    <div className="bg-paper min-h-dvh pb-28">
+    <div className="bg-page min-h-dvh pb-28">
       {/* Header */}
-      <header className="bg-paper/85 sticky top-0 z-10 backdrop-blur-md">
+      <header className="bg-page/85 sticky top-0 z-10 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-md items-center gap-3 px-4 py-3">
           <Rss className="text-ink h-5 w-5" />
           <h1 className="text-ink text-lg font-bold">RSS 阅读</h1>
@@ -114,7 +114,7 @@ export default function RssWorkspaceView() {
             <button
               type="button"
               onClick={() => setShowFeedPicker((v) => !v)}
-              className="border-border bg-paper hover:bg-surface ml-auto flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+              className="border-border bg-page hover:bg-surface ml-auto flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
             >
               <span className="max-w-32 truncate">
                 {selectedFeed?.feedTitle || '全部'}
@@ -133,7 +133,7 @@ export default function RssWorkspaceView() {
               exit={{ opacity: 0, height: 0 }}
               className="border-border/60 overflow-hidden border-t"
             >
-              <div className="bg-paper/95 mx-auto w-full max-w-md px-4 py-2">
+              <div className="bg-page/95 mx-auto w-full max-w-md px-4 py-2">
                 <button
                   type="button"
                   onClick={() => handleSelectFeed('')}
@@ -226,7 +226,7 @@ export default function RssWorkspaceView() {
               >
                 <Link
                   to={`/rss/articles/${article.id}`}
-                  className="bg-paper border-border/60 hover:bg-surface/50 block rounded-2xl border p-4 transition-colors active:scale-[0.99]"
+                  className="bg-page border-border/60 hover:bg-surface/50 block rounded-2xl border p-4 transition-colors active:scale-[0.99]"
                 >
                   <h2 className="text-ink text-[15px] leading-snug font-semibold">
                     {article.title || '无标题'}

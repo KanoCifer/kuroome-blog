@@ -374,7 +374,7 @@ onBeforeUnmount(() => {
     · 状态不用彩色 chip（bg-warning/10 等），改用单一字色 + 留白 + 描线
     · 所有动画 honor prefers-reduced-motion
   -->
-  <div class="bg-paper min-h-dvh">
+  <div class="bg-page min-h-dvh">
     <div class="mx-auto w-full max-w-6xl px-5 pt-8 pb-28 sm:px-8 sm:pt-10">
       <!-- ─── Top bar: wordmark · breadcrumb · status ─── -->
       <header class="text-muted mb-7 flex items-center gap-3 text-xs">
@@ -534,7 +534,7 @@ onBeforeUnmount(() => {
             <span
               v-for="tag in tags"
               :key="tag"
-              class="bg-paper text-ink inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs"
+              class="bg-page text-ink inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs"
             >
               #{{ tag }}
               <button
@@ -566,7 +566,7 @@ onBeforeUnmount(() => {
             :class="[
               'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 transition-colors',
               pin
-                ? 'border-ink/40 bg-ink text-paper'
+                ? 'border-ink/40 bg-ink text-page'
                 : 'border-border bg-surface text-muted hover:text-ink',
             ]"
             :aria-pressed="pin"
@@ -721,11 +721,11 @@ onBeforeUnmount(() => {
 
         <!-- ─── The writing canvas ─── -->
         <!--
-          桌面 · 抬起的一张纸。页面底色是 --warm-gray (bg-surface)，
-          编辑器在它之上用 --paper (bg-surface) 浮起，靠阴影分层。
+          桌面 · 抬起的一张纸。页面底色是 --secondary (bg-surface)，
+          编辑器在它之上用 --page (bg-surface) 浮起，靠阴影分层。
         -->
         <div
-          class="bg-surface border-border/60 overflow-hidden rounded-2xl border shadow-[0_1px_0_0_oklch(from_var(--paper)_l_c_h_/_0.6)_inset,0_2px_4px_-1px_oklch(from_var(--ink)_l_c_h_/_0.04),0_8px_24px_-8px_oklch(from_var(--ink)_l_c_h_/_0.12)]"
+          class="bg-surface border-border/60 overflow-hidden rounded-2xl border shadow-[0_1px_0_0_oklch(from_var(--page)_l_c_h_/_0.6)_inset,0_2px_4px_-1px_oklch(from_var(--ink)_l_c_h_/_0.04),0_8px_24px_-8px_oklch(from_var(--ink)_l_c_h_/_0.12)]"
         >
           <div class="h-full">
             <MarkdownEditor ref="markdownEditorRef" v-model="markdownBody" />

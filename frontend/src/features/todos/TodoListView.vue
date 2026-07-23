@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-paper flex min-h-screen w-full flex-col">
+  <div class="bg-page flex min-h-screen w-full flex-col">
     <!-- ── page header ── -->
     <TodoHeader @create="openCreate" @mcp-token="mcpTokenOpen = true" />
 

@@ -253,7 +253,7 @@ watch(
 
         <!-- Article Body -->
         <div
-          class="border-border bg-paper overflow-hidden rounded-2xl border shadow-sm"
+          class="border-border bg-page overflow-hidden rounded-2xl border shadow-sm"
         >
           <div class="border-border border-border border-b p-8">
             <h1 class="text-ink mb-4 text-3xl leading-tight font-bold">

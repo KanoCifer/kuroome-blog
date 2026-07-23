@@ -205,7 +205,7 @@ export const BentoNavSidebar: React.FC = () => {
       {/* 背景层 */}
       {isOpen && (
         <motion.div
-          className="bg-paper/50 fixed inset-0 z-90 backdrop-blur-sm"
+          className="bg-page/50 fixed inset-0 z-90 backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -221,7 +221,7 @@ export const BentoNavSidebar: React.FC = () => {
           duration: 0.3,
           ease: 'easeInOut',
         }}
-        className="bg-paper/90 fixed top-0 left-0 z-100 flex h-screen w-80 flex-col gap-6 rounded-r-4xl p-6 backdrop-blur-sm"
+        className="bg-page/90 fixed top-0 left-0 z-100 flex h-screen w-80 flex-col gap-6 rounded-r-4xl p-6 backdrop-blur-sm"
       >
         {/* 下拉菜单 */}
         <div ref={dropdownRef} className="relative">
@@ -233,7 +233,7 @@ export const BentoNavSidebar: React.FC = () => {
               <img
                 src={avatarUrl}
                 alt={currentUserName}
-                className="h-14 w-14 rounded-full object-cover shadow-[0_0_14px_rgba(0,0,0,0.8)] ring-4 ring-(--warm-gray)"
+                className="h-14 w-14 rounded-full object-cover shadow-[0_0_14px_rgba(0,0,0,0.8)] ring-4 ring-(--secondary)"
               />
               <div className="ml-4 flex items-baseline gap-2">
                 <span className="text-base-content truncate font-serif text-2xl font-bold text-nowrap select-none">
@@ -259,7 +259,7 @@ export const BentoNavSidebar: React.FC = () => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="selection-none bg-paper absolute top-full left-0 z-50 mt-4 flex w-60 flex-col gap-1 rounded-2xl p-2 shadow-xl"
+              className="selection-none bg-page absolute top-full left-0 z-50 mt-4 flex w-60 flex-col gap-1 rounded-2xl p-2 shadow-xl"
             >
               <DropDownItems />
             </motion.div>

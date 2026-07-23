@@ -34,7 +34,7 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
         @click.self="emit('close')"
       >
-        <div class="bg-paper w-full max-w-md rounded-3xl shadow-2xl">
+        <div class="bg-page w-full max-w-md rounded-3xl shadow-2xl">
           <div
             class="border-border flex items-center justify-between border-b px-6 py-4"
           >
@@ -65,7 +65,7 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
                 :value="alt"
                 type="text"
                 placeholder="图片说明 (Alt)"
-                class="text-ink placeholder:text-muted focus:border-ring border-border bg-paper w-full rounded-xl border px-3 py-2 text-sm outline-none"
+                class="text-ink placeholder:text-muted focus:border-ring border-border bg-page w-full rounded-xl border px-3 py-2 text-sm outline-none"
                 @input="
                   emit('update:alt', ($event.target as HTMLInputElement).value)
                 "
@@ -77,7 +77,7 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
                   type="number"
                   min="0"
                   placeholder="宽度"
-                  class="text-ink placeholder:text-muted focus:border-ring border-border bg-paper w-full rounded-xl border px-3 py-2 text-sm outline-none"
+                  class="text-ink placeholder:text-muted focus:border-ring border-border bg-page w-full rounded-xl border px-3 py-2 text-sm outline-none"
                   @input="
                     emit(
                       'update:width',
@@ -90,7 +90,7 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
                   type="number"
                   min="0"
                   placeholder="高度"
-                  class="text-ink placeholder:text-muted focus:border-ring border-border bg-paper w-full rounded-xl border px-3 py-2 text-sm outline-none"
+                  class="text-ink placeholder:text-muted focus:border-ring border-border bg-page w-full rounded-xl border px-3 py-2 text-sm outline-none"
                   @input="
                     emit(
                       'update:height',

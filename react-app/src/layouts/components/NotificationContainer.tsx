@@ -51,7 +51,7 @@ export function Notifier() {
         }}
         exit={{ opacity: 0, y: -40, scale: 0.9 }}
         transition={{ type: 'spring', damping: 30, stiffness: 500 }}
-        className="squircle border-border bg-paper/80 text-ink absolute top-0 left-1/2 flex h-18 w-60 -translate-x-1/2 items-center justify-between gap-3 border shadow-xl backdrop-blur-sm transition-colors duration-200"
+        className="squircle border-border bg-page/80 text-ink absolute top-0 left-1/2 flex h-18 w-60 -translate-x-1/2 items-center justify-between gap-3 border shadow-xl backdrop-blur-sm transition-colors duration-200"
       >
         <AnimationLayer type={n.type} />
 

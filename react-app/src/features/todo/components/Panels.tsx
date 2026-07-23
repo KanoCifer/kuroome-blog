@@ -366,7 +366,7 @@ export function ReviewPanel({ onOpen }: Pick<PanelEmit, 'onOpen'>) {
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="border-border bg-paper rounded-3xl border px-5 py-4 shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent),0_18px_32px_color-mix(in_oklch,var(--ink)_8%,transparent)]"
+              className="border-border bg-page rounded-3xl border px-5 py-4 shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent),0_18px_32px_color-mix(in_oklch,var(--ink)_8%,transparent)]"
             >
               <div className="text-muted text-[10px] font-medium tracking-widest uppercase">
                 {stat.label}

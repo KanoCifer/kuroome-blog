@@ -245,7 +245,7 @@ export function SnapSheet({
             transition={SPRING.modal}
             onClick={(e) => e.stopPropagation()}
             style={{ height: heightMV }}
-            className="bg-paper border-border/40 fixed inset-x-0 bottom-0 z-210 flex flex-col overflow-hidden rounded-t-3xl border-t pb-[calc(1rem+env(safe-area-inset-bottom,0px))] shadow-2xl outline-none"
+            className="bg-page border-border/40 fixed inset-x-0 bottom-0 z-210 flex flex-col overflow-hidden rounded-t-3xl border-t pb-[calc(1rem+env(safe-area-inset-bottom,0px))] shadow-2xl outline-none"
           >
             {/* Drag handle — 单独区域, pointer 事件专属此区域 */}
             <div

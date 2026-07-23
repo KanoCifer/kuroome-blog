@@ -88,7 +88,7 @@ async function switchToChat() {
 
 <template>
   <section
-    class="summary-card bg-paper/60 border-border/60 mb-6 overflow-hidden rounded-3xl border shadow-sm transition-all"
+    class="summary-card bg-page/60 border-border/60 mb-6 overflow-hidden rounded-3xl border shadow-sm transition-all"
     :class="{ 'is-loading': loading }"
   >
     <!-- Header -->
@@ -145,7 +145,7 @@ async function switchToChat() {
             class="relative cursor-pointer rounded-md px-3 py-1 text-sm font-medium transition-all"
             :class="
               cardMode === CardMode.SUMMARY
-                ? 'bg-paper text-ink shadow-sm'
+                ? 'bg-page text-ink shadow-sm'
                 : 'text-muted hover:text-ink'
             "
             :disabled="loading"
@@ -157,7 +157,7 @@ async function switchToChat() {
             class="relative cursor-pointer rounded-md px-3 py-1 text-sm font-medium transition-all"
             :class="
               cardMode === CardMode.CHAT
-                ? 'bg-paper text-ink shadow-sm'
+                ? 'bg-page text-ink shadow-sm'
                 : 'text-muted hover:text-ink'
             "
             :disabled="loading"

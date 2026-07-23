@@ -101,11 +101,11 @@ watch(
         <button
           type="button"
           aria-label="关闭弹窗"
-          class="bg-paper/60 absolute inset-0 backdrop-blur-sm"
+          class="bg-page/60 absolute inset-0 backdrop-blur-sm"
           @click="emit('close')"
         />
         <section
-          class="border-border bg-paper relative z-10 w-full max-w-2xl rounded-2xl border p-5 shadow-2xl"
+          class="border-border bg-page relative z-10 w-full max-w-2xl rounded-2xl border p-5 shadow-2xl"
         >
           <header class="mb-4 flex items-start justify-between gap-4">
             <div>
@@ -139,7 +139,7 @@ watch(
                   :class="
                     localForm.channels.includes(channel.value)
                       ? 'border-accent/30 bg-accent/15 text-ink'
-                      : 'border-border bg-paper text-ink hover:bg-surface'
+                      : 'border-border bg-page text-ink hover:bg-surface'
                   "
                   @click="toggleChannel(channel.value)"
                 >
@@ -158,7 +158,7 @@ watch(
                 <label
                   v-for="point in reminderPointOptions"
                   :key="point.key"
-                  class="border-border bg-paper text-ink flex items-center gap-2 rounded-xl border px-3 py-2 text-sm"
+                  class="border-border bg-page text-ink flex items-center gap-2 rounded-xl border px-3 py-2 text-sm"
                 >
                   <input
                     v-model="localForm[point.key]"
@@ -182,7 +182,7 @@ watch(
                   v-model="localForm.email"
                   type="email"
                   placeholder="name@example.com"
-                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-page text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
               <label
@@ -196,7 +196,7 @@ watch(
                   v-model="localForm.feishu_webhook_url"
                   type="text"
                   placeholder="https://open.feishu.cn/open-apis/bot/v2/hook/..."
-                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-page text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
               <label
@@ -210,7 +210,7 @@ watch(
                   v-model="localForm.bark_device_key"
                   type="text"
                   placeholder="请输入 Bark 设备 Key"
-                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
+                  class="border-border bg-page text-ink focus:border-accent focus:ring-accent/20 placeholder:text-muted w-full rounded-xl border px-3 py-2.5 text-sm focus:ring-2 focus:outline-none"
                 />
               </label>
             </section>

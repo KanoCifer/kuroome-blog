@@ -31,7 +31,7 @@ const VAR_MAP: Record<keyof ChartTheme, string> = {
   muted: '--muted-text',
   border: '--border-color',
   accent: '--accent',
-  paper: '--paper',
+  paper: '--page',
   tide: '--chart-3',
   temp: '--chart-1',
   rain: '--chart-3',
@@ -79,7 +79,10 @@ function resolveChartTheme(): ChartTheme {
 /** `rgb(r, g, b)` → `rgba(r, g, b, a)`（用于图表面积渐变的透明尾巴）。
  *  防御性: 输入非字符串 / 非 rgb 格式 / undefined 时, 返回带 fallback 的 rgba,
  *  避免 zrender 在 addColorStop 里撞到 'undefined'。*/
-export function withAlpha(rgb: string | undefined | null, alpha: number): string {
+export function withAlpha(
+  rgb: string | undefined | null,
+  alpha: number,
+): string {
   if (!rgb || typeof rgb !== 'string') {
     return `rgba(120, 134, 170, ${alpha})`;
   }

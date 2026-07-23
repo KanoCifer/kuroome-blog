@@ -19,7 +19,7 @@
         :animate="{ x: 0 }"
         :exit="{ x: '100%' }"
         :transition="SPRING_SNUG"
-        class="bg-paper border-border fixed top-0 right-0 z-[9999] flex h-full w-full max-w-[min(640px,52vw)] flex-col border-l shadow-[0_12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)] max-sm:max-w-full"
+        class="bg-page border-border fixed top-0 right-0 z-[9999] flex h-full w-full max-w-[min(640px,52vw)] flex-col border-l shadow-[0_12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)] max-sm:max-w-full"
         role="dialog"
         aria-modal="true"
         aria-labelledby="detail-title"

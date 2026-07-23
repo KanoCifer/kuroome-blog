@@ -79,7 +79,7 @@
         :value="searchTerm"
         type="search"
         placeholder="搜索标题…"
-        class="border-border bg-paper text-ink placeholder:text-muted/60 focus-visible:ring-ring w-32 rounded-md border px-2 py-1 text-xs focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none sm:w-40"
+        class="border-border bg-page text-ink placeholder:text-muted/60 focus-visible:ring-ring w-32 rounded-md border px-2 py-1 text-xs focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none sm:w-40"
         @input="
           $emit('update:searchTerm', ($event.target as HTMLInputElement).value)
         "

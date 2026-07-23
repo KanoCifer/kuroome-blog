@@ -82,7 +82,7 @@ function MenuItem({ icon, label, onClick }: MenuItemProps) {
         visible: { opacity: 1, transition: { duration: 0.2 } },
         exit: { opacity: 0, transition: { duration: 0.15 } },
       }}
-      className="border-border/20 bg-paper/40 flex items-center gap-3 rounded-xl border p-4 transition-transform active:scale-[0.96]"
+      className="border-border/20 bg-page/40 flex items-center gap-3 rounded-xl border p-4 transition-transform active:scale-[0.96]"
       onClick={(e) => onClick(e)}
     >
       <span className="text-ink shrink-0">{icon}</span>
@@ -178,7 +178,7 @@ export function BasicNav() {
           {hidden ? null : (
             <motion.nav
               id="mobile-nav"
-              className="bg-paper/80 fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] left-1/2 z-65 flex h-16 max-w-md -translate-x-1/2 items-center justify-around rounded-full px-6 py-3 shadow-lg backdrop-blur-sm"
+              className="bg-page/80 fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] left-1/2 z-65 flex h-16 max-w-md -translate-x-1/2 items-center justify-around rounded-full px-6 py-3 shadow-lg backdrop-blur-sm"
               initial={{ y: 10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 80, opacity: 0 }}

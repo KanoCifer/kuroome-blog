@@ -92,9 +92,9 @@
 
 @theme inline {
   /* Core */
-  --color-paper: var(--paper);
+  --color-page: var(--page);
   --color-ink: var(--ink);
-  --color-card: var(--surface);
+  --color-card: var(--card);
   --color-surface: var(--surface);
 
   /* Accent (was: --color-primary) */
@@ -106,7 +106,7 @@
 
   /* Border */
   --color-border: var(--border-color);
-  --color-input: var(--warm-gray);
+  --color-input: var(--secondary);
   --color-ring: var(--accent-slate);
 
   /* Charts */

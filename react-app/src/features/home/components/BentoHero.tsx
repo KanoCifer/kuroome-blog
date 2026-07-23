@@ -153,10 +153,10 @@ export function BentoHero() {
           </div>
 
           <div className="min-w-0 flex-1">
-            <p className="text-paper/70 text-xs font-medium tracking-wide">
+            <p className="text-page/70 text-xs font-medium tracking-wide">
               {greeting}
             </p>
-            <h1 className="text-paper font-serif text-3xl leading-tight font-extrabold tracking-tight">
+            <h1 className="text-page font-serif text-3xl leading-tight font-extrabold tracking-tight">
               Kuroome
             </h1>
           </div>
@@ -170,7 +170,7 @@ export function BentoHero() {
           <motion.button
             whileTap={{ scale: 0.96 }}
             transition={SPRING.snappy}
-            className="bg-paper/15 hover:bg-paper/25 text-paper flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md"
+            className="bg-page/15 hover:bg-page/25 text-page flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md"
             onClick={() => navigate('/todos')}
             title="查看任务"
           >
@@ -193,7 +193,7 @@ export function BentoHero() {
             whileTap={{ scale: 0.96 }}
             transition={SPRING.snappy}
             title="切换到 Vue 版本"
-            className="bg-paper/15 hover:bg-paper/25 text-paper flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md"
+            className="bg-page/15 hover:bg-page/25 text-page flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md"
             onClick={switchToVue}
           >
             <svg viewBox="0 0 256 221" className="h-4 w-4" fill="currentColor">
@@ -205,7 +205,7 @@ export function BentoHero() {
             whileTap={{ scale: 0.96 }}
             transition={SPRING.snappy}
             title="喜欢这个网站吗？点个赞吧！"
-            className="bg-paper/15 hover:bg-paper/25 text-paper relative flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md"
+            className="bg-page/15 hover:bg-page/25 text-page relative flex h-10 w-10 items-center justify-center rounded-full backdrop-blur-md"
             onClick={handleLike}
           >
             <LikeAnimation />
@@ -222,7 +222,7 @@ export function BentoHero() {
         >
           {isEvening ? (
             <svg
-              className="text-paper h-16 w-16"
+              className="text-page h-16 w-16"
               fill="currentColor"
               viewBox="0 0 24 24"
             >
@@ -234,7 +234,7 @@ export function BentoHero() {
             </svg>
           ) : (
             <svg
-              className="text-paper h-16 w-16"
+              className="text-page h-16 w-16"
               fill="currentColor"
               viewBox="0 0 24 24"
             >
@@ -252,7 +252,7 @@ export function BentoHero() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8, duration: 0.5 }}
         >
-          <div className="scroll-hint text-paper/60 flex flex-col items-center gap-1">
+          <div className="scroll-hint text-page/60 flex flex-col items-center gap-1">
             <span className="text-xs font-medium tracking-wide">Scroll</span>
             <svg
               className="h-5 w-5"

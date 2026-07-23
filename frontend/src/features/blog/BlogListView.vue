@@ -34,7 +34,7 @@
             type="search"
             placeholder="在字里行间，寻一句心动…"
             aria-label="搜索文章"
-            class="text-ink placeholder:text-muted/70 focus:border-accent focus:ring-accent/20 border-border bg-paper w-full rounded-xl border py-3 pr-10 pl-10 font-serif text-sm placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="text-ink placeholder:text-muted/70 focus:border-accent focus:ring-accent/20 border-border bg-page w-full rounded-xl border py-3 pr-10 pl-10 font-serif text-sm placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             @keyup.enter="handleSearch"
           />
           <button
@@ -67,7 +67,7 @@
           <button
             v-if="activeTag"
             type="button"
-            class="border-border bg-paper text-muted hover:bg-surface hover:text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+            class="border-border bg-page text-muted hover:bg-surface hover:text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
             @click="handleResetFilter"
           >
             <span class="text-ink/70 font-serif italic">#</span>
@@ -172,7 +172,7 @@
             v-if="isLoading"
             role="status"
             aria-live="polite"
-            class="border-border bg-paper/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center"
+            class="border-border bg-page/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center"
           >
             <div
               class="border-accent/20 border-t-accent mb-5 h-12 w-12 animate-spin rounded-full border-4"
@@ -218,7 +218,7 @@
 
           <div
             v-else-if="posts.length === 0"
-            class="border-border bg-paper/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center"
+            class="border-border bg-page/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -290,7 +290,7 @@
             aria-label="博客分页"
           >
             <ul
-              class="border-border/80 bg-paper/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2"
+              class="border-border/80 bg-page/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2"
             >
               <li>
                 <button

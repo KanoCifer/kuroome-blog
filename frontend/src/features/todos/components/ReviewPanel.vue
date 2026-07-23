@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-8">
-    <!-- ── 本周复盘：单张 lifted-paper 汇总，不再是四张同构指标卡 ── -->
+    <!-- ── 本周复盘：单张 lifted-page 汇总，不再是四张同构指标卡 ── -->
     <section>
       <div class="mb-3 flex items-baseline justify-between">
         <h2 class="text-ink font-serif text-lg font-medium tracking-tight">

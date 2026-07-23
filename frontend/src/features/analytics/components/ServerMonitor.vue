@@ -48,7 +48,7 @@
 
         <!-- Server Status — single card, three cells -->
         <div
-          class="border-border/60 bg-paper mt-4 overflow-hidden rounded-2xl border p-6"
+          class="border-border/60 bg-page mt-4 overflow-hidden rounded-2xl border p-6"
         >
           <div
             class="grid grid-cols-1 divide-y lg:grid-cols-3 lg:divide-x lg:divide-y-0"
@@ -199,7 +199,7 @@
 
         <!-- Server History Chart -->
         <div
-          class="border-border/60 bg-paper mt-4 overflow-hidden rounded-2xl border p-6"
+          class="border-border/60 bg-page mt-4 overflow-hidden rounded-2xl border p-6"
         >
           <h3 class="text-ink mb-4 flex items-center gap-2 text-sm font-medium">
             <svg
@@ -447,7 +447,7 @@ const getStatusColor = (percent: number): string => {
 
 // ---- layout helpers ----------------------------------------------------
 const cardClass = computed(() =>
-  ['border-border/60 bg-paper border p-5 rounded-3xl', props.customClass || '']
+  ['border-border/60 bg-page border p-5 rounded-3xl', props.customClass || '']
     .filter(Boolean)
     .join(' '),
 );

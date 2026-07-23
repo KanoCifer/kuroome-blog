@@ -14,7 +14,7 @@
 - Use `<script setup lang="ts">` + Composition API
 - Type safety: avoid `any`; use `unknown` + narrowing for external inputs; keep props/emits/store types explicit
 - Naming: variables/functions `camelCase`, components/types `PascalCase`, component file `PascalCase.vue`, utility file `camelCase.ts`
-- Styling: **Tailwind semantic tokens only** (`bg-paper`, `text-muted`, `bg-accent`, `bg-surface`...). No custom CSS, no hardcoded colors
+- Styling: **Tailwind semantic tokens only** (`bg-page`, `text-muted`, `bg-accent`, `bg-surface`...). No custom CSS, no hardcoded colors
 - Package manager: `pnpm` only (Node ^26.4)
 - Error handling: async flows use try/catch; narrow caught values before property access; route user-visible failures to notification flows
 - Lint/format: Oxlint (`pnpm run lint:fix`) + Prettier (with `prettier-plugin-tailwindcss` auto-sort); no ESLint

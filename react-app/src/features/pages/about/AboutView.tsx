@@ -23,7 +23,7 @@ export default function AboutView() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="bg-paper/95 mb-20 flex h-full w-full flex-col items-center px-4 py-8"
+      className="bg-page/95 mb-20 flex h-full w-full flex-col items-center px-4 py-8"
     >
       {/* Hero Section */}
       <motion.div
@@ -52,7 +52,7 @@ export default function AboutView() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.5, ease: 'easeOut' }}
-        className="border-border/60 bg-paper/80 mb-6 w-full max-w-md rounded-2xl border p-5 shadow-sm backdrop-blur-sm"
+        className="border-border/60 bg-page/80 mb-6 w-full max-w-md rounded-2xl border p-5 shadow-sm backdrop-blur-sm"
       >
         <p className="text-muted text-sm leading-relaxed">
           你好！欢迎来到我的博客。这个网站是我的第一个 Web
@@ -115,7 +115,7 @@ export default function AboutView() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.25, duration: 0.5, ease: 'easeOut' }}
-        className="border-border/60 bg-paper/80 mb-8 w-full max-w-md rounded-2xl border p-4 shadow-sm backdrop-blur-sm"
+        className="border-border/60 bg-page/80 mb-8 w-full max-w-md rounded-2xl border p-4 shadow-sm backdrop-blur-sm"
       >
         <h2 className="text-muted mb-2 text-xs font-semibold tracking-wider uppercase">
           兴趣爱好

@@ -3,7 +3,7 @@
  * 统一的卡片 chrome wrapper。
  *
  * Dashboard 中所有 tile (Index / Weather / Tide / Hourly / Map / banner) 共享:
- * - bg-paper / border-border 语义 token (无 dark: 手写)
+ * - bg-page / border-border 语义 token (无 dark: 手写)
  * - 圆角 + 阴影 + overflow hidden
  *
  * 区分:
@@ -77,7 +77,7 @@ const whileHover = computed(() => {
     :is="motionMap[as]"
     :while-hover="whileHover"
     :transition="EASE"
-    class="group fishing-card bg-paper border-border relative flex h-full flex-col overflow-hidden rounded-3xl border shadow-sm"
+    class="group fishing-card bg-page border-border relative flex h-full flex-col overflow-hidden rounded-3xl border shadow-sm"
     :class="[
       tone === 'hero' && 'border-border shadow-md',
       interactive && 'fishing-card--interactive cursor-pointer',

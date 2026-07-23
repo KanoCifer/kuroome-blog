@@ -166,7 +166,7 @@ export default function Login() {
   };
 
   return (
-    <div className="font-body bg-paper relative min-h-screen overflow-hidden">
+    <div className="font-body bg-page relative min-h-screen overflow-hidden">
       {/* Main Content */}
       <main className="relative z-10 mt-4 flex flex-col items-center px-5 pt-8 pb-10">
         {/* Hero Section */}
@@ -193,7 +193,7 @@ export default function Login() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
-          className={`} border-border/50 bg-paper/70 w-full max-w-100 rounded-4xl border p-6 shadow-xl`}
+          className={`} border-border/50 bg-page/70 w-full max-w-100 rounded-4xl border p-6 shadow-xl`}
         >
           <form className="flex flex-col" onSubmit={handleSubmit}>
             {/* Username Field */}
@@ -285,7 +285,7 @@ export default function Login() {
             <button
               type="button"
               disabled={isPasskeySubmitting}
-              className="bg-paper text-ink disabled:bg-surface flex w-full items-center justify-center space-x-2 rounded-full py-4 text-[15px] font-bold shadow-lg transition-all active:scale-[0.98] disabled:opacity-70"
+              className="bg-page text-ink disabled:bg-surface flex w-full items-center justify-center space-x-2 rounded-full py-4 text-[15px] font-bold shadow-lg transition-all active:scale-[0.98] disabled:opacity-70"
               onClick={handlePasskeyLogin}
             >
               <IconKey className="size-5" />
@@ -308,7 +308,7 @@ export default function Login() {
 
           {/* GitHub Button */}
           <button
-            className="bg-ink text-paper hover:bg-ink/90 flex w-full items-center justify-center space-x-2.5 rounded-full py-4 text-[15px] font-bold shadow-md transition-all active:scale-[0.98]"
+            className="bg-ink text-page hover:bg-ink/90 flex w-full items-center justify-center space-x-2.5 rounded-full py-4 text-[15px] font-bold shadow-md transition-all active:scale-[0.98]"
             onClick={handleGitHubLogin}
           >
             <IconGitHub />

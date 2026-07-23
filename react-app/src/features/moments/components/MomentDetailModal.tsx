@@ -74,7 +74,7 @@ export function MomentDetailModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.18 }}
-          className="bg-paper/60 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+          className="bg-page/60 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
           onClick={onClose}
           role="dialog"
           aria-modal="true"
@@ -85,10 +85,10 @@ export function MomentDetailModal({
             exit={{ opacity: 0, scale: 0.97, y: 4 }}
             transition={{ duration: 0.18 }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-paper border-border/40 relative flex max-h-[88vh] w-full max-w-[720px] flex-col overflow-hidden rounded-xl border shadow-xl"
+            className="bg-page border-border/40 relative flex max-h-[88vh] w-full max-w-[720px] flex-col overflow-hidden rounded-xl border shadow-xl"
           >
             {/* Header */}
-            <div className="border-border/40 bg-paper sticky top-0 z-10 flex items-center justify-between gap-2 border-b px-6 py-4">
+            <div className="border-border/40 bg-page sticky top-0 z-10 flex items-center justify-between gap-2 border-b px-6 py-4">
               <div className="flex items-center gap-3">
                 <span className="text-ink/70 font-serif text-sm italic">
                   {volumeLabel}
@@ -284,7 +284,7 @@ function MetaRow({
 
 function Kbd({ label }: { label: string }) {
   return (
-    <kbd className="text-ink/80 bg-paper border-border/40 rounded border px-1.5 py-0.5 font-mono text-[10px]">
+    <kbd className="text-ink/80 bg-page border-border/40 rounded border px-1.5 py-0.5 font-mono text-[10px]">
       {label}
     </kbd>
   );

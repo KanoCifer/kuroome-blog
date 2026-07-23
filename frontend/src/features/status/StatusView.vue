@@ -84,7 +84,7 @@ const showDetails = ref(false);
 </script>
 
 <template>
-  <div class="bg-paper min-h-screen">
+  <div class="bg-page min-h-screen">
     <motion.div
       :initial="prefersReducedMotion ? false : { opacity: 0, y: 8 }"
       :animate="{ opacity: 1, y: 0 }"

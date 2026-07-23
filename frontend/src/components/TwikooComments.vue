@@ -59,7 +59,7 @@ watch(
 #tcomment .el-input__inner,
 #tcomment .el-textarea__inner {
   background: var(--card-bg);
-  border-color: var(--warm-gray);
+  border-color: var(--secondary);
   border-radius: 0.75rem;
   color: var(--ink);
   font-size: 0.9375rem;
@@ -105,7 +105,7 @@ watch(
     .el-button--text
   ) {
   background: var(--card-bg);
-  border-color: var(--warm-gray);
+  border-color: var(--secondary);
   color: var(--ink);
 }
 #tcomment .el-button--default:hover,
@@ -128,7 +128,7 @@ watch(
 }
 
 #tcomment .tk-comment {
-  border-bottom: 1px solid var(--warm-gray);
+  border-bottom: 1px solid var(--secondary);
   padding: 1.25rem 0;
 }
 #tcomment .tk-comment:last-child {
@@ -156,7 +156,7 @@ watch(
 }
 
 #tcomment .tk-replies {
-  border-left: 2px solid var(--warm-gray);
+  border-left: 2px solid var(--secondary);
   margin-left: 1.5rem;
   padding-left: 1rem;
 }
@@ -179,6 +179,6 @@ watch(
 
 .dark #tcomment .el-input__inner,
 .dark #tcomment .el-textarea__inner {
-  background: color-mix(in oklch, var(--card-bg) 60%, var(--paper));
+  background: color-mix(in oklch, var(--card-bg) 60%, var(--page));
 }
 </style>

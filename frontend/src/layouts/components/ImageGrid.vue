@@ -40,7 +40,7 @@ defineEmits<{
         </svg>
       </div>
       <div
-        class="bg-paper/80 absolute right-2 bottom-2 rounded-md px-2 py-0.5 text-xs backdrop-blur-sm"
+        class="bg-page/80 absolute right-2 bottom-2 rounded-md px-2 py-0.5 text-xs backdrop-blur-sm"
       >
         {{ index + 1 }}
       </div>

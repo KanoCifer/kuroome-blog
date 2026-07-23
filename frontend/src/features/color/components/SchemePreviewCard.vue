@@ -74,7 +74,7 @@ const isOther = computed(
       'border-border bg-card/80 text-ink relative flex flex-col overflow-hidden rounded-xl border shadow-sm backdrop-blur',
       isDark ? 'dark' : '',
       isCurrent
-        ? 'ring-2 ring-[var(--accent)] ring-offset-2 ring-offset-[var(--paper)]'
+        ? 'ring-2 ring-[var(--accent)] ring-offset-2 ring-offset-[var(--page)]'
         : '',
     ]"
   >
@@ -177,7 +177,7 @@ const isOther = computed(
 
     <!-- footer：应用按钮 -->
     <footer
-      class="border-border flex items-center justify-between gap-3 border-t bg-[var(--warm-gray)] px-5 py-3"
+      class="border-border flex items-center justify-between gap-3 border-t bg-[var(--secondary)] px-5 py-3"
     >
       <span class="text-muted text-xs">
         {{ isCurrent ? '正在使用此配色' : '点击应用切换全局配色' }}

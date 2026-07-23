@@ -1,7 +1,7 @@
 <template>
   <section
     id="rss-subscriptions"
-    class="border-border bg-paper rounded-2xl border p-6"
+    class="border-border bg-page rounded-2xl border p-6"
   >
     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
       <div>
@@ -50,7 +50,7 @@
         :class="
           activeSubscriptionId === subscription.id
             ? 'border-accent/30 bg-accent/5'
-            : 'border-border bg-paper hover:border-border/70'
+            : 'border-border bg-page hover:border-border/70'
         "
       >
         <div

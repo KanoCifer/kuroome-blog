@@ -17,7 +17,7 @@ export function TaskRow({
   onDelete,
 }: TaskRowProps) {
   return (
-    <div className="bg-paper border-border group flex items-center gap-3 rounded-xl border px-4 py-2.5 transition-[box-shadow] duration-200 hover:shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent)]">
+    <div className="bg-page border-border group flex items-center gap-3 rounded-xl border px-4 py-2.5 transition-[box-shadow] duration-200 hover:shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent)]">
       <button
         type="button"
         onClick={() => onOpen(task.slug)}

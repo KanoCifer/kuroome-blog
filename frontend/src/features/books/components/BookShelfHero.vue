@@ -9,7 +9,7 @@
     <template #actions>
       <button
         type="button"
-        class="border-border bg-paper/60 hover:bg-surface flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors disabled:opacity-50"
+        class="border-border bg-page/60 hover:bg-surface flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors disabled:opacity-50"
         :disabled="isSyncing"
         @click="$emit('sync')"
         aria-label="同步书架"

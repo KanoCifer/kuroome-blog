@@ -2,7 +2,7 @@
   <Modal :open="open" size="lg" @close="emit('update:open', false)">
     <!-- 顶栏：卷序 + 关闭 + admin 操作 -->
     <header
-      class="border-border/40 bg-paper sticky top-0 z-10 flex items-center justify-between gap-2 border-b px-6 py-4"
+      class="border-border/40 bg-page sticky top-0 z-10 flex items-center justify-between gap-2 border-b px-6 py-4"
     >
       <div class="flex items-center gap-3">
         <span class="text-ink/70 font-serif text-sm italic">
@@ -275,7 +275,7 @@ const Kbd = (props: { label: string }) =>
     'kbd',
     {
       class:
-        'text-ink/80 font-mono text-[10px] px-1.5 py-0.5 bg-paper border border-border/40 rounded',
+        'text-ink/80 font-mono text-[10px] px-1.5 py-0.5 bg-page border border-border/40 rounded',
     },
     props.label,
   );

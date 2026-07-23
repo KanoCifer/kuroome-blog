@@ -66,7 +66,7 @@ const schemes: {
  */
 const cardBase =
   'flex w-full cursor-pointer items-stretch overflow-hidden rounded-xl border transition-colors';
-const cardDefault = 'border-border bg-paper hover:border-accent';
+const cardDefault = 'border-border bg-page hover:border-accent';
 const cardActive = 'border-accent bg-accent/5 !shadow-sm';
 
 const smallCardBase =
@@ -82,7 +82,7 @@ const smallCardBase =
 
       <button
         @click="themeStore.toggleFooter()"
-        class="border-border bg-paper hover:border-accent flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-3 transition-colors"
+        class="border-border bg-page hover:border-accent flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-3 transition-colors"
       >
         <div class="text-left">
           <div class="text-ink text-sm font-medium">显示页脚</div>
@@ -93,7 +93,7 @@ const smallCardBase =
           :class="themeStore.showFooter === 'true' ? 'bg-accent' : 'bg-surface'"
         >
           <div
-            class="bg-paper h-5 w-5 rounded-full shadow-md transition-transform"
+            class="bg-page h-5 w-5 rounded-full shadow-md transition-transform"
             :class="
               themeStore.showFooter === 'true'
                 ? 'translate-x-5'
@@ -118,7 +118,7 @@ const smallCardBase =
             smallCardBase,
             themeStore.theme === theme.value
               ? cardActive
-              : 'border-border bg-paper hover:border-accent',
+              : 'border-border bg-page hover:border-accent',
           ]"
         >
           <component
@@ -151,7 +151,7 @@ const smallCardBase =
             smallCardBase,
             themeStore.font === 'default'
               ? cardActive
-              : 'border-border bg-paper hover:border-accent',
+              : 'border-border bg-page hover:border-accent',
           ]"
         >
           <span
@@ -168,7 +168,7 @@ const smallCardBase =
             smallCardBase,
             themeStore.font === 'harmonyos'
               ? cardActive
-              : 'border-border bg-paper hover:border-accent',
+              : 'border-border bg-page hover:border-accent',
           ]"
         >
           <span

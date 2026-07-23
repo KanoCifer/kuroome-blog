@@ -74,7 +74,7 @@ export function WeatherHero({
           <span className="relative inline-flex">
             <Bot className="h-4 w-4" aria-hidden />
             {analysisHasData && !analysisOpen && (
-              <span className="bg-success ring-paper absolute -top-1 -right-1 inline-flex h-2 w-2 rounded-full ring-2" />
+              <span className="bg-success ring-page absolute -top-1 -right-1 inline-flex h-2 w-2 rounded-full ring-2" />
             )}
           </span>
           AI 分析

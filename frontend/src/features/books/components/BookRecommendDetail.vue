@@ -76,7 +76,7 @@ onUnmounted(() => {
           :animate="{ scale: 1, opacity: 1 }"
           :exit="{ scale: 0.6, opacity: 0 }"
           :transition="SPRING_BOUNCE"
-          class="bg-paper border-border relative w-full max-w-3xl overflow-hidden rounded-t-3xl border shadow-2xl sm:rounded-3xl"
+          class="bg-page border-border relative w-full max-w-3xl overflow-hidden rounded-t-3xl border shadow-2xl sm:rounded-3xl"
         >
           <div class="grid grid-cols-1 sm:grid-cols-[200px_1fr]">
             <!-- Cover column — the morph happens here -->
@@ -91,7 +91,7 @@ onUnmounted(() => {
               />
               <span
                 v-if="book.newRating > 0"
-                class="bg-paper/85 text-ink absolute top-3 left-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium tabular-nums backdrop-blur-md"
+                class="bg-page/85 text-ink absolute top-3 left-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium tabular-nums backdrop-blur-md"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

@@ -20,7 +20,7 @@ defineEmits<{
 
 <template>
   <header
-    class="border-border/40 bg-paper/80 top-0 z-30 border-b backdrop-blur-sm"
+    class="border-border/40 bg-page/80 top-0 z-30 border-b backdrop-blur-sm"
   >
     <div
       class="mx-auto flex max-w-screen-2xl items-center justify-between px-4 py-3 sm:px-6"
@@ -55,7 +55,7 @@ defineEmits<{
         </button>
 
         <button
-          class="border-border bg-paper hover:bg-surface text-ink inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors"
+          class="border-border bg-page hover:bg-surface text-ink inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors"
           :class="analysisOpen ? 'border-accent text-ink bg-accent/5' : ''"
           type="button"
           :aria-pressed="analysisOpen"

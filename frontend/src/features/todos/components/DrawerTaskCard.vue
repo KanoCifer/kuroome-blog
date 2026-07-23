@@ -7,7 +7,7 @@
     :class="
       done
         ? 'bg-surface/40 ring-border/60 ring-1'
-        : 'bg-paper ring-border/60 hover:bg-paper hover:ring-border/80 ring-1 hover:shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent)]'
+        : 'bg-page ring-border/60 hover:bg-page hover:ring-border/80 ring-1 hover:shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent)]'
     "
   >
     <div class="flex items-start gap-3">

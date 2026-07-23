@@ -53,7 +53,7 @@
         <div
           v-for="i in count"
           :key="i"
-          class="bg-paper flex w-56 flex-shrink-0 animate-pulse flex-col gap-3 rounded-2xl p-4"
+          class="bg-page flex w-56 flex-shrink-0 animate-pulse flex-col gap-3 rounded-2xl p-4"
         >
           <div class="bg-surface aspect-[2/3] w-full rounded-md" />
           <div class="bg-surface h-4 w-3/4 rounded" />
@@ -66,7 +66,7 @@
     <template #card="{ book, open, ratingScore }">
       <button
         type="button"
-        class="group bg-paper hover:border-accent/40 flex w-56 flex-shrink-0 snap-start flex-col gap-3 rounded-2xl border border-transparent p-4 text-left transition-colors sm:w-60"
+        class="group bg-page hover:border-accent/40 flex w-56 flex-shrink-0 snap-start flex-col gap-3 rounded-2xl border border-transparent p-4 text-left transition-colors sm:w-60"
         @click="open(book)"
       >
         <Motion
@@ -82,7 +82,7 @@
           />
           <span
             v-if="book.newRating > 0"
-            class="bg-paper/80 text-ink absolute top-2 right-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium tabular-nums backdrop-blur-md"
+            class="bg-page/80 text-ink absolute top-2 right-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium tabular-nums backdrop-blur-md"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

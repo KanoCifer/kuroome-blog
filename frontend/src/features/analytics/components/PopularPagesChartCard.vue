@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="border-border/60 bg-paper h-full rounded-3xl border p-6 shadow-sm"
-  >
+  <div class="border-border/60 bg-page h-full rounded-3xl border p-6 shadow-sm">
     <h2 class="text-ink mb-2 flex items-center gap-2 text-sm font-medium">
       <icon-popular class="size-5" /> 热门页面
     </h2>

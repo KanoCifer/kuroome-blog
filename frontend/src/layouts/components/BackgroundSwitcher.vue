@@ -23,7 +23,7 @@
     <DropdownTransition>
       <div
         v-if="isOpen"
-        class="border-border bg-paper absolute top-full right-0 z-9999 mt-2 w-48 rounded-lg shadow-lg"
+        class="border-border bg-page absolute top-full right-0 z-9999 mt-2 w-48 rounded-lg shadow-lg"
         @click.stop
       >
         <!-- Random 选项 -->

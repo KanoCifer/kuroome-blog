@@ -281,7 +281,7 @@ onMounted(() => {
         <select
           v-model="selectedHarbor"
           aria-label="选择港口"
-          class="border-border bg-paper text-ink focus:ring-accent cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
+          class="border-border bg-page text-ink focus:ring-accent cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
         >
           <option
             v-for="opt in HARBOR_OPTIONS"
@@ -294,7 +294,7 @@ onMounted(() => {
         <select
           v-model="selectedDate"
           aria-label="选择日期"
-          class="border-border bg-paper text-ink focus:ring-accent cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
+          class="border-border bg-page text-ink focus:ring-accent cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
         >
           <option
             v-for="opt in dateOptions"

@@ -82,7 +82,7 @@ const handleSubmit = () => {
 
 <template>
   <div
-    class="bg-paper/80 ring-border mx-auto mt-12 mb-4 rounded-3xl p-4 py-8 shadow-lg ring-1 hover:shadow-xl motion-safe:transition-shadow motion-safe:duration-300"
+    class="bg-page/80 ring-border mx-auto mt-12 mb-4 rounded-3xl p-4 py-8 shadow-lg ring-1 hover:shadow-xl motion-safe:transition-shadow motion-safe:duration-300"
   >
     <div class="mx-4 my-2">
       <!-- 申请须知 -->
@@ -304,7 +304,7 @@ const handleSubmit = () => {
           <div class="md:col-span-2">
             <button
               type="submit"
-              class="bg-accent text-ink shadow-accent/30 hover:bg-accent/90 focus:ring-ring dark:ring-offset-paper flex cursor-pointer items-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg ring-offset-2 focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+              class="bg-accent text-ink shadow-accent/30 hover:bg-accent/90 focus:ring-ring dark:ring-offset-page flex cursor-pointer items-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg ring-offset-2 focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
               :disabled="submitting"
             >
               {{ submitting ? '正在打开邮件客户端...' : '提交申请' }}

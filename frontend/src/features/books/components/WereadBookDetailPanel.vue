@@ -118,12 +118,12 @@ const coverGradient = computed(() =>
           :animate="{ scale: 1, y: 0, opacity: 1 }"
           :exit="{ scale: 0.97, y: 8, opacity: 0 }"
           :transition="SPRING_SNUG"
-          class="bg-paper border-border/60 relative w-full max-w-4xl overflow-hidden rounded-3xl border shadow-2xl"
+          class="bg-page border-border/60 relative w-full max-w-4xl overflow-hidden rounded-3xl border shadow-2xl"
         >
           <!-- 关闭按钮 -->
           <button
             type="button"
-            class="bg-paper/80 text-ink hover:bg-paper border-border/40 absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
+            class="bg-page/80 text-ink hover:bg-page border-border/40 absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
             aria-label="关闭"
             @click="emit('close')"
           >

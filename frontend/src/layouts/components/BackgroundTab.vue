@@ -44,7 +44,7 @@ const fillPct = (val: number, min: number, max: number) =>
   `${((val - min) / (max - min)) * 100}%`;
 
 const sliderFill = (val: number, min: number, max: number) =>
-  `linear-gradient(to right, var(--accent) 0%, var(--accent) ${fillPct(val, min, max)}, var(--warm-gray) ${fillPct(val, min, max)}, var(--warm-gray) 100%)`;
+  `linear-gradient(to right, var(--accent) 0%, var(--accent) ${fillPct(val, min, max)}, var(--secondary) ${fillPct(val, min, max)}, var(--secondary) 100%)`;
 
 /*
  * 重置背景参数到默认值。
@@ -86,7 +86,7 @@ const autoSwitchOptions = [
  */
 const smallCardBase =
   'flex flex-col items-center gap-2 rounded-xl border p-4 transition-colors';
-const smallCardDefault = 'border-border bg-paper hover:border-accent';
+const smallCardDefault = 'border-border bg-page hover:border-accent';
 const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
 </script>
 
@@ -97,7 +97,7 @@ const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
       <h2 class="text-ink mb-1 font-serif text-lg font-semibold">背景调整</h2>
       <p class="text-muted mb-4 text-xs italic">Adjust background appearance</p>
 
-      <div class="border-border/60 bg-paper rounded-xl border p-5">
+      <div class="border-border/60 bg-page rounded-xl border p-5">
         <!-- 滑块行 -->
         <div class="relative space-y-5">
           <!-- 背景模糊 -->
@@ -326,7 +326,7 @@ const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
           :class="
             backgroundStore.autoSwitchInterval === opt.value
               ? 'border-accent bg-accent/5 text-ink font-medium !shadow-sm'
-              : 'border-border bg-paper text-ink hover:border-accent'
+              : 'border-border bg-page text-ink hover:border-accent'
           "
         >
           {{ opt.label }}
@@ -351,7 +351,7 @@ const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
 /*
  * 自定义滑块样式。
  * 用 `--track-fill` 行内属性驱动渐变填充"已取值段"，
- * 跟随主题 — track 基色 = var(--warm-gray), fill 色 = var(--accent)。
+ * 跟随主题 — track 基色 = var(--secondary), fill 色 = var(--accent)。
  */
 
 /* ---- reset ---- */
@@ -377,7 +377,7 @@ const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
   height: 18px;
   margin-top: -6px;
   border-radius: 9999px;
-  background: var(--paper);
+  background: var(--page);
   border: 2px solid var(--accent);
   box-shadow:
     0 1px 2px color-mix(in oklch, var(--ink) 12%, transparent),
@@ -411,7 +411,7 @@ const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
   width: 18px;
   height: 18px;
   border-radius: 9999px;
-  background: var(--paper);
+  background: var(--page);
   border: 2px solid var(--accent);
   box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 12%, transparent);
   transition:

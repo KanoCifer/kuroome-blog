@@ -195,7 +195,7 @@ export default function BlogListView() {
   };
 
   return (
-    <div className="bg-paper min-h-dvh">
+    <div className="bg-page min-h-dvh">
       {/* ──────────────────────────────────────────────────────────── */}
       {/*  BasicDetail 风格 hero：parallax 标题 + subtitle           */}
       {/* ──────────────────────────────────────────────────────────── */}
@@ -245,7 +245,7 @@ export default function BlogListView() {
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder="在字里行间，寻一句心动…"
               aria-label="搜索文章"
-              className="text-ink placeholder:text-muted/70 focus:border-accent focus:ring-accent/20 border-border bg-paper w-full rounded-xl border py-3 pr-10 pl-10 font-serif text-sm placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+              className="text-ink placeholder:text-muted/70 focus:border-accent focus:ring-accent/20 border-border bg-page w-full rounded-xl border py-3 pr-10 pl-10 font-serif text-sm placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             />
             {searchQuery && (
               <button
@@ -278,7 +278,7 @@ export default function BlogListView() {
             {activeTag && (
               <button
                 type="button"
-                className="border-border bg-paper text-muted hover:bg-surface hover:text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+                className="border-border bg-page text-muted hover:bg-surface hover:text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
                 onClick={handleResetFilter}
               >
                 <span className="text-ink/70 font-serif italic">#</span>
@@ -390,7 +390,7 @@ export default function BlogListView() {
             {/* Pagination: 统一算法，gap ≥ 2 时自动插入省略号 */}
             {!isLoading && !error && pagination && pagination.pages > 1 && (
               <nav className="mt-10" aria-label="博客分页">
-                <ul className="border-border/80 bg-paper/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2">
+                <ul className="border-border/80 bg-page/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2">
                   <li>
                     <button
                       type="button"

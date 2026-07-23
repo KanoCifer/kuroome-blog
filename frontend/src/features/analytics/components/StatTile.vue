@@ -1,6 +1,6 @@
 <template>
   <div
-    class="border-border/60 bg-paper flex flex-col gap-2 rounded-2xl border p-4"
+    class="border-border/60 bg-page flex flex-col gap-2 rounded-2xl border p-4"
   >
     <div class="flex items-center justify-between">
       <span

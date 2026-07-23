@@ -329,7 +329,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="blog-post bg-paper">
+  <div class="blog-post bg-page">
     <!-- 阅读进度条：跟随窗口滚动 -->
     <div
       class="bg-border/50 fixed inset-x-0 top-0 z-30 h-[2px] overflow-hidden"
@@ -635,7 +635,7 @@ onUnmounted(() => {
     transform 0.2s cubic-bezier(0.2, 0, 0, 1);
   padding: 4px 8px;
   background: var(--ink);
-  color: var(--paper);
+  color: var(--page);
   border-radius: var(--radius-sm);
   pointer-events: none;
   font-size: 0.875rem;

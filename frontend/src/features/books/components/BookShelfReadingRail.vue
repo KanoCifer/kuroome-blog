@@ -42,7 +42,7 @@
               -->
               <span
                 v-if="book.readUpdateTime && !book.finishReading"
-                class="bg-paper/85 text-ink/80 rounded-full px-2 py-0.5 text-[10px] font-medium shadow-sm backdrop-blur-sm"
+                class="bg-page/85 text-ink/80 rounded-full px-2 py-0.5 text-[10px] font-medium shadow-sm backdrop-blur-sm"
               >
                 {{ formatRelative(book.readUpdateTime) }}
               </span>

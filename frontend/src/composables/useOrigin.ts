@@ -38,7 +38,7 @@ export function useOrigin(url: string) {
  * 背景：数据库里历史记录的 url 形如 `https://api.kanocifer.chat/api/v1/media/...`，
  * 是绝对路径。在开发环境（localhost:5173）下浏览器无法直接访问生产域名，
  * 且会被 CORB 拦截导致 `<img>` 加载失败 —— 拍立得"相片区"为空，
- * 在深色模式下 `--paper` 也是深色，整张卡片与背景融为一体，看起来一片空白。
+ * 在深色模式下 `--page` 也是深色，整张卡片与背景融为一体，看起来一片空白。
  *
  * 规则：
  * 1. 空字符串 —— 原样返回；

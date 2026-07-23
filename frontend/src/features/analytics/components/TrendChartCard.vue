@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="border-border/60 bg-paper h-full rounded-3xl border p-6 shadow-sm"
-  >
+  <div class="border-border/60 bg-page h-full rounded-3xl border p-6 shadow-sm">
     <h2 class="text-ink mb-4 flex items-center gap-2 text-sm font-medium">
       <icon-trend class="size-5" />
       访问趋势 · 最近 {{ selectedDays }} 天

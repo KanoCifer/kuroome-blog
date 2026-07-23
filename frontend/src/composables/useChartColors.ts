@@ -87,7 +87,7 @@ export function useChartColors() {
       foreground: resolveCssColor('--color-ink', '#1f2937'),
       mutedForeground: resolveCssColor('--color-muted', '#9ca3af'),
       border: resolveCssColor('--color-border', '#e5e7eb'),
-      card: resolveCssColor('--color-paper', '#ffffff'),
+      card: resolveCssColor('--color-page', '#ffffff'),
       series,
     };
     if (

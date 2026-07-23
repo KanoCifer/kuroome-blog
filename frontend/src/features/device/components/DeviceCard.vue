@@ -1,12 +1,12 @@
 <template>
   <article
-    class="group squircle border-border/10 bg-paper overflow-hidden p-6 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+    class="group squircle border-border/10 bg-page overflow-hidden p-6 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
   >
     <div class="mb-6 flex items-start justify-between">
       <div class="flex items-center gap-4">
         <!-- Logo placeholder -->
         <div
-          class="border-border/50 bg-paper flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border shadow-inner"
+          class="border-border/50 bg-page flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border shadow-inner"
         >
           <span class="text-muted text-2xl font-bold">
             {{ device.name.charAt(0).toUpperCase() }}

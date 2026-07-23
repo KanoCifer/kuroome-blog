@@ -195,7 +195,7 @@ export function TideCard() {
               onClick={() => setSelectedHarbor(opt.code)}
               className={`min-h-8 flex-1 shrink-0 rounded-md px-3 text-xs font-medium transition-all duration-200 ease-out ${
                 isActive
-                  ? 'bg-paper text-ink shadow-sm'
+                  ? 'bg-page text-ink shadow-sm'
                   : 'text-muted hover:text-ink'
               }`}
             >
@@ -237,7 +237,7 @@ export function TideCard() {
           </div>
           {/* High / low tide — Apple HIG inset-grouped 双列 */}
           <div className="fm-grouped bg-border/40 grid grid-cols-2 gap-px">
-            <div className="bg-paper flex flex-col gap-1 px-4 py-3">
+            <div className="bg-page flex flex-col gap-1 px-4 py-3">
               <span className="text-muted text-xs font-medium">
                 最高潮
                 <span className="text-ink ml-1.5 tabular-nums">
@@ -248,7 +248,7 @@ export function TideCard() {
                 {highTide ? Number(highTide.height).toFixed(2) : '--'} m
               </span>
             </div>
-            <div className="bg-paper flex flex-col gap-1 px-4 py-3">
+            <div className="bg-page flex flex-col gap-1 px-4 py-3">
               <span className="text-muted text-xs font-medium">
                 最低潮
                 <span className="text-ink ml-1.5 tabular-nums">

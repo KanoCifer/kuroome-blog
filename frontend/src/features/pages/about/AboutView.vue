@@ -97,7 +97,7 @@ onMounted(() => {
 
 <template>
   <div
-    class="about-page bg-paper flex min-h-screen flex-col items-center justify-center px-6 py-20"
+    class="about-page bg-page flex min-h-screen flex-col items-center justify-center px-6 py-20"
   >
     <!-- Hero: greeting + avatar -->
     <div
@@ -322,7 +322,7 @@ onMounted(() => {
   flex-direction: column;
   gap: 0.875rem;
   padding: 1.125rem 1.125rem 1rem;
-  background-color: var(--color-paper);
+  background-color: var(--color-page);
   color: var(--color-ink);
   border-radius: 0.875rem; /* rounded-xl —— DESIGN.md */
   text-decoration: none;
@@ -331,7 +331,7 @@ onMounted(() => {
     0 1px 1px color-mix(in oklch, var(--ink) 6%, transparent),
     0 6px 14px color-mix(in oklch, var(--ink) 10%, transparent),
     0 18px 32px color-mix(in oklch, var(--ink) 8%),
-    inset 0 1px 0 0 color-mix(in oklch, var(--paper) 70%, transparent);
+    inset 0 1px 0 0 color-mix(in oklch, var(--page) 70%, transparent);
   transition:
     transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1);
@@ -344,7 +344,7 @@ onMounted(() => {
     0 2px 2px color-mix(in oklch, var(--ink) 8%, transparent),
     0 12px 24px color-mix(in oklch, var(--ink) 18%, transparent),
     0 28px 48px color-mix(in oklch, var(--ink) 14%),
-    inset 0 1px 0 0 color-mix(in oklch, var(--paper) 70%, transparent);
+    inset 0 1px 0 0 color-mix(in oklch, var(--page) 70%, transparent);
 }
 
 .social-card:focus-visible {
@@ -352,7 +352,7 @@ onMounted(() => {
     0 0 0 3px color-mix(in oklch, var(--ring) 50%, transparent),
     0 6px 14px color-mix(in oklch, var(--ink) 10%, transparent),
     0 18px 32px color-mix(in oklch, var(--ink) 8%),
-    inset 0 1px 0 0 color-mix(in oklch, var(--paper) 70%, transparent);
+    inset 0 1px 0 0 color-mix(in oklch, var(--page) 70%, transparent);
 }
 
 .social-card__hairline {

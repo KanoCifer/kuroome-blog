@@ -106,7 +106,7 @@ export function SecuritySection({
             type="button"
             onClick={onBindGitHub}
             disabled={bindingGitHub}
-            className="bg-ink text-paper hover:bg-ink/90 flex w-full items-center justify-center space-x-2.5 rounded-full py-4 text-[15px] font-bold shadow-md transition-all active:scale-[0.98] disabled:opacity-70"
+            className="bg-ink text-page hover:bg-ink/90 flex w-full items-center justify-center space-x-2.5 rounded-full py-4 text-[15px] font-bold shadow-md transition-all active:scale-[0.98] disabled:opacity-70"
           >
             {bindingGitHub ? (
               <>
@@ -125,7 +125,7 @@ export function SecuritySection({
             type="button"
             onClick={onOpenGithubDialog}
             disabled={unbindingGitHub}
-            className="bg-ink text-paper hover:bg-ink/90 flex w-full items-center justify-center space-x-2.5 rounded-full py-4 text-[15px] font-bold shadow-md transition-all active:scale-[0.98] disabled:opacity-70"
+            className="bg-ink text-page hover:bg-ink/90 flex w-full items-center justify-center space-x-2.5 rounded-full py-4 text-[15px] font-bold shadow-md transition-all active:scale-[0.98] disabled:opacity-70"
           >
             {unbindingGitHub ? (
               <>

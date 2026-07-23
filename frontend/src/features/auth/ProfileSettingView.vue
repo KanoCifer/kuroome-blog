@@ -491,7 +491,7 @@ onMounted(() => {
         <span class="border-border w-full border-t"></span>
       </div>
       <div class="relative flex justify-center text-xs uppercase">
-        <span class="bg-paper text-muted px-2"> Security </span>
+        <span class="bg-page text-muted px-2"> Security </span>
       </div>
     </div>
 
@@ -556,7 +556,7 @@ onMounted(() => {
         <span class="border-border w-full border-t"></span>
       </div>
       <div class="relative flex justify-center text-xs uppercase">
-        <span class="bg-paper text-muted px-2"> Connected Accounts </span>
+        <span class="bg-page text-muted px-2"> Connected Accounts </span>
       </div>
     </div>
 

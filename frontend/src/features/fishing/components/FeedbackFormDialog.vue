@@ -227,7 +227,7 @@ const handleSubmit = async () => {
   max-width: 28rem;
   margin: 0 1rem;
   border-radius: var(--radius-2xl, 1rem);
-  background-color: var(--color-paper);
+  background-color: var(--color-page);
   padding: 1.5rem;
   box-shadow: 0 20px 60px -10px oklch(0% 0 0 / 0.25);
   transition:

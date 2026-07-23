@@ -3,7 +3,7 @@
     <div class="col-span-full mx-auto w-full max-w-6xl">
       <!-- 每日推荐横幅 -->
       <div
-        class="border-border bg-paper/30 group relative mb-6 cursor-pointer overflow-hidden rounded-4xl border p-6 shadow-sm transition-all duration-300 hover:shadow-lg sm:p-8"
+        class="border-border bg-page/30 group relative mb-6 cursor-pointer overflow-hidden rounded-4xl border p-6 shadow-sm transition-all duration-300 hover:shadow-lg sm:p-8"
         @click="$router.push('/websites')"
       >
         <Transition name="pick-switch" mode="out-in">
@@ -128,7 +128,7 @@
             </div>
 
             <!-- 信息行 -->
-            <div class="bg-paper/60 space-y-2 rounded-xl p-4">
+            <div class="bg-page/60 space-y-2 rounded-xl p-4">
               <div class="flex items-center gap-3 text-sm">
                 <span class="text-muted w-16 shrink-0 font-medium">URL</span>
                 <code class="text-ink truncate">{{ selfInfo.url }}</code>
@@ -158,7 +158,7 @@
             :href="link.url"
             target="_blank"
             rel="noopener noreferrer"
-            class="group border-border bg-paper/30 hover:bg-accent block cursor-pointer overflow-hidden rounded-4xl border p-8 shadow-sm transition-all duration-300 hover:shadow-xl"
+            class="group border-border bg-page/30 hover:bg-accent block cursor-pointer overflow-hidden rounded-4xl border p-8 shadow-sm transition-all duration-300 hover:shadow-xl"
           >
             <div class="flex items-start gap-5">
               <div
@@ -203,7 +203,7 @@
           <!-- 空状态 -->
           <div
             v-if="links.length === 0"
-            class="border-border bg-paper/30 flex flex-col items-center justify-center rounded-4xl border py-16"
+            class="border-border bg-page/30 flex flex-col items-center justify-center rounded-4xl border py-16"
           >
             <IconUsersGroup class="text-muted mb-4 h-16 w-16" />
             <p class="text-muted text-lg">暂无友链</p>
@@ -216,7 +216,7 @@
         <!-- ======== 右列：申请须知 + GitHub Issue ======== -->
         <div class="space-y-6 lg:col-span-1">
           <div
-            class="border-border bg-paper/30 overflow-hidden rounded-4xl border p-8 shadow-sm"
+            class="border-border bg-page/30 overflow-hidden rounded-4xl border p-8 shadow-sm"
           >
             <!-- Header -->
             <div class="mb-6">
@@ -362,7 +362,7 @@ const {
 #tcomment .el-input__inner,
 #tcomment .el-textarea__inner {
   background: var(--card-bg);
-  border-color: var(--warm-gray);
+  border-color: var(--secondary);
   border-radius: 0.75rem;
   color: var(--ink);
   font-size: 0.9375rem;
@@ -408,7 +408,7 @@ const {
     .el-button--text
   ) {
   background: var(--card-bg);
-  border-color: var(--warm-gray);
+  border-color: var(--secondary);
   color: var(--ink);
 }
 #tcomment .el-button--default:hover,
@@ -431,7 +431,7 @@ const {
 }
 
 #tcomment .tk-comment {
-  border-bottom: 1px solid var(--warm-gray);
+  border-bottom: 1px solid var(--secondary);
   padding: 1.25rem 0;
 }
 #tcomment .tk-comment:last-child {
@@ -459,7 +459,7 @@ const {
 }
 
 #tcomment .tk-replies {
-  border-left: 2px solid var(--warm-gray);
+  border-left: 2px solid var(--secondary);
   margin-left: 1.5rem;
   padding-left: 1rem;
 }
@@ -482,6 +482,6 @@ const {
 
 .dark #tcomment .el-input__inner,
 .dark #tcomment .el-textarea__inner {
-  background: color-mix(in oklch, var(--card-bg) 60%, var(--paper));
+  background: color-mix(in oklch, var(--card-bg) 60%, var(--page));
 }
 </style>

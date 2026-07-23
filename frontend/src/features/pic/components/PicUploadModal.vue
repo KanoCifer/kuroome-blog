@@ -20,7 +20,7 @@
           :animate="{ opacity: 1, scale: 1, y: 0 }"
           :exit="{ opacity: 0, scale: 0.95, y: 10 }"
           :transition="{ type: 'spring', damping: 25, stiffness: 300 }"
-          class="bg-paper/95 border-border/60 relative z-10 w-full max-w-md rounded-[2rem] border p-6 shadow-2xl backdrop-blur-2xl md:p-8"
+          class="bg-page/95 border-border/60 relative z-10 w-full max-w-md rounded-[2rem] border p-6 shadow-2xl backdrop-blur-2xl md:p-8"
         >
           <!-- Close Button -->
           <button
@@ -62,7 +62,7 @@
                 class="absolute inset-0 flex items-center justify-center rounded-xl bg-black/40 opacity-0 transition-opacity group-hover/preview:opacity-100"
               >
                 <span
-                  class="bg-paper/30 rounded-full px-3 py-1.5 text-sm font-medium text-white backdrop-blur-md"
+                  class="bg-page/30 rounded-full px-3 py-1.5 text-sm font-medium text-white backdrop-blur-md"
                   >更换图片</span
                 >
               </div>
@@ -80,7 +80,7 @@
               v-model="uploadDescription"
               type="text"
               placeholder="为这张图片添加描述..."
-              class="text-ink placeholder:text-muted focus:border-ink focus:ring-ink border-border/80 bg-paper mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
+              class="text-ink placeholder:text-muted focus:border-ink focus:ring-ink border-border/80 bg-page mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
             />
           </div>
 

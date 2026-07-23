@@ -33,7 +33,7 @@ export function BlogPagination({
 
   return (
     <nav aria-label="博客分页">
-      <ul className="border-border/80 bg-paper/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2">
+      <ul className="border-border/80 bg-page/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2">
         {/* Previous */}
         <li>
           <button

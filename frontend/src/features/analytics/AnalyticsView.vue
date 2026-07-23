@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-paper min-h-screen">
+  <div class="bg-page min-h-screen">
     <!-- Page header — literary register via Averia + Dongfang display -->
     <header class="mx-auto max-w-6xl px-6 pt-10 sm:px-8 sm:pt-14">
       <div class="bg-accent/40 mb-4 h-px w-8"></div>
@@ -24,7 +24,7 @@
       <!-- Filter row -->
       <div class="mt-8">
         <div
-          class="border-border/60 bg-paper flex flex-col items-center justify-between gap-3 rounded-2xl border p-3 sm:flex-row"
+          class="border-border/60 bg-page flex flex-col items-center justify-between gap-3 rounded-2xl border p-3 sm:flex-row"
         >
           <!-- Days Filter: segmented control (radio group) -->
           <div
@@ -41,7 +41,7 @@
               class="rounded-lg px-4 py-1.5 text-sm font-medium transition-colors"
               :class="
                 selectedDays === option
-                  ? 'bg-paper text-ink shadow-sm'
+                  ? 'bg-page text-ink shadow-sm'
                   : 'text-muted hover:text-ink'
               "
               @click="selectedDays = option"
@@ -229,7 +229,7 @@
         <!-- Collapsed secondary: 设备 & 浏览器 -->
         <div class="col-span-1 lg:col-span-3">
           <div
-            class="border-border/60 bg-paper overflow-hidden rounded-3xl border"
+            class="border-border/60 bg-page overflow-hidden rounded-3xl border"
           >
             <button
               type="button"
@@ -291,7 +291,7 @@
         <!-- Login Logs Table -->
         <div class="col-span-1 lg:col-span-3">
           <div
-            class="border-border/60 bg-paper overflow-hidden rounded-3xl border p-5"
+            class="border-border/60 bg-page overflow-hidden rounded-3xl border p-5"
           >
             <h2
               class="text-ink mb-4 flex items-center gap-2 text-sm font-medium"

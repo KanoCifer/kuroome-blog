@@ -29,7 +29,7 @@ const CARD_SHADOW = [
   '0 -1px 1px color-mix(in oklch, var(--ink) 6%, transparent)',
   '0 -8px 18px color-mix(in oklch, var(--ink) 8%, transparent)',
   '0 -24px 40px color-mix(in oklch, var(--ink) 5%, transparent)',
-  'inset 0 1px 0 0 oklch(from var(--paper) l c h / 0.6)',
+  'inset 0 1px 0 0 oklch(from var(--page) l c h / 0.6)',
 ].join(', ');
 import { MapPin, Navigation, Pencil, Star, Trash2, X } from '@lucide/vue';
 import { useNotificationStore } from '@/stores';
@@ -212,7 +212,7 @@ watch(
       <aside
         v-if="open"
         ref="panelRef"
-        class="bg-paper border-border/60 fixed top-6 right-6 bottom-6 z-50 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
+        class="bg-page border-border/60 fixed top-6 right-6 bottom-6 z-50 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
         :style="CARD_SHADOW"
         role="dialog"
         aria-modal="true"
@@ -476,7 +476,7 @@ watch(
       v-if="deleting"
       class="bg-ink/30 fixed inset-0 z-[70] flex items-center justify-center backdrop-blur-sm"
     >
-      <p class="text-paper text-sm">删除中…</p>
+      <p class="text-page text-sm">删除中…</p>
     </div>
   </Teleport>
 </template>

@@ -159,7 +159,7 @@ const ServiceRow = (props: {
           'span',
           {
             class:
-              'bg-paper text-muted rounded-full px-2 py-0.5 font-mono text-[10px] tracking-wide',
+              'bg-page text-muted rounded-full px-2 py-0.5 font-mono text-[10px] tracking-wide',
           },
           props.tag,
         ),
@@ -243,7 +243,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
       target: props.href.startsWith('http') ? '_blank' : undefined,
       rel: props.href.startsWith('http') ? 'noopener noreferrer' : undefined,
       class:
-        'bg-paper border-border/60 hover:border-accent/40 group flex items-center justify-between rounded-2xl border p-4 transition-colors sm:p-5',
+        'bg-page border-border/60 hover:border-accent/40 group flex items-center justify-between rounded-2xl border p-4 transition-colors sm:p-5',
     },
     [
       h('div', {}, [
@@ -266,7 +266,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
 </script>
 
 <template>
-  <div class="privacy-page bg-paper min-h-dvh pb-24">
+  <div class="privacy-page bg-page min-h-dvh pb-24">
     <!-- 顶部阅读进度条 -->
     <div
       class="bg-border sticky top-0 right-0 left-0 z-40 h-[2px] overflow-hidden"

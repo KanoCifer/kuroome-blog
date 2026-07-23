@@ -1,7 +1,7 @@
 /* ── FishingMap 表面材质 (Apple HIG refactor) ──
    主内容区采用 iOS Settings 「Inset Grouped」分组: 每个数据段是一块圆角容器,
    容器内行间用 hairline 分隔, 容器外用节奏化的 gap 区分不同段。
-   不再用 lifted-paper 外壳, 也不复刻 2024 AI bento 的卡片网格。
+   不再用 lifted-page 外壳, 也不复刻 2024 AI bento 的卡片网格。
    阴影走 color-mix(var(--ink)) 以随主题自适应 (DESIGN.md §4 Layered-Shadow Rule)。
    禁止硬编码 rgba / 硬编码色。 */
 
@@ -9,7 +9,7 @@
    4% ink + 96% paper, 比 page 凹一层但不过重, 是 iOS Settings 的招牌分组质感。
    行内分隔靠 divide-border/40 (Tailwind utility)。 */
 .fm-grouped {
-  background: color-mix(in oklch, var(--ink) 4%, var(--paper));
+  background: color-mix(in oklch, var(--ink) 4%, var(--page));
   border-radius: var(--radius-xl); /* 0.875rem — DESIGN.md rounded.xl */
   overflow: hidden;
 }
@@ -24,7 +24,7 @@
    视觉上"嵌进"浮层里而非"放在"页面上)。
    主滚动区不再使用。 */
 .fm-tile {
-  background: color-mix(in oklch, var(--ink) 6%, var(--paper));
+  background: color-mix(in oklch, var(--ink) 6%, var(--page));
   border-radius: var(--radius-xl); /* 0.875rem — DESIGN.md rounded.xl */
 }
 @supports (corner-shape: squircle) {
@@ -47,7 +47,7 @@
 }
 
 /* Apple HIG Segmented Control 风格的容器 (harbor / date chip)。
-   bg-secondary 凹一层, 内部 item 选中态 bg-paper + shadow-sm。 */
+   bg-secondary 凹一层, 内部 item 选中态 bg-page + shadow-sm。 */
 .fm-segmented {
   background: color-mix(in oklch, var(--secondary) 70%, transparent);
   border-radius: var(--radius-lg); /* 0.625rem — DESIGN.md rounded.lg */
@@ -59,9 +59,9 @@
 /* 底部 sheet / 抽屉统一材质 (对齐 SettingMoal):
    顶部 paper 高光 + 分层 ambient，rounded 由组件用 rounded-t-3xl 控制。 */
 .fm-sheet {
-  background: var(--paper);
+  background: var(--page);
   box-shadow:
-    inset 0 1px 0 0 oklch(from var(--paper) l c h / 0.6),
+    inset 0 1px 0 0 oklch(from var(--page) l c h / 0.6),
     0 -1px 1px color-mix(in oklch, var(--ink) 6%, transparent),
     0 -8px 18px color-mix(in oklch, var(--ink) 8%, transparent),
     0 -24px 40px color-mix(in oklch, var(--ink) 6%, transparent);
@@ -69,9 +69,9 @@
 
 /* 桌面右侧抽屉：光从右来，阴影落左（对齐 settings drawer 方向）。 */
 .fm-drawer-right {
-  background: var(--paper);
+  background: var(--page);
   box-shadow:
-    inset 1px 0 0 0 oklch(from var(--paper) l c h / 0.6),
+    inset 1px 0 0 0 oklch(from var(--page) l c h / 0.6),
     -1px 0 1px color-mix(in oklch, var(--ink) 6%, transparent),
     -8px 0 18px color-mix(in oklch, var(--ink) 8%, transparent),
     -24px 0 40px color-mix(in oklch, var(--ink) 6%, transparent);

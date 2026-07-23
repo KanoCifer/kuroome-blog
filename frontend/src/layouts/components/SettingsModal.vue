@@ -29,7 +29,7 @@
           · shadow-* 用 inline 覆盖全局 :where([class~='border']) 的硬阴影
         -->
         <div
-          class="bg-paper border-border/60 relative z-10 mx-4 my-6 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
+          class="bg-page border-border/60 relative z-10 mx-4 my-6 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
           :style="DRAWER_SHADOW"
           role="dialog"
           aria-modal="true"
@@ -68,7 +68,7 @@
 
           <!--
             章节 Tab — 横向胶囊分段控件
-            底托 bg-surface + 激活项 bg-paper 给出"高度差"指示
+            底托 bg-surface + 激活项 bg-page 给出"高度差"指示
           -->
           <nav
             ref="navRef"
@@ -84,7 +84,7 @@
               class="relative flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ease-out active:scale-[0.97]"
               :class="
                 activeTab === tab.key
-                  ? 'bg-paper text-ink shadow-sm'
+                  ? 'bg-page text-ink shadow-sm'
                   : 'hover:text-ink text-[color-mix(in_oklch,var(--ink)_55%,transparent)]'
               "
             >
@@ -222,7 +222,7 @@ const DRAWER_SHADOW = [
   '0 -1px 1px color-mix(in oklch, var(--ink) 6%, transparent)',
   '0 -8px 18px color-mix(in oklch, var(--ink) 8%, transparent)',
   '0 -24px 40px color-mix(in oklch, var(--ink) 5%, transparent)',
-  'inset 0 1px 0 0 oklch(from var(--paper) l c h / 0.6)',
+  'inset 0 1px 0 0 oklch(from var(--page) l c h / 0.6)',
 ].join(', ');
 </script>
 
@@ -235,7 +235,7 @@ const DRAWER_SHADOW = [
   left: 0;
   height: calc(100% - 8px); /* fill nav minus vertical padding */
   z-index: 0;
-  background: var(--paper);
+  background: var(--page);
   border-radius: 0.5rem; /* rounded-lg, matches the buttons */
   box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 8%, transparent);
   transform: translateX(0);

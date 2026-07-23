@@ -226,7 +226,7 @@ export default function MomentListView() {
                   'rounded-full px-3 py-1 font-medium transition-colors',
                   publicActiveTag === null
                     ? 'bg-accent text-ink shadow-sm'
-                    : 'bg-paper text-muted hover:bg-surface border-border/60 border',
+                    : 'bg-page text-muted hover:bg-surface border-border/60 border',
                 ].join(' ')}
                 onClick={() => setTag(null)}
               >
@@ -240,7 +240,7 @@ export default function MomentListView() {
                     'rounded-full px-3 py-1 font-medium transition-colors',
                     publicActiveTag === tag
                       ? 'bg-accent text-ink shadow-sm'
-                      : 'bg-paper text-muted hover:bg-surface border-border/60 border',
+                      : 'bg-page text-muted hover:bg-surface border-border/60 border',
                   ].join(' ')}
                   onClick={() => setTag(tag)}
                 >
@@ -285,7 +285,7 @@ export default function MomentListView() {
               {[0, 1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="bg-paper/60 border-border/40 h-32 animate-pulse rounded-2xl border"
+                  className="bg-page/60 border-border/40 h-32 animate-pulse rounded-2xl border"
                 />
               ))}
             </div>
@@ -322,7 +322,7 @@ export default function MomentListView() {
               <button
                 type="button"
                 disabled={publicPage <= 1}
-                className="bg-paper text-ink hover:bg-surface border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+                className="bg-page text-ink hover:bg-surface border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
                 onClick={() => goPage(publicPage - 1)}
               >
                 <svg
@@ -350,7 +350,7 @@ export default function MomentListView() {
               <button
                 type="button"
                 disabled={publicPage >= totalPages}
-                className="bg-paper text-ink hover:bg-surface border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+                className="bg-page text-ink hover:bg-surface border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
                 onClick={() => goPage(publicPage + 1)}
               >
                 下一页
@@ -426,11 +426,11 @@ export default function MomentListView() {
       {/* 删除确认 modal（inline，避免依赖缺失的 shadcn Dialog） */}
       {deleteConfirmOpen && (
         <div
-          className="bg-paper/60 fixed inset-0 z-[70] flex items-center justify-center p-4 backdrop-blur-sm"
+          className="bg-page/60 fixed inset-0 z-[70] flex items-center justify-center p-4 backdrop-blur-sm"
           onClick={() => setDeleteConfirmOpen(false)}
         >
           <div
-            className="bg-paper border-border/40 w-full max-w-[420px] rounded-xl border p-6 shadow-xl"
+            className="bg-page border-border/40 w-full max-w-[420px] rounded-xl border p-6 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-ink font-serif text-lg font-medium">

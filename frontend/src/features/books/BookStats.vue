@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-paper flex min-h-[calc(100dvh-4rem)] flex-col">
+  <div class="bg-page flex min-h-[calc(100dvh-4rem)] flex-col">
     <PageHero
       title="阅读统计"
       subtitle="微信读书 · 你的阅读时间记录"
@@ -10,7 +10,7 @@
     <div class="flex-1 pb-12">
       <div class="mx-auto max-w-3xl px-4 py-8 sm:px-6 md:px-10 md:py-10">
         <!-- ── Mode Tabs ─────────────────────────────────────────────── -->
-        <div class="bg-paper mb-4 flex gap-1 rounded-xl p-1">
+        <div class="bg-page mb-4 flex gap-1 rounded-xl p-1">
           <button
             v-for="m in MODES"
             :key="m.key"

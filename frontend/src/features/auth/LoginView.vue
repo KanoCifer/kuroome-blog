@@ -276,7 +276,7 @@ const showPassword = ref<boolean>(false);
           <span class="border-border w-full border-t"></span>
         </div>
         <div class="relative flex justify-center text-xs uppercase">
-          <span class="bg-paper text-muted px-2"> Or continue with </span>
+          <span class="bg-page text-muted px-2"> Or continue with </span>
         </div>
       </div>
 

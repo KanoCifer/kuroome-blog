@@ -91,7 +91,7 @@ export default function BookShelf() {
   }, [fetchBooks, statsStore]);
 
   return (
-    <div className="bg-paper flex min-h-[calc(100dvh-4rem)] flex-col">
+    <div className="bg-page flex min-h-[calc(100dvh-4rem)] flex-col">
       {/* Hero Image Section */}
       <div className="relative h-[40vh] flex-shrink-0 overflow-hidden md:h-[45vh]">
         <img
@@ -99,13 +99,13 @@ export default function BookShelf() {
           alt=""
           className="h-full w-full object-cover"
         />
-        <div className="from-paper/40 via-paper/5 to-paper pointer-events-none absolute inset-0 bg-gradient-to-b" />
+        <div className="from-page/40 via-page/5 to-page pointer-events-none absolute inset-0 bg-gradient-to-b" />
 
         {/* Back Button */}
         <div className="absolute top-0 right-0 left-0 z-10 flex items-center px-4 py-4 md:px-6">
           <button
             type="button"
-            className="border-border bg-paper/60 hover:bg-surface flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
+            className="border-border bg-page/60 hover:bg-surface flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
             onClick={handleBack}
             aria-label="返回"
           >
@@ -117,7 +117,7 @@ export default function BookShelf() {
         <div className="absolute top-0 right-0 z-10 flex items-center px-4 py-4 md:px-6">
           <button
             type="button"
-            className="border-border bg-paper/60 hover:bg-surface flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors disabled:opacity-50"
+            className="border-border bg-page/60 hover:bg-surface flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors disabled:opacity-50"
             disabled={isSyncing}
             onClick={handleSync}
             aria-label="同步书架"
@@ -148,7 +148,7 @@ export default function BookShelf() {
       {/* Stats Summary Bar */}
       {weeklySnapshot && (
         <div
-          className="border-border bg-paper mx-auto mt-6 mb-4 w-[calc(100%-2rem)] max-w-6xl cursor-pointer rounded-2xl border p-4 shadow-sm transition-shadow hover:shadow-md sm:px-6 md:mt-8 md:mb-6 md:px-10"
+          className="border-border bg-page mx-auto mt-6 mb-4 w-[calc(100%-2rem)] max-w-6xl cursor-pointer rounded-2xl border p-4 shadow-sm transition-shadow hover:shadow-md sm:px-6 md:mt-8 md:mb-6 md:px-10"
           onClick={() => navigate('/bookshelf/stats')}
         >
           <div className="flex items-center gap-4 sm:gap-6">
@@ -261,7 +261,7 @@ export default function BookShelf() {
                   }}
                 >
                   <div
-                    className="bg-paper hover:shadow-accent/5 relative overflow-hidden rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                    className="bg-page hover:shadow-accent/5 relative overflow-hidden rounded-xl shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                     style={{ animationDelay: `${index * 30}ms` }}
                   >
                     <div className="relative aspect-3/4 overflow-hidden">
@@ -286,7 +286,7 @@ export default function BookShelf() {
 
                       {/* Hover overlay with open icon */}
                       <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors duration-300 group-hover:bg-black/30">
-                        <div className="bg-paper/90 text-ink flex h-10 w-10 items-center justify-center rounded-full opacity-0 shadow-lg backdrop-blur-sm transition-all duration-300 group-hover:opacity-100">
+                        <div className="bg-page/90 text-ink flex h-10 w-10 items-center justify-center rounded-full opacity-0 shadow-lg backdrop-blur-sm transition-all duration-300 group-hover:opacity-100">
                           <ExternalLink className="h-5 w-5" />
                         </div>
                       </div>

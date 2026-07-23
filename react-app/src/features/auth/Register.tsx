@@ -169,7 +169,7 @@ export default function Register() {
   };
 
   return (
-    <div className="font-body bg-paper relative min-h-screen overflow-hidden">
+    <div className="font-body bg-page relative min-h-screen overflow-hidden">
       {/* Main Content */}
       <main className="relative z-10 mt-4 flex flex-col items-center px-5 pt-8 pb-10">
         {/* Hero Section */}
@@ -192,7 +192,7 @@ export default function Register() {
 
         {/* Register Card */}
         <div
-          className={`border-border/50 bg-paper/70 w-full max-w-100 rounded-4xl border p-6 shadow-xl transition-all delay-100 duration-700 ease-out ${
+          className={`border-border/50 bg-page/70 w-full max-w-100 rounded-4xl border p-6 shadow-xl transition-all delay-100 duration-700 ease-out ${
             isReady ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}
         >

@@ -64,7 +64,7 @@ export function FishingAnalysisDrawer({
             border-radius: 24px 0 0 24px !important;
             border-left: 1px solid var(--border-color, color-mix(in oklch, var(--ink) 12%, transparent));
             box-shadow:
-              inset 1px 0 0 0 oklch(from var(--paper) l c h / 0.6),
+              inset 1px 0 0 0 oklch(from var(--page) l c h / 0.6),
               -1px 0 1px color-mix(in oklch, var(--ink) 6%, transparent),
               -8px 0 18px color-mix(in oklch, var(--ink) 8%, transparent),
               -24px 0 40px color-mix(in oklch, var(--ink) 6%, transparent);

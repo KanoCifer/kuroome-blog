@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-paper min-h-screen w-full overflow-x-hidden overflow-y-auto">
+  <div class="bg-page min-h-screen w-full overflow-x-hidden overflow-y-auto">
     <!-- Subtle Dot Pattern Background -->
     <div
       class="text-muted/40 pointer-events-none fixed inset-0 z-0 opacity-40 dark:opacity-20"
@@ -65,7 +65,7 @@
         class="gallery-empty flex h-[60vh] flex-col items-center justify-center"
       >
         <div
-          class="bg-paper border-border relative max-w-md rounded-3xl border p-10 text-center shadow-2xl"
+          class="bg-page border-border relative max-w-md rounded-3xl border p-10 text-center shadow-2xl"
         >
           <div
             class="bg-accent/10 text-ink mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl"

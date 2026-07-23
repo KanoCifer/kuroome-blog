@@ -19,7 +19,7 @@
             'rounded-full px-3 py-1 font-medium transition-colors',
             activeTag === null
               ? 'bg-accent text-ink shadow-sm'
-              : 'bg-paper text-muted hover:bg-surface border-border/60 border',
+              : 'bg-page text-muted hover:bg-surface border-border/60 border',
           ]"
           @click="setTag(null)"
         >
@@ -33,7 +33,7 @@
             'rounded-full px-3 py-1 font-medium transition-colors',
             activeTag === tag
               ? 'bg-accent text-ink shadow-sm'
-              : 'bg-paper text-muted hover:bg-surface border-border/60 border',
+              : 'bg-page text-muted hover:bg-surface border-border/60 border',
           ]"
           @click="setTag(tag)"
         >
@@ -75,7 +75,7 @@
         <div
           v-for="i in 4"
           :key="i"
-          class="bg-paper/60 border-border/40 h-32 animate-pulse rounded-2xl border"
+          class="bg-page/60 border-border/40 h-32 animate-pulse rounded-2xl border"
         />
       </div>
 
@@ -109,7 +109,7 @@
         <button
           type="button"
           :disabled="publicPage <= 1"
-          class="bg-paper text-ink hover:bg-surface border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          class="bg-page text-ink hover:bg-surface border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
           @click="goPage(publicPage - 1)"
         >
           <svg
@@ -137,7 +137,7 @@
         <button
           type="button"
           :disabled="publicPage >= totalPages"
-          class="bg-paper text-ink hover:bg-surface border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          class="bg-page text-ink hover:bg-surface border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
           @click="goPage(publicPage + 1)"
         >
           下一页

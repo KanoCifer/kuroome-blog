@@ -56,7 +56,7 @@ routeInfo.value = result;
 
 ### 5. 共享 Chrome 抽象 (DashboardCard)
 
-所有 tile 共享 `DashboardCard` 包装,统一 `bg-paper / border-border` 语义 token,`tone='hero' | 'default'` 决定视觉档位,motion-v 接管 GPU 动画。
+所有 tile 共享 `DashboardCard` 包装,统一 `bg-page / border-border` 语义 token,`tone='hero' | 'default'` 决定视觉档位,motion-v 接管 GPU 动画。
 
 ## Consequences
 

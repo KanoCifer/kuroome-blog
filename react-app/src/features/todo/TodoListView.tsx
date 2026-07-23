@@ -151,9 +151,9 @@ export default function TodoListView() {
   };
 
   return (
-    <div className="bg-paper flex min-h-screen w-full flex-col">
+    <div className="bg-page flex min-h-screen w-full flex-col">
       {/* ── page header ── */}
-      <header className="bg-paper/75 border-border sticky top-0 z-10 flex flex-wrap items-end justify-between gap-3 border-b px-5 py-3 backdrop-blur-sm sm:px-8">
+      <header className="bg-page/75 border-border sticky top-0 z-10 flex flex-wrap items-end justify-between gap-3 border-b px-5 py-3 backdrop-blur-sm sm:px-8">
         <div>
           <h1 className="text-ink ml-12 font-serif text-2xl leading-tight font-medium tracking-tight">
             开发任务
@@ -244,7 +244,7 @@ export default function TodoListView() {
           <nav role="tablist" aria-label="工作台视角" className="relative">
             {/* 滑动指示器 */}
             <span
-              className="tab-indicator bg-accent/10 absolute top-0 left-0 z-0 h-9 w-full rounded-lg shadow-[inset_0_1px_0_0_oklch(from_var(--paper)_l_c_h_/_0.5),inset_0_-1px_1px_oklch(0_0_0_/_0.04)]"
+              className="tab-indicator bg-accent/10 absolute top-0 left-0 z-0 h-9 w-full rounded-lg shadow-[inset_0_1px_0_0_oklch(from_var(--page)_l_c_h_/_0.5),inset_0_-1px_1px_oklch(0_0_0_/_0.04)]"
               style={{ transform: `translateY(${indicatorY}px)` }}
             />
             {tabs.map((tab, index) => (
@@ -299,7 +299,7 @@ export default function TodoListView() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`focus-visible:ring-ring relative flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.96] ${
                     isActive
-                      ? 'bg-paper text-ink shadow-[0_1px_2px_color-mix(in_oklch,var(--ink)_6%,transparent),inset_0_1px_0_0_oklch(from_var(--paper)_l_c_h_/_0.6)]'
+                      ? 'bg-page text-ink shadow-[0_1px_2px_color-mix(in_oklch,var(--ink)_6%,transparent),inset_0_1px_0_0_oklch(from_var(--page)_l_c_h_/_0.6)]'
                       : 'text-muted hover:text-ink'
                   }`}
                 >

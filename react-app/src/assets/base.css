@@ -149,8 +149,10 @@ footer {
 
 @theme inline {
   /* Core */
-  --color-paper: var(--paper);
+  --color-page: var(--page);
   --color-ink: var(--ink);
+  --color-card: var(--card);
+  --color-surface: var(--surface);
 
   /* Accent (was: --color-primary) */
   --color-accent: var(--accent);
@@ -161,7 +163,7 @@ footer {
 
   /* Border */
   --color-border: var(--border-color);
-  --color-input: var(--warm-gray);
+  --color-input: var(--secondary);
   --color-ring: var(--accent-slate);
 
   /* Charts */
@@ -193,7 +195,7 @@ footer {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-paper text-ink;
+    @apply bg-page text-ink;
     font-family: var(--font-body);
   }
   /* 修复 iOS Safari 表单聚焦时自动放大 */
@@ -233,7 +235,7 @@ footer {
   height: 18px;
   margin-top: -6px;
   border-radius: 9999px;
-  background: var(--paper);
+  background: var(--page);
   border: 2px solid var(--accent);
   box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 12%, transparent);
   transition:
@@ -259,7 +261,7 @@ footer {
   width: 18px;
   height: 18px;
   border-radius: 9999px;
-  background: var(--paper);
+  background: var(--page);
   border: 2px solid var(--accent);
   box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 12%, transparent);
   transition:
@@ -406,7 +408,7 @@ footer {
     transform 0.2s cubic-bezier(0.2, 0, 0, 1);
   padding: 4px 8px;
   background: var(--ink);
-  color: var(--paper);
+  color: var(--page);
   border-radius: var(--radius-sm);
   pointer-events: none;
   font-size: 0.875rem;

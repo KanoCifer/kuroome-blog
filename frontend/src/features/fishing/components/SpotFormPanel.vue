@@ -54,7 +54,7 @@ const CARD_SHADOW = [
   '0 -1px 1px color-mix(in oklch, var(--ink) 6%, transparent)',
   '0 -8px 18px color-mix(in oklch, var(--ink) 8%, transparent)',
   '0 -24px 40px color-mix(in oklch, var(--ink) 5%, transparent)',
-  'inset 0 1px 0 0 oklch(from var(--paper) l c h / 0.6)',
+  'inset 0 1px 0 0 oklch(from var(--page) l c h / 0.6)',
 ].join(', ');
 
 // ── 表单字段 ──
@@ -296,7 +296,7 @@ watch(
       <aside
         v-if="open"
         ref="panelRef"
-        class="bg-paper border-border/60 fixed top-6 right-6 bottom-6 z-50 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
+        class="bg-page border-border/60 fixed top-6 right-6 bottom-6 z-50 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
         :style="CARD_SHADOW"
         role="dialog"
         aria-modal="true"
@@ -476,7 +476,7 @@ watch(
                 @drop.prevent="handleDrop"
               >
                 <div
-                  class="bg-paper ring-border/5 mb-3 flex h-12 w-12 items-center justify-center rounded-full shadow-sm ring-1 transition-transform group-hover:scale-110"
+                  class="bg-page ring-border/5 mb-3 flex h-12 w-12 items-center justify-center rounded-full shadow-sm ring-1 transition-transform group-hover:scale-110"
                 >
                   <ImagePlus
                     class="text-muted group-hover:text-ink h-5 w-5 transition-colors"
@@ -500,7 +500,7 @@ watch(
                   <img :src="p.url" alt="" class="h-full w-full object-cover" />
                   <button
                     type="button"
-                    class="bg-paper/80 text-ink hover:bg-paper absolute top-1.5 right-1.5 inline-flex h-6 w-6 items-center justify-center rounded-full opacity-0 shadow-sm backdrop-blur-md transition-opacity group-hover:opacity-100"
+                    class="bg-page/80 text-ink hover:bg-page absolute top-1.5 right-1.5 inline-flex h-6 w-6 items-center justify-center rounded-full opacity-0 shadow-sm backdrop-blur-md transition-opacity group-hover:opacity-100"
                     aria-label="移除图片"
                     @click="removePicture(p)"
                   >
@@ -532,7 +532,7 @@ watch(
                   <!-- 失败:错误态 -->
                   <div
                     v-else
-                    class="border-destructive bg-paper/95 absolute inset-0 flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 p-2 text-center backdrop-blur-md"
+                    class="border-destructive bg-page/95 absolute inset-0 flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 p-2 text-center backdrop-blur-md"
                     role="alert"
                   >
                     <ImageOff class="text-destructive h-5 w-5" />

@@ -159,7 +159,7 @@
       >
         <div
           v-if="layoutStore.isEditing"
-          class="border-border bg-paper/90 fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-2xl border px-4 py-2 shadow-lg backdrop-blur-md"
+          class="border-border bg-page/90 fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-2xl border px-4 py-2 shadow-lg backdrop-blur-md"
         >
           <span class="text-muted px-1 text-sm font-medium"> 编辑布局 </span>
           <span class="bg-border mx-1 h-5 w-px" aria-hidden="true" />

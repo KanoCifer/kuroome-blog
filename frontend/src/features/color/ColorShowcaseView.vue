@@ -48,10 +48,10 @@ const heroStyle = computed(() => ({
 </script>
 
 <template>
-  <div class="text-ink bg-paper min-h-screen pb-24">
+  <div class="text-ink bg-page min-h-screen pb-24">
     <!-- Hero：跟随当前 scheme 的真实 token -->
     <header
-      class="from-paper/40 via-paper/5 to-paper/40 relative overflow-hidden"
+      class="from-page/40 via-page/5 to-page/40 relative overflow-hidden"
       :style="heroStyle"
     >
       <div
@@ -72,7 +72,7 @@ const heroStyle = computed(() => ({
         >
           每个配色都共享同一组 CSS 变量（<code
             class="bg-surface rounded px-1.5 py-0.5 font-mono text-sm"
-            >--ink --paper --accent --chart-1..5</code
+            >--ink --page --accent --chart-1..5</code
           >）。
           切换的是基色与饱和度，组件代码无需改动。下面四张卡分别嵌套了对应的
           <code class="bg-surface rounded px-1.5 py-0.5 font-mono text-sm"

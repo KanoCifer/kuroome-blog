@@ -170,7 +170,7 @@ export function FishingFeedbackForm({
                     aria-pressed={isActive}
                     className={`min-h-9 flex-1 rounded-md px-2 py-1.5 text-xs font-medium transition-all duration-200 ease-out ${
                       isActive
-                        ? 'bg-paper text-ink shadow-sm'
+                        ? 'bg-page text-ink shadow-sm'
                         : 'text-muted hover:text-ink'
                     }`}
                   >

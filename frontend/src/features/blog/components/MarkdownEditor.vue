@@ -343,7 +343,7 @@ defineExpose({
         <!-- Focus mode dimming overlay -->
         <div
           v-if="isFocusMode"
-          class="from-paper/90 pointer-events-none absolute inset-x-0 top-0 z-10 h-1/4 bg-gradient-to-b to-transparent"
+          class="from-page/90 pointer-events-none absolute inset-x-0 top-0 z-10 h-1/4 bg-gradient-to-b to-transparent"
         ></div>
 
         <textarea
@@ -375,7 +375,7 @@ defineExpose({
     >
       <div
         v-if="showPreview"
-        class="border-border/50 bg-paper/50 border-l md:w-1/2 md:pl-4"
+        class="border-border/50 bg-page/50 border-l md:w-1/2 md:pl-4"
       >
         <div class="flex h-full flex-col">
           <div class="flex h-10 shrink-0 items-center justify-between px-4">

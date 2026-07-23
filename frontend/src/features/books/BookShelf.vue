@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-paper flex min-h-[calc(100dvh-4rem)] flex-col">
+  <div class="bg-page flex min-h-[calc(100dvh-4rem)] flex-col">
     <BookShelfHero
       :book-count="isLoading ? null : displayedBooks.length"
       :is-syncing="isSyncing"

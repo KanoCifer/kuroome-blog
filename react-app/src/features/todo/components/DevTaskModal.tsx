@@ -144,7 +144,7 @@ export function DevTaskModal({
     <TodoModal open={open} size="xl" onClose={onClose}>
       <div className="flex max-h-[85vh] w-full flex-col">
         {/* Header — sticky */}
-        <div className="bg-paper border-border shrink-0 border-b px-6 pt-5 pb-4">
+        <div className="bg-page border-border shrink-0 border-b px-6 pt-5 pb-4">
           <div className="flex items-start gap-3">
             <span className="bg-accent/10 text-ink mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
               <svg
@@ -185,7 +185,7 @@ export function DevTaskModal({
                 onChange={(e) => set('title', e.target.value)}
                 type="text"
                 placeholder="例如：重构首页响应式布局"
-                className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+                className="border-border bg-page text-ink focus:border-accent placeholder:text-muted/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
               />
             </label>
 
@@ -246,7 +246,7 @@ export function DevTaskModal({
                   onChange={(e) => set('scope', e.target.value)}
                   type="text"
                   placeholder="例如：前端-React"
-                  className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+                  className="border-border bg-page text-ink focus:border-accent placeholder:text-muted/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
                 />
               </div>
               <label className="block">
@@ -257,7 +257,7 @@ export function DevTaskModal({
                   value={form.due_date}
                   onChange={(e) => set('due_date', e.target.value)}
                   type="date"
-                  className="border-border bg-paper text-ink focus:border-accent w-full cursor-pointer rounded-lg border px-3 py-2 text-sm outline-none"
+                  className="border-border bg-page text-ink focus:border-accent w-full cursor-pointer rounded-lg border px-3 py-2 text-sm outline-none"
                 />
               </label>
             </div>
@@ -295,7 +295,7 @@ export function DevTaskModal({
                 onChange={(e) => set('description', e.target.value)}
                 rows={3}
                 placeholder="一两句话说清楚要做什么、为什么..."
-                className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+                className="border-border bg-page text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               />
             </label>
 
@@ -308,7 +308,7 @@ export function DevTaskModal({
                 onChange={(e) => set('detail', e.target.value)}
                 rows={6}
                 placeholder="实现思路、参考链接、验收标准等，可较长..."
-                className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+                className="border-border bg-page text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               />
               <span className="text-muted/60 mt-1 block text-[11px]">
                 支持比描述更长的自由文本
@@ -329,7 +329,7 @@ export function DevTaskModal({
                 placeholder={
                   '- 所有接口有单测覆盖\n- 文档同步更新\n- 性能基准不降级'
                 }
-                className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+                className="border-border bg-page text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               />
             </label>
 
@@ -347,7 +347,7 @@ export function DevTaskModal({
                 placeholder={
                   '- 不动 src/legacy/ 目录\n- 后端继续用 Gin，不换框架\n- API 响应格式保持不变'
                 }
-                className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+                className="border-border bg-page text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               />
             </label>
 
@@ -363,14 +363,14 @@ export function DevTaskModal({
                 onChange={(e) => set('context_pointers', e.target.value)}
                 rows={4}
                 placeholder="internal/auth/, docs/adr/0003, src/middleware/session.ts"
-                className="border-border bg-paper text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+                className="border-border bg-page text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               />
             </label>
           </div>
         </div>
 
         {/* Footer (sticky) */}
-        <div className="bg-paper border-border flex shrink-0 items-center justify-between border-t px-6 pt-4 pb-5">
+        <div className="bg-page border-border flex shrink-0 items-center justify-between border-t px-6 pt-4 pb-5">
           {form.slug ? (
             <button
               type="button"

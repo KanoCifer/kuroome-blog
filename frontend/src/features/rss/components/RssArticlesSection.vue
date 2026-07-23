@@ -1,7 +1,7 @@
 <template>
   <section
     id="rss-articles"
-    class="border-border bg-paper rounded-2xl border p-6"
+    class="border-border bg-page rounded-2xl border p-6"
   >
     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
       <div>
@@ -24,7 +24,7 @@
           :value="searchQuery"
           type="search"
           placeholder="搜索文章标题和内容..."
-          class="border-border bg-paper text-ink placeholder:text-muted focus:border-accent focus:ring-accent/20 w-full rounded-xl border py-3 pr-24 pl-4 text-sm focus:ring-2 focus:outline-none"
+          class="border-border bg-page text-ink placeholder:text-muted focus:border-accent focus:ring-accent/20 w-full rounded-xl border py-3 pr-24 pl-4 text-sm focus:ring-2 focus:outline-none"
           @input="
             $emit(
               'update:searchQuery',
@@ -95,7 +95,7 @@
         <li
           v-for="article in articles"
           :key="article.id"
-          class="border-border bg-paper hover:border-accent/30 rounded-xl border p-4 transition-all"
+          class="border-border bg-page hover:border-accent/30 rounded-xl border p-4 transition-all"
         >
           <div class="flex flex-col gap-3">
             <div class="flex flex-wrap items-start justify-between gap-2">

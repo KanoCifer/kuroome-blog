@@ -40,7 +40,7 @@
       <!-- 滑动指示器 -->
       <span
         :class="[
-          'tab-indicator bg-accent/10 absolute top-0 left-0 z-0 w-full rounded-lg shadow-[inset_0_1px_0_0_oklch(from_var(--paper)_l_c_h_/_0.5),inset_0_-1px_1px_oklch(0_0_0_/_0.04)]',
+          'tab-indicator bg-accent/10 absolute top-0 left-0 z-0 w-full rounded-lg shadow-[inset_0_1px_0_0_oklch(from_var(--page)_l_c_h_/_0.5),inset_0_-1px_1px_oklch(0_0_0_/_0.04)]',
           collapsed ? 'h-8' : 'h-9',
         ]"
         :style="{ transform: `translateY(${indicatorY}px)` }"

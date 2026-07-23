@@ -47,7 +47,7 @@
       >
         <Motion
           :layoutId="RECOMMEND_COVER_LAYOUT_ID_PREFIX + book.bookId"
-          class="bg-paper relative aspect-3/4 overflow-hidden rounded-xl shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl"
+          class="bg-page relative aspect-3/4 overflow-hidden rounded-xl shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl"
         >
           <img
             v-if="book.cover"
@@ -68,7 +68,7 @@
 
           <span
             v-if="book.newRating > 0"
-            class="bg-paper/85 text-ink absolute top-2 right-2 inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium tabular-nums backdrop-blur-md"
+            class="bg-page/85 text-ink absolute top-2 right-2 inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium tabular-nums backdrop-blur-md"
           >
             <Star class="text-ink h-2.5 w-2.5 fill-current" />
             {{ ratingScore(book.newRating) }}

@@ -4,7 +4,7 @@
     <ModalFadeTransition>
       <div
         v-if="modelValue"
-        class="bg-paper/50 fixed inset-0 z-50 backdrop-blur-sm"
+        class="bg-page/50 fixed inset-0 z-50 backdrop-blur-sm"
         @click="handleClose"
       />
     </ModalFadeTransition>
@@ -16,11 +16,11 @@
         class="fixed inset-x-8 inset-y-24 z-50 flex items-center justify-center"
       >
         <div
-          class="bg-paper max-h-full w-full max-w-md overflow-y-auto rounded-2xl shadow-2xl"
+          class="bg-page max-h-full w-full max-w-md overflow-y-auto rounded-2xl shadow-2xl"
         >
           <!-- Header -->
           <div
-            class="bg-paper border-border sticky top-0 z-10 border-b px-6 pt-6 pb-4"
+            class="bg-page border-border sticky top-0 z-10 border-b px-6 pt-6 pb-4"
           >
             <div class="flex items-start justify-between gap-3">
               <div>
@@ -36,7 +36,7 @@
           </div>
 
           <!-- Form -->
-          <form @submit.prevent="handleSubmit" class="bg-paper space-y-5 p-6">
+          <form @submit.prevent="handleSubmit" class="bg-page space-y-5 p-6">
             <!-- Name -->
             <label class="block space-y-1.5">
               <span class="text-muted ml-1 text-xs font-semibold">
@@ -47,7 +47,7 @@
                 type="text"
                 placeholder="例如：iPhone 15 Pro Max"
                 maxlength="100"
-                class="border-border bg-paper text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                class="border-border bg-page text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
               />
             </label>
 
@@ -59,7 +59,7 @@
               <input
                 v-model="form.purchase_date"
                 type="date"
-                class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                class="border-border bg-page text-ink focus:border-accent focus:ring-accent/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
               />
             </label>
 
@@ -71,7 +71,7 @@
                 </span>
                 <select
                   v-model="form.currency"
-                  class="border-border bg-paper text-ink focus:border-accent focus:ring-accent/30 w-full cursor-pointer appearance-none rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                  class="border-border bg-page text-ink focus:border-accent focus:ring-accent/30 w-full cursor-pointer appearance-none rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 >
                   <option v-for="c in currencyOptions" :key="c" :value="c">
                     {{ c }}
@@ -89,7 +89,7 @@
                   min="0"
                   step="0.01"
                   placeholder="0.00"
-                  class="border-border bg-paper text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                  class="border-border bg-page text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
             </div>
@@ -103,7 +103,7 @@
                 v-model="form.notes"
                 type="text"
                 placeholder="例如：256GB 银色、国行版本"
-                class="border-border bg-paper text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                class="border-border bg-page text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 w-full rounded-xl border px-4 py-3 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
               />
             </label>
 

@@ -52,7 +52,7 @@ function renderMarkdown(content: string): string {
  *
  * 嵌入模式 (drawer / sheet 内): 流式布局, 顶部 status chip, 主体内容区, 底部 model select + 主按钮。
  * 浮层模式 (默认): 一个 flat solid FAB (没有 blob orbs / 没有渐变装饰),
- * 卡片表面 `bg-paper border-border/40 shadow-sm`, 不使用 AI bento 的
+ * 卡片表面 `bg-page border-border/40 shadow-sm`, 不使用 AI bento 的
  * `from-indigo-300/30 ... blur-2xl` 装饰光晕 (DESIGN.md §6 显式禁止)。
  */
 export function AIAnalysisWidget({
@@ -219,7 +219,7 @@ export function AIAnalysisWidget({
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.96, y: 12 }}
                 transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-                className="bg-paper border-border/40 w-[90vw] max-w-sm overflow-hidden rounded-3xl border shadow-xl"
+                className="bg-page border-border/40 w-[90vw] max-w-sm overflow-hidden rounded-3xl border shadow-xl"
                 role="dialog"
                 aria-label="AI 天气分析"
               >
@@ -333,7 +333,7 @@ export function AIAnalysisWidget({
           title="AI分析"
         >
           {analysisHasData && (
-            <span className="bg-success ring-paper absolute top-0.5 right-0.5 inline-flex h-2.5 w-2.5 rounded-full ring-2 sm:top-0 sm:right-0 sm:h-3 sm:w-3" />
+            <span className="bg-success ring-page absolute top-0.5 right-0.5 inline-flex h-2.5 w-2.5 rounded-full ring-2 sm:top-0 sm:right-0 sm:h-3 sm:w-3" />
           )}
           <Bot className="h-5 w-5 sm:h-6 sm:w-6" />
         </button>

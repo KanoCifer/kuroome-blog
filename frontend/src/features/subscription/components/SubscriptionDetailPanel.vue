@@ -30,7 +30,7 @@ const emit = defineEmits<{
 
 <template>
   <aside class="xl:sticky xl:top-24 xl:h-fit">
-    <section class="border-border/80 bg-paper rounded-3xl border p-5 shadow-sm">
+    <section class="border-border/80 bg-page rounded-3xl border p-5 shadow-sm">
       <h3 class="text-ink text-sm font-semibold tracking-wide uppercase">
         详情面板
       </h3>
@@ -112,7 +112,7 @@ const emit = defineEmits<{
         <div class="grid grid-cols-2 gap-2">
           <button
             type="button"
-            class="border-border bg-paper text-ink hover:bg-surface rounded-xl border px-3 py-2 text-sm font-medium transition"
+            class="border-border bg-page text-ink hover:bg-surface rounded-xl border px-3 py-2 text-sm font-medium transition"
             @click="emit('edit', selectedSubscription)"
           >
             编辑订阅
@@ -126,7 +126,7 @@ const emit = defineEmits<{
           </button>
           <button
             type="button"
-            class="border-border bg-paper text-ink hover:bg-surface rounded-xl border px-3 py-2 text-sm font-medium transition disabled:opacity-60"
+            class="border-border bg-page text-ink hover:bg-surface rounded-xl border px-3 py-2 text-sm font-medium transition disabled:opacity-60"
             :disabled="pendingStatusId === selectedSubscription.id"
             @click="emit('toggleStatus', selectedSubscription)"
           >

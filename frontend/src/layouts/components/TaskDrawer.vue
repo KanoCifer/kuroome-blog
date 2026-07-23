@@ -358,19 +358,19 @@ onMounted(() => {
 /* 抽屉面板：layered ambient + 顶部 inset 高光 = 「台灯下的纸」。
    shadow 全部走 color-mix(in oklch, var(--ink) N%, transparent)，跟随主题自适应。 */
 .drawer-panel {
-  background-color: var(--color-paper);
+  background-color: var(--color-page);
   border: 1px solid color-mix(in oklch, var(--ink) 10%, transparent);
   box-shadow:
     0 1px 1px color-mix(in oklch, var(--ink) 6%, transparent),
     0 6px 14px color-mix(in oklch, var(--ink) 10%, transparent),
     0 18px 32px color-mix(in oklch, var(--ink) 8%, transparent),
-    inset 0 1px 0 0 oklch(from var(--paper) l c h / 0.6);
+    inset 0 1px 0 0 oklch(from var(--page) l c h / 0.6);
 }
 
 /* 新建任务折叠/展开：弱化为虚线 surface，不抢 section 主线的注意力。 */
 .add-shell {
-  background-color: color-mix(in oklch, var(--paper) 60%, transparent);
-  box-shadow: inset 0 1px 0 0 oklch(from var(--paper) l c h / 0.5);
+  background-color: color-mix(in oklch, var(--page) 60%, transparent);
+  box-shadow: inset 0 1px 0 0 oklch(from var(--page) l c h / 0.5);
 }
 
 @media (prefers-reduced-motion: reduce) {

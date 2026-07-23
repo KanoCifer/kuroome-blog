@@ -6,7 +6,7 @@ export function BlogEmptyState({
   onReset?: () => void;
 }) {
   return (
-    <div className="border-border bg-paper/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center">
+    <div className="border-border bg-page/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         className="text-muted/50 mb-5 h-14 w-14"

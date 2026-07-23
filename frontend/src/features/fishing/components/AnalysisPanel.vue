@@ -35,7 +35,7 @@ const CARD_SHADOW = [
   '0 -1px 1px color-mix(in oklch, var(--ink) 6%, transparent)',
   '0 -8px 18px color-mix(in oklch, var(--ink) 8%, transparent)',
   '0 -24px 40px color-mix(in oklch, var(--ink) 5%, transparent)',
-  'inset 0 1px 0 0 oklch(from var(--paper) l c h / 0.6)',
+  'inset 0 1px 0 0 oklch(from var(--page) l c h / 0.6)',
 ].join(', ');
 
 // ── 无障碍:focus trap + Esc + restore focus ──
@@ -88,7 +88,7 @@ watch(
       <aside
         v-if="open"
         ref="panelRef"
-        class="bg-paper border-border/60 fixed top-6 right-6 bottom-6 z-50 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
+        class="bg-page border-border/60 fixed top-6 right-6 bottom-6 z-50 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
         :style="CARD_SHADOW"
         role="dialog"
         aria-modal="true"

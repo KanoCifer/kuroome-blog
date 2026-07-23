@@ -97,13 +97,13 @@ function onImgError(e: Event) {
 <template>
   <button
     type="button"
-    class="group focus-visible:ring-ring focus-visible:ring-offset-paper block w-full cursor-pointer rounded-xl text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+    class="group focus-visible:ring-ring focus-visible:ring-offset-page block w-full cursor-pointer rounded-xl text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
     @click="handleSelect"
   >
     <!-- ─── List variant: 横向单行 ────────────────────────────── -->
     <div
       v-if="isList"
-      class="border-border/60 bg-paper hover:bg-surface/40 hover:shadow-accent/5 flex items-center gap-3 rounded-xl border p-3 transition-all duration-300 sm:gap-4 sm:p-4"
+      class="border-border/60 bg-page hover:bg-surface/40 hover:shadow-accent/5 flex items-center gap-3 rounded-xl border p-3 transition-all duration-300 sm:gap-4 sm:p-4"
     >
       <div
         class="bg-surface relative h-16 w-12 flex-shrink-0 overflow-hidden rounded-md shadow-sm sm:h-20 sm:w-14"
@@ -165,7 +165,7 @@ function onImgError(e: Event) {
     <!-- ─── Grid variants: standard / compact ─────────────────── -->
     <div
       v-else
-      class="book-card bg-paper ring-border/0 group-hover:ring-border/40 group-hover:shadow-accent/10 relative overflow-hidden rounded-xl shadow-sm ring-1 transition-all duration-300 ease-out ring-inset group-hover:-translate-y-1 group-hover:shadow-lg"
+      class="book-card bg-page ring-border/0 group-hover:ring-border/40 group-hover:shadow-accent/10 relative overflow-hidden rounded-xl shadow-sm ring-1 transition-all duration-300 ease-out ring-inset group-hover:-translate-y-1 group-hover:shadow-lg"
       :style="gridAnimStyle"
     >
       <div class="relative aspect-3/4 overflow-hidden">
@@ -199,7 +199,7 @@ function onImgError(e: Event) {
         <!-- hover: 中央动作按钮(带 scale 弹入) -->
         <div class="absolute inset-0 flex items-center justify-center">
           <div
-            class="bg-paper/90 text-ink ring-border/50 flex h-9 w-9 scale-90 items-center justify-center rounded-full opacity-0 shadow-md ring-1 backdrop-blur-md transition-all duration-300 ease-out group-hover:scale-100 group-hover:opacity-100"
+            class="bg-page/90 text-ink ring-border/50 flex h-9 w-9 scale-90 items-center justify-center rounded-full opacity-0 shadow-md ring-1 backdrop-blur-md transition-all duration-300 ease-out group-hover:scale-100 group-hover:opacity-100"
           >
             <ChevronRight class="h-4 w-4" />
           </div>

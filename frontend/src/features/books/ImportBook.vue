@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="bg-paper flex min-h-screen items-center justify-center px-4 py-16"
-  >
+  <div class="bg-page flex min-h-screen items-center justify-center px-4 py-16">
     <div class="w-full max-w-xl" style="animation: fadeInUp 0.6s ease-out">
       <!-- Header -->
       <div class="mb-10">
@@ -69,7 +67,7 @@
               :aria-describedby="
                 hasFieldError ? 'api-key-error' : 'api-key-hint'
               "
-              class="border-input bg-paper text-ink placeholder:text-muted/70 focus:ring-accent/20 w-full rounded-2xl border px-5 py-4 pr-14 font-mono text-base transition-all duration-200 focus:ring-2 focus:outline-none"
+              class="border-input bg-page text-ink placeholder:text-muted/70 focus:ring-accent/20 w-full rounded-2xl border px-5 py-4 pr-14 font-mono text-base transition-all duration-200 focus:ring-2 focus:outline-none"
               :class="
                 hasFieldError
                   ? 'border-destructive focus:border-destructive focus:ring-destructive/20'

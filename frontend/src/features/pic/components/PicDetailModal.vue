@@ -24,7 +24,7 @@
           role="dialog"
           aria-modal="true"
           aria-labelledby="pdm-title"
-          class="bg-paper text-muted border-border/60 relative z-10 grid w-full max-w-5xl overflow-hidden rounded-2xl border shadow-[0_12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)] md:grid-cols-[1.45fr_1fr]"
+          class="bg-page text-muted border-border/60 relative z-10 grid w-full max-w-5xl overflow-hidden rounded-2xl border shadow-[0_12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)] md:grid-cols-[1.45fr_1fr]"
         >
           <!-- ============= 左侧：胶片查看 ============= -->
           <section
@@ -33,7 +33,7 @@
           >
             <header class="flex items-center justify-between gap-3">
               <span
-                class="bg-ink text-paper inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[10.5px] tracking-[0.2em] uppercase"
+                class="bg-ink text-page inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[10.5px] tracking-[0.2em] uppercase"
                 style="font-family: var(--font-mono)"
               >
                 <span
@@ -66,16 +66,16 @@
                 aria-hidden="true"
               >
                 <span
-                  class="absolute top-3 left-3 h-[18px] w-[18px] border-t-[1.5px] border-l-[1.5px] border-[color-mix(in_oklch,var(--paper)_85%,transparent)]"
+                  class="absolute top-3 left-3 h-[18px] w-[18px] border-t-[1.5px] border-l-[1.5px] border-[color-mix(in_oklch,var(--page)_85%,transparent)]"
                 ></span>
                 <span
-                  class="absolute top-3 right-3 h-[18px] w-[18px] border-t-[1.5px] border-r-[1.5px] border-[color-mix(in_oklch,var(--paper)_85%,transparent)]"
+                  class="absolute top-3 right-3 h-[18px] w-[18px] border-t-[1.5px] border-r-[1.5px] border-[color-mix(in_oklch,var(--page)_85%,transparent)]"
                 ></span>
                 <span
-                  class="absolute bottom-3 left-3 h-[18px] w-[18px] border-b-[1.5px] border-l-[1.5px] border-[color-mix(in_oklch,var(--paper)_85%,transparent)]"
+                  class="absolute bottom-3 left-3 h-[18px] w-[18px] border-b-[1.5px] border-l-[1.5px] border-[color-mix(in_oklch,var(--page)_85%,transparent)]"
                 ></span>
                 <span
-                  class="absolute right-3 bottom-3 h-[18px] w-[18px] border-r-[1.5px] border-b-[1.5px] border-[color-mix(in_oklch,var(--paper)_85%,transparent)]"
+                  class="absolute right-3 bottom-3 h-[18px] w-[18px] border-r-[1.5px] border-b-[1.5px] border-[color-mix(in_oklch,var(--page)_85%,transparent)]"
                 ></span>
               </div>
               <div
@@ -119,7 +119,7 @@
               >
                 <button
                   type="button"
-                  class="border-border/40 text-ink hover:bg-paper inline-flex h-8 w-8 items-center justify-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+                  class="border-border/40 text-ink hover:bg-page inline-flex h-8 w-8 items-center justify-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
                   aria-label="上一张"
                   @click="$emit('prev')"
                 >
@@ -138,7 +138,7 @@
                 </button>
                 <button
                   type="button"
-                  class="border-border/40 text-ink hover:bg-paper inline-flex h-8 w-8 items-center justify-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+                  class="border-border/40 text-ink hover:bg-page inline-flex h-8 w-8 items-center justify-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
                   aria-label="下一张"
                   @click="$emit('next')"
                 >
@@ -222,7 +222,7 @@
               role="group"
               aria-label="拍摄参数"
             >
-              <div class="bg-paper p-2.5">
+              <div class="bg-page p-2.5">
                 <div
                   class="text-muted mb-1 text-[10px] tracking-[0.16em] uppercase"
                   style="font-family: var(--font-mono)"
@@ -239,7 +239,7 @@
                   {{ camera }}
                 </div>
               </div>
-              <div class="bg-paper p-2.5">
+              <div class="bg-page p-2.5">
                 <div
                   class="text-muted mb-1 text-[10px] tracking-[0.16em] uppercase"
                   style="font-family: var(--font-mono)"
@@ -256,7 +256,7 @@
                   {{ lens }}
                 </div>
               </div>
-              <div class="bg-paper p-2.5">
+              <div class="bg-page p-2.5">
                 <div
                   class="text-muted mb-1 text-[10px] tracking-[0.16em] uppercase"
                   style="font-family: var(--font-mono)"
@@ -273,7 +273,7 @@
                   {{ aperture }}
                 </div>
               </div>
-              <div class="bg-paper p-2.5">
+              <div class="bg-page p-2.5">
                 <div
                   class="text-muted mb-1 text-[10px] tracking-[0.16em] uppercase"
                   style="font-family: var(--font-mono)"
@@ -318,7 +318,7 @@
                 v-model="localDescription"
                 rows="4"
                 aria-label="编辑拍摄笔记"
-                class="bg-paper text-ink placeholder:text-muted focus:border-accent focus:ring-accent/20 w-full resize-y rounded-xl border border-[color-mix(in_oklch,var(--ink)_18%,transparent)] px-4 py-3.5 text-[14.5px] leading-[1.55] transition-shadow focus:ring-2 focus:outline-none"
+                class="bg-page text-ink placeholder:text-muted focus:border-accent focus:ring-accent/20 w-full resize-y rounded-xl border border-[color-mix(in_oklch,var(--ink)_18%,transparent)] px-4 py-3.5 text-[14.5px] leading-[1.55] transition-shadow focus:ring-2 focus:outline-none"
                 style="font-family: var(--font-sans)"
                 @keydown.esc="toggleEdit"
               ></textarea>
@@ -404,7 +404,7 @@
 
               <button
                 type="button"
-                class="bg-secondary text-paper ml-auto inline-flex items-center gap-2 rounded-full border border-[color:var(--ink)] px-[18px] py-2.5 text-[13.5px] font-medium tracking-[0.01em] transition-colors hover:bg-[color-mix(in_oklch,var(--ink)_90%,var(--accent))] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+                class="bg-secondary text-page ml-auto inline-flex items-center gap-2 rounded-full border border-[color:var(--ink)] px-[18px] py-2.5 text-[13.5px] font-medium tracking-[0.01em] transition-colors hover:bg-[color-mix(in_oklch,var(--ink)_90%,var(--accent))] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
                 style="min-height: 36px"
                 :aria-label="
                   editable && isEditing ? '保存对描述的修改' : '确认'
@@ -534,7 +534,7 @@ function onCopy() {
 <style scoped>
 /* ============================================================
    PicDetailModal — 胶片查看详情页
-   - 颜色：shadcn-vue 主题 token（--paper / --ink / --warm-gray / --secondary / --accent / --muted-text / --card-bg）
+   - 颜色：shadcn-vue 主题 token（--page / --ink / --secondary / --secondary / --accent / --muted-text / --card-bg）
    - 字体：base.css 的 3 套（HarmonyOS Sans / 阿里妈妈东方大楷 / Averia Gruesa Libre）
    - 10 主题 × 2 模式自动重染
    ============================================================ */

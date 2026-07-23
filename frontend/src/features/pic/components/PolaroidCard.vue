@@ -17,7 +17,7 @@
     <!--
       PolaroidCard — 拍立得瀑布流版
       - 卡片宽度 = 列宽（100%），照片高度由 aspect-ratio 自适应
-      - 保留 var(--paper) 白边 + 日期 + 胶片质感
+      - 保留 var(--page) 白边 + 日期 + 胶片质感
       - 编辑模式：左上选中圈 + 右上删除按钮；非编辑模式：点击进详情
     -->
     <div class="polaroid group relative flex flex-col rounded-[2px]">
@@ -155,10 +155,10 @@ const onClick = (e: MouseEvent) => {
 <style scoped>
 /* ============================================================
    Polaroid — 跟随主题 token（拍立得瀑布流版）
-   白边 = var(--paper)        阴影 = color-mix(--ink)
+   白边 = var(--page)        阴影 = color-mix(--ink)
    ============================================================ */
 .polaroid {
-  background: var(--paper);
+  background: var(--page);
   box-shadow:
     0 1px 1px color-mix(in oklch, var(--ink) 6%, transparent),
     0 6px 14px color-mix(in oklch, var(--ink) 10%, transparent),
@@ -177,17 +177,17 @@ const onClick = (e: MouseEvent) => {
 }
 
 .polaroid-top {
-  background: var(--paper);
+  background: var(--page);
 }
 
 .polaroid-photo {
-  background: var(--warm-gray);
+  background: var(--secondary);
   /* 图片区上下加 1px 极细描边模拟胶片曝光边缘 */
   box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ink) 8%, transparent);
 }
 
 .polaroid-bottom {
-  background: var(--paper);
+  background: var(--page);
 }
 
 .polaroid-date {

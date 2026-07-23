@@ -45,7 +45,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
 
   return (
     <section
-      className={`summary-card border-border/60 bg-paper/60 dark:bg-paper/50 mx-4 mb-6 overflow-hidden rounded-2xl border shadow-sm transition-all${loading ? 'is-loading' : ''}`}
+      className={`summary-card border-border/60 bg-page/60 dark:bg-page/50 mx-4 mb-6 overflow-hidden rounded-2xl border shadow-sm transition-all${loading ? 'is-loading' : ''}`}
     >
       {/* Header */}
       <div className="flex items-center justify-between gap-3 px-5 pt-4 pb-3">

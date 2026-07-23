@@ -43,7 +43,7 @@
               {{ col.label }}
             </h3>
             <span
-              class="text-muted bg-paper rounded-full px-1.5 py-px text-[10px] tabular-nums"
+              class="text-muted bg-page rounded-full px-1.5 py-px text-[10px] tabular-nums"
             >
               {{ columnCount(col.id) }}
             </span>

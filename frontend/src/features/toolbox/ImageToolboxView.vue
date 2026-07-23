@@ -2,7 +2,7 @@
   <BasicDetail title="图片工具箱" subtitle="本地压缩与格式转换">
     <div class="col-span-full">
       <div
-        class="squircle border-border/60 bg-paper/50 overflow-hidden border shadow-sm"
+        class="squircle border-border/60 bg-page/50 overflow-hidden border shadow-sm"
       >
         <div class="flex flex-col lg:flex-row lg:items-stretch">
           <!-- 左侧配置面板 -->
@@ -55,7 +55,7 @@
                     type="number"
                     min="1"
                     :disabled="!enableMaxWidth"
-                    class="text-ink placeholder:text-muted focus:border-ink border-border bg-paper disabled:bg-surface disabled:text-muted w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
+                    class="text-ink placeholder:text-muted focus:border-ink border-border bg-page disabled:bg-surface disabled:text-muted w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
                   />
                   <span
                     class="text-muted absolute top-1/2 right-4 -translate-y-1/2 text-xs"
@@ -100,8 +100,8 @@
                     class="rounded-xl border py-2 text-xs font-medium transition-all"
                     :class="
                       outputType === option.value
-                        ? 'border-ink bg-ink text-paper'
-                        : 'border-border bg-paper text-muted hover:border-muted'
+                        ? 'border-ink bg-ink text-page'
+                        : 'border-border bg-page text-muted hover:border-muted'
                     "
                     @click="outputType = option.value"
                   >
@@ -128,7 +128,7 @@
                   type="text"
                   spellcheck="false"
                   placeholder="留空则使用原文件名"
-                  class="text-ink placeholder:text-muted focus:border-ink border-border bg-paper w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
+                  class="text-ink placeholder:text-muted focus:border-ink border-border bg-page w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
                 />
               </div>
 
@@ -137,7 +137,7 @@
                 <button
                   type="button"
                   :disabled="!originalFile || processing"
-                  class="bg-ink text-paper hover:bg-ink/90 group relative overflow-hidden rounded-xl py-3 text-sm font-bold transition-all"
+                  class="bg-ink text-page hover:bg-ink/90 group relative overflow-hidden rounded-xl py-3 text-sm font-bold transition-all"
                   @click="process"
                 >
                   <span
@@ -168,7 +168,7 @@
                 <button
                   type="button"
                   :disabled="!processedBlob"
-                  class="text-ink hover:bg-surface border-border bg-paper flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium shadow-md transition-all hover:scale-105 hover:shadow-lg disabled:opacity-50"
+                  class="text-ink hover:bg-surface border-border bg-page flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium shadow-md transition-all hover:scale-105 hover:shadow-lg disabled:opacity-50"
                   @click="download"
                 >
                   <svg
@@ -209,8 +209,8 @@
                   isOverDropZone
                     ? 'border-ink bg-ink/5'
                     : originalFile
-                      ? 'bg-paper border-transparent shadow-sm'
-                      : 'border-border bg-paper hover:border-muted'
+                      ? 'bg-page border-transparent shadow-sm'
+                      : 'border-border bg-page hover:border-muted'
                 "
                 @click="triggerFilePicker"
               >
@@ -273,7 +273,7 @@
                     </div>
                     <button
                       type="button"
-                      class="text-ink bg-paper ring-border hover:bg-surface rounded-full px-4 py-1.5 text-xs font-bold shadow-sm ring-1 transition-all"
+                      class="text-ink bg-page ring-border hover:bg-surface rounded-full px-4 py-1.5 text-xs font-bold shadow-sm ring-1 transition-all"
                       @click.stop="triggerFilePicker"
                     >
                       更换图片
@@ -297,7 +297,7 @@
               >
                 <!-- 原图预览 -->
                 <div
-                  class="group bg-paper relative flex flex-col overflow-hidden rounded-3xl shadow-sm"
+                  class="group bg-page relative flex flex-col overflow-hidden rounded-3xl shadow-sm"
                 >
                   <div
                     class="border-border/50 flex items-center justify-between border-b p-4"
@@ -354,7 +354,7 @@
 
                 <!-- 处理后预览 -->
                 <div
-                  class="group bg-paper relative flex flex-col overflow-hidden rounded-3xl shadow-sm"
+                  class="group bg-page relative flex flex-col overflow-hidden rounded-3xl shadow-sm"
                 >
                   <div
                     class="border-border/50 flex items-center justify-between border-b p-4"
@@ -594,7 +594,7 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
   width: 1rem; /* 16px (w-4) */
   height: 1rem;
   border-radius: 9999px;
-  background-color: var(--color-paper);
+  background-color: var(--color-page);
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
   transform: translateY(-50%);
   transition: left 200ms ease-out;

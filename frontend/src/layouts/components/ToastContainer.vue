@@ -79,7 +79,7 @@ onUnmounted(() => {
         :transition="{ type: 'spring', damping: 30, stiffness: 500 }"
         class="card"
         :class="[
-          'squircle bg-paper/80 text-ink dark:bg-paper/80 dark:text-ink absolute top-0 left-0 flex h-20 w-full items-center justify-between gap-3 backdrop-blur-sm transition-colors duration-300',
+          'squircle bg-page/80 text-ink dark:bg-page/80 dark:text-ink absolute top-0 left-0 flex h-20 w-full items-center justify-between gap-3 backdrop-blur-sm transition-colors duration-300',
         ]"
       >
         <component

@@ -119,7 +119,7 @@ const handlePrivacyScroll = (e: Event) => {
     >
       <div
         v-if="showBanner && !consentGiven"
-        class="group border-border bg-paper/95 fixed right-4 bottom-6 z-50 w-[340px] overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-[box-shadow] duration-300 hover:shadow-xl sm:right-8 sm:bottom-8 sm:w-[380px]"
+        class="group border-border bg-page/95 fixed right-4 bottom-6 z-50 w-[340px] overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-[box-shadow] duration-300 hover:shadow-xl sm:right-8 sm:bottom-8 sm:w-[380px]"
       >
         <div class="relative px-5 py-5">
           <!-- 标题行 -->
@@ -319,7 +319,7 @@ const handlePrivacyScroll = (e: Event) => {
                 type="checkbox"
                 :checked="cat.required || (settings[cat.id] ?? false)"
                 :disabled="cat.required"
-                class="border-input bg-paper checked:border-accent checked:bg-accent focus:ring-ring/30 h-3.5 w-3.5 appearance-none rounded-[3px] border transition-[background-color,border-color] duration-150 focus:ring-1 focus:ring-offset-0 disabled:opacity-60"
+                class="border-input bg-page checked:border-accent checked:bg-accent focus:ring-ring/30 h-3.5 w-3.5 appearance-none rounded-[3px] border transition-[background-color,border-color] duration-150 focus:ring-1 focus:ring-offset-0 disabled:opacity-60"
                 @change="settings[cat.id] = !settings[cat.id]"
               />
             </div>

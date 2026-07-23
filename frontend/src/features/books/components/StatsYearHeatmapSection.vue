@@ -89,7 +89,7 @@ function onCellLeave() {
     </p>
 
     <div
-      class="border-border bg-paper/50 overflow-x-auto rounded-lg border p-3 sm:p-4"
+      class="border-border bg-page/50 overflow-x-auto rounded-lg border p-3 sm:p-4"
       role="img"
       :aria-label="`${year}年阅读足迹,共${totalActiveDays}天有阅读`"
     >
@@ -180,7 +180,7 @@ function onCellLeave() {
       >
         <div
           v-if="tooltipCell"
-          class="bg-paper text-ink border-border pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-full rounded-md border px-2.5 py-1.5 text-xs whitespace-nowrap shadow-md"
+          class="bg-page text-ink border-border pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-full rounded-md border px-2.5 py-1.5 text-xs whitespace-nowrap shadow-md"
           :style="{ left: `${tooltipLeft}px`, top: `${tooltipTop}px` }"
         >
           <div class="text-ink font-medium tabular-nums">

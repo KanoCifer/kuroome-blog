@@ -2,7 +2,7 @@
   <Modal :open="open" size="xl" @close="emit('update:open', false)">
     <!-- 顶栏 -->
     <header
-      class="border-border/40 bg-paper sticky top-0 z-10 flex items-center justify-between gap-2 border-b px-6 py-4"
+      class="border-border/40 bg-page sticky top-0 z-10 flex items-center justify-between gap-2 border-b px-6 py-4"
     >
       <div>
         <div
@@ -52,7 +52,7 @@
             rows="8"
             :maxlength="2000"
             placeholder="今天想到什么..."
-            class="bg-paper border-input text-ink placeholder:text-muted/60 focus:border-accent focus:ring-ring/20 min-h-[180px] w-full resize-y rounded-lg border px-4 py-3 font-serif text-[15px] leading-loose focus:ring-2 focus:outline-none"
+            class="bg-page border-input text-ink placeholder:text-muted/60 focus:border-accent focus:ring-ring/20 min-h-[180px] w-full resize-y rounded-lg border px-4 py-3 font-serif text-[15px] leading-loose focus:ring-2 focus:outline-none"
           />
           <div
             class="text-muted mt-1.5 flex items-center justify-between font-mono text-[10px] tracking-wide"
@@ -80,7 +80,7 @@
                 'flex h-8 w-8 items-center justify-center rounded-lg border text-[16px] transition-colors',
                 form.mood === e
                   ? 'border-accent bg-accent/10'
-                  : 'border-border/40 bg-paper hover:bg-surface',
+                  : 'border-border/40 bg-page hover:bg-surface',
               ]"
               @click="toggleMood(e)"
             >
@@ -92,7 +92,7 @@
             type="text"
             maxlength="50"
             placeholder="或自定义心情..."
-            class="bg-paper border-input text-ink placeholder:text-muted/60 focus:border-accent focus:ring-ring/20 mt-2 w-full rounded-lg border px-3 py-1.5 text-[13px] focus:ring-2 focus:outline-none"
+            class="bg-page border-input text-ink placeholder:text-muted/60 focus:border-accent focus:ring-ring/20 mt-2 w-full rounded-lg border px-3 py-1.5 text-[13px] focus:ring-2 focus:outline-none"
           />
         </div>
 
@@ -103,7 +103,7 @@
             <span class="text-muted text-[11px]">回车添加，× 删除 · ≤20</span>
           </div>
           <div
-            class="bg-paper border-input flex flex-wrap items-center gap-1.5 rounded-lg border px-2 py-1.5"
+            class="bg-page border-input flex flex-wrap items-center gap-1.5 rounded-lg border px-2 py-1.5"
           >
             <span
               v-for="(tag, i) in form.tags"
@@ -151,7 +151,7 @@
                 'flex cursor-pointer items-start gap-2 rounded-lg border px-2.5 py-2',
                 form.visibility === v
                   ? 'border-accent bg-accent/5'
-                  : 'border-border/40 bg-paper hover:bg-surface',
+                  : 'border-border/40 bg-page hover:bg-surface',
               ]"
             >
               <input
@@ -180,7 +180,7 @@
           </div>
           <select
             v-model="form.status"
-            class="bg-paper border-input text-ink w-full rounded-lg border px-2.5 py-1.5 text-[13px]"
+            class="bg-page border-input text-ink w-full rounded-lg border px-2.5 py-1.5 text-[13px]"
           >
             <option value="published">已发布</option>
             <option value="draft">草稿</option>

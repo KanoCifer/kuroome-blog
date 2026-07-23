@@ -370,7 +370,7 @@ function EditForm({
           type="text"
           value={name}
           onChange={(e) => onNameChange(e.target.value)}
-          className="border-input bg-paper text-ink focus:border-ring focus:ring-ring/20 min-h-11 rounded-xl border px-3.5 text-sm outline-none focus:ring-2"
+          className="border-input bg-page text-ink focus:border-ring focus:ring-ring/20 min-h-11 rounded-xl border px-3.5 text-sm outline-none focus:ring-2"
         />
       </label>
 
@@ -380,7 +380,7 @@ function EditForm({
           value={description}
           onChange={(e) => onDescriptionChange(e.target.value)}
           rows={3}
-          className="border-input bg-paper text-ink focus:border-ring focus:ring-ring/20 resize-none rounded-xl border px-3.5 py-2.5 text-sm leading-relaxed outline-none focus:ring-2"
+          className="border-input bg-page text-ink focus:border-ring focus:ring-ring/20 resize-none rounded-xl border px-3.5 py-2.5 text-sm leading-relaxed outline-none focus:ring-2"
         />
       </label>
 
@@ -390,7 +390,7 @@ function EditForm({
           type="text"
           value={tags}
           onChange={(e) => onTagsChange(e.target.value)}
-          className="border-input bg-paper text-ink focus:border-ring focus:ring-ring/20 min-h-11 rounded-xl border px-3.5 text-sm outline-none focus:ring-2"
+          className="border-input bg-page text-ink focus:border-ring focus:ring-ring/20 min-h-11 rounded-xl border px-3.5 text-sm outline-none focus:ring-2"
         />
       </label>
 

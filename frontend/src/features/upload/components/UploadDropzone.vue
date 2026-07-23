@@ -117,7 +117,7 @@ const onDrop = (event: DragEvent) => {
     />
 
     <div
-      class="bg-paper ring-border/5 mb-4 flex h-12 w-12 items-center justify-center rounded-full shadow-sm ring-1 transition-transform group-hover:scale-110"
+      class="bg-page ring-border/5 mb-4 flex h-12 w-12 items-center justify-center rounded-full shadow-sm ring-1 transition-transform group-hover:scale-110"
     >
       <UploadCloud
         class="text-muted group-hover:text-ink h-5 w-5 transition-colors"

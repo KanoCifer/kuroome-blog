@@ -286,7 +286,7 @@ export default function BlogPostView() {
   };
 
   return (
-    <div className="bg-paper min-h-dvh">
+    <div className="bg-page min-h-dvh">
       <ReadingProgress />
 
       {/* 极简返回条：替代旧 Scroll 指示器，回随笔录 */}
@@ -508,7 +508,7 @@ export default function BlogPostView() {
             className="bg-ink/80 fixed inset-0 backdrop-blur-sm"
             onClick={() => setShowDeleteDialog(false)}
           />
-          <div className="bg-paper border-border relative w-full max-w-sm rounded-2xl border p-6 shadow-lg">
+          <div className="bg-page border-border relative w-full max-w-sm rounded-2xl border p-6 shadow-lg">
             <h3 className="text-ink text-lg font-semibold">确认删除</h3>
             <p className="text-muted mt-2 text-sm">
               确定要删除这篇文章吗？此操作无法撤销。
