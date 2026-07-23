@@ -358,7 +358,7 @@ onMounted(() => {
 /* 抽屉面板：layered ambient + 顶部 inset 高光 = 「台灯下的纸」。
    shadow 全部走 color-mix(in oklch, var(--ink) N%, transparent)，跟随主题自适应。 */
 .drawer-panel {
-  @apply bg-paper;
+  background-color: var(--color-paper);
   border: 1px solid color-mix(in oklch, var(--ink) 10%, transparent);
   box-shadow:
     0 1px 1px color-mix(in oklch, var(--ink) 6%, transparent),

@@ -594,7 +594,7 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
   width: 1rem; /* 16px (w-4) */
   height: 1rem;
   border-radius: 9999px;
-  @apply bg-paper;
+  background-color: var(--color-paper);
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
   transform: translateY(-50%);
   transition: left 200ms ease-out;

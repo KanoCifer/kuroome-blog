@@ -322,7 +322,7 @@ onMounted(() => {
   flex-direction: column;
   gap: 0.875rem;
   padding: 1.125rem 1.125rem 1rem;
-  @apply bg-paper;
+  background-color: var(--color-paper);
   color: var(--color-ink);
   border-radius: 0.875rem; /* rounded-xl —— DESIGN.md */
   text-decoration: none;
