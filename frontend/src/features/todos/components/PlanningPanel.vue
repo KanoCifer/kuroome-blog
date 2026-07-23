@@ -11,11 +11,11 @@
     />
 
     <!-- index list -->
-    <div class="border-border overflow-hidden rounded-xl border">
+    <div class="overflow-hidden rounded-xl border">
       <div
         v-for="task in filteredPlanning"
         :key="task.slug"
-        class="hover:bg-accent/5 border-border group relative flex cursor-pointer items-center gap-3 border-b px-4 py-3 transition-colors last:border-b-0"
+        class="hover:bg-accent/5 group relative flex cursor-pointer items-center gap-3 border-b px-4 py-3 transition-colors last:border-b-0"
         role="button"
         tabindex="0"
         :aria-label="`任务: ${task.title}`"

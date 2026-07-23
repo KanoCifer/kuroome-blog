@@ -126,7 +126,7 @@ export function SettingModal({
                   className={`flex flex-col items-center gap-2 rounded-xl border p-3 transition-colors ${
                     theme === value
                       ? 'border-accent bg-accent/5 shadow-sm'
-                      : 'border-border hover:border-accent bg-page'
+                      : 'hover:border-accent bg-page'
                   }`}
                 >
                   <Icon
@@ -166,7 +166,7 @@ export function SettingModal({
                   className={`flex flex-col items-center gap-1 rounded-xl border p-3 transition-colors ${
                     font === o.value
                       ? 'border-accent bg-accent/5 !shadow-sm'
-                      : 'border-border bg-page hover:border-accent'
+                      : 'bg-page hover:border-accent'
                   }`}
                 >
                   <span
@@ -203,7 +203,7 @@ export function SettingModal({
                   className={`flex w-full items-stretch overflow-hidden rounded-xl border transition-colors ${
                     scheme === s.value
                       ? 'border-accent bg-accent/5 !shadow-sm'
-                      : 'border-border bg-page hover:border-accent'
+                      : 'bg-page hover:border-accent'
                   }`}
                 >
                   <div className="flex w-[72px] flex-col">

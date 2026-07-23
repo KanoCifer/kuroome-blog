@@ -47,7 +47,7 @@
         >
           <!-- Header：font-serif 标题 + 静默 active 计数 + 关闭键 -->
           <div
-            class="border-border/50 flex shrink-0 items-center justify-between border-b px-6 py-4"
+            class="border-border flex shrink-0 items-center justify-between border-b px-6 py-4"
           >
             <h3
               class="text-ink flex items-baseline gap-2 font-serif text-lg font-medium tracking-tight"
@@ -134,10 +134,7 @@
               </button>
 
               <!-- Expanded add form：和 section 行卡片同 surface 质感 -->
-              <div
-                v-else
-                class="add-shell border-border mb-6 rounded-xl border px-4 py-3.5"
-              >
+              <div v-else class="add-shell mb-6 rounded-xl border px-4 py-3.5">
                 <input
                   ref="addTitleInput"
                   v-model="newTaskForm.title"
@@ -151,12 +148,12 @@
                     v-model="newTaskForm.description"
                     placeholder="描述… (可选)"
                     rows="3"
-                    class="border-border bg-surface focus:border-accent placeholder:text-muted/50 text-ink w-full resize-none rounded-lg border p-2.5 text-sm outline-none"
+                    class="bg-surface focus:border-accent placeholder:text-muted/50 text-ink w-full resize-none rounded-lg border p-2.5 text-sm outline-none"
                   ></textarea>
                   <div class="flex flex-wrap items-center gap-2">
                     <select
                       v-model="newTaskForm.type"
-                      class="border-border bg-surface text-ink cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
+                      class="bg-surface text-ink cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
                     >
                       <option v-for="t in TASK_TYPES" :key="t" :value="t">
                         {{ t }}
@@ -164,7 +161,7 @@
                     </select>
                     <select
                       v-model="newTaskForm.priority"
-                      class="border-border bg-surface text-ink cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
+                      class="bg-surface text-ink cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
                     >
                       <option v-for="p in PRIORITIES" :key="p" :value="p">
                         {{ p }}
@@ -175,7 +172,7 @@
                     <input
                       v-model="newTaskForm.due_date"
                       type="date"
-                      class="border-border bg-surface text-ink cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
+                      class="bg-surface text-ink cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
                     />
                     <div class="ml-auto flex gap-2">
                       <button

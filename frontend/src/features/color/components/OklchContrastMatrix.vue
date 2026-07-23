@@ -114,7 +114,7 @@ const ratioFor = (cell: Cell) =>
 
 <template>
   <div
-    class="border-border bg-card/70 space-y-4 rounded-xl border p-5 shadow-sm backdrop-blur"
+    class="bg-card/70 space-y-4 rounded-xl border p-5 shadow-sm backdrop-blur"
   >
     <div class="flex items-baseline justify-between">
       <h3 class="text-ink text-sm font-semibold tracking-wider uppercase">
@@ -136,7 +136,7 @@ const ratioFor = (cell: Cell) =>
       <div
         v-for="cell in cells"
         :key="`${cell.scheme}-${cell.dark}`"
-        class="border-border/40 overflow-hidden rounded-lg border shadow-sm"
+        class="/40 overflow-hidden rounded-lg border shadow-sm"
       >
         <div
           class="px-2.5 py-1.5 text-[10px] tracking-wider uppercase"

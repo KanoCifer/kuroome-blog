@@ -263,7 +263,7 @@ onUnmounted(() => {
         <select
           v-if="!loading"
           v-model="selectedModel"
-          class="border-border bg-surface text-ink min-w-0 truncate rounded-lg border px-2 py-1 text-xs"
+          class="bg-surface text-ink min-w-0 truncate rounded-lg border px-2 py-1 text-xs"
           aria-label="选择模型"
         >
           <option v-for="model in AI_MODELS" :key="model.id" :value="model.id">

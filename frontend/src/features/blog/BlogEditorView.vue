@@ -419,7 +419,7 @@ onBeforeUnmount(() => {
       <div
         v-if="showDraftRestore"
         role="status"
-        class="bg-surface border-border mb-6 flex items-center gap-3 rounded-2xl border px-4 py-3 shadow-sm"
+        class="bg-surface mb-6 flex items-center gap-3 rounded-2xl border px-4 py-3 shadow-sm"
       >
         <span
           class="text-muted ring-border inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full ring-1"
@@ -468,7 +468,7 @@ onBeforeUnmount(() => {
       <div
         v-if="error"
         role="alert"
-        class="text-muted border-border bg-surface/70 mb-6 flex items-start gap-2 rounded-xl border px-4 py-3 text-sm"
+        class="text-muted bg-surface/70 mb-6 flex items-start gap-2 rounded-xl border px-4 py-3 text-sm"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -489,7 +489,7 @@ onBeforeUnmount(() => {
       <!-- ─── Loading ─── -->
       <div v-if="loading && isEdit" class="py-20 text-center">
         <div
-          class="border-border border-t-ink mx-auto h-7 w-7 animate-spin rounded-full border-2 motion-reduce:animate-none"
+          class="border-t-ink mx-auto h-7 w-7 animate-spin rounded-full border-2 motion-reduce:animate-none"
           aria-hidden="true"
         ></div>
         <p class="text-muted mt-3 font-serif text-xs italic">正取文稿…</p>
@@ -528,7 +528,7 @@ onBeforeUnmount(() => {
         <div class="flex flex-wrap items-center gap-2 text-xs">
           <!-- Tags input -->
           <div
-            class="border-border bg-surface flex flex-wrap items-center gap-1.5 rounded-full border px-2 py-1"
+            class="bg-surface flex flex-wrap items-center gap-1.5 rounded-full border px-2 py-1"
           >
             <span class="text-muted/70 tracking-wider">标签</span>
             <span
@@ -567,7 +567,7 @@ onBeforeUnmount(() => {
               'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 transition-colors',
               pin
                 ? 'border-ink/40 bg-ink text-page'
-                : 'border-border bg-surface text-muted hover:text-ink',
+                : 'bg-surface text-muted hover:text-ink',
             ]"
             :aria-pressed="pin"
             @click="pin = !pin"
@@ -596,7 +596,7 @@ onBeforeUnmount(() => {
               'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 transition-colors',
               metaOpen
                 ? 'border-ink/30 bg-surface text-ink'
-                : 'border-border bg-surface text-muted hover:text-ink',
+                : 'bg-surface text-muted hover:text-ink',
             ]"
             :aria-expanded="metaOpen"
             aria-controls="meta-drawer"
@@ -636,7 +636,7 @@ onBeforeUnmount(() => {
           <div
             v-if="metaOpen"
             id="meta-drawer"
-            class="border-border bg-surface/60 space-y-4 rounded-2xl border p-5"
+            class="bg-surface/60 space-y-4 rounded-2xl border p-5"
           >
             <!-- Summary -->
             <div>
@@ -650,7 +650,7 @@ onBeforeUnmount(() => {
                 rows="2"
                 maxlength="200"
                 placeholder="两三行，写给读者的开场白…"
-                class="text-ink placeholder:text-muted/60 border-border bg-surface focus:border-ink/40 focus:ring-ink/10 w-full resize-none rounded-lg border px-3 py-2 font-serif text-sm leading-relaxed outline-0 focus:ring-1"
+                class="text-ink placeholder:text-muted/60 bg-surface focus:border-ink/40 focus:ring-ink/10 w-full resize-none rounded-lg border px-3 py-2 font-serif text-sm leading-relaxed outline-0 focus:ring-1"
               />
               <p class="text-muted/60 mt-1 text-right font-mono text-[10px]">
                 {{ summary.length }} / 200
@@ -670,7 +670,7 @@ onBeforeUnmount(() => {
                     v-model="cover"
                     type="text"
                     placeholder="粘贴封面 URL"
-                    class="text-ink placeholder:text-muted/60 border-border bg-surface focus:border-ink/40 focus:ring-ink/10 w-full rounded-lg border px-3 py-2 font-mono text-sm outline-0 focus:ring-1"
+                    class="text-ink placeholder:text-muted/60 bg-surface focus:border-ink/40 focus:ring-ink/10 w-full rounded-lg border px-3 py-2 font-mono text-sm outline-0 focus:ring-1"
                   />
                   <div class="flex items-center gap-3 text-xs">
                     <input
@@ -699,7 +699,7 @@ onBeforeUnmount(() => {
                   </div>
                 </div>
                 <div
-                  class="border-border bg-surface h-20 w-28 shrink-0 overflow-hidden rounded-lg border"
+                  class="bg-surface h-20 w-28 shrink-0 overflow-hidden rounded-lg border"
                 >
                   <img
                     v-if="cover"
@@ -725,7 +725,7 @@ onBeforeUnmount(() => {
           编辑器在它之上用 --page (bg-surface) 浮起，靠阴影分层。
         -->
         <div
-          class="bg-surface border-border/60 overflow-hidden rounded-2xl border shadow-[0_1px_0_0_oklch(from_var(--page)_l_c_h_/_0.6)_inset,0_2px_4px_-1px_oklch(from_var(--ink)_l_c_h_/_0.04),0_8px_24px_-8px_oklch(from_var(--ink)_l_c_h_/_0.12)]"
+          class="bg-surface /60 overflow-hidden rounded-2xl border shadow-[0_1px_0_0_oklch(from_var(--page)_l_c_h_/_0.6)_inset,0_2px_4px_-1px_oklch(from_var(--ink)_l_c_h_/_0.04),0_8px_24px_-8px_oklch(from_var(--ink)_l_c_h_/_0.12)]"
         >
           <div class="h-full">
             <MarkdownEditor ref="markdownEditorRef" v-model="markdownBody" />
@@ -739,7 +739,7 @@ onBeforeUnmount(() => {
           用 sticky bottom 跟随滚动，bg-surface/85 backdrop-blur 与纸面对齐。
         -->
         <div
-          class="text-muted border-border/70 bg-surface/85 sticky bottom-3 -mx-3 flex items-center gap-3 rounded-2xl border px-4 py-2.5 text-xs shadow-sm backdrop-blur-md sm:mx-0"
+          class="text-muted /70 bg-surface/85 sticky bottom-3 -mx-3 flex items-center gap-3 rounded-2xl border px-4 py-2.5 text-xs shadow-sm backdrop-blur-md sm:mx-0"
         >
           <!-- 计量 -->
           <span class="hidden items-center gap-2 font-serif sm:inline-flex">
@@ -755,7 +755,7 @@ onBeforeUnmount(() => {
               'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 transition-colors',
               autoSaveEnabled
                 ? 'border-ink/30 bg-surface text-ink'
-                : 'border-border bg-surface text-muted hover:text-ink',
+                : 'bg-surface text-muted hover:text-ink',
             ]"
             :title="
               autoSaveEnabled ? '自动保存 · ⌘S 手动触发' : '自动保存已关闭'

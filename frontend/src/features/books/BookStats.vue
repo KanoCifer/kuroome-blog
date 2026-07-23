@@ -10,7 +10,7 @@
     <div class="flex-1 pb-12">
       <div class="mx-auto max-w-3xl px-4 py-8 sm:px-6 md:px-10 md:py-10">
         <!-- ── Mode Tabs ─────────────────────────────────────────────── -->
-        <div class="bg-page mb-4 flex gap-1 rounded-xl p-1">
+        <div class="bg-secondary mb-4 flex gap-1 rounded-xl p-1">
           <button
             v-for="m in MODES"
             :key="m.key"
@@ -179,7 +179,7 @@
               activeSnapshot.readStat &&
               activeSnapshot.readStat.length
             "
-            class="border-border mb-4 grid grid-cols-2 gap-x-6 gap-y-6 border-t pt-10 sm:grid-cols-4"
+            class="mb-4 grid grid-cols-2 gap-x-6 gap-y-6 border-t pt-10 sm:grid-cols-4"
           >
             <div
               v-for="stat in activeSnapshot.readStat"

@@ -17,9 +17,9 @@ const props = defineProps<{ priority: DevTaskPriority }>();
 const PRIORITY_CLASS: Record<DevTaskPriority, string> = {
   'P0 紧急': 'border-destructive/40 bg-destructive/10 text-destructive',
   'P1 高': 'border-warning/40 bg-warning/10 text-warning',
-  'P2 中': 'border-border text-muted',
-  'P3 低': 'border-border text-muted/70',
+  'P2 中': ' text-muted',
+  'P3 低': ' text-muted/70',
 };
 
-const cls = PRIORITY_CLASS[props.priority] ?? 'border-border text-muted';
+const cls = PRIORITY_CLASS[props.priority] ?? ' text-muted';
 </script>

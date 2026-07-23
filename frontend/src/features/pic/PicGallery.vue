@@ -65,7 +65,7 @@
         class="gallery-empty flex h-[60vh] flex-col items-center justify-center"
       >
         <div
-          class="bg-page border-border relative max-w-md rounded-3xl border p-10 text-center shadow-2xl"
+          class="bg-card relative max-w-md space-y-3 rounded-3xl border p-10 text-center shadow-2xl"
         >
           <div
             class="bg-accent/10 text-ink mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl"
@@ -78,7 +78,8 @@
           </p>
           <Button
             v-if="canEdit"
-            class="mt-6 rounded-full px-8 shadow-sm"
+            class="rounded-full"
+            size="sm"
             @click="openUploadModal"
           >
             开始上传

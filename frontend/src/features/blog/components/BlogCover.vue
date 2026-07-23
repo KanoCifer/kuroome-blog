@@ -2,7 +2,7 @@
   <div
     :class="[
       'relative overflow-hidden rounded-xl',
-      'border-border/60 bg-surface border',
+      '/60 bg-surface border',
       sizeClasses,
     ]"
   >

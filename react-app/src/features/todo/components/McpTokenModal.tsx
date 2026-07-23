@@ -66,7 +66,7 @@ export function McpTokenModal({ open, onClose }: McpTokenModalProps) {
   return (
     <TodoModal open={open} size="md" onClose={onClose}>
       <div className="flex flex-col">
-        <header className="border-border flex items-start justify-between gap-3 border-b px-6 pt-5 pb-4">
+        <header className="flex items-start justify-between gap-3 border-b px-6 pt-5 pb-4">
           <div>
             <h2 className="text-ink text-lg font-semibold">
               签发 MCP 服务 Token
@@ -111,7 +111,7 @@ export function McpTokenModal({ open, onClose }: McpTokenModalProps) {
                   className={`cursor-pointer rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
                     days === opt.days
                       ? 'border-accent/40 bg-accent/10 text-ink'
-                      : 'border-border text-muted hover:text-ink'
+                      : 'text-muted hover:text-ink'
                   }`}
                 >
                   {opt.label}
@@ -175,7 +175,7 @@ export function McpTokenModal({ open, onClose }: McpTokenModalProps) {
 
               <div className="relative">
                 <textarea
-                  className="bg-surface border-border text-ink block w-full resize-none rounded-lg border px-3 py-2 pr-10 font-mono text-[11px] leading-relaxed outline-none"
+                  className="bg-surface text-ink block w-full resize-none rounded-lg border px-3 py-2 pr-10 font-mono text-[11px] leading-relaxed outline-none"
                   rows={4}
                   readOnly
                   value={result.token}

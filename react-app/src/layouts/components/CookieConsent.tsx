@@ -177,7 +177,7 @@ export function CookieConsent() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.95 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="group border-border bg-page/95 fixed bottom-6 left-1/2 z-9999 w-[340px] -translate-x-1/2 overflow-hidden rounded-2xl border shadow-2xl backdrop-blur-sm transition-all duration-300 sm:bottom-8 sm:w-[380px]"
+            className="group bg-page/95 fixed bottom-6 left-1/2 z-9999 w-[340px] -translate-x-1/2 overflow-hidden rounded-2xl border shadow-2xl backdrop-blur-sm transition-all duration-300 sm:bottom-8 sm:w-[380px]"
           >
             <div className="relative px-5 py-5">
               <div className="mb-3 flex items-center justify-between">
@@ -203,13 +203,13 @@ export function CookieConsent() {
               </p>
               <div className="flex items-center gap-2">
                 <button
-                  className="border-border text-muted hover:bg-surface hover:text-muted flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-all duration-200 active:scale-[0.97]"
+                  className="text-muted hover:bg-surface hover:text-muted flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-all duration-200 active:scale-[0.97]"
                   onClick={openSettings}
                 >
                   自定义
                 </button>
                 <button
-                  className="border-border text-muted hover:bg-surface hover:text-muted flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-all duration-200 active:scale-[0.97]"
+                  className="text-muted hover:bg-surface hover:text-muted flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-all duration-200 active:scale-[0.97]"
                   onClick={rejectAll}
                 >
                   拒绝
@@ -235,7 +235,7 @@ export function CookieConsent() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="border-border bg-page/95 relative w-full max-w-[500px] overflow-hidden rounded-2xl border p-6 shadow-2xl backdrop-blur-sm"
+              className="bg-page/95 relative w-full max-w-[500px] overflow-hidden rounded-2xl border p-6 shadow-2xl backdrop-blur-sm"
             >
               <h2 className="text-muted relative text-[16px] font-medium">
                 隐私协议核心摘要
@@ -275,7 +275,7 @@ export function CookieConsent() {
                       (快捷登录)，仅在您使用时生效。
                     </p>
                   </div>
-                  <div className="border-border border-t pt-2">
+                  <div className="border-t pt-2">
                     <button
                       onClick={navigateToFullPolicy}
                       className="text-warning/80 hover:text-warning inline-flex items-center gap-1 text-[12px] transition-colors"
@@ -289,7 +289,7 @@ export function CookieConsent() {
               <div className="relative mt-4 flex justify-end gap-2">
                 <button
                   onClick={() => setShowPrivacyPreview(false)}
-                  className="border-border text-muted hover:bg-surface hover:text-muted h-9 rounded-xl border px-4 text-[12px] font-medium transition-all duration-200"
+                  className="text-muted hover:bg-surface hover:text-muted h-9 rounded-xl border px-4 text-[12px] font-medium transition-all duration-200"
                 >
                   返回
                 </button>
@@ -315,7 +315,7 @@ export function CookieConsent() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="border-border bg-page/95 relative w-full max-w-[400px] overflow-hidden rounded-2xl border p-6 shadow-2xl backdrop-blur-sm"
+              className="bg-page/95 relative w-full max-w-[400px] overflow-hidden rounded-2xl border p-6 shadow-2xl backdrop-blur-sm"
             >
               <h2 className="text-muted relative text-[15px] font-medium">
                 Cookie 偏好设置
@@ -327,7 +327,7 @@ export function CookieConsent() {
                 {cookieCategories.map((cat) => (
                   <div
                     key={cat.id}
-                    className={`border-border flex items-start gap-3 rounded-xl border px-3.5 py-3 transition-colors ${cat.required ? 'opacity-70' : ''}`}
+                    className={`flex items-start gap-3 rounded-xl border px-3.5 py-3 transition-colors ${cat.required ? 'opacity-70' : ''}`}
                   >
                     <div className="flex h-5 items-center pt-0.5">
                       <input
@@ -336,7 +336,7 @@ export function CookieConsent() {
                         checked={cat.required || (settings[cat.id] ?? false)}
                         disabled={cat.required}
                         onChange={() => toggleSetting(cat.id)}
-                        className="border-border bg-page checked:border-warning checked:bg-warning focus:ring-warning/30 h-3.5 w-3.5 appearance-none rounded-[3px] border transition-all duration-150 focus:ring-1 focus:ring-offset-0 disabled:opacity-60"
+                        className="bg-page checked:border-warning checked:bg-warning focus:ring-warning/30 h-3.5 w-3.5 appearance-none rounded-[3px] border transition-all duration-150 focus:ring-1 focus:ring-offset-0 disabled:opacity-60"
                       />
                     </div>
                     <label
@@ -351,7 +351,7 @@ export function CookieConsent() {
                       </p>
                     </label>
                     {cat.required && (
-                      <span className="border-border text-muted mt-0.5 shrink-0 rounded-md border px-2 py-0.5 text-[10px]">
+                      <span className="text-muted mt-0.5 shrink-0 rounded-md border px-2 py-0.5 text-[10px]">
                         必需
                       </span>
                     )}
@@ -361,7 +361,7 @@ export function CookieConsent() {
               <div className="relative mt-4 flex justify-end gap-2">
                 <button
                   onClick={() => setShowSettings(false)}
-                  className="border-border text-muted hover:bg-surface hover:text-muted h-9 rounded-xl border px-4 text-[12px] font-medium transition-all duration-200"
+                  className="text-muted hover:bg-surface hover:text-muted h-9 rounded-xl border px-4 text-[12px] font-medium transition-all duration-200"
                 >
                   取消
                 </button>

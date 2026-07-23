@@ -30,7 +30,7 @@ const emit = defineEmits<{
 
 <template>
   <aside class="xl:sticky xl:top-24 xl:h-fit">
-    <section class="border-border/80 bg-page rounded-3xl border p-5 shadow-sm">
+    <section class="/80 bg-card rounded-3xl border p-5 shadow-sm">
       <h3 class="text-ink text-sm font-semibold tracking-wide uppercase">
         详情面板
       </h3>
@@ -89,7 +89,7 @@ const emit = defineEmits<{
           </div>
         </div>
 
-        <div class="border-border rounded-xl border px-3 py-2">
+        <div class="rounded-xl border px-3 py-2">
           <p class="text-muted text-xs">提醒配置</p>
           <p class="text-ink mt-1 text-sm">
             渠道：{{
@@ -103,16 +103,14 @@ const emit = defineEmits<{
           </p>
         </div>
 
-        <div
-          class="border-border bg-surface/70 text-ink rounded-xl border px-3 py-2 text-sm"
-        >
+        <div class="bg-surface/70 text-ink rounded-xl border px-3 py-2 text-sm">
           {{ selectedSubscription.notes?.trim() || '暂无备注' }}
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <button
             type="button"
-            class="border-border bg-page text-ink hover:bg-surface rounded-xl border px-3 py-2 text-sm font-medium transition"
+            class="bg-secondary text-ink hover:bg-secondary/80 rounded-xl border px-3 py-2 text-sm font-medium transition"
             @click="emit('edit', selectedSubscription)"
           >
             编辑订阅
@@ -126,7 +124,7 @@ const emit = defineEmits<{
           </button>
           <button
             type="button"
-            class="border-border bg-page text-ink hover:bg-surface rounded-xl border px-3 py-2 text-sm font-medium transition disabled:opacity-60"
+            class="bg-secondary text-ink hover:bg-secondary/80 rounded-xl border px-3 py-2 text-sm font-medium transition disabled:opacity-60"
             :disabled="pendingStatusId === selectedSubscription.id"
             @click="emit('toggleStatus', selectedSubscription)"
           >
@@ -147,7 +145,7 @@ const emit = defineEmits<{
 
       <div
         v-else
-        class="border-border text-muted mt-4 rounded-xl border border-dashed px-4 py-10 text-center text-sm"
+        class="text-muted mt-4 rounded-xl border border-dashed px-4 py-10 text-center text-sm"
       >
         从左侧列表中选择一条订阅以查看详情。
       </div>

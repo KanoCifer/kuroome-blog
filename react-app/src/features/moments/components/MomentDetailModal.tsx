@@ -85,10 +85,10 @@ export function MomentDetailModal({
             exit={{ opacity: 0, scale: 0.97, y: 4 }}
             transition={{ duration: 0.18 }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-page border-border/40 relative flex max-h-[88vh] w-full max-w-[720px] flex-col overflow-hidden rounded-xl border shadow-xl"
+            className="bg-page /40 relative flex max-h-[88vh] w-full max-w-[720px] flex-col overflow-hidden rounded-xl border shadow-xl"
           >
             {/* Header */}
-            <div className="border-border/40 bg-page sticky top-0 z-10 flex items-center justify-between gap-2 border-b px-6 py-4">
+            <div className="/40 bg-page sticky top-0 z-10 flex items-center justify-between gap-2 border-b px-6 py-4">
               <div className="flex items-center gap-3">
                 <span className="text-ink/70 font-serif text-sm italic">
                   {volumeLabel}
@@ -114,7 +114,7 @@ export function MomentDetailModal({
                       type="button"
                       disabled={!hasPrev}
                       onClick={() => onNavigate('prev')}
-                      className="hover:text-ink border-border/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors disabled:cursor-not-allowed disabled:opacity-30"
+                      className="hover:text-ink /40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors disabled:cursor-not-allowed disabled:opacity-30"
                       aria-label="上一条"
                     >
                       <IconChevronLeft className="h-3.5 w-3.5" />
@@ -123,7 +123,7 @@ export function MomentDetailModal({
                       type="button"
                       disabled={!hasNext}
                       onClick={() => onNavigate('next')}
-                      className="hover:text-ink border-border/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors disabled:cursor-not-allowed disabled:opacity-30"
+                      className="hover:text-ink /40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors disabled:cursor-not-allowed disabled:opacity-30"
                       aria-label="下一条"
                     >
                       <IconChevronRight className="h-3.5 w-3.5" />
@@ -142,7 +142,7 @@ export function MomentDetailModal({
                     <button
                       type="button"
                       onClick={() => onDelete?.(moment)}
-                      className="text-muted hover:text-destructive border-border/40 hover:border-destructive/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
+                      className="text-muted hover:text-destructive /40 hover:border-destructive/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
                       aria-label="删除"
                     >
                       <span aria-hidden="true">🗑</span>
@@ -152,7 +152,7 @@ export function MomentDetailModal({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="text-muted hover:text-ink border-border/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
+                  className="text-muted hover:text-ink /40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
                   aria-label="关闭"
                 >
                   <IconClose className="h-3.5 w-3.5" />
@@ -191,7 +191,7 @@ export function MomentDetailModal({
                     ))}
                   </div>
                 )}
-                <div className="text-muted border-border/40 mt-10 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-dashed pt-4 font-mono text-[11px] tracking-wide">
+                <div className="text-muted /40 mt-10 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-dashed pt-4 font-mono text-[11px] tracking-wide">
                   <span>发布于 {moment.published_at ?? moment.created_at}</span>
                   {moment.source && (
                     <>
@@ -205,7 +205,7 @@ export function MomentDetailModal({
               </div>
 
               {/* Right: meta */}
-              <aside className="bg-surface/30 border-border/40 hidden border-l px-5 py-6 md:block">
+              <aside className="bg-surface/30 /40 hidden border-l px-5 py-6 md:block">
                 <div className="text-muted sticky top-4 font-mono text-[10px] tracking-[0.18em] uppercase">
                   META
                 </div>
@@ -230,7 +230,7 @@ export function MomentDetailModal({
                   <MetaRow label="状态" value={STATUS_LABEL[moment.status]} />
                 </dl>
 
-                <div className="text-muted border-border/40 mt-6 border-t border-dashed pt-4 font-mono text-[10px] tracking-[0.18em] uppercase">
+                <div className="text-muted /40 mt-6 border-t border-dashed pt-4 font-mono text-[10px] tracking-[0.18em] uppercase">
                   KEYBOARD
                 </div>
                 <ul className="text-muted mt-3 space-y-1.5 text-[12px]">
@@ -284,7 +284,7 @@ function MetaRow({
 
 function Kbd({ label }: { label: string }) {
   return (
-    <kbd className="text-ink/80 bg-page border-border/40 rounded border px-1.5 py-0.5 font-mono text-[10px]">
+    <kbd className="text-ink/80 bg-page /40 rounded border px-1.5 py-0.5 font-mono text-[10px]">
       {label}
     </kbd>
   );

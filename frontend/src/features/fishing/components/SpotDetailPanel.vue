@@ -212,7 +212,7 @@ watch(
       <aside
         v-if="open"
         ref="panelRef"
-        class="bg-page border-border/60 fixed top-6 right-6 bottom-6 z-50 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
+        class="bg-page /60 fixed top-6 right-6 bottom-6 z-50 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
         :style="CARD_SHADOW"
         role="dialog"
         aria-modal="true"
@@ -222,7 +222,7 @@ watch(
       >
         <!-- 顶栏 -->
         <header
-          class="border-border flex items-start justify-between gap-3 border-b px-6 pt-6 pb-5"
+          class="flex items-start justify-between gap-3 border-b px-6 pt-6 pb-5"
         >
           <div class="min-w-0 space-y-1.5">
             <!-- 名称 -->
@@ -388,7 +388,7 @@ watch(
               v-for="(img, i) in spot.images"
               :key="i"
               type="button"
-              class="group border-border/30 relative block overflow-hidden rounded-xl border"
+              class="group /30 relative block overflow-hidden rounded-xl border"
               @click="openLightbox(i)"
             >
               <img
@@ -414,7 +414,7 @@ watch(
         </div>
 
         <!-- 底栏 -->
-        <footer class="border-border space-y-3 border-t px-6 py-4">
+        <footer class="space-y-3 border-t px-6 py-4">
           <!-- 主操作:规划路线 -->
           <button
             type="button"

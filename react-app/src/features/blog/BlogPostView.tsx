@@ -451,7 +451,7 @@ export default function BlogPostView() {
           </div>
 
           {/* 文章脚：作者署名块 + 复制链接 */}
-          <footer className="border-border mt-14 border-t pt-8">
+          <footer className="mt-14 border-t pt-8">
             <div className="flex flex-wrap items-start justify-between gap-5">
               <div className="flex items-center gap-3.5">
                 <span className="text-ink ring-border bg-surface flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-serif text-sm font-semibold ring-1">
@@ -508,7 +508,7 @@ export default function BlogPostView() {
             className="bg-ink/80 fixed inset-0 backdrop-blur-sm"
             onClick={() => setShowDeleteDialog(false)}
           />
-          <div className="bg-page border-border relative w-full max-w-sm rounded-2xl border p-6 shadow-lg">
+          <div className="bg-page relative w-full max-w-sm rounded-2xl border p-6 shadow-lg">
             <h3 className="text-ink text-lg font-semibold">确认删除</h3>
             <p className="text-muted mt-2 text-sm">
               确定要删除这篇文章吗？此操作无法撤销。

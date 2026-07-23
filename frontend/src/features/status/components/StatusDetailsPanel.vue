@@ -65,7 +65,7 @@ function formatLogTime(iso: string): string {
 
 <template>
   <div
-    class="bg-card squircle border-border mt-6 grid gap-8 border p-6 shadow-[inset_0_0_20px_0px_rgba(255,255,255,0.35)] sm:p-8 md:grid-cols-2"
+    class="bg-card squircle mt-6 grid gap-8 border p-6 shadow-[inset_0_0_20px_0px_rgba(255,255,255,0.35)] sm:p-8 md:grid-cols-2"
   >
     <!-- 主机信息 -->
     <div class="space-y-4">
@@ -206,7 +206,7 @@ function formatLogTime(iso: string): string {
     <!-- 版本(跨双列) -->
     <div
       v-if="serverStatus"
-      class="border-border text-muted flex items-center justify-between border-t pt-4 text-[12px] md:col-span-2"
+      class="text-muted flex items-center justify-between border-t pt-4 text-[12px] md:col-span-2"
     >
       <span>
         当前版本

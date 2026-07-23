@@ -99,13 +99,14 @@
 
   /* Accent (was: --color-primary) */
   --color-accent: var(--accent);
+  --color-contrast: var(--contrast);
 
   /* Secondary / Muted */
   --color-secondary: var(--secondary);
   --color-muted: var(--muted-text);
 
   /* Border */
-  --color-border: var(--border-color);
+  --color-border: var(--border);
   --color-input: var(--secondary);
   --color-ring: var(--accent-slate);
 
@@ -127,23 +128,26 @@
 
 /* Global border-as-shadow system.
    Any element with a non-zero Tailwind border-width class automatically gets
-   a layered box-shadow outline REPLACING the hard border. The original 1px
-   border is made transparent (since shadow is a more flexible, theme-adaptive
-   replacement), and the shadow adapts to the active theme via --muted
-   at low alpha. */
+   a layered box-shadow outline REPLACING the hard border. The 1px border is
+   forced transparent so the shadow carries all the visual weight. Shadow
+   alpha is theme-adaptive via color-mix on --ink (dark in light mode, light
+   in dark mode) so the outline stays visible in both. State borders
+   (border-accent, border-destructive, etc.) override border-color back to
+   a visible value. */
 @layer base {
   :where([class~='border']) {
+    border-color: transparent;
     box-shadow:
-      0px 0px 0px 1px rgba(0, 0, 0, 0.06),
-      0px 1px 2px -1px rgba(0, 0, 0, 0.06),
-      0px 2px 4px 0px rgba(0, 0, 0, 0.04);
+      0px 0px 0px 1px color-mix(in oklch, var(--ink) 7%, transparent),
+      0px 1px 2px -1px color-mix(in oklch, var(--ink) 8%, transparent),
+      0px 2px 4px 0px color-mix(in oklch, var(--ink) 5%, transparent);
     transition: box-shadow 200ms ease-out;
   }
 
   :where([class~='border']):hover {
     box-shadow:
-      0px 0px 0px 1px rgba(0, 0, 0, 0.08),
-      0px 1px 2px -1px rgba(0, 0, 0, 0.08),
-      0px 2px 4px 0px rgba(0, 0, 0, 0.06);
+      0px 0px 0px 1px color-mix(in oklch, var(--ink) 12%, transparent),
+      0px 1px 2px -1px color-mix(in oklch, var(--ink) 14%, transparent),
+      0px 2px 4px 0px color-mix(in oklch, var(--ink) 8%, transparent);
   }
 }

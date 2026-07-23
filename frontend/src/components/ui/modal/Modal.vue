@@ -24,7 +24,7 @@
           :exit="{ scale: 0.97, y: 6, opacity: 0 }"
           :transition="SPRING_SNUG"
           :class="[
-            'bg-page border-border/60 relative w-full overflow-hidden rounded-2xl border shadow-2xl',
+            'bg-card /60 relative w-full overflow-hidden rounded-2xl border shadow-2xl',
             sizeClass,
           ]"
           role="dialog"

@@ -114,7 +114,7 @@ const getTypeClass = (type: string): string => {
             <!-- Content Card -->
             <div class="-mx-8 w-full md:w-1/2">
               <div
-                class="group squircle border-border bg-page/80 cursor-pointer border p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl md:p-8"
+                class="group squircle bg-page/80 cursor-pointer border p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl md:p-8"
               >
                 <!-- Version Badge & Date -->
                 <div class="mb-4 flex flex-wrap items-center gap-3">

@@ -19,7 +19,7 @@
             'rounded-full px-3 py-1 font-medium transition-colors',
             activeTag === null
               ? 'bg-accent text-ink shadow-sm'
-              : 'bg-page text-muted hover:bg-surface border-border/60 border',
+              : 'bg-page text-muted hover:bg-surface /60 border',
           ]"
           @click="setTag(null)"
         >
@@ -33,7 +33,7 @@
             'rounded-full px-3 py-1 font-medium transition-colors',
             activeTag === tag
               ? 'bg-accent text-ink shadow-sm'
-              : 'bg-page text-muted hover:bg-surface border-border/60 border',
+              : 'bg-page text-muted hover:bg-surface /60 border',
           ]"
           @click="setTag(tag)"
         >
@@ -75,7 +75,7 @@
         <div
           v-for="i in 4"
           :key="i"
-          class="bg-page/60 border-border/40 h-32 animate-pulse rounded-2xl border"
+          class="bg-page/60 /40 h-32 animate-pulse rounded-2xl border"
         />
       </div>
 
@@ -109,7 +109,7 @@
         <button
           type="button"
           :disabled="publicPage <= 1"
-          class="bg-page text-ink hover:bg-surface border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          class="bg-card text-ink hover:bg-secondary /60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
           @click="goPage(publicPage - 1)"
         >
           <svg
@@ -137,7 +137,7 @@
         <button
           type="button"
           :disabled="publicPage >= totalPages"
-          class="bg-page text-ink hover:bg-surface border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          class="bg-card text-ink hover:bg-secondary /60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
           @click="goPage(publicPage + 1)"
         >
           下一页
@@ -226,13 +226,11 @@
           将软删除该条记录（deleted_at 置位），列表中将不再展示。
         </p>
       </div>
-      <div
-        class="border-border/40 flex items-center justify-end gap-2 border-t px-6 py-4"
-      >
+      <div class="/40 flex items-center justify-end gap-2 border-t px-6 py-4">
         <button
           type="button"
           :disabled="deleting"
-          class="border-border/60 text-ink hover:bg-surface inline-flex items-center justify-center rounded-lg border px-4 py-1.5 text-[13px] transition-colors disabled:opacity-50"
+          class="/60 text-ink hover:bg-surface inline-flex items-center justify-center rounded-lg border px-4 py-1.5 text-[13px] transition-colors disabled:opacity-50"
           @click="onDeleteCancel"
         >
           取消

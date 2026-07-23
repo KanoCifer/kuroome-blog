@@ -4,7 +4,7 @@
     class="transition-colors duration-1000"
     :class="
       !isEntryView
-        ? 'border-border/40 border-t bg-white dark:bg-black'
+        ? 'border-border border-t bg-white dark:bg-black'
         : 'border-0'
     "
   >
@@ -44,10 +44,7 @@
           >粤ICP备2026018113号</a
         >
         <span aria-hidden="true" class="text-border/50">·</span>
-        <router-link
-          to="/privacy"
-          class="hover:text-ink transition-colors"
-        >
+        <router-link to="/privacy" class="hover:text-ink transition-colors">
           <span class="font-mono tracking-[0.1em]">隐私政策</span>
         </router-link>
       </div>

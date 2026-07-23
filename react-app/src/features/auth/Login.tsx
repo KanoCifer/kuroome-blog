@@ -193,7 +193,7 @@ export default function Login() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut', delay: 0.15 }}
-          className={`} border-border/50 bg-page/70 w-full max-w-100 rounded-4xl border p-6 shadow-xl`}
+          className={`} /50 bg-page/70 w-full max-w-100 rounded-4xl border p-6 shadow-xl`}
         >
           <form className="flex flex-col" onSubmit={handleSubmit}>
             {/* Username Field */}

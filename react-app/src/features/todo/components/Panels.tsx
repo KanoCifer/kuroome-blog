@@ -192,7 +192,7 @@ export function PlanningPanel({ onOpen, onDelete }: PanelEmit) {
             className={`rounded-full border px-2.5 py-0.5 text-xs transition-colors ${
               filterType.has(t)
                 ? 'border-accent/40 bg-accent/10 text-ink'
-                : 'border-border text-muted hover:text-ink'
+                : 'text-muted hover:text-ink'
             }`}
           >
             {t}
@@ -212,7 +212,7 @@ export function PlanningPanel({ onOpen, onDelete }: PanelEmit) {
             className={`rounded-full border px-2.5 py-0.5 text-xs transition-colors ${
               filterPriority.has(p)
                 ? 'border-accent/40 bg-accent/10 text-ink'
-                : 'border-border text-muted hover:text-ink'
+                : 'text-muted hover:text-ink'
             }`}
           >
             {p}
@@ -225,8 +225,8 @@ export function PlanningPanel({ onOpen, onDelete }: PanelEmit) {
       </div>
 
       {/* table */}
-      <div className="border-border overflow-hidden rounded-xl border">
-        <div className="text-muted bg-surface border-border grid grid-cols-[1fr_80px_32px] gap-4 border-b px-4 py-2.5 text-[10px] font-medium tracking-widest uppercase sm:grid-cols-[2fr_1fr_1fr_1fr_100px_32px]">
+      <div className="overflow-hidden rounded-xl border">
+        <div className="text-muted bg-surface grid grid-cols-[1fr_80px_32px] gap-4 border-b px-4 py-2.5 text-[10px] font-medium tracking-widest uppercase sm:grid-cols-[2fr_1fr_1fr_1fr_100px_32px]">
           <span>标题</span>
           <span className="max-sm:hidden">类型</span>
           <span className="max-sm:hidden">优先级</span>
@@ -244,7 +244,7 @@ export function PlanningPanel({ onOpen, onDelete }: PanelEmit) {
             onKeyDown={(e) => {
               if (e.key === 'Enter') onOpen(task.slug);
             }}
-            className="hover:bg-surface/40 border-border grid cursor-pointer grid-cols-[1fr_80px_32px] items-center gap-4 border-t px-4 py-2.5 transition-colors sm:grid-cols-[2fr_1fr_1fr_1fr_100px_32px]"
+            className="hover:bg-surface/40 grid cursor-pointer grid-cols-[1fr_80px_32px] items-center gap-4 border-t px-4 py-2.5 transition-colors sm:grid-cols-[2fr_1fr_1fr_1fr_100px_32px]"
           >
             <span className="text-ink truncate text-sm font-medium">
               {task.title}
@@ -366,7 +366,7 @@ export function ReviewPanel({ onOpen }: Pick<PanelEmit, 'onOpen'>) {
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="border-border bg-page rounded-3xl border px-5 py-4 shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent),0_18px_32px_color-mix(in_oklch,var(--ink)_8%,transparent)]"
+              className="bg-page rounded-3xl border px-5 py-4 shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent),0_18px_32px_color-mix(in_oklch,var(--ink)_8%,transparent)]"
             >
               <div className="text-muted text-[10px] font-medium tracking-widest uppercase">
                 {stat.label}

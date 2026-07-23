@@ -80,7 +80,7 @@ const forecastIconClass = (textDay: string): string => {
       class="relative z-10 flex flex-1 flex-col items-center justify-center py-8"
     >
       <div
-        class="border-border border-t-accent h-10 w-10 animate-spin rounded-full border-2"
+        class="border-t-accent h-10 w-10 animate-spin rounded-full border-2"
       />
       <span class="text-muted mt-3 text-sm">获取天气数据...</span>
     </div>

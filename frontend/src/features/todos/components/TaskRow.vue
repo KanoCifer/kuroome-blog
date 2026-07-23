@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-surface border-border group hover:bg-surface flex items-center gap-3 rounded-xl border px-4 py-2.5 transition-[background-color] duration-200"
+    class="bg-surface group hover:bg-surface flex items-center gap-3 rounded-2xl px-4 py-2.5 transition-[background-color] duration-200"
   >
     <!-- open affordance: real button (no nested interactives) -->
     <button

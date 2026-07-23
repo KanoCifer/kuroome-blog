@@ -81,7 +81,7 @@ function DailyPickBanner() {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="border-border bg-page group cursor-pointer overflow-hidden rounded-2xl border p-4 shadow-sm transition-all duration-300 hover:shadow-md sm:p-5"
+      className="bg-page group cursor-pointer overflow-hidden rounded-2xl border p-4 shadow-sm transition-all duration-300 hover:shadow-md sm:p-5"
       onClick={() => navigate('/websites')}
     >
       <AnimatePresence mode="wait">
@@ -256,7 +256,7 @@ function FriendLinkCard({ link, index }: { link: FriendLink; index: number }) {
         damping: 20,
         delay: index * 0.06,
       }}
-      className="border-border bg-page group hover:border-accent/25 block overflow-hidden rounded-2xl border p-4 shadow-sm transition-all duration-300 hover:shadow-md"
+      className="bg-page group hover:border-accent/25 block overflow-hidden rounded-2xl border p-4 shadow-sm transition-all duration-300 hover:shadow-md"
     >
       <div className="flex items-start gap-3.5">
         <div className="bg-surface flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full">
@@ -298,7 +298,7 @@ function ApplyCard() {
       initial={{ opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="border-border bg-page overflow-hidden rounded-2xl border p-4"
+      className="bg-page overflow-hidden rounded-2xl border p-4"
     >
       <h3 className="text-ink mb-3 flex items-center gap-2 text-sm font-bold">
         <Link2 className="text-ink h-4 w-4" />
@@ -359,7 +359,7 @@ function ApplyCard() {
 
 function EmptyState() {
   return (
-    <div className="border-border bg-page flex flex-col items-center justify-center rounded-2xl border py-12">
+    <div className="bg-page flex flex-col items-center justify-center rounded-2xl border py-12">
       <Users className="text-muted mb-3 h-12 w-12" />
       <p className="text-muted text-sm">暂无友链</p>
       <p className="text-muted mt-1 text-xs">

@@ -19,14 +19,14 @@
         :animate="{ x: 0 }"
         :exit="{ x: '100%' }"
         :transition="SPRING_SNUG"
-        class="bg-page border-border fixed top-0 right-0 z-[9999] flex h-full w-full max-w-[min(640px,52vw)] flex-col border-l shadow-[0_12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)] max-sm:max-w-full"
+        class="bg-page fixed top-0 right-0 z-[9999] flex h-full w-full max-w-[min(640px,52vw)] flex-col border-l shadow-[0_12px_32px_color-mix(in_oklch,var(--ink)_10%,transparent)] max-sm:max-w-full"
         role="dialog"
         aria-modal="true"
         aria-labelledby="detail-title"
       >
         <!-- header -->
         <header
-          class="border-border flex shrink-0 items-start justify-between gap-3 border-b px-5 py-4"
+          class="flex shrink-0 items-start justify-between gap-3 border-b px-5 py-4"
         >
           <h2
             id="detail-title"
@@ -96,7 +96,7 @@
                     v-if="i > 0"
                     class="absolute top-3.5 right-1/2 w-full"
                     :class="
-                      i <= statusIndex ? 'border-success' : 'border-border'
+                      i <= statusIndex ? 'border-success' : ''
                     "
                     style="border-top-width: 1px; transform: translateY(-50%)"
                     aria-hidden="true"
@@ -109,7 +109,7 @@
                         ? 'border-success bg-success/10 text-success'
                         : i === statusIndex
                           ? 'border-accent/40 bg-accent/10 text-ink'
-                          : 'border-border text-muted opacity-60'
+                          : 'text-muted opacity-60'
                     "
                     :aria-pressed="task.status === s"
                     @click="
@@ -165,7 +165,7 @@
                 <KindBadge :kind="task.kind" />
                 <span
                   v-if="task.scope"
-                  class="text-muted border-border rounded-full border px-1.5 py-px text-[10px]"
+                  class="text-muted rounded-full border px-1.5 py-px text-[10px]"
                 >
                   {{ task.scope }}
                 </span>
@@ -230,7 +230,7 @@
               v-html="renderMarkdown(task.detail)"
             />
 
-            <hr class="border-border my-5" />
+            <hr class="my-5" />
 
             <!-- ── 附区：元信息（弱化：label + 更轻的文字色） ── -->
             <div class="space-y-4">
@@ -291,7 +291,7 @@
 
         <!-- footer -->
         <footer
-          class="border-border flex shrink-0 items-center justify-between gap-2 border-t px-5 py-3"
+          class="flex shrink-0 items-center justify-between gap-2 border-t px-5 py-3"
         >
           <button
             class="text-destructive hover:bg-destructive/10 focus-visible:ring-destructive/30 cursor-pointer rounded-lg px-3 py-1.5 text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"

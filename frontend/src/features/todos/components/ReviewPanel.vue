@@ -9,7 +9,7 @@
         <span class="text-muted text-xs tabular-nums">{{ weekRange }}</span>
       </div>
 
-      <div class="border-border bg-surface rounded-3xl border px-6 py-5">
+      <div class="bg-surface rounded-3xl px-6 py-5">
         <!-- 主图：本周完成数 + 真实同比 -->
         <div class="text-muted font-serif text-xs tracking-widest">
           本周完成

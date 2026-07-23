@@ -12,14 +12,14 @@
           :value="searchQuery"
           type="text"
           placeholder="搜索书名或作者…"
-          class="border-border bg-page placeholder:text-muted/50 focus:border-accent focus:ring-accent/20 w-full rounded-xl border py-2 pr-3 pl-9 text-sm transition-colors outline-none focus:ring-2"
+          class="bg-page placeholder:text-muted/50 focus:border-accent focus:ring-accent/20 w-full rounded-xl border py-2 pr-3 pl-9 text-sm transition-colors outline-none focus:ring-2"
           @input="onSearchInput"
         />
       </div>
 
       <!-- 密度切换 -->
       <div
-        class="border-border bg-page hidden items-center rounded-xl border p-0.5 sm:flex"
+        class="bg-page hidden items-center rounded-xl border p-0.5 sm:flex"
         role="group"
         aria-label="书架密度"
       >
@@ -46,7 +46,7 @@
       <div class="relative">
         <button
           type="button"
-          class="border-border bg-page hover:bg-surface text-ink inline-flex h-9 items-center gap-1.5 rounded-xl border px-3 text-sm transition-colors"
+          class="bg-page hover:bg-surface text-ink inline-flex h-9 items-center gap-1.5 rounded-xl border px-3 text-sm transition-colors"
           :aria-expanded="sortMenuOpen"
           aria-haspopup="menu"
           @click="sortMenuOpen = !sortMenuOpen"
@@ -57,7 +57,7 @@
         </button>
         <div
           v-if="sortMenuOpen"
-          class="border-border bg-page absolute top-full right-0 z-30 mt-1 w-36 overflow-hidden rounded-xl border shadow-lg"
+          class="bg-page absolute top-full right-0 z-30 mt-1 w-36 overflow-hidden rounded-xl border shadow-lg"
           role="menu"
           @click.stop
         >
@@ -91,7 +91,7 @@
         :class="
           filter === chip.key
             ? 'border-accent bg-accent text-ink'
-            : 'border-border bg-page text-muted hover:border-ink/20 hover:text-ink'
+            : 'bg-page text-muted hover:border-ink/20 hover:text-ink'
         "
         role="tab"
         :aria-selected="filter === chip.key"

@@ -281,7 +281,7 @@ onMounted(() => {
         <select
           v-model="selectedHarbor"
           aria-label="选择港口"
-          class="border-border bg-page text-ink focus:ring-accent cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
+          class="bg-page text-ink focus:ring-accent cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
         >
           <option
             v-for="opt in HARBOR_OPTIONS"
@@ -294,7 +294,7 @@ onMounted(() => {
         <select
           v-model="selectedDate"
           aria-label="选择日期"
-          class="border-border bg-page text-ink focus:ring-accent cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
+          class="bg-page text-ink focus:ring-accent cursor-pointer rounded-lg border px-1.5 py-1 text-xs focus:ring-1 focus:outline-none"
         >
           <option
             v-for="opt in dateOptions"
@@ -313,7 +313,7 @@ onMounted(() => {
       class="flex flex-1 flex-col items-center justify-center py-12"
     >
       <div
-        class="border-border border-t-accent h-10 w-10 animate-spin rounded-full border-2"
+        class="border-t-accent h-10 w-10 animate-spin rounded-full border-2"
       />
       <span class="text-muted mt-3 text-sm">获取潮汐数据...</span>
     </div>

@@ -24,13 +24,13 @@
       <!-- Filter row -->
       <div class="mt-8">
         <div
-          class="border-border/60 bg-page flex flex-col items-center justify-between gap-3 rounded-2xl border p-3 sm:flex-row"
+          class="bg-card flex flex-col items-center justify-between gap-3 rounded-2xl border p-3 sm:flex-row"
         >
           <!-- Days Filter: segmented control (radio group) -->
           <div
             role="radiogroup"
             aria-label="日期范围"
-            class="bg-surface flex rounded-xl p-1"
+            class="bg-secondary flex rounded-xl p-1"
           >
             <button
               v-for="option in [7, 30, 90]"
@@ -51,11 +51,10 @@
           </div>
 
           <!-- Refresh Button -->
-          <button
-            type="button"
+          <Button
             :disabled="loading && !!overviewData"
             @click="fetchAllData"
-            class="bg-accent text-ink hover:bg-accent/90 flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50"
+            size="md"
           >
             <svg
               :class="[
@@ -74,7 +73,7 @@
               />
             </svg>
             {{ loading && !overviewData ? '加载中…' : '刷新' }}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -228,9 +227,7 @@
 
         <!-- Collapsed secondary: 设备 & 浏览器 -->
         <div class="col-span-1 lg:col-span-3">
-          <div
-            class="border-border/60 bg-page overflow-hidden rounded-3xl border"
-          >
+          <div class="bg-card overflow-hidden rounded-3xl border">
             <button
               type="button"
               class="text-ink hover:bg-surface/30 flex w-full items-center justify-between px-6 py-4 text-left transition-colors"
@@ -290,9 +287,7 @@
 
         <!-- Login Logs Table -->
         <div class="col-span-1 lg:col-span-3">
-          <div
-            class="border-border/60 bg-page overflow-hidden rounded-3xl border p-5"
-          >
+          <div class="bg-card overflow-hidden rounded-3xl border p-5">
             <h2
               class="text-ink mb-4 flex items-center gap-2 text-sm font-medium"
             >
@@ -327,9 +322,7 @@
                     用户登录记录表
                   </caption>
                   <thead>
-                    <tr
-                      class="border-border text-muted border-b text-left text-sm"
-                    >
+                    <tr class="text-muted border-b text-left text-sm">
                       <th scope="col" class="pb-3 font-medium">用户</th>
                       <th scope="col" class="pb-3 font-medium">登录次数</th>
                       <th scope="col" class="pb-3 font-medium">最近登录</th>
@@ -392,7 +385,7 @@
               <!-- Pagination -->
               <div
                 v-if="loginLogsData && loginLogsData.total_pages > 1"
-                class="border-border mt-4 flex items-center justify-between border-t pt-4"
+                class="mt-4 flex items-center justify-between border-t pt-4"
               >
                 <p class="text-muted text-sm">
                   显示第
@@ -453,6 +446,7 @@ import PopularPagesChartCard from './components/PopularPagesChartCard.vue';
 import PostViewsChartCard from './components/PostViewsChartCard.vue';
 import ServerMonitor from './components/ServerMonitor.vue';
 import StatTile from './components/StatTile.vue';
+import { Button } from '@/components';
 
 // Types
 interface OverviewData {

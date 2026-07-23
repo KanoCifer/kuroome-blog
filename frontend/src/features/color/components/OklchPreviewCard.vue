@@ -67,7 +67,7 @@ defineOptions({
 
 <template>
   <div
-    class="border-border bg-card/70 relative overflow-hidden rounded-xl border shadow-sm backdrop-blur"
+    class="bg-card/70 relative overflow-hidden rounded-xl border shadow-sm backdrop-blur"
   >
     <!-- 大色块 -->
     <div class="relative aspect-[5/3] w-full" :style="swatchStyle()">
@@ -120,10 +120,7 @@ defineOptions({
     </div>
 
     <!-- 对比度 -->
-    <div
-      v-if="contrastBg"
-      class="border-border space-y-1.5 border-t px-4 py-3 text-xs"
-    >
+    <div v-if="contrastBg" class="space-y-1.5 border-t px-4 py-3 text-xs">
       <div class="text-muted flex items-baseline justify-between">
         <span>对比度 · vs {{ contrastBgLabel ?? 'bg' }}</span>
         <span

@@ -75,7 +75,7 @@ function applyVariant(oklch: { L: number; C: number; H: number }) {
 
 <template>
   <div
-    class="border-border bg-card/70 space-y-4 rounded-xl border p-5 shadow-sm backdrop-blur"
+    class="bg-card/70 space-y-4 rounded-xl border p-5 shadow-sm backdrop-blur"
   >
     <div class="flex items-baseline justify-between">
       <h3 class="text-ink text-sm font-semibold tracking-wider uppercase">
@@ -88,7 +88,7 @@ function applyVariant(oklch: { L: number; C: number; H: number }) {
       <div
         v-for="row in rows"
         :key="row.key"
-        class="border-border/40 space-y-1.5 rounded-lg border p-2.5"
+        class="/40 space-y-1.5 rounded-lg border p-2.5"
       >
         <div class="flex items-baseline justify-between gap-2">
           <div class="text-ink text-xs font-semibold">{{ row.name }}</div>
@@ -101,18 +101,18 @@ function applyVariant(oklch: { L: number; C: number; H: number }) {
             v-for="(v, i) in row.variants"
             :key="`${row.key}-${i}`"
             type="button"
-            class="border-border/40 hover:ring-ring group flex h-10 flex-1 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-md border shadow-inner transition-all hover:ring-2"
+            class="/40 hover:ring-ring group flex h-10 flex-1 flex-col items-center justify-center gap-0.5 overflow-hidden rounded-md border shadow-inner transition-all hover:ring-2"
             :style="{ background: v.css }"
             :title="`${v.label} · ${v.css}`"
             @click="applyVariant(v.oklch)"
           >
             <span
-              class="rounded-full bg-[var(--card-bg)]/80 text-ink px-1.5 py-0.5 text-[9px] font-semibold tracking-wider uppercase shadow-sm"
+              class="text-ink rounded-full bg-[var(--card-bg)]/80 px-1.5 py-0.5 text-[9px] font-semibold tracking-wider uppercase shadow-sm"
             >
               {{ v.label }}
             </span>
             <span
-              class="rounded-full bg-[var(--card-bg)]/80 text-muted px-1.5 py-0.5 font-mono text-[9px] shadow-sm"
+              class="text-muted rounded-full bg-[var(--card-bg)]/80 px-1.5 py-0.5 font-mono text-[9px] shadow-sm"
             >
               {{ v.hex }}
             </span>

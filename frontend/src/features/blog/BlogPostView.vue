@@ -542,7 +542,7 @@ onUnmounted(() => {
       </div>
 
       <!-- 文章脚：作者署名块 + 复制链接 -->
-      <footer class="border-border mt-14 border-t pt-8">
+      <footer class="mt-14 border-t pt-8">
         <div class="flex flex-wrap items-start justify-between gap-5">
           <div class="flex items-center gap-3.5">
             <span

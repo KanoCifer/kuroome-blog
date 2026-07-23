@@ -54,7 +54,7 @@
         class="mx-auto flex aspect-square w-full max-w-8 items-center justify-center rounded-lg text-sm transition-colors"
         :class="
           day === today
-            ? 'bg-accent text-ink font-bold'
+            ? 'bg-accent text-contrast font-bold'
             : 'text-muted hover:bg-accent/10'
         "
       >

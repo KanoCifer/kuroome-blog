@@ -7,13 +7,15 @@
     --page: oklch(0.97 0.013 50);
     --secondary: oklch(0.92 0.022 50);
     --border: oklch(0.88 0.02 50);
+
+    --contrast: oklch(0.97 0.018 50);
     /* 文字压暗 */
     --muted-text: oklch(0.42 0.015 50);
     --accent-slate: oklch(0.55 0.025 245);
     --accent-rose: oklch(0.58 0.13 28);
     --accent: oklch(0.5 0.08 50);
-    --card: oklch(0.99 0.008 50);
-    --surface: oklch(0.97 0.013 50 / 0.75);
+    --card: oklch(0.93 0.015 50);
+    --surface: oklch(0.94 0.015 50 / 0.75);
     --chart-1: oklch(0.6 0.14 50);
     --chart-2: oklch(0.55 0.08 145);
     --chart-3: oklch(0.55 0.1 245);

@@ -1,8 +1,5 @@
 <template>
-  <section
-    id="rss-subscriptions"
-    class="border-border bg-page rounded-2xl border p-6"
-  >
+  <section id="rss-subscriptions" class="bg-card rounded-2xl border p-6">
     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
       <div>
         <h2 class="text-ink text-xl font-bold">我的订阅</h2>
@@ -31,13 +28,13 @@
       <div
         v-for="skeleton in 3"
         :key="skeleton"
-        class="border-border bg-surface/40 h-24 animate-pulse rounded-xl border"
+        class="bg-surface/40 h-24 animate-pulse rounded-xl border"
       />
     </div>
 
     <div
       v-else-if="subscriptions.length === 0"
-      class="border-border bg-surface/40 text-muted rounded-xl border border-dashed p-8 text-center text-sm"
+      class="bg-surface/40 text-muted rounded-xl border border-dashed p-8 text-center text-sm"
     >
       暂无订阅，先在上方解析并保存一个 RSS 地址吧。
     </div>
@@ -50,7 +47,7 @@
         :class="
           activeSubscriptionId === subscription.id
             ? 'border-accent/30 bg-accent/5'
-            : 'border-border bg-page hover:border-border/70'
+            : 'bg-card hover:/70'
         "
       >
         <div

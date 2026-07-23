@@ -18,7 +18,7 @@ export interface ButtonVariants {
 // 所有变体共享这套"骨架"，变体只负责配色和边框，尺寸只负责高/宽/间距。
 const BASE = [
   'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium',
-  'transition-[color,transform]',
+  'transition-[color,transform,background-color] duration-280',
   'focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
   'active:scale-[0.96]',
   'disabled:cursor-not-allowed disabled:opacity-50',
@@ -26,9 +26,9 @@ const BASE = [
 ];
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  default: 'bg-accent text-ink hover:bg-accent/90',
-  outline: 'border-border text-muted hover:bg-surface hover:text-ink border',
-  destructive: 'bg-destructive text-white hover:bg-destructive/90',
+  default: 'bg-accent text-contrast hover:bg-accent/90',
+  outline: ' text-muted hover:bg-surface hover:text-ink border',
+  destructive: 'bg-destructive text-contrast hover:bg-destructive/90',
   ghost: 'text-muted hover:bg-surface hover:text-ink',
 };
 

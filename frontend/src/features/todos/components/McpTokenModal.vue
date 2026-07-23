@@ -3,7 +3,7 @@
     <div class="flex flex-col">
       <!-- ── 头部 ── -->
       <header
-        class="border-border flex items-start justify-between gap-3 border-b px-6 pt-5 pb-4"
+        class="flex items-start justify-between gap-3 border-b px-6 pt-5 pb-4"
       >
         <div>
           <h2 class="text-ink text-lg font-semibold">签发 MCP 服务 Token</h2>
@@ -46,7 +46,7 @@
               :class="
                 days === opt.days
                   ? 'border-accent/40 bg-accent/10 text-ink'
-                  : 'border-border text-muted hover:text-ink'
+                  : 'text-muted hover:text-ink'
               "
               @click="days = opt.days"
             >
@@ -112,7 +112,7 @@
 
           <div class="relative">
             <textarea
-              class="bg-surface border-border text-ink block w-full resize-none rounded-lg border px-3 py-2 pr-10 font-mono text-[11px] leading-relaxed outline-none"
+              class="bg-surface text-ink block w-full resize-none rounded-lg border px-3 py-2 pr-10 font-mono text-[11px] leading-relaxed outline-none"
               rows="4"
               readonly
               :value="result.token"

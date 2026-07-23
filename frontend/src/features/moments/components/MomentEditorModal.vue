@@ -2,7 +2,7 @@
   <Modal :open="open" size="xl" @close="emit('update:open', false)">
     <!-- 顶栏 -->
     <header
-      class="border-border/40 bg-page sticky top-0 z-10 flex items-center justify-between gap-2 border-b px-6 py-4"
+      class="/40 bg-page sticky top-0 z-10 flex items-center justify-between gap-2 border-b px-6 py-4"
     >
       <div>
         <div
@@ -16,7 +16,7 @@
       </div>
       <button
         type="button"
-        class="text-muted hover:text-ink border-border/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
+        class="text-muted hover:text-ink /40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
         aria-label="关闭"
         @click="emit('update:open', false)"
       >
@@ -80,7 +80,7 @@
                 'flex h-8 w-8 items-center justify-center rounded-lg border text-[16px] transition-colors',
                 form.mood === e
                   ? 'border-accent bg-accent/10'
-                  : 'border-border/40 bg-page hover:bg-surface',
+                  : '/40 bg-page hover:bg-surface',
               ]"
               @click="toggleMood(e)"
             >
@@ -135,7 +135,7 @@
 
       <!-- 右侧设置 -->
       <aside
-        class="bg-surface/30 border-border/40 space-y-4 overflow-y-auto border-t px-5 py-6 md:border-t-0 md:border-l"
+        class="bg-surface/30 /40 space-y-4 overflow-y-auto border-t px-5 py-6 md:border-t-0 md:border-l"
       >
         <div>
           <div
@@ -151,7 +151,7 @@
                 'flex cursor-pointer items-start gap-2 rounded-lg border px-2.5 py-2',
                 form.visibility === v
                   ? 'border-accent bg-accent/5'
-                  : 'border-border/40 bg-page hover:bg-surface',
+                  : '/40 bg-page hover:bg-surface',
               ]"
             >
               <input
@@ -213,7 +213,7 @@
           </button>
           <button
             type="button"
-            class="border-border/60 text-ink hover:bg-surface inline-flex w-full items-center justify-center rounded-lg border px-3 py-1.5 text-[12px] transition-colors"
+            class="/60 text-ink hover:bg-surface inline-flex w-full items-center justify-center rounded-lg border px-3 py-1.5 text-[12px] transition-colors"
             @click="emit('update:open', false)"
           >
             取消

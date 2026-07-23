@@ -12,7 +12,7 @@ export function MomentEmptyState({
   action,
 }: MomentEmptyStateProps) {
   return (
-    <div className="border-border/40 bg-page/60 mx-auto flex max-w-md flex-col items-center gap-4 rounded-2xl border border-dashed px-6 py-12 text-center">
+    <div className="/40 bg-page/60 mx-auto flex max-w-md flex-col items-center gap-4 rounded-2xl border border-dashed px-6 py-12 text-center">
       <div
         aria-hidden="true"
         className="bg-surface text-muted flex h-12 w-12 items-center justify-center rounded-full"

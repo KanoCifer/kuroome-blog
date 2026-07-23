@@ -119,7 +119,7 @@ const handlePrivacyScroll = (e: Event) => {
     >
       <div
         v-if="showBanner && !consentGiven"
-        class="group border-border bg-page/95 fixed right-4 bottom-6 z-50 w-[340px] overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-[box-shadow] duration-300 hover:shadow-xl sm:right-8 sm:bottom-8 sm:w-[380px]"
+        class="group bg-page/95 fixed right-4 bottom-6 z-50 w-[340px] overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-[box-shadow] duration-300 hover:shadow-xl sm:right-8 sm:bottom-8 sm:w-[380px]"
       >
         <div class="relative px-5 py-5">
           <!-- 标题行 -->
@@ -179,13 +179,13 @@ const handlePrivacyScroll = (e: Event) => {
           <!-- 操作按钮 -->
           <div class="flex items-center gap-2">
             <button
-              class="border-border text-muted hover:bg-surface hover:text-ink flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-[background-color,color,transform] duration-200 active:scale-[0.97]"
+              class="text-muted hover:bg-surface hover:text-ink flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-[background-color,color,transform] duration-200 active:scale-[0.97]"
               @click="openSettings"
             >
               自定义
             </button>
             <button
-              class="border-border text-muted hover:bg-surface hover:text-ink flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-[background-color,color,transform] duration-200 active:scale-[0.97]"
+              class="text-muted hover:bg-surface hover:text-ink flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-[background-color,color,transform] duration-200 active:scale-[0.97]"
               @click="rejectAll"
             >
               拒绝
@@ -249,7 +249,7 @@ const handlePrivacyScroll = (e: Event) => {
                 (快捷登录)，仅在您使用时生效。
               </p>
             </div>
-            <div class="border-border border-t pt-2">
+            <div class="border-t pt-2">
               <button
                 @click="navigateToFullPolicy"
                 class="text-warning/80 hover:text-warning inline-flex items-center gap-1 text-[12px] transition-colors"
@@ -279,7 +279,7 @@ const handlePrivacyScroll = (e: Event) => {
 
         <AlertDialogFooter class="mt-4">
           <AlertDialogCancel
-            class="border-border text-muted hover:bg-surface hover:text-ink h-9 rounded-xl border px-4 text-[12px] font-medium"
+            class="text-muted hover:bg-surface hover:text-ink h-9 rounded-xl border px-4 text-[12px] font-medium"
           >
             返回
           </AlertDialogCancel>
@@ -310,7 +310,7 @@ const handlePrivacyScroll = (e: Event) => {
           <div
             v-for="cat in cookieCategories"
             :key="cat.id"
-            class="border-border flex items-start gap-3 rounded-xl border px-3.5 py-3 transition-colors"
+            class="flex items-start gap-3 rounded-xl border px-3.5 py-3 transition-colors"
             :class="{ 'opacity-70': cat.required }"
           >
             <div class="flex h-5 items-center pt-0.5">
@@ -333,7 +333,7 @@ const handlePrivacyScroll = (e: Event) => {
             </label>
             <span
               v-if="cat.required"
-              class="border-border text-muted mt-0.5 shrink-0 rounded-md border px-2 py-0.5 text-[10px]"
+              class="text-muted mt-0.5 shrink-0 rounded-md border px-2 py-0.5 text-[10px]"
             >
               必需
             </span>
@@ -342,7 +342,7 @@ const handlePrivacyScroll = (e: Event) => {
 
         <AlertDialogFooter>
           <AlertDialogCancel
-            class="border-border text-muted hover:bg-surface hover:text-ink h-9 rounded-xl border px-4 text-[12px] font-medium transition-all duration-200"
+            class="text-muted hover:bg-surface hover:text-ink h-9 rounded-xl border px-4 text-[12px] font-medium transition-all duration-200"
           >
             取消
           </AlertDialogCancel>

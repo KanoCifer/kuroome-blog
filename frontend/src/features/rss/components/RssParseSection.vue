@@ -1,5 +1,5 @@
 <template>
-  <section id="rss-parse" class="border-border bg-page rounded-2xl border p-6">
+  <section id="rss-parse" class="bg-card rounded-2xl border p-6">
     <div class="mb-5 flex items-center justify-between gap-3">
       <div>
         <h2 class="text-ink text-xl font-bold">解析订阅地址</h2>
@@ -22,7 +22,7 @@
           :value="rssUrl"
           type="text"
           placeholder="https://example.com/feed.xml"
-          class="border-border bg-page text-ink placeholder:text-muted focus:border-accent focus:ring-accent/20 w-full rounded-xl border px-4 py-3 transition-all focus:ring-2 focus:outline-none"
+          class="bg-page text-ink placeholder:text-muted focus:border-accent focus:ring-accent/20 w-full rounded-xl border px-4 py-3 transition-all focus:ring-2 focus:outline-none"
           @input="
             $emit('update:rssUrl', ($event.target as HTMLInputElement).value)
           "
@@ -75,10 +75,7 @@
       </button>
     </div>
 
-    <div
-      v-if="parseMetadata"
-      class="border-border bg-surface/40 mt-6 rounded-xl border p-5"
-    >
+    <div v-if="parseMetadata" class="bg-surface/40 mt-6 rounded-xl border p-5">
       <h3 class="text-ink text-lg font-bold">
         {{ parseMetadata.title }}
       </h3>
@@ -108,7 +105,7 @@
         <li
           v-for="(entry, index) in parseEntries"
           :key="`${entry.link}-${index}`"
-          class="border-border bg-page rounded-xl border p-4"
+          class="bg-card rounded-xl border p-4"
         >
           <a
             :href="entry.link"

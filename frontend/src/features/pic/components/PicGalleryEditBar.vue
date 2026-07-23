@@ -6,19 +6,16 @@
         variant="outline"
         size="sm"
         @click="$emit('toggle-edit')"
-        class="border-border/60 h-9 gap-2 rounded-full px-4 shadow-sm transition-all duration-300"
+        class="/60 h-9 gap-2 rounded-full px-4 shadow-sm transition-all duration-300"
         :class="isEditMode ? 'bg-accent text-ink' : ''"
       >
         <component :is="isEditMode ? Check : Edit2" class="h-4 w-4" />
         {{ isEditMode ? '完成编辑' : '编辑模式' }}
       </Button>
-      <button
-        @click="$emit('shuffle')"
-        class="border-border/60 text-ink bg-accent flex h-9 items-center gap-2 rounded-lg px-4 shadow-sm"
-      >
+      <Button @click="$emit('shuffle')" size="md">
         <Shuffle class="h-4 w-4" />
         重排
-      </button>
+      </Button>
       <Transition
         enter-active-class="transition-all  duration-300 ease-in-out"
         enter-from-class="translate-x-full opacity-0"

@@ -76,7 +76,7 @@ onUnmounted(() => {
           :animate="{ scale: 1, opacity: 1 }"
           :exit="{ scale: 0.6, opacity: 0 }"
           :transition="SPRING_BOUNCE"
-          class="bg-page border-border relative w-full max-w-3xl overflow-hidden rounded-t-3xl border shadow-2xl sm:rounded-3xl"
+          class="bg-card relative w-full max-w-3xl overflow-hidden rounded-t-3xl border shadow-2xl sm:rounded-3xl"
         >
           <div class="grid grid-cols-1 sm:grid-cols-[200px_1fr]">
             <!-- Cover column — the morph happens here -->
@@ -175,7 +175,7 @@ onUnmounted(() => {
               <!-- Reason — italicized editorial blurb -->
               <p
                 v-if="book.reason"
-                class="text-muted border-border mt-5 border-l-2 pl-3 text-sm leading-relaxed italic sm:text-base"
+                class="text-muted mt-5 border-l-2 pl-3 text-sm leading-relaxed italic sm:text-base"
               >
                 {{ book.reason }}
               </p>

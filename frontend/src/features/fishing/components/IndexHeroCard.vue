@@ -13,8 +13,8 @@ import { storeToRefs } from 'pinia';
  *   保证用 activeLocation（用户定位 / 默认中心）而不是组件局部默认值
  */
 const emit = defineEmits<{
-  (e: 'feedback-click', data: FishingIndexData): void;
-  (e: 'refresh'): void;
+  'feedback-click': [data: FishingIndexData];
+  refresh: [];
 }>();
 
 const fishingMapStore = useFishingMapStore();
@@ -85,7 +85,7 @@ const handleFeedback = () => {
           {{ loading ? '刷新中' : '刷新' }}
         </button>
         <div
-          class="bg-accent text-ink flex h-11 w-11 items-center justify-center rounded-2xl shadow-sm transition-all duration-300 group-hover:rounded-xl"
+          class="bg-accent text-contrast flex h-11 w-11 items-center justify-center rounded-2xl shadow-sm transition-all duration-300 group-hover:rounded-xl"
         >
           <FishingRod class="h-5 w-5" />
         </div>
@@ -148,7 +148,7 @@ const handleFeedback = () => {
           <div
             v-for="(value, keyName) in indexData.feature_breakdown"
             :key="keyName"
-            class="border-border/60 bg-surface/30 rounded-xl border p-2.5"
+            class="/60 bg-surface/30 rounded-xl border p-2.5"
           >
             <p class="text-ink">{{ formatFeatureName(keyName) }}</p>
             <div

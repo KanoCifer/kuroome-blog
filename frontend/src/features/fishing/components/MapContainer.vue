@@ -24,7 +24,7 @@
       <button
         type="button"
         :class="[
-          'bg-page/90 text-ink hover:bg-page border-border/40 absolute right-2.5 bottom-5 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-all duration-200 ease-out active:scale-95 disabled:opacity-50',
+          'bg-page/90 text-ink hover:bg-page /40 absolute right-2.5 bottom-5 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-all duration-200 ease-out active:scale-95 disabled:opacity-50',
           isLocating && 'text-ink',
         ]"
         :disabled="isLocating"
@@ -49,7 +49,7 @@
       <!-- 地图全屏按钮 -->
       <button
         type="button"
-        class="bg-page/90 text-ink hover:bg-page border-border/40 absolute right-2.5 bottom-20 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-all duration-200 ease-out active:scale-95 disabled:opacity-50"
+        class="bg-page/90 text-ink hover:bg-page /40 absolute right-2.5 bottom-20 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-all duration-200 ease-out active:scale-95 disabled:opacity-50"
         @click="handleFullscreen"
       >
         <span
@@ -75,7 +75,7 @@
       >
         <div
           v-if="isPlanning || routeInfo"
-          class="bg-page/90 border-border absolute right-4 bottom-4 left-4 mx-auto w-fit rounded-2xl border p-4 shadow-lg backdrop-blur-md"
+          class="bg-page/90 absolute right-4 bottom-4 left-4 mx-auto w-fit rounded-2xl border p-4 shadow-lg backdrop-blur-md"
         >
           <div v-if="isPlanning" class="text-muted flex items-center gap-3">
             <Loader2 class="h-4 w-4 animate-spin" />

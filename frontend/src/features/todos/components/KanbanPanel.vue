@@ -21,7 +21,7 @@
         v-for="col in KANBAN_COLUMNS"
         :key="col.id"
         role="listitem"
-        class="bg-surface/40 border-border flex min-h-96 flex-col rounded-xl border p-3 transition-colors"
+        class="bg-surface/40 flex min-h-96 flex-col rounded-xl border p-3 transition-colors"
         :class="
           dragOverColumn === col.id
             ? 'border-accent/60 bg-accent/5 ring-accent/30 ring-1'

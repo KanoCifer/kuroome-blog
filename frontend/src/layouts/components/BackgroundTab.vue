@@ -86,7 +86,7 @@ const autoSwitchOptions = [
  */
 const smallCardBase =
   'flex flex-col items-center gap-2 rounded-xl border p-4 transition-colors';
-const smallCardDefault = 'border-border bg-page hover:border-accent';
+const smallCardDefault = ' bg-page hover:border-accent';
 const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
 </script>
 
@@ -97,7 +97,7 @@ const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
       <h2 class="text-ink mb-1 font-serif text-lg font-semibold">背景调整</h2>
       <p class="text-muted mb-4 text-xs italic">Adjust background appearance</p>
 
-      <div class="border-border/60 bg-page rounded-xl border p-5">
+      <div class="/60 bg-page rounded-xl border p-5">
         <!-- 滑块行 -->
         <div class="relative space-y-5">
           <!-- 背景模糊 -->
@@ -326,7 +326,7 @@ const smallCardActive = 'border-accent bg-accent/5 !shadow-sm';
           :class="
             backgroundStore.autoSwitchInterval === opt.value
               ? 'border-accent bg-accent/5 text-ink font-medium !shadow-sm'
-              : 'border-border bg-page text-ink hover:border-accent'
+              : 'bg-page text-ink hover:border-accent'
           "
         >
           {{ opt.label }}

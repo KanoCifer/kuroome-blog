@@ -118,7 +118,7 @@ export function BottomSheet({
             aria-modal="true"
             tabIndex={-1}
             style={{ maxHeight: maxH }}
-            className="bg-page border-border fixed right-0 bottom-0 left-0 z-210 flex flex-col rounded-t-3xl border-t pb-[calc(1rem+env(safe-area-inset-bottom,0px))] shadow-2xl outline-none"
+            className="bg-page fixed right-0 bottom-0 left-0 z-210 flex flex-col rounded-t-3xl border-t pb-[calc(1rem+env(safe-area-inset-bottom,0px))] shadow-2xl outline-none"
             initial={reduce ? false : { y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}

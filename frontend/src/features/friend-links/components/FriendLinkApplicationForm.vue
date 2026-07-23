@@ -186,7 +186,7 @@ const handleSubmit = () => {
               id="fl-name"
               v-model="name"
               type="text"
-              class="border-border bg-surface focus:border-ring focus:ring-ring text-ink placeholder:text-muted w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
+              class="bg-surface focus:border-ring focus:ring-ring text-ink placeholder:text-muted w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
               :disabled="submitting"
               placeholder="怎么称呼您"
             />
@@ -210,7 +210,7 @@ const handleSubmit = () => {
               id="fl-email"
               v-model="email"
               type="email"
-              class="border-border bg-surface focus:border-ring focus:ring-ring text-ink placeholder:text-muted w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
+              class="bg-surface focus:border-ring focus:ring-ring text-ink placeholder:text-muted w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
               :disabled="submitting"
               placeholder="your@email.com"
             />
@@ -234,7 +234,7 @@ const handleSubmit = () => {
               id="fl-site-name"
               v-model="siteName"
               type="text"
-              class="border-border bg-surface focus:border-ring focus:ring-ring text-ink placeholder:text-muted w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
+              class="bg-surface focus:border-ring focus:ring-ring text-ink placeholder:text-muted w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
               :disabled="submitting"
               placeholder="您的网站名称"
             />
@@ -258,7 +258,7 @@ const handleSubmit = () => {
               id="fl-site-url"
               v-model="siteUrl"
               type="text"
-              class="border-border bg-surface focus:border-ring focus:ring-ring text-ink placeholder:text-muted w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
+              class="bg-surface focus:border-ring focus:ring-ring text-ink placeholder:text-muted w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
               :disabled="submitting"
               placeholder="https://example.com"
             />
@@ -283,7 +283,7 @@ const handleSubmit = () => {
               v-model="description"
               rows="3"
               maxlength="200"
-              class="border-border bg-surface focus:border-ring focus:ring-ring text-ink placeholder:text-muted w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
+              class="bg-surface focus:border-ring focus:ring-ring text-ink placeholder:text-muted w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
               :disabled="submitting"
               placeholder="用简短的一段话介绍您的网站（不超过 200 字）"
             ></textarea>

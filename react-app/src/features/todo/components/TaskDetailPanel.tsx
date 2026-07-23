@@ -92,7 +92,7 @@ export function TaskDetailPanel({
           onClick={(e) => e.stopPropagation()}
         >
           {/* header */}
-          <header className="border-border flex shrink-0 items-start justify-between gap-3 border-b px-5 pt-4 pb-3">
+          <header className="flex shrink-0 items-start justify-between gap-3 border-b px-5 pt-4 pb-3">
             <h2
               id="detail-title"
               className="text-ink min-w-0 flex-1 truncate pr-2 font-serif text-lg leading-tight font-medium"
@@ -160,7 +160,7 @@ export function TaskDetailPanel({
                               ? 'border-success bg-success/10 text-success'
                               : i === statusIndex
                                 ? 'border-accent/40 bg-accent/10 text-ink'
-                                : 'border-border text-muted opacity-60'
+                                : 'text-muted opacity-60'
                           }`}
                           aria-pressed={task.status === s}
                           onClick={() =>
@@ -282,7 +282,7 @@ export function TaskDetailPanel({
                   />
                 )}
 
-                <hr className="border-border my-5" />
+                <hr className="my-5" />
 
                 {/* 附区：元信息 */}
                 <div className="space-y-4">
@@ -343,7 +343,7 @@ export function TaskDetailPanel({
 
           {/* footer */}
           {task && (
-            <footer className="border-border flex shrink-0 items-center justify-between gap-2 border-t px-5 py-3">
+            <footer className="flex shrink-0 items-center justify-between gap-2 border-t px-5 py-3">
               <button
                 type="button"
                 onClick={() => onDelete(task.slug)}

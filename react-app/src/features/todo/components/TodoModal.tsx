@@ -62,7 +62,7 @@ export function TodoModal({
               mass: 0.8,
             }}
             onClick={(e) => e.stopPropagation()}
-            className={`bg-page border-border/60 relative max-h-[85vh] w-full overflow-hidden rounded-2xl border shadow-2xl ${SIZE_CLASS[size]}`}
+            className={`bg-page /60 relative max-h-[85vh] w-full overflow-hidden rounded-2xl border shadow-2xl ${SIZE_CLASS[size]}`}
             role="dialog"
             aria-modal="true"
           >

@@ -124,7 +124,7 @@ export default function ChangelogView() {
                 }`}
               >
                 <div className="-mx-8 w-full max-sm:mx-0 md:w-1/2">
-                  <div className="group squircle border-border bg-page/80 cursor-pointer border p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl max-sm:p-4 md:p-8">
+                  <div className="group squircle bg-page/80 cursor-pointer border p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl max-sm:p-4 md:p-8">
                     <div className="mb-4 flex flex-wrap items-center gap-3 max-sm:gap-2">
                       <span className="inline-flex items-center gap-2 rounded-full bg-linear-to-r from-blue-500 to-cyan-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-blue-500/25 max-sm:px-3 max-sm:py-1 max-sm:text-xs">
                         <svg

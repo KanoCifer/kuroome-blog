@@ -29,7 +29,7 @@
           · shadow-* 用 inline 覆盖全局 :where([class~='border']) 的硬阴影
         -->
         <div
-          class="bg-page border-border/60 relative z-10 mx-4 my-6 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
+          class="bg-page /60 relative z-10 mx-4 my-6 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
           :style="DRAWER_SHADOW"
           role="dialog"
           aria-modal="true"

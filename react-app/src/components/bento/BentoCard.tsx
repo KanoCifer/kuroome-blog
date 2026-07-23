@@ -11,7 +11,7 @@ interface BentoCardProps {
 export function BentoCard({ children, className, onClick }: BentoCardProps) {
   return (
     <div
-      className={`squircle border-border/50 bg-card border p-6 ${className || ''}`}
+      className={`squircle /50 bg-card border p-6 ${className || ''}`}
       onClick={onClick}
       style={{
         boxShadow:

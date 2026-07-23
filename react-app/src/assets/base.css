@@ -83,7 +83,7 @@ html::-webkit-scrollbar {
     @apply min-h-screen;
   }
   * {
-    @apply border-border outline-ring/50;
+    @apply outline-ring/50;
   }
 }
 @theme {
@@ -162,7 +162,7 @@ footer {
   --color-muted: var(--muted-text);
 
   /* Border */
-  --color-border: var(--border-color);
+  --color-border: var(--border);
   --color-input: var(--secondary);
   --color-ring: var(--accent-slate);
 
@@ -192,7 +192,7 @@ footer {
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply outline-ring/50;
   }
   body {
     @apply bg-page text-ink;

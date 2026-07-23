@@ -4,13 +4,15 @@
     --ink: oklch(0.2 0.018 225);
     --page: oklch(0.97 0.01 225);
     --secondary: oklch(0.92 0.018 225);
-    --border: oklch(0.88 0.016 225);
+    --border: oklch(0.88 0.02 225);
+    --contrast: oklch(0.97 0.018 50);
+
     --muted-text: oklch(0.42 0.013 225);
     --accent-slate: oklch(0.5 0.04 225);
     --accent-rose: oklch(0.58 0.1 18);
     --accent: oklch(0.5 0.06 225);
-    --card: oklch(0.99 0.008 225);
-    --surface: oklch(0.97 0.01 225 / 0.75);
+    --card: oklch(0.93 0.015 225);
+    --surface: oklch(0.94 0.015 225 / 0.75);
     --chart-1: oklch(0.5 0.06 225);
     --chart-2: oklch(0.55 0.08 165);
     --chart-3: oklch(0.65 0.08 60);

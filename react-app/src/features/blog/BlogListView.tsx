@@ -245,7 +245,7 @@ export default function BlogListView() {
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder="在字里行间，寻一句心动…"
               aria-label="搜索文章"
-              className="text-ink placeholder:text-muted/70 focus:border-accent focus:ring-accent/20 border-border bg-page w-full rounded-xl border py-3 pr-10 pl-10 font-serif text-sm placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+              className="text-ink placeholder:text-muted/70 focus:border-accent focus:ring-accent/20 bg-page w-full rounded-xl border py-3 pr-10 pl-10 font-serif text-sm placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             />
             {searchQuery && (
               <button
@@ -278,7 +278,7 @@ export default function BlogListView() {
             {activeTag && (
               <button
                 type="button"
-                className="border-border bg-page text-muted hover:bg-surface hover:text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+                className="bg-page text-muted hover:bg-surface hover:text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
                 onClick={handleResetFilter}
               >
                 <span className="text-ink/70 font-serif italic">#</span>
@@ -390,7 +390,7 @@ export default function BlogListView() {
             {/* Pagination: 统一算法，gap ≥ 2 时自动插入省略号 */}
             {!isLoading && !error && pagination && pagination.pages > 1 && (
               <nav className="mt-10" aria-label="博客分页">
-                <ul className="border-border/80 bg-page/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2">
+                <ul className="/80 bg-page/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2">
                   <li>
                     <button
                       type="button"
@@ -483,7 +483,7 @@ export default function BlogListView() {
         {/* ──────────────────────────────────────────────────────────── -->
         {/* 底部装饰：ka·no·ci·fer */}
         {/* ──────────────────────────────────────────────────────────── */}
-        <div className="text-muted border-border/50 mt-12 flex items-center justify-between border-t pt-4 font-mono text-[10px] tracking-[0.2em] uppercase">
+        <div className="text-muted /50 mt-12 flex items-center justify-between border-t pt-4 font-mono text-[10px] tracking-[0.2em] uppercase">
           <span>Essays · 卷一</span>
           <span className="font-serif tracking-normal normal-case italic">
             ka·no·ci·fer

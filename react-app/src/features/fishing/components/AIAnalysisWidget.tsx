@@ -52,7 +52,7 @@ function renderMarkdown(content: string): string {
  *
  * 嵌入模式 (drawer / sheet 内): 流式布局, 顶部 status chip, 主体内容区, 底部 model select + 主按钮。
  * 浮层模式 (默认): 一个 flat solid FAB (没有 blob orbs / 没有渐变装饰),
- * 卡片表面 `bg-page border-border/40 shadow-sm`, 不使用 AI bento 的
+ * 卡片表面 `bg-page /40 shadow-sm`, 不使用 AI bento 的
  * `from-indigo-300/30 ... blur-2xl` 装饰光晕 (DESIGN.md §6 显式禁止)。
  */
 export function AIAnalysisWidget({
@@ -219,11 +219,11 @@ export function AIAnalysisWidget({
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.96, y: 12 }}
                 transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-                className="bg-page border-border/40 w-[90vw] max-w-sm overflow-hidden rounded-3xl border shadow-xl"
+                className="bg-page /40 w-[90vw] max-w-sm overflow-hidden rounded-3xl border shadow-xl"
                 role="dialog"
                 aria-label="AI 天气分析"
               >
-                <div className="border-border/60 flex items-start justify-between gap-3 border-b px-4 py-3">
+                <div className="/60 flex items-start justify-between gap-3 border-b px-4 py-3">
                   <div>
                     <h3 className="text-ink text-sm font-semibold tracking-tight">
                       AI 天气分析

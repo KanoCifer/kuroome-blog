@@ -1,6 +1,6 @@
 <template>
   <article
-    class="bg-surface/80 border-border group hover:bg-surface flex flex-col gap-2 rounded-xl border p-3 transition-[background-color,transform,opacity] duration-200"
+    class="bg-surface/80 group hover:bg-surface flex flex-col gap-2 rounded-xl border p-3 transition-[background-color,transform,opacity] duration-200"
     :class="[
       isDragging ? 'cursor-grabbing opacity-50' : 'cursor-grab',
       done ? 'opacity-70' : '',
@@ -43,7 +43,7 @@
       <KindBadge v-if="task.kind === 'subtask'" :kind="task.kind" />
       <span
         v-if="task.scope"
-        class="text-muted border-border rounded-full border px-1.5 py-px text-[10px]"
+        class="text-muted rounded-full border px-1.5 py-px text-[10px]"
       >
         {{ task.scope }}
       </span>

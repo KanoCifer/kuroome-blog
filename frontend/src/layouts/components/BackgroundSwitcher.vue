@@ -23,7 +23,7 @@
     <DropdownTransition>
       <div
         v-if="isOpen"
-        class="border-border bg-page absolute top-full right-0 z-9999 mt-2 w-48 rounded-lg shadow-lg"
+        class="bg-page absolute top-full right-0 z-9999 mt-2 w-48 rounded-lg shadow-lg"
         @click.stop
       >
         <!-- Random 选项 -->
@@ -67,7 +67,7 @@
           </svg>
         </button>
 
-        <div class="border-border mx-2 border-t" />
+        <div class="mx-2 border-t" />
 
         <div class="max-h-60 overflow-y-auto">
           <button

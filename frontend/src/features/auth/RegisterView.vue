@@ -179,7 +179,7 @@ const handleSubmit = async () => {
             type="text"
             autocomplete="off"
             placeholder="username"
-            class="form-control border-border bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="form-control bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.username,
@@ -219,7 +219,7 @@ const handleSubmit = async () => {
             type="email"
             autocomplete="off"
             placeholder="email"
-            class="form-control border-border bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="form-control bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.email,
@@ -259,7 +259,7 @@ const handleSubmit = async () => {
             type="password"
             autocomplete="off"
             placeholder="password"
-            class="form-control border-border bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="form-control bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.password,
@@ -299,7 +299,7 @@ const handleSubmit = async () => {
             type="password"
             autocomplete="off"
             placeholder="confirm password"
-            class="form-control border-border bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="form-control bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.confirmPassword,
@@ -339,7 +339,7 @@ const handleSubmit = async () => {
             type="text"
             autocomplete="off"
             placeholder="email code"
-            class="form-control border-border bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-24 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="form-control bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-24 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.emailCode,

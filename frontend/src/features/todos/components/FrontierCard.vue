@@ -1,6 +1,6 @@
 <template>
   <article
-    class="bg-page border-border group flex flex-col rounded-3xl border p-4 shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent),0_18px_32px_color-mix(in_oklch,var(--ink)_8%,transparent)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_2px_2px_color-mix(in_oklch,var(--ink)_7%,transparent),0_10px_22px_color-mix(in_oklch,var(--ink)_12%,transparent),0_24px_40px_color-mix(in_oklch,var(--ink)_10%,transparent)]"
+    class="bg-page group flex flex-col rounded-3xl border p-4 shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent),0_18px_32px_color-mix(in_oklch,var(--ink)_8%,transparent)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_2px_2px_color-mix(in_oklch,var(--ink)_7%,transparent),0_10px_22px_color-mix(in_oklch,var(--ink)_12%,transparent),0_24px_40px_color-mix(in_oklch,var(--ink)_10%,transparent)]"
   >
     <!-- open affordance: a real button wrapping the content area (no nested interactives) -->
     <button
@@ -16,7 +16,7 @@
         <KindBadge :kind="task.kind" />
         <span
           v-if="task.scope"
-          class="text-muted border-border rounded-full border px-1.5 py-px text-[10px]"
+          class="text-muted rounded-full border px-1.5 py-px text-[10px]"
         >
           {{ task.scope }}
         </span>

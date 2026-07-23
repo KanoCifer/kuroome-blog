@@ -40,7 +40,7 @@ const goToChangelog = () => {
     >
       <div
         v-if="showToast"
-        class="group border-border bg-page/95 fixed bottom-6 left-4 z-50 w-[300px] overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-xl sm:bottom-8 sm:left-8"
+        class="group bg-page/95 fixed bottom-6 left-4 z-50 w-[300px] overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-xl sm:bottom-8 sm:left-8"
       >
         <div class="relative px-4 py-4">
           <!-- 关闭按钮 -->
@@ -121,7 +121,7 @@ const goToChangelog = () => {
           <!-- CTA 按钮：hover 流光 -->
           <button
             @click="goToChangelog"
-            class="group/btn bg-accent text-ink hover:bg-accent/90 relative mt-3 flex w-full items-center justify-center gap-1.5 overflow-hidden rounded-xl py-2 text-xs font-medium shadow-sm transition-all duration-300 hover:shadow-md active:scale-[0.97]"
+            class="group/btn bg-accent text-contrast hover:bg-accent/90 relative mt-3 flex w-full items-center justify-center gap-1.5 overflow-hidden rounded-xl py-2 text-xs font-medium shadow-sm transition-all duration-300 hover:shadow-md active:scale-[0.97]"
           >
             <span class="relative z-10">查看更新日志</span>
             <svg

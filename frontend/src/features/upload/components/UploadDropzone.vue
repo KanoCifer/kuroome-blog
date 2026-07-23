@@ -93,7 +93,7 @@ const onDrop = (event: DragEvent) => {
     role="button"
     :tabindex="disabled ? -1 : 0"
     :aria-disabled="disabled"
-    class="group border-border bg-surface/40 text-ink hover:border-muted-foreground hover:bg-surface relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-10 text-center transition-all select-none"
+    class="group bg-surface/40 text-ink hover:border-muted-foreground hover:bg-surface relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-10 text-center transition-all select-none"
     :class="[
       isDragging ? 'border-ink bg-surface scale-[0.99]' : '',
       disabled ? 'cursor-not-allowed opacity-60' : '',

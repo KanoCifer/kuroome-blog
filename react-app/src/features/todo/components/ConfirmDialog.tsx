@@ -76,7 +76,7 @@ export function ConfirmDialog({
               mass: 0.8,
             }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-page border-border/60 w-full max-w-[420px] rounded-2xl border p-6 shadow-2xl"
+            className="bg-page /60 w-full max-w-[420px] rounded-2xl border p-6 shadow-2xl"
             role="alertdialog"
             aria-modal="true"
           >

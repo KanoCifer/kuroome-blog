@@ -174,7 +174,7 @@ defineOptions({
 
 <template>
   <div
-    class="border-border bg-card/70 text-ink space-y-6 rounded-xl border p-5 shadow-sm backdrop-blur"
+    class="bg-card/70 text-ink space-y-6 rounded-xl border p-5 shadow-sm backdrop-blur"
   >
     <div>
       <h3 class="text-ink text-sm font-semibold tracking-wider uppercase">
@@ -267,12 +267,12 @@ defineOptions({
           v-for="p in presets"
           :key="p.scheme"
           type="button"
-          class="border-border bg-card/40 hover:bg-card/70 group flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-left transition-colors"
+          class="bg-card/40 hover:bg-card/70 group flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-left transition-colors"
           :title="`应用 ${p.scheme} 主题的 --accent`"
           @click="applyPreset(p)"
         >
           <span
-            class="border-border/60 h-5 w-5 shrink-0 rounded border shadow-inner"
+            class="/60 h-5 w-5 shrink-0 rounded border shadow-inner"
             :style="{ background: p.hex }"
             aria-hidden="true"
           />

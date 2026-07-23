@@ -34,7 +34,7 @@
             type="search"
             placeholder="在字里行间，寻一句心动…"
             aria-label="搜索文章"
-            class="text-ink placeholder:text-muted/70 focus:border-accent focus:ring-accent/20 border-border bg-page w-full rounded-xl border py-3 pr-10 pl-10 font-serif text-sm placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="text-ink placeholder:text-muted/70 focus:border-accent focus:ring-accent/20 bg-page w-full rounded-xl border py-3 pr-10 pl-10 font-serif text-sm placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             @keyup.enter="handleSearch"
           />
           <button
@@ -67,7 +67,7 @@
           <button
             v-if="activeTag"
             type="button"
-            class="border-border bg-page text-muted hover:bg-surface hover:text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+            class="bg-page text-muted hover:bg-surface hover:text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
             @click="handleResetFilter"
           >
             <span class="text-ink/70 font-serif italic">#</span>
@@ -89,26 +89,13 @@
             </svg>
             <span class="sr-only">清除分类筛选</span>
           </button>
-          <router-link
-            v-if="user.isAuthenticated"
-            to="/blog/new"
-            class="bg-accent text-ink hover:bg-accent/90 focus-visible:ring-ring inline-flex w-fit items-center rounded-lg px-4 py-2 text-sm font-semibold shadow-sm focus-visible:ring-2 focus-visible:ring-offset-2"
+          <UiButton
+            variant="default"
+            @click="$router.push('/blog/new')"
+            size="md"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="mr-2 h-4 w-4"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                clip-rule="evenodd"
-              />
-            </svg>
             写一篇
-          </router-link>
+          </UiButton>
         </div>
       </div>
 
@@ -172,7 +159,7 @@
             v-if="isLoading"
             role="status"
             aria-live="polite"
-            class="border-border bg-page/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center"
+            class="bg-page/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center"
           >
             <div
               class="border-accent/20 border-t-accent mb-5 h-12 w-12 animate-spin rounded-full border-4"
@@ -218,7 +205,7 @@
 
           <div
             v-else-if="posts.length === 0"
-            class="border-border bg-page/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center"
+            class="bg-page/50 flex flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-20 text-center"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -249,7 +236,7 @@
               <button
                 v-if="activeTag"
                 type="button"
-                class="border-border text-muted hover:bg-surface hover:text-ink rounded-lg border px-4 py-2 text-sm font-medium"
+                class="text-muted hover:bg-surface hover:text-ink rounded-lg border px-4 py-2 text-sm font-medium"
                 @click="handleResetFilter"
               >
                 翻看全卷
@@ -290,7 +277,7 @@
             aria-label="博客分页"
           >
             <ul
-              class="border-border/80 bg-page/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2"
+              class="/80 bg-page/90 mx-auto inline-flex w-full max-w-full items-center justify-center gap-1 rounded-2xl border p-1.5 shadow-sm backdrop-blur-sm sm:w-fit sm:gap-2"
             >
               <li>
                 <button
@@ -403,7 +390,7 @@
       <!--  底部装饰：与 SettingsModal · ka·no·ci·fer 对齐              -->
       <!-- ──────────────────────────────────────────────────────────── -->
       <div
-        class="text-muted border-border/50 mt-12 flex items-center justify-between border-t pt-4 font-mono text-[10px] tracking-[0.2em] uppercase"
+        class="text-muted /50 mt-12 flex items-center justify-between border-t pt-4 font-mono text-[10px] tracking-[0.2em] uppercase"
       >
         <span>Essays · 卷一</span>
         <span class="font-serif tracking-normal normal-case italic"
@@ -427,6 +414,7 @@ import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import BentoCategory from './components/BentoCategory.vue';
 import BlogListItem from './components/BlogListItem.vue';
+import { Button as UiButton } from '@/components';
 
 const route = useRoute();
 const router = useRouter();

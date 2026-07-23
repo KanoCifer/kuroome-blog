@@ -58,7 +58,9 @@
 
     <!-- 用户名 -->
     <div class="flex items-baseline gap-2">
-      <span class="text-ink dark:text-ink font-serif text-2xl font-bold">
+      <span
+        class="text-ink dark:text-ink font-serif text-2xl font-bold whitespace-nowrap"
+      >
         {{ currentUserName }}
       </span>
       <ChevronDownIcon

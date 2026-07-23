@@ -34,12 +34,12 @@ const copyValue = async () => {
 <template>
   <button
     type="button"
-    class="border-border bg-card/40 hover:bg-card/70 group flex w-full items-center gap-3 rounded-md border px-3 py-2 text-left transition-colors"
+    class="bg-card/40 hover:bg-card/70 group flex w-full items-center gap-3 rounded-md border px-3 py-2 text-left transition-colors"
     :title="`点击复制 ${value}`"
     @click="copyValue"
   >
     <span
-      class="border-border/60 h-8 w-8 shrink-0 rounded-md border shadow-inner"
+      class="/60 h-8 w-8 shrink-0 rounded-md border shadow-inner"
       :style="swatchStyle"
     />
     <span class="flex min-w-0 flex-1 flex-col gap-0.5">

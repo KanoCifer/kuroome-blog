@@ -18,7 +18,7 @@ const emit = defineEmits<{
 
 <template>
   <section
-    class="border-border/80 bg-page rounded-[28px] border p-7 shadow-[0_24px_70px_-34px_rgba(15,23,42,0.45)] backdrop-blur"
+    class="/80 bg-page rounded-[28px] border p-7 shadow-[0_24px_70px_-34px_rgba(15,23,42,0.45)] backdrop-blur"
   >
     <div class="flex flex-wrap items-start justify-between gap-5">
       <div class="max-w-3xl">
@@ -37,7 +37,7 @@ const emit = defineEmits<{
         <button
           type="button"
           :disabled="isLoading || isRefreshing"
-          class="border-border bg-page text-ink hover:bg-surface inline-flex items-center rounded-xl border px-4 py-2.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60"
+          class="bg-page text-ink hover:bg-surface inline-flex items-center rounded-xl border px-4 py-2.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60"
           @click="emit('refresh')"
         >
           {{ isRefreshing ? '刷新中...' : '刷新列表' }}
@@ -51,7 +51,7 @@ const emit = defineEmits<{
         </button>
         <RouterLink
           to="/device-tracker"
-          class="border-border bg-page text-ink hover:bg-surface inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition"
+          class="bg-page text-ink hover:bg-surface inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -73,7 +73,7 @@ const emit = defineEmits<{
     </div>
 
     <div class="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-      <article class="border-border/80 bg-page/70 rounded-2xl border p-4">
+      <article class="/80 bg-page/70 rounded-2xl border p-4">
         <p class="text-muted text-xs">总订阅数</p>
         <p class="text-ink mt-2 text-2xl font-semibold">
           {{ totalCount }}

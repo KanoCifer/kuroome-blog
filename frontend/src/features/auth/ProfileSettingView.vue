@@ -251,9 +251,7 @@ onMounted(() => {
 
     <div class="mb-8 flex flex-col items-center gap-3">
       <div class="group relative">
-        <div
-          class="border-border h-24 w-24 overflow-hidden rounded-full border-4 shadow-lg"
-        >
+        <div class="h-24 w-24 overflow-hidden rounded-full border-4 shadow-lg">
           <img
             :src="avatarUrl"
             alt="Avatar"
@@ -290,7 +288,7 @@ onMounted(() => {
             type="text"
             autocomplete="off"
             placeholder="display name"
-            class="border-border bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.name,
@@ -318,7 +316,7 @@ onMounted(() => {
             type="text"
             autocomplete="off"
             placeholder="username"
-            class="border-border bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.username,
@@ -349,7 +347,7 @@ onMounted(() => {
               @click="toggleGender('male')"
             />
             <div
-              class="border-border bg-surface peer-checked:border-accent peer-checked:bg-accent/10 peer-checked:shadow-accent/10 hover:border-accent/30 flex items-center justify-center rounded-xl border-2 px-4 py-2.5 transition-all duration-200 select-none group-active:scale-95"
+              class="bg-surface peer-checked:border-accent peer-checked:bg-accent/10 peer-checked:shadow-accent/10 hover:border-accent/30 flex items-center justify-center rounded-xl border-2 px-4 py-2.5 transition-all duration-200 select-none group-active:scale-95"
             >
               <span
                 class="text-muted peer-checked:text-ink text-sm font-bold transition-colors"
@@ -366,7 +364,7 @@ onMounted(() => {
               @click="toggleGender('female')"
             />
             <div
-              class="border-border bg-surface peer-checked:border-accent peer-checked:bg-accent/10 peer-checked:shadow-accent/10 hover:border-accent/30 flex items-center justify-center rounded-xl border-2 px-4 py-2.5 transition-all duration-200 select-none group-active:scale-95"
+              class="bg-surface peer-checked:border-accent peer-checked:bg-accent/10 peer-checked:shadow-accent/10 hover:border-accent/30 flex items-center justify-center rounded-xl border-2 px-4 py-2.5 transition-all duration-200 select-none group-active:scale-95"
             >
               <span
                 class="text-muted peer-checked:text-ink text-sm font-bold transition-colors"
@@ -389,7 +387,7 @@ onMounted(() => {
             type="email"
             autocomplete="off"
             placeholder="email"
-            class="border-border bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.email,
@@ -417,7 +415,7 @@ onMounted(() => {
             type="tel"
             autocomplete="off"
             placeholder="mobile"
-            class="border-border bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.mobile,
@@ -445,7 +443,7 @@ onMounted(() => {
             type="password"
             autocomplete="off"
             placeholder="new password (leave empty to keep current)"
-            class="border-border bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.password,
@@ -488,7 +486,7 @@ onMounted(() => {
 
     <div class="relative mt-8">
       <div class="absolute inset-0 flex items-center">
-        <span class="border-border w-full border-t"></span>
+        <span class="w-full border-t"></span>
       </div>
       <div class="relative flex justify-center text-xs uppercase">
         <span class="bg-page text-muted px-2"> Security </span>
@@ -553,7 +551,7 @@ onMounted(() => {
 
     <div class="relative mt-8">
       <div class="absolute inset-0 flex items-center">
-        <span class="border-border w-full border-t"></span>
+        <span class="w-full border-t"></span>
       </div>
       <div class="relative flex justify-center text-xs uppercase">
         <span class="bg-page text-muted px-2"> Connected Accounts </span>

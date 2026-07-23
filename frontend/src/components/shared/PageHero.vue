@@ -49,7 +49,7 @@ const heightClass = computed(() =>
       <button
         v-if="back"
         type="button"
-        class="border-border bg-page/60 hover:bg-surface flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
+        class="bg-page/60 hover:bg-secondary flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
         aria-label="返回"
         @click="goBack(backFallback)"
       >

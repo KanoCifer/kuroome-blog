@@ -33,7 +33,7 @@ export function FishingAnalysisDrawer({
         lockScroll
         renderHeader={() => (
           <header className="shrink-0 px-5 pt-3 pb-4">
-            <div className="border-border/60 flex items-center justify-between border-b px-0 pb-3">
+            <div className="/60 flex items-center justify-between border-b px-0 pb-3">
               <div>
                 <h1 className="text-ink font-family-averia text-lg">AI 分析</h1>
                 <p className="text-muted mt-0.5 text-xs">
@@ -86,7 +86,7 @@ export function FishingAnalysisDrawer({
       lockScroll
       renderHeader={() => (
         <header className="shrink-0 px-5 pt-3 pb-4">
-          <div className="border-border/60 flex items-center justify-between border-b px-0 pb-3">
+          <div className="/60 flex items-center justify-between border-b px-0 pb-3">
             <div>
               <h2 className="text-ink text-base font-semibold">AI 分析</h2>
               <p className="text-muted mt-0.5 text-xs">

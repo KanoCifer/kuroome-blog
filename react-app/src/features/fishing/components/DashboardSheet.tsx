@@ -144,7 +144,7 @@ export function DashboardSheet({
       animate={{ y: 0 }}
       transition={SPRING.modal}
       style={{ height: heightMV }}
-      className="bg-page border-border/40 fixed inset-x-0 bottom-0 z-30 flex flex-col overflow-hidden rounded-t-3xl border-t shadow-[0_-8px_28px_color-mix(in_oklch,var(--ink)_10%,transparent)]"
+      className="bg-page /40 fixed inset-x-0 bottom-0 z-30 flex flex-col overflow-hidden rounded-t-3xl border-t shadow-[0_-8px_28px_color-mix(in_oklch,var(--ink)_10%,transparent)]"
     >
       {/* Drag handle */}
       <div

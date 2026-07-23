@@ -21,5 +21,5 @@ const TYPE_CLASS: Record<DevTaskType, string> = {
   技术债: 'border-chart-2/40 bg-chart-2/10 text-chart-2',
 };
 
-const cls = TYPE_CLASS[props.type] ?? 'border-border text-muted';
+const cls = TYPE_CLASS[props.type] ?? ' text-muted';
 </script>

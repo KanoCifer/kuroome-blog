@@ -1,6 +1,6 @@
 <template>
   <div
-    class="border-border/40 bg-page/60 mx-auto flex max-w-md flex-col items-center gap-4 rounded-2xl border border-dashed px-6 py-12 text-center"
+    class="/40 bg-page/60 mx-auto flex max-w-md flex-col items-center gap-4 rounded-2xl border border-dashed px-6 py-12 text-center"
   >
     <div
       class="bg-surface text-muted flex h-12 w-12 items-center justify-center rounded-full"

@@ -51,7 +51,7 @@
     class="flex justify-center py-12"
   >
     <div
-      class="bg-page border-border w-full max-w-md rounded-2xl border p-8 text-center shadow-sm"
+      class="bg-card w-full max-w-md rounded-2xl border p-8 text-center shadow-sm"
     >
       <div
         class="bg-destructive/10 text-destructive mx-auto mb-5 flex size-12 items-center justify-center rounded-full"
@@ -99,9 +99,7 @@
     data-testid="shelf-state-empty"
     class="flex justify-center py-12"
   >
-    <div
-      class="bg-page border-border w-full max-w-md rounded-2xl border p-10 text-center"
-    >
+    <div class="bg-card w-full max-w-md rounded-2xl border p-10 text-center">
       <svg
         viewBox="0 0 88 64"
         class="text-muted/50 mx-auto mb-6 h-20"

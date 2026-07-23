@@ -30,7 +30,7 @@
             <button
               type="button"
               @click="toggleCollapsed"
-              class="bg-surface text-ink hover:bg-surface/80 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors"
+              class="bg-card text-ink hover:bg-secondary rounded-xl px-3 py-1.5 text-xs font-medium transition-colors"
               :aria-expanded="!collapsed"
               aria-controls="server-monitor-detail"
             >
@@ -39,7 +39,7 @@
             <button
               type="button"
               @click="toggleAutoRefresh"
-              class="bg-surface text-ink hover:bg-surface/80 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors"
+              class="bg-card text-ink hover:bg-secondary rounded-xl px-3 py-1.5 text-xs font-medium transition-colors"
             >
               {{ isSSEConnected ? '暂停' : '开始' }} 自动刷新
             </button>
@@ -47,9 +47,7 @@
         </div>
 
         <!-- Server Status — single card, three cells -->
-        <div
-          class="border-border/60 bg-page mt-4 overflow-hidden rounded-2xl border p-6"
-        >
+        <div class="bg-card mt-4 overflow-hidden rounded-2xl border p-6">
           <div
             class="grid grid-cols-1 divide-y lg:grid-cols-3 lg:divide-x lg:divide-y-0"
           >
@@ -198,9 +196,7 @@
         </div>
 
         <!-- Server History Chart -->
-        <div
-          class="border-border/60 bg-page mt-4 overflow-hidden rounded-2xl border p-6"
-        >
+        <div class="bg-card mt-4 overflow-hidden rounded-2xl border p-6">
           <h3 class="text-ink mb-4 flex items-center gap-2 text-sm font-medium">
             <svg
               class="h-4 w-4"
@@ -447,7 +443,7 @@ const getStatusColor = (percent: number): string => {
 
 // ---- layout helpers ----------------------------------------------------
 const cardClass = computed(() =>
-  ['border-border/60 bg-page border p-5 rounded-3xl', props.customClass || '']
+  [' bg-card border p-5 rounded-3xl', props.customClass || '']
     .filter(Boolean)
     .join(' '),
 );

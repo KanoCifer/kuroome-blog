@@ -155,7 +155,7 @@ const setTheme = (value: ThemeChoice) => themeStore.setTheme(value);
             Theme
           </span>
           <div
-            class="border-border bg-card/50 inline-flex items-center gap-1 rounded-lg border p-1 backdrop-blur"
+            class="bg-card/50 inline-flex items-center gap-1 rounded-lg border p-1 backdrop-blur"
             role="tablist"
             aria-label="切换主题"
           >
@@ -206,7 +206,7 @@ const setTheme = (value: ThemeChoice) => themeStore.setTheme(value);
 
     <section class="mx-auto mt-12 max-w-6xl px-6 md:px-10">
       <div
-        class="border-border bg-card/40 text-muted rounded-lg border px-5 py-4 text-sm leading-relaxed backdrop-blur"
+        class="bg-card/40 text-muted rounded-lg border px-5 py-4 text-sm leading-relaxed backdrop-blur"
       >
         💡
         <strong class="text-ink">怎么用</strong>

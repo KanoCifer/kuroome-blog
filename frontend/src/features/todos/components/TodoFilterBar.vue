@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-surface flex flex-wrap items-center gap-2 rounded-xl px-4 py-3"
+    class="bg-secondary flex flex-wrap items-center gap-2 rounded-xl px-4 py-3"
     role="group"
     aria-label="筛选条件"
   >
@@ -12,7 +12,7 @@
       :class="
         filterType.has(t)
           ? 'border-accent/40 bg-accent/10 text-ink'
-          : 'border-border text-muted hover:text-ink'
+          : 'text-muted hover:text-ink'
       "
       :aria-pressed="filterType.has(t)"
       @click="$emit('toggle', { key: 'type', value: t })"
@@ -30,7 +30,7 @@
       :class="
         filterPriority.has(p)
           ? 'border-accent/40 bg-accent/10 text-ink'
-          : 'border-border text-muted hover:text-ink'
+          : 'text-muted hover:text-ink'
       "
       :aria-pressed="filterPriority.has(p)"
       @click="$emit('toggle', { key: 'priority', value: p })"
@@ -48,7 +48,7 @@
         :class="
           filterMember.has(m.userId)
             ? 'border-accent/40 bg-accent/10 text-ink'
-            : 'border-border text-muted hover:text-ink'
+            : 'text-muted hover:text-ink'
         "
         :aria-pressed="filterMember.has(m.userId)"
         :title="`仅看 ${m.label}`"
@@ -79,7 +79,7 @@
         :value="searchTerm"
         type="search"
         placeholder="搜索标题…"
-        class="border-border bg-page text-ink placeholder:text-muted/60 focus-visible:ring-ring w-32 rounded-md border px-2 py-1 text-xs focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none sm:w-40"
+        class="bg-page text-ink placeholder:text-muted/60 focus-visible:ring-ring w-32 rounded-md border px-2 py-1 text-xs focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none sm:w-40"
         @input="
           $emit('update:searchTerm', ($event.target as HTMLInputElement).value)
         "

@@ -54,7 +54,7 @@ export function BlogCover({
         : 'text-sm sm:text-[15px] line-clamp-2';
 
   return (
-    <div className="border-border/60 bg-surface relative aspect-[3/4] w-full overflow-hidden rounded-xl border">
+    <div className="/60 bg-surface relative aspect-[3/4] w-full overflow-hidden rounded-xl border">
       {/* 真实封面 */}
       {coverSrc && (
         <img

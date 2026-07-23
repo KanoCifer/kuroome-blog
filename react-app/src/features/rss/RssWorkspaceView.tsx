@@ -114,7 +114,7 @@ export default function RssWorkspaceView() {
             <button
               type="button"
               onClick={() => setShowFeedPicker((v) => !v)}
-              className="border-border bg-page hover:bg-surface ml-auto flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+              className="bg-page hover:bg-surface ml-auto flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
             >
               <span className="max-w-32 truncate">
                 {selectedFeed?.feedTitle || '全部'}
@@ -131,7 +131,7 @@ export default function RssWorkspaceView() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="border-border/60 overflow-hidden border-t"
+              className="/60 overflow-hidden border-t"
             >
               <div className="bg-page/95 mx-auto w-full max-w-md px-4 py-2">
                 <button
@@ -226,7 +226,7 @@ export default function RssWorkspaceView() {
               >
                 <Link
                   to={`/rss/articles/${article.id}`}
-                  className="bg-page border-border/60 hover:bg-surface/50 block rounded-2xl border p-4 transition-colors active:scale-[0.99]"
+                  className="bg-page /60 hover:bg-surface/50 block rounded-2xl border p-4 transition-colors active:scale-[0.99]"
                 >
                   <h2 className="text-ink text-[15px] leading-snug font-semibold">
                     {article.title || '无标题'}
@@ -258,7 +258,7 @@ export default function RssWorkspaceView() {
               type="button"
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage <= 1}
-              className="border-border text-ink disabled:text-muted flex items-center gap-1 rounded-full border px-4 py-2 font-medium transition-colors disabled:opacity-40"
+              className="text-ink disabled:text-muted flex items-center gap-1 rounded-full border px-4 py-2 font-medium transition-colors disabled:opacity-40"
             >
               上一页
             </button>
@@ -269,7 +269,7 @@ export default function RssWorkspaceView() {
               type="button"
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage >= totalPages}
-              className="border-border text-ink disabled:text-muted flex items-center gap-1 rounded-full border px-4 py-2 font-medium transition-colors disabled:opacity-40"
+              className="text-ink disabled:text-muted flex items-center gap-1 rounded-full border px-4 py-2 font-medium transition-colors disabled:opacity-40"
             >
               下一页
             </button>

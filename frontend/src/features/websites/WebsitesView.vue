@@ -5,7 +5,7 @@
       <div
         role="tablist"
         aria-label="网站分类"
-        class="border-border bg-page/40 mb-10 flex flex-wrap items-center gap-2 rounded-full border p-1.5 shadow-sm sm:mb-12"
+        class="bg-page/40 mb-10 flex flex-wrap items-center gap-2 rounded-full border p-1.5 shadow-sm sm:mb-12"
       >
         <button
           v-for="opt in filterOptions"
@@ -35,7 +35,7 @@
       <!-- 空状态 -->
       <div
         v-if="visibleSites.length === 0"
-        class="border-border bg-page/30 flex flex-col items-center justify-center rounded-4xl border py-20"
+        class="bg-page/30 flex flex-col items-center justify-center rounded-4xl border py-20"
       >
         <IconGlobeOutline class="text-muted mb-5 h-16 w-16" />
         <p class="text-ink font-serif text-lg">这个抽屉还没添东西。</p>
@@ -88,7 +88,7 @@
             :href="site.url"
             target="_blank"
             rel="noopener noreferrer"
-            class="group border-border bg-page/40 hover:border-accent/40 hover:bg-page/60 focus-visible:ring-ring relative block cursor-pointer overflow-hidden rounded-3xl border p-6 shadow-sm transition-[background-color,border-color,box-shadow] duration-300 hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+            class="group bg-page/40 hover:border-accent/40 hover:bg-page/60 focus-visible:ring-ring relative block cursor-pointer overflow-hidden rounded-3xl border p-6 shadow-sm transition-[background-color,border-color,box-shadow] duration-300 hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
             <!-- 顶部：图标 + 名称 + 分类 chip -->
             <div class="mb-4 flex items-start gap-3">

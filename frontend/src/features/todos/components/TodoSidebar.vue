@@ -1,7 +1,7 @@
 <template>
   <aside
     :class="[
-      'border-border sidebar-collapse-transition top-16 hidden shrink-0 space-y-1 self-start border-r px-4 py-6 lg:sticky lg:block lg:h-[calc(100vh-4rem)]',
+      'sidebar-collapse-transition border-border top-16 hidden shrink-0 space-y-1 self-start border-r px-4 py-6 lg:sticky lg:block lg:h-[calc(100vh-4rem)]',
       collapsed ? 'lg:w-14' : 'lg:w-60',
     ]"
   >

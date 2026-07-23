@@ -172,7 +172,7 @@ watch(
       <!-- Loading State -->
       <div v-if="isLoading" class="py-12 text-center">
         <div
-          class="border-border border-t-accent mx-auto h-8 w-8 animate-spin rounded-full border-2"
+          class="border-t-accent mx-auto h-8 w-8 animate-spin rounded-full border-2"
         ></div>
         <p class="text-muted mt-2">Loading...</p>
       </div>
@@ -252,10 +252,8 @@ watch(
         </div>
 
         <!-- Article Body -->
-        <div
-          class="border-border bg-page overflow-hidden rounded-2xl border shadow-sm"
-        >
-          <div class="border-border border-border border-b p-8">
+        <div class="bg-card overflow-hidden rounded-2xl border shadow-sm">
+          <div class="border-b p-8">
             <h1 class="text-ink mb-4 text-3xl leading-tight font-bold">
               {{ article.title }}
             </h1>

@@ -153,7 +153,7 @@ export default function TodoListView() {
   return (
     <div className="bg-page flex min-h-screen w-full flex-col">
       {/* ── page header ── */}
-      <header className="bg-page/75 border-border sticky top-0 z-10 flex flex-wrap items-end justify-between gap-3 border-b px-5 py-3 backdrop-blur-sm sm:px-8">
+      <header className="bg-page/75 sticky top-0 z-10 flex flex-wrap items-end justify-between gap-3 border-b px-5 py-3 backdrop-blur-sm sm:px-8">
         <div>
           <h1 className="text-ink ml-12 font-serif text-2xl leading-tight font-medium tracking-tight">
             开发任务
@@ -168,7 +168,7 @@ export default function TodoListView() {
             <>
               <button
                 onClick={() => setMcpTokenOpen(true)}
-                className="text-muted hover:bg-surface hover:text-ink focus-visible:ring-ring border-border inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                className="text-muted hover:bg-surface hover:text-ink focus-visible:ring-ring inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                 title="签发 MCP 服务 Token"
               >
                 <svg
@@ -190,7 +190,7 @@ export default function TodoListView() {
               <button
                 onClick={handleRefresh}
                 disabled={loading}
-                className="text-muted hover:bg-surface hover:text-ink focus-visible:ring-ring border-border inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-2 text-sm transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-50"
+                className="text-muted hover:bg-surface hover:text-ink focus-visible:ring-ring inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-2 text-sm transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-50"
                 title="刷新任务列表"
               >
                 <svg
@@ -235,7 +235,7 @@ export default function TodoListView() {
       {/* ── main content ── */}
       <div className="flex flex-1">
         {/* ── sidebar (desktop tab nav with sliding indicator) ── */}
-        <aside className="border-border top-16 hidden w-52 shrink-0 space-y-1 self-start overflow-y-auto border-r px-4 py-6 lg:sticky lg:block lg:h-[calc(100vh-4rem)] lg:w-60">
+        <aside className="top-16 hidden w-52 shrink-0 space-y-1 self-start overflow-y-auto border-r px-4 py-6 lg:sticky lg:block lg:h-[calc(100vh-4rem)] lg:w-60">
           <div className="px-3 pb-2">
             <span className="text-muted text-[10px] font-medium tracking-widest uppercase">
               工作台

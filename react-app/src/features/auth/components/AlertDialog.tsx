@@ -27,7 +27,7 @@ export function AlertDialog({
         className="bg-page/50 absolute inset-0"
         onClick={() => onOpenChange(false)}
       />
-      <div className="border-border/50 bg-page/80 relative z-10 w-full max-w-md rounded-2xl border p-6 shadow-xl backdrop-blur-xl">
+      <div className="/50 bg-page/80 relative z-10 w-full max-w-md rounded-2xl border p-6 shadow-xl backdrop-blur-xl">
         <div className="mb-4">
           <h2 className="text-ink text-xl font-bold">{title}</h2>
           <p className="text-muted mt-2 text-sm">{description}</p>

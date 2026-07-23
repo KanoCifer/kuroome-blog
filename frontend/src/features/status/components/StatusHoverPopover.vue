@@ -96,10 +96,10 @@ onBeforeUnmount(() => clearTimers());
       @mouseleave="scheduleClose"
     >
       <div
-        class="bg-page/95 supports-[backdrop-filter]:bg-page/80 border-border/60 overflow-hidden rounded-lg border shadow-xl backdrop-blur-md"
+        class="bg-page/95 supports-[backdrop-filter]:bg-page/80 /60 overflow-hidden rounded-lg border shadow-xl backdrop-blur-md"
       >
         <header
-          class="border-border/40 bg-surface/30 flex items-center gap-2.5 border-b px-3 py-2"
+          class="/40 bg-surface/30 flex items-center gap-2.5 border-b px-3 py-2"
         >
           <div class="flex items-center gap-1">
             <span class="h-2 w-2 rounded-full bg-red-400/70" />
@@ -118,7 +118,7 @@ onBeforeUnmount(() => clearTimers());
         <StatusMini />
 
         <footer
-          class="border-border/40 text-muted/70 flex items-center justify-between border-t px-3 py-1.5 font-mono text-[10px] tracking-[0.15em] uppercase"
+          class="/40 text-muted/70 flex items-center justify-between border-t px-3 py-1.5 font-mono text-[10px] tracking-[0.15em] uppercase"
         >
           <span>live preview</span>
           <span class="inline-flex items-center gap-1.5">

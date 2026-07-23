@@ -82,7 +82,7 @@ function MenuItem({ icon, label, onClick }: MenuItemProps) {
         visible: { opacity: 1, transition: { duration: 0.2 } },
         exit: { opacity: 0, transition: { duration: 0.15 } },
       }}
-      className="border-border/20 bg-page/40 flex items-center gap-3 rounded-xl border p-4 transition-transform active:scale-[0.96]"
+      className="/20 bg-page/40 flex items-center gap-3 rounded-xl border p-4 transition-transform active:scale-[0.96]"
       onClick={(e) => onClick(e)}
     >
       <span className="text-ink shrink-0">{icon}</span>

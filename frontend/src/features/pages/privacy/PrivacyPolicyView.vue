@@ -150,7 +150,7 @@ const ServiceRow = (props: {
   h(
     'li',
     {
-      class: 'bg-surface/25 border-border/60 rounded-2xl border p-4 sm:p-5',
+      class: 'bg-surface/25 /60 rounded-2xl border p-4 sm:p-5',
     },
     [
       h('div', { class: 'flex flex-wrap items-center gap-2' }, [
@@ -243,7 +243,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
       target: props.href.startsWith('http') ? '_blank' : undefined,
       rel: props.href.startsWith('http') ? 'noopener noreferrer' : undefined,
       class:
-        'bg-page border-border/60 hover:border-accent/40 group flex items-center justify-between rounded-2xl border p-4 transition-colors sm:p-5',
+        'bg-page /60 hover:border-accent/40 group flex items-center justify-between rounded-2xl border p-4 transition-colors sm:p-5',
     },
     [
       h('div', {}, [
@@ -401,9 +401,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
             title="Cookies 与本地存储"
             desc="为提供登录、主题切换、偏好记忆等必要能力，本站会在你的浏览器中写入少量持久化数据。"
           />
-          <div
-            class="bg-surface/40 border-border/70 mt-5 rounded-2xl border p-5 sm:p-6"
-          >
+          <div class="bg-surface/40 /70 mt-5 rounded-2xl border p-5 sm:p-6">
             <p class="text-ink/90">
               本站不会使用任何跨站跟踪 Cookie。
               所有写入都用于本站自身功能：身份认证、深色 / 浅色模式、用户偏好。
@@ -555,7 +553,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
           </p>
 
           <div
-            class="bg-surface/30 border-border/60 mt-6 overflow-hidden rounded-2xl border"
+            class="bg-surface/30 /60 mt-6 overflow-hidden rounded-2xl border"
           >
             <dl class="divide-border/60 divide-y text-sm">
               <RetentionRow
@@ -630,9 +628,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
             本站采取与本站规模相称的安全措施来保护你提交的信息：
           </p>
 
-          <div
-            class="bg-ink/[0.025] border-border/60 mt-6 rounded-2xl border p-5 sm:p-6"
-          >
+          <div class="bg-ink/[0.025] /60 mt-6 rounded-2xl border p-5 sm:p-6">
             <dl class="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
               <SecurityItem
                 tag="HTTPS"
@@ -810,7 +806,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
 
         <!-- ----- 文末落款 ----- -->
         <footer
-          class="text-muted border-border/60 mt-20 flex flex-col items-center gap-3 border-t pt-10 text-center"
+          class="text-muted /60 mt-20 flex flex-col items-center gap-3 border-t pt-10 text-center"
         >
           <p class="font-serif text-base italic">谢谢你读到最后。</p>
           <p class="font-mono text-[10px] tracking-[0.28em] uppercase">
@@ -850,7 +846,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
                   :class="
                     activeId === item.id
                       ? 'border-accent'
-                      : 'border-border/60 group-hover:border-ink/40'
+                      : '/60 group-hover:border-ink/40'
                   "
                 >
                   {{ item.label }}

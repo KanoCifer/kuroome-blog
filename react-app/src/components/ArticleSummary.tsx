@@ -45,7 +45,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
 
   return (
     <section
-      className={`summary-card border-border/60 bg-page/60 dark:bg-page/50 mx-4 mb-6 overflow-hidden rounded-2xl border shadow-sm transition-all${loading ? 'is-loading' : ''}`}
+      className={`summary-card /60 bg-page/60 dark:bg-page/50 mx-4 mb-6 overflow-hidden rounded-2xl border shadow-sm transition-all${loading ? 'is-loading' : ''}`}
     >
       {/* Header */}
       <div className="flex items-center justify-between gap-3 px-5 pt-4 pb-3">
@@ -90,7 +90,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
 
         <div className="flex items-center gap-2">
           <select
-            className="bg-surface/50 text-ink border-border/60 cursor-pointer rounded-lg border px-2 py-1 text-xs transition-colors outline-none"
+            className="bg-surface/50 text-ink /60 cursor-pointer rounded-lg border px-2 py-1 text-xs transition-colors outline-none"
             value={selectedModel}
             onChange={(e) => setSelectedModel(e.target.value)}
           >
@@ -111,7 +111,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
       </div>
 
       {/* Content */}
-      <div className="border-border/40 border-t px-5 pt-4 pb-5">
+      <div className="/40 border-t px-5 pt-4 pb-5">
         {summary ? (
           <div
             className="prose max-w-none"

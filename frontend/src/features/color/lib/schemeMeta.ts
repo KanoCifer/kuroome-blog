@@ -34,12 +34,11 @@ export const SCHEME_META: readonly SchemeMeta[] = [
 /** 完整 token 列表 — 顺序即在预览卡里的展示顺序 */
 export const TOKEN_META: readonly TokenMeta[] = [
   // surface
-  { name: 'paper', label: 'paper', hint: '页面底色', group: 'surface' },
-  { name: 'card-bg', label: 'card-bg', hint: '卡片底色', group: 'surface' },
+  { name: 'page', label: 'page', hint: '页面底色', group: 'surface' },
+  { name: 'card', label: 'card', hint: '卡片底色', group: 'surface' },
   { name: 'surface', label: 'surface', hint: '毛玻璃面', group: 'surface' },
-  { name: 'warm-gray', label: 'warm-gray', hint: '暖灰', group: 'surface' },
   { name: 'secondary', label: 'secondary', hint: '次级面', group: 'surface' },
-  { name: 'border-color', label: 'border', hint: '边框色', group: 'surface' },
+  { name: 'border', label: 'border', hint: '边框色', group: 'surface' },
 
   // text
   { name: 'ink', label: 'ink', hint: '正文文字', group: 'text' },
@@ -47,9 +46,24 @@ export const TOKEN_META: readonly TokenMeta[] = [
 
   // accent
   { name: 'accent', label: 'accent', hint: '主强调', group: 'accent' },
-  { name: 'accent-rose', label: 'accent-rose', hint: '玫强调', group: 'accent' },
-  { name: 'accent-slate', label: 'accent-slate', hint: '冷强调', group: 'accent' },
-  { name: 'accent-contrast', label: 'accent-contrast', hint: '强调之上文字', group: 'accent' },
+  {
+    name: 'accent-rose',
+    label: 'accent-rose',
+    hint: '玫强调',
+    group: 'accent',
+  },
+  {
+    name: 'accent-slate',
+    label: 'accent-slate',
+    hint: '冷强调',
+    group: 'accent',
+  },
+  {
+    name: 'contrast',
+    label: 'contrast',
+    hint: '强调之上文字',
+    group: 'accent',
+  },
 
   // charts
   { name: 'chart-1', label: 'chart-1', group: 'chart' },
@@ -61,7 +75,11 @@ export const TOKEN_META: readonly TokenMeta[] = [
   // gradient
   { name: 'gradient-primary-from', label: 'primary-from', group: 'gradient' },
   { name: 'gradient-primary-to', label: 'primary-to', group: 'gradient' },
-  { name: 'gradient-decorative-from', label: 'decorative-from', group: 'gradient' },
+  {
+    name: 'gradient-decorative-from',
+    label: 'decorative-from',
+    group: 'gradient',
+  },
   { name: 'gradient-decorative-to', label: 'decorative-to', group: 'gradient' },
 ] as const;
 

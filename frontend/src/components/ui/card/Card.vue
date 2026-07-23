@@ -14,7 +14,7 @@ defineOptions({
   <div
     data-slot="card"
     :class="[
-      'bg-page text-ink flex flex-col gap-6 rounded-xl border py-6 shadow-sm',
+      'bg-card text-ink flex flex-col gap-6 rounded-xl border py-6 shadow-sm',
       props.class,
     ]"
   >

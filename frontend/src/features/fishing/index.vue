@@ -45,7 +45,7 @@ onMounted(dash.init);
         class="fishing-dashboard grid grid-cols-1 gap-4 md:grid-cols-6 md:grid-rows-[minmax(420px,580px)_auto] lg:grid-cols-12"
       >
         <div
-          class="fishing-map-wrapper border-border order-2 h-[300px] overflow-hidden rounded-2xl border shadow-sm md:order-1 md:col-span-6 md:h-full lg:col-span-8"
+          class="fishing-map-wrapper order-2 h-[300px] overflow-hidden rounded-2xl border shadow-sm md:order-1 md:col-span-6 md:h-full lg:col-span-8"
         >
           <MapContainer
             ref="mapTileRef"

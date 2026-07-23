@@ -3,7 +3,7 @@
     <!-- 外层 flex 列：限制总高度，让表单区独立滚动 -->
     <div class="flex max-h-[85vh] w-full flex-col">
       <!-- ── 头部 ── -->
-      <div class="bg-page border-border border-b px-6 pt-5 pb-4">
+      <div class="bg-card border-b px-6 pt-5 pb-4">
         <div class="flex items-start gap-3">
           <span
             class="bg-accent/10 text-ink mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
@@ -44,7 +44,7 @@
             </span>
             <input
               v-model="form.title"
-              class="border-border bg-page text-ink focus:border-accent placeholder:text-muted/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+              class="bg-input text-ink focus:border-accent placeholder:text-muted/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
               placeholder="例如：重构首页响应式布局"
             />
           </label>
@@ -64,7 +64,7 @@
                 :class="
                   form.type === t
                     ? typeChipActive(t)
-                    : 'border-border text-muted hover:bg-surface'
+                    : 'text-muted hover:bg-surface'
                 "
               >
                 {{ t }}
@@ -87,7 +87,7 @@
                 :class="
                   form.priority === p
                     ? priorityChipActive(p)
-                    : 'border-border text-muted hover:bg-surface'
+                    : 'text-muted hover:bg-surface'
                 "
               >
                 {{ p }}
@@ -106,7 +106,7 @@
               >
               <input
                 v-model="form.scope"
-                class="border-border bg-page text-ink focus:border-accent placeholder:text-muted/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
+                class="bg-page text-ink focus:border-accent placeholder:text-muted/50 w-full rounded-lg border px-3 py-2 text-sm outline-none"
                 placeholder="例如：前端-React"
               />
             </div>
@@ -117,7 +117,7 @@
               <input
                 v-model="form.due_date"
                 type="date"
-                class="border-border bg-page text-ink focus:border-accent w-full cursor-pointer rounded-lg border px-3 py-2 text-sm outline-none"
+                class="bg-page text-ink focus:border-accent w-full cursor-pointer rounded-lg border px-3 py-2 text-sm outline-none"
               />
             </label>
           </div>
@@ -137,7 +137,7 @@
                 :class="
                   form.status === s
                     ? 'border-accent/40 bg-accent/10 text-ink'
-                    : 'border-border text-muted hover:bg-surface'
+                    : 'text-muted hover:bg-surface'
                 "
               >
                 {{ s }}
@@ -153,7 +153,7 @@
             <textarea
               v-model="form.description"
               rows="3"
-              class="border-border bg-page text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+              class="bg-page text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               placeholder="一两句话说清楚要做什么、为什么..."
             ></textarea>
           </label>
@@ -166,7 +166,7 @@
             <textarea
               v-model="form.detail"
               rows="6"
-              class="border-border bg-page text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+              class="bg-page text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               placeholder="实现思路、参考链接、验收标准等，可较长..."
             ></textarea>
             <span class="text-muted/60 mt-1 block text-[11px]"
@@ -185,7 +185,7 @@
             <textarea
               v-model="form.acceptance_criteria"
               rows="4"
-              class="border-border bg-page text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+              class="bg-page text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               placeholder="- 所有接口有单测覆盖&#10;- 文档同步更新&#10;- 性能基准不降级"
             ></textarea>
           </label>
@@ -201,7 +201,7 @@
             <textarea
               v-model="form.constraints"
               rows="4"
-              class="border-border bg-page text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+              class="bg-page text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               placeholder="- 不动 src/legacy/ 目录&#10;- 后端继续用 Gin，不换框架&#10;- API 响应格式保持不变"
             ></textarea>
           </label>
@@ -217,7 +217,7 @@
             <textarea
               v-model="form.context_pointers"
               rows="4"
-              class="border-border bg-page text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
+              class="bg-page text-ink focus:border-accent placeholder:text-muted/50 w-full resize-none rounded-lg border px-3 py-2 text-sm outline-none"
               placeholder="internal/auth/, docs/adr/0003, src/middleware/session.ts"
             ></textarea>
           </label>
@@ -226,7 +226,7 @@
 
       <!-- ── 底部按钮 ── -->
       <div
-        class="bg-page border-border flex shrink-0 items-center justify-between border-t px-6 pt-4 pb-5"
+        class="bg-page flex shrink-0 items-center justify-between border-t px-6 pt-4 pb-5"
       >
         <button
           v-if="form.slug"
@@ -301,7 +301,7 @@ const PRIORITY_ACTIVE: Record<DevTaskPriority, string> = {
   'P1 高':
     'border-orange-300/60 bg-orange-50 text-orange-700 dark:border-orange-700/60 dark:bg-orange-950/30 dark:text-orange-400',
   'P2 中': 'border-accent/40 bg-accent/10 text-ink',
-  'P3 低': 'border-border bg-surface text-muted',
+  'P3 低': ' bg-surface text-muted',
 };
 
 function typeChipActive(t: DevTaskType): string {

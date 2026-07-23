@@ -103,7 +103,7 @@ function onImgError(e: Event) {
     <!-- ─── List variant: 横向单行 ────────────────────────────── -->
     <div
       v-if="isList"
-      class="border-border/60 bg-page hover:bg-surface/40 hover:shadow-accent/5 flex items-center gap-3 rounded-xl border p-3 transition-all duration-300 sm:gap-4 sm:p-4"
+      class="/60 bg-page hover:bg-surface/40 hover:shadow-accent/5 flex items-center gap-3 rounded-xl border p-3 transition-all duration-300 sm:gap-4 sm:p-4"
     >
       <div
         class="bg-surface relative h-16 w-12 flex-shrink-0 overflow-hidden rounded-md shadow-sm sm:h-20 sm:w-14"

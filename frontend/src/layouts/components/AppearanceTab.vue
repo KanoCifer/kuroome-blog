@@ -36,25 +36,41 @@ const schemes: {
   {
     value: 'paper',
     label: 'Paper · 纸',
-    colors: ['#a87649', '#7a8e6b', '#5a6b7a'],
+    colors: [
+      'oklch(0.5 0.08 50)',
+      'oklch(0.97 0.013 50)',
+      'oklch(0.92 0.022 50)',
+    ],
     desc: '落纸烟云 · 3 色',
   },
   {
     value: 'sage',
     label: 'Sage',
-    colors: ['#6e8d6e', '#a89968', '#7d8a9b'],
+    colors: [
+      'oklch(0.5 0.08 145)',
+      'oklch(0.97 0.013 145)',
+      'oklch(0.92 0.022 145)',
+    ],
     desc: '清隽素雅 · 3 色',
   },
   {
     value: 'mist',
     label: 'Mist',
-    colors: ['#6c8aa4', '#7d9d8a', '#b09878'],
+    colors: [
+      'oklch(0.5 0.06 225)',
+      'oklch(0.97 0.01 225)',
+      'oklch(0.92 0.018 225)',
+    ],
     desc: '烟岚氤氲 · 3 色',
   },
   {
     value: 'blush',
     label: 'Blush',
-    colors: ['#a87180', '#7d9080', '#8a7474'],
+    colors: [
+      'oklch(0.55 0.09 355)',
+      'oklch(0.97 0.013 355)',
+      'oklch(0.92 0.022 355)',
+    ],
     desc: '桃夭未央 · 3 色',
   },
 ];
@@ -66,7 +82,7 @@ const schemes: {
  */
 const cardBase =
   'flex w-full cursor-pointer items-stretch overflow-hidden rounded-xl border transition-colors';
-const cardDefault = 'border-border bg-page hover:border-accent';
+const cardDefault = ' bg-page hover:border-accent';
 const cardActive = 'border-accent bg-accent/5 !shadow-sm';
 
 const smallCardBase =
@@ -82,7 +98,7 @@ const smallCardBase =
 
       <button
         @click="themeStore.toggleFooter()"
-        class="border-border bg-page hover:border-accent flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-3 transition-colors"
+        class="bg-page hover:border-accent flex w-full cursor-pointer items-center justify-between rounded-xl border px-4 py-3 transition-colors"
       >
         <div class="text-left">
           <div class="text-ink text-sm font-medium">显示页脚</div>
@@ -118,7 +134,7 @@ const smallCardBase =
             smallCardBase,
             themeStore.theme === theme.value
               ? cardActive
-              : 'border-border bg-page hover:border-accent',
+              : 'bg-page hover:border-accent',
           ]"
         >
           <component
@@ -151,7 +167,7 @@ const smallCardBase =
             smallCardBase,
             themeStore.font === 'default'
               ? cardActive
-              : 'border-border bg-page hover:border-accent',
+              : 'bg-page hover:border-accent',
           ]"
         >
           <span
@@ -168,7 +184,7 @@ const smallCardBase =
             smallCardBase,
             themeStore.font === 'harmonyos'
               ? cardActive
-              : 'border-border bg-page hover:border-accent',
+              : 'bg-page hover:border-accent',
           ]"
         >
           <span

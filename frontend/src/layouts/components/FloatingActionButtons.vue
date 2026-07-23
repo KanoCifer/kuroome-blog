@@ -10,7 +10,7 @@
         class="fab group bg-secondary hover:bg-accent"
         aria-label="偏好设置"
       >
-        <SettingIcon class="fab-icon text-ink group-hover:text-ink" />
+        <Settings class="fab-icon text-ink group-hover:text-contrast" />
         <span class="fab-label">偏好设置</span>
       </button>
     </div>
@@ -19,21 +19,11 @@
     <div class="fixed top-16 right-4 z-50 flex flex-col gap-2">
       <button
         @click="goToNewPost"
-        class="fab group bg-accent hover:bg-accent/90"
+        class="fab group bg-accent hover:bg-accent/90 text-contrast"
         aria-label="写文章"
       >
-        <svg
-          class="fab-icon text-ink"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path d="M12 5v14M5 12h14" />
-        </svg>
-        <span class="fab-label text-ink">新建</span>
+        <Plus class="fab-icon" />
+        <span class="fab-label">新建</span>
       </button>
     </div>
 
@@ -42,25 +32,13 @@
       <button
         @click="handleLike"
         :class="[
-          'fab group',
+          'fab group text-contrast',
           liked ? 'bg-rose-500' : 'bg-accent hover:bg-rose-500',
         ]"
         aria-label="点赞"
       >
-        <svg
-          :class="['fab-icon text-ink']"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path
-            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-          />
-        </svg>
-        <span class="fab-label text-ink">{{ likesCount }}</span>
+        <Heart class="fab-icon" :class="liked ? 'fill-current' : ''" />
+        <span class="fab-label">{{ likesCount }}</span>
       </button>
     </div>
 
@@ -71,22 +49,7 @@
         class="fab group bg-secondary hover:bg-accent"
         aria-label="友情链接"
       >
-        <svg
-          class="fab-icon text-ink group-hover:text-ink"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path
-            d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"
-          />
-          <path
-            d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"
-          />
-        </svg>
+        <Link2 class="fab-icon text-ink group-hover:text-contrast" />
         <span class="fab-label">友链</span>
       </button>
     </div>
@@ -98,21 +61,7 @@
         class="fab group bg-secondary hover:bg-accent"
         :aria-label="layoutStore.isEditing ? '退出编辑' : '编辑布局'"
       >
-        <svg
-          class="fab-icon text-ink group-hover:text-ink"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <polyline points="16 3 21 3 21 8" />
-          <line x1="4" y1="20" x2="21" y2="3" />
-          <polyline points="21 16 21 21 16 21" />
-          <line x1="15" y1="15" x2="21" y2="21" />
-          <line x1="4" y1="4" x2="9" y2="9" />
-        </svg>
+        <Pencil class="fab-icon text-ink group-hover:text-contrast" />
         <span class="fab-label">编辑布局</span>
       </button>
     </div>
@@ -124,7 +73,7 @@
         class="fab group bg-secondary hover:bg-accent"
         aria-label="切换到移动版"
       >
-        <Smartphone class="fab-icon text-ink group-hover:text-ink" />
+        <Smartphone class="fab-icon text-ink group-hover:text-contrast" />
         <span class="fab-label">移动版</span>
       </button>
     </div>
@@ -136,7 +85,7 @@
         class="fab group bg-secondary hover:bg-accent"
         aria-label="RSS"
       >
-        <Rss class="fab-icon text-ink group-hover:text-ink" />
+        <Rss class="fab-icon text-ink group-hover:text-contrast" />
         <span class="fab-label">RSS</span>
       </button>
     </div>
@@ -148,7 +97,7 @@
         class="fab group bg-secondary hover:bg-accent"
         aria-label="订阅管理"
       >
-        <CreditCard class="fab-icon text-ink group-hover:text-ink" />
+        <CreditCard class="fab-icon text-ink group-hover:text-contrast" />
         <span class="fab-label">订阅</span>
       </button>
     </div>
@@ -160,7 +109,7 @@
         class="fab group bg-secondary hover:bg-accent"
         aria-label="图片工具"
       >
-        <Wrench class="fab-icon text-ink group-hover:text-ink" />
+        <Wrench class="fab-icon text-ink group-hover:text-contrast" />
         <span class="fab-label">图片工具</span>
       </button>
     </div>
@@ -171,9 +120,18 @@
 import { socialGateway } from '@/features/blog';
 import { useCardLayoutStore } from '@/features/entry';
 import { useNotificationStore } from '@/stores';
-import { SettingIcon } from '@/components';
 import { AxiosError } from 'axios';
-import { CreditCard, Rss, Smartphone, Wrench } from '@lucide/vue';
+import {
+  CreditCard,
+  Heart,
+  Link2,
+  Pencil,
+  Plus,
+  Rss,
+  Settings,
+  Smartphone,
+  Wrench,
+} from '@lucide/vue';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 

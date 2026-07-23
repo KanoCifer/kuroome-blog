@@ -1,8 +1,5 @@
 <template>
-  <section
-    id="rss-articles"
-    class="border-border bg-page rounded-2xl border p-6"
-  >
+  <section id="rss-articles" class="bg-card rounded-2xl border p-6">
     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
       <div>
         <h2 class="text-ink text-xl font-bold">文章列表</h2>
@@ -24,7 +21,7 @@
           :value="searchQuery"
           type="search"
           placeholder="搜索文章标题和内容..."
-          class="border-border bg-page text-ink placeholder:text-muted focus:border-accent focus:ring-accent/20 w-full rounded-xl border py-3 pr-24 pl-4 text-sm focus:ring-2 focus:outline-none"
+          class="bg-page text-ink placeholder:text-muted focus:border-accent focus:ring-accent/20 w-full rounded-xl border py-3 pr-24 pl-4 text-sm focus:ring-2 focus:outline-none"
           @input="
             $emit(
               'update:searchQuery',
@@ -79,13 +76,13 @@
       <div
         v-for="skeleton in 5"
         :key="skeleton"
-        class="border-border bg-surface/40 h-24 animate-pulse rounded-xl border"
+        class="bg-surface/40 h-24 animate-pulse rounded-xl border"
       />
     </div>
 
     <div
       v-else-if="articles.length === 0"
-      class="border-border bg-surface/40 text-muted rounded-xl border border-dashed p-8 text-center text-sm"
+      class="bg-surface/40 text-muted rounded-xl border border-dashed p-8 text-center text-sm"
     >
       暂无文章，尝试刷新订阅或更换搜索条件。
     </div>
@@ -95,7 +92,7 @@
         <li
           v-for="article in articles"
           :key="article.id"
-          class="border-border bg-page hover:border-accent/30 rounded-xl border p-4 transition-all"
+          class="bg-card hover:border-accent/30 rounded-xl border p-4 transition-all"
         >
           <div class="flex flex-col gap-3">
             <div class="flex flex-wrap items-start justify-between gap-2">

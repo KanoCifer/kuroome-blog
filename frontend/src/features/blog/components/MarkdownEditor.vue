@@ -231,7 +231,7 @@ defineExpose({
 
       <!-- Toolbar -->
       <div
-        class="border-border/50 flex h-10 shrink-0 items-center justify-between border-b px-4"
+        class="/50 flex h-10 shrink-0 items-center justify-between border-b px-4"
       >
         <div class="flex items-center gap-1">
           <button
@@ -373,10 +373,7 @@ defineExpose({
       leave-from-class="opacity-100"
       leave-to-class="opacity-0 w-0"
     >
-      <div
-        v-if="showPreview"
-        class="border-border/50 bg-page/50 border-l md:w-1/2 md:pl-4"
-      >
+      <div v-if="showPreview" class="/50 bg-page/50 border-l md:w-1/2 md:pl-4">
         <div class="flex h-full flex-col">
           <div class="flex h-10 shrink-0 items-center justify-between px-4">
             <h2 class="text-muted text-xs font-medium">预览</h2>

@@ -268,7 +268,7 @@ export default function PicGalleryView() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, type: 'spring' }}
-              className="border-border/80 bg-page/70 w-full max-w-xs rounded-[2rem] border p-8 text-center shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] backdrop-blur-xl"
+              className="/80 bg-page/70 w-full max-w-xs rounded-[2rem] border p-8 text-center shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] backdrop-blur-xl"
             >
               <div className="from-accent/10 to-accent/10 text-ink mx-auto mb-6 flex h-18 w-18 items-center justify-center rounded-2xl bg-linear-to-tr shadow-inner">
                 <ImageOff className="h-9 w-9" strokeWidth={1.5} />
@@ -330,12 +330,12 @@ export default function PicGalleryView() {
 
       {canEdit && (
         <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+5.75rem)] left-1/2 z-40 w-fit -translate-x-1/2">
-          <div className="border-border/50 bg-page/85 rounded-2xl border p-2 shadow-[0_10px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl">
+          <div className="/50 bg-page/85 rounded-2xl border p-2 shadow-[0_10px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl">
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={toggleEditMode}
-                className={`border-border/70 flex h-10 items-center gap-2 rounded-xl border px-3 text-sm shadow-sm ${
+                className={`/70 flex h-10 items-center gap-2 rounded-xl border px-3 text-sm shadow-sm ${
                   isEditMode ? 'bg-accent/10 text-ink' : 'text-ink'
                 }`}
               >
@@ -408,7 +408,7 @@ export default function PicGalleryView() {
                       }
                       rows={3}
                       placeholder="输入新的描述..."
-                      className="border-border/80 bg-page text-ink placeholder-muted focus:border-ring focus:ring-ring w-full resize-none rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
+                      className="/80 bg-page text-ink placeholder-muted focus:border-ring focus:ring-ring w-full resize-none rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
                     />
                     <div className="flex justify-end gap-3 pt-1">
                       <button
@@ -477,7 +477,7 @@ export default function PicGalleryView() {
               </div>
 
               <div
-                className="border-border/80 bg-secondary/50 hover:border-border hover:bg-secondary flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-all"
+                className="/80 bg-secondary/50 hover: hover:bg-secondary flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed p-8 text-center transition-all"
                 onClick={triggerFileInput}
               >
                 <input
@@ -528,14 +528,14 @@ export default function PicGalleryView() {
                   onChange={(event) => setUploadDescription(event.target.value)}
                   type="text"
                   placeholder="为这张图片添加描述..."
-                  className="border-border/80 bg-page text-ink placeholder-muted focus:border-ring focus:ring-ring mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
+                  className="/80 bg-page text-ink placeholder-muted focus:border-ring focus:ring-ring mt-2 w-full rounded-xl border px-4 py-3 text-sm shadow-sm transition-all focus:ring-1 focus:outline-none"
                 />
               </div>
 
               <div className="mt-8 flex gap-3">
                 <button
                   type="button"
-                  className="border-border bg-page text-muted hover:bg-surface flex-1 rounded-xl border py-3 text-sm font-medium shadow-sm transition-colors"
+                  className="bg-page text-muted hover:bg-surface flex-1 rounded-xl border py-3 text-sm font-medium shadow-sm transition-colors"
                   onClick={closeUploadModal}
                 >
                   取消

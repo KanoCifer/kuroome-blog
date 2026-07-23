@@ -71,7 +71,7 @@ const isOther = computed(
   <article
     :data-color-scheme="scheme"
     :class="[
-      'border-border bg-card/80 text-ink relative flex flex-col overflow-hidden rounded-xl border shadow-sm backdrop-blur',
+      'bg-card/80 text-ink relative flex flex-col overflow-hidden rounded-xl border shadow-sm backdrop-blur',
       isDark ? 'dark' : '',
       isCurrent
         ? 'ring-2 ring-[var(--accent)] ring-offset-2 ring-offset-[var(--page)]'
@@ -94,13 +94,13 @@ const isOther = computed(
           </h3>
           <span
             v-if="isCurrent"
-            class="rounded-full bg-[var(--accent)] px-2 py-0.5 text-xs font-semibold tracking-wider text-[var(--accent)] uppercase"
+            class="bg-accent text-contrast rounded-full px-2 py-0.5 text-xs font-semibold tracking-wider uppercase"
           >
             current
           </span>
           <span
             v-if="isDark"
-            class="border-border text-muted rounded-full border bg-[var(--card-bg)] px-2 py-0.5 text-xs tracking-wider uppercase"
+            class="text-muted rounded-full border bg-[var(--card-bg)] px-2 py-0.5 text-xs tracking-wider uppercase"
           >
             dark
           </span>
@@ -116,13 +116,13 @@ const isOther = computed(
       <div class="flex flex-wrap items-center gap-2">
         <button
           type="button"
-          class="rounded-md bg-[var(--accent)] px-3 py-1.5 text-xs font-semibold text-[var(--accent)] shadow-sm"
+          class="bg-accent text-contrast rounded-md px-3 py-1.5 text-xs font-semibold shadow-sm"
         >
           Primary
         </button>
         <button
           type="button"
-          class="border-border text-ink rounded-md border px-3 py-1.5 text-xs"
+          class="text-ink rounded-md border px-3 py-1.5 text-xs"
         >
           Secondary
         </button>
@@ -132,9 +132,7 @@ const isOther = computed(
           surface
         </span>
       </div>
-      <div
-        class="border-border rounded-md border bg-[var(--card-bg)] p-3 text-xs"
-      >
+      <div class="rounded-md border bg-[var(--card-bg)] p-3 text-xs">
         <div class="text-ink font-medium">卡片标题</div>
         <div class="text-muted-text mt-1">
           muted text 用作正文段落，warm-gray 与 secondary 做底面分层。
@@ -144,7 +142,7 @@ const isOther = computed(
         <span
           v-for="n in 5"
           :key="n"
-          class="border-border/40 h-3 flex-1 rounded-full border"
+          class="/40 h-3 flex-1 rounded-full border"
           :style="{ background: `var(--chart-${n})` }"
           :aria-label="`chart-${n}`"
         />
@@ -153,7 +151,7 @@ const isOther = computed(
 
     <!-- 分组 token 列表 -->
     <div
-      class="border-border space-y-3 border-t px-5 py-4"
+      class="space-y-3 border-t px-5 py-4"
       @click="showCopied(($event.target as HTMLElement)?.textContent ?? '')"
     >
       <div v-for="g in tokensByGroup" :key="g.key">
@@ -177,7 +175,7 @@ const isOther = computed(
 
     <!-- footer：应用按钮 -->
     <footer
-      class="border-border flex items-center justify-between gap-3 border-t bg-[var(--secondary)] px-5 py-3"
+      class="flex items-center justify-between gap-3 border-t bg-[var(--secondary)] px-5 py-3"
     >
       <span class="text-muted text-xs">
         {{ isCurrent ? '正在使用此配色' : '点击应用切换全局配色' }}
@@ -189,7 +187,7 @@ const isOther = computed(
           'rounded-md px-3 py-1.5 text-xs font-semibold transition-colors',
           isCurrent
             ? 'text-muted cursor-default border border-[var(--border-color)] bg-[var(--card-bg)]'
-            : 'bg-[var(--accent)] text-[var(--accent)] hover:opacity-90',
+            : 'bg-accent text-contrast hover:opacity-90',
         ]"
         @click="apply"
       >
@@ -199,7 +197,7 @@ const isOther = computed(
 
     <span
       v-if="swatchHint"
-      class="pointer-events-none absolute right-3 bottom-16 rounded-full bg-[var(--accent)] px-2 py-0.5 text-xs font-semibold text-[var(--accent)] shadow"
+      class="bg-accent text-contrast pointer-events-none absolute right-3 bottom-16 rounded-full px-2 py-0.5 text-xs font-semibold shadow"
     >
       已复制 {{ swatchHint }}
     </span>

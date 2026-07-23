@@ -17,7 +17,7 @@ defineEmits<{
       v-for="(bg, index) in images"
       :key="bg.id"
       @click="$emit('select', index)"
-      class="border-border hover:border-accent relative overflow-hidden rounded-xl border-2 transition-all"
+      class="hover:border-accent relative overflow-hidden rounded-xl border-2 transition-all"
       :class="{ 'border-accent': selected === index }"
     >
       <img :src="bg.url" :alt="bg.name" class="h-24 w-full object-cover" />

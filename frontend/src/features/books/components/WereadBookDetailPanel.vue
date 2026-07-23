@@ -118,12 +118,12 @@ const coverGradient = computed(() =>
           :animate="{ scale: 1, y: 0, opacity: 1 }"
           :exit="{ scale: 0.97, y: 8, opacity: 0 }"
           :transition="SPRING_SNUG"
-          class="bg-page border-border/60 relative w-full max-w-4xl overflow-hidden rounded-3xl border shadow-2xl"
+          class="bg-card /60 relative w-full max-w-4xl overflow-hidden rounded-3xl border shadow-2xl"
         >
           <!-- 关闭按钮 -->
           <button
             type="button"
-            class="bg-page/80 text-ink hover:bg-page border-border/40 absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
+            class="bg-page/80 text-ink hover:bg-page /40 absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
             aria-label="关闭"
             @click="emit('close')"
           >
@@ -233,7 +233,7 @@ const coverGradient = computed(() =>
                 :initial="{ opacity: 0, y: 10 }"
                 :animate="{ opacity: 1, y: 0 }"
                 :transition="{ delay: 0.24, duration: 0.3 }"
-                class="border-border/40 grid grid-cols-3 gap-3 border-y py-4"
+                class="/40 grid grid-cols-3 gap-3 border-y py-4"
               >
                 <div>
                   <p class="text-muted text-xs">累计阅读</p>
@@ -277,7 +277,7 @@ const coverGradient = computed(() =>
                 </a>
                 <button
                   type="button"
-                  class="border-border text-ink hover:bg-surface inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm transition-colors"
+                  class="text-ink hover:bg-surface inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm transition-colors"
                 >
                   <Eye class="h-4 w-4" />
                   标记读完

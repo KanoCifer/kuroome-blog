@@ -127,7 +127,7 @@ onUnmounted(() => {
       <DropdownTransition>
         <div
           v-if="isSchemeOpen"
-          class="border-border bg-page dark:border-border dark:bg-page absolute top-full right-0 z-9999 mt-2 w-40 rounded-lg shadow-lg"
+          class="bg-page dark: dark:bg-page absolute top-full right-0 z-9999 mt-2 w-40 rounded-lg shadow-lg"
           @click.stop
         >
           <button
@@ -204,7 +204,7 @@ onUnmounted(() => {
       <DropdownTransition>
         <div
           v-if="isOpen"
-          class="border-border bg-page dark:border-border dark:bg-page absolute top-full right-0 z-9999 mt-2 w-36 rounded-lg shadow-lg"
+          class="bg-page dark: dark:bg-page absolute top-full right-0 z-9999 mt-2 w-36 rounded-lg shadow-lg"
           @click.stop
         >
           <button

@@ -296,7 +296,7 @@ watch(
       <aside
         v-if="open"
         ref="panelRef"
-        class="bg-page border-border/60 fixed top-6 right-6 bottom-6 z-50 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
+        class="bg-page /60 fixed top-6 right-6 bottom-6 z-50 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
         :style="CARD_SHADOW"
         role="dialog"
         aria-modal="true"
@@ -306,7 +306,7 @@ watch(
       >
         <!-- 顶栏 -->
         <header
-          class="border-border flex items-start justify-between gap-3 border-b px-6 pt-6 pb-5"
+          class="flex items-start justify-between gap-3 border-b px-6 pt-6 pb-5"
         >
           <div class="min-w-0">
             <h2 class="text-ink font-family-averia text-2xl leading-snug">
@@ -468,7 +468,7 @@ watch(
               <button
                 v-if="pictures.length === 0 && !previewUrl"
                 type="button"
-                class="border-border bg-surface hover:bg-surface/70 group flex w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed py-10 transition-colors"
+                class="bg-surface hover:bg-surface/70 group flex w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed py-10 transition-colors"
                 :class="{ 'border-ink bg-surface': isDragging }"
                 @click="triggerFileInput"
                 @dragover.prevent
@@ -565,7 +565,7 @@ watch(
                 <button
                   v-if="canAddMore && !previewUrl"
                   type="button"
-                  class="border-border bg-surface hover:bg-surface/70 group relative aspect-square overflow-hidden rounded-xl border-2 border-dashed transition-colors"
+                  class="bg-surface hover:bg-surface/70 group relative aspect-square overflow-hidden rounded-xl border-2 border-dashed transition-colors"
                   :class="{ 'border-ink': isDragging }"
                   :aria-label="'添加图片'"
                   :title="`还可上传 ${MAX_PICTURES - pictures.length} 张`"
@@ -594,9 +594,7 @@ watch(
         </div>
 
         <!-- 底栏 -->
-        <footer
-          class="border-border flex items-center justify-end gap-2 border-t px-6 py-4"
-        >
+        <footer class="flex items-center justify-end gap-2 border-t px-6 py-4">
           <button
             type="button"
             class="text-muted hover:bg-surface rounded-lg px-4 py-2 text-sm font-medium transition-colors"

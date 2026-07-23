@@ -83,7 +83,7 @@ const heroStyle = computed(() => ({
         <!-- 当前状态 -->
         <div class="mt-8 flex flex-wrap items-center gap-3">
           <span
-            class="rounded-full bg-[var(--accent)] px-3 py-1 text-xs font-semibold tracking-wider text-[var(--accent)] uppercase shadow-sm"
+            class="bg-accent text-contrast rounded-full px-3 py-1 text-xs font-semibold tracking-wider uppercase shadow-sm"
           >
             {{ activeScheme }} · 当前
           </span>
@@ -99,7 +99,7 @@ const heroStyle = computed(() => ({
             Theme
           </span>
           <div
-            class="border-border bg-card/50 inline-flex items-center gap-1 rounded-lg border p-1 backdrop-blur"
+            class="bg-card/50 inline-flex items-center gap-1 rounded-lg border p-1 backdrop-blur"
             role="tablist"
             aria-label="切换主题"
           >
@@ -112,7 +112,7 @@ const heroStyle = computed(() => ({
               :class="[
                 'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors',
                 currentTheme === opt.value
-                  ? 'bg-[var(--accent)] text-[var(--accent)] shadow-sm'
+                  ? 'bg-accent text-contrast shadow-sm'
                   : 'text-muted hover:text-ink',
               ]"
               @click="setTheme(opt.value)"
@@ -152,7 +152,7 @@ const heroStyle = computed(() => ({
     <!-- 提示：暗色态 -->
     <section class="mx-auto mt-12 max-w-6xl px-6 md:px-10">
       <div
-        class="border-border bg-card/40 text-muted rounded-lg border px-5 py-4 text-sm leading-relaxed backdrop-blur"
+        class="bg-card/40 text-muted rounded-lg border px-5 py-4 text-sm leading-relaxed backdrop-blur"
       >
         💡
         <strong class="text-ink">暗色态预览</strong>

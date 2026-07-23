@@ -164,7 +164,7 @@ const handleSubmit = async () => {
           <div class="flex gap-3 pt-2">
             <button
               type="button"
-              class="border-border text-ink hover:bg-surface flex-1 rounded-lg border px-4 py-2 text-sm font-medium"
+              class="text-ink hover:bg-surface flex-1 rounded-lg border px-4 py-2 text-sm font-medium"
               :disabled="loading"
               @click="$emit('cancel')"
             >

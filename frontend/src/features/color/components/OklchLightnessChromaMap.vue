@@ -61,7 +61,7 @@ function pick(cell: Cell) {
 
 <template>
   <div
-    class="border-border bg-card/70 space-y-4 rounded-xl border p-5 shadow-sm backdrop-blur"
+    class="bg-card/70 space-y-4 rounded-xl border p-5 shadow-sm backdrop-blur"
   >
     <div class="flex items-baseline justify-between">
       <h3 class="text-ink text-sm font-semibold tracking-wider uppercase">
@@ -72,7 +72,8 @@ function pick(cell: Cell) {
       </span>
     </div>
     <p class="text-muted -mt-2 text-xs leading-relaxed">
-      行 = 亮度 L（亮→暗），列 = 饱和度 C（灰→鲜）。当前主色用 ring 标出，点击任意 cell 即替换。
+      行 = 亮度 L（亮→暗），列 = 饱和度 C（灰→鲜）。当前主色用 ring
+      标出，点击任意 cell 即替换。
     </p>
 
     <div class="flex gap-3">
@@ -90,7 +91,7 @@ function pick(cell: Cell) {
             v-for="(c, i) in cells"
             :key="i"
             type="button"
-            class="border-border/30 aspect-square rounded-md border shadow-inner transition-transform hover:scale-105"
+            class="/30 aspect-square rounded-md border shadow-inner transition-transform hover:scale-105"
             :class="{
               'ring-accent ring-2 ring-offset-2 ring-offset-[var(--card-bg)]':
                 i === currentCellIndex,

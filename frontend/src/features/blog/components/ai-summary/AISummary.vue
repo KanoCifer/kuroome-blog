@@ -88,7 +88,7 @@ async function switchToChat() {
 
 <template>
   <section
-    class="summary-card bg-page/60 border-border/60 mb-6 overflow-hidden rounded-3xl border shadow-sm transition-all"
+    class="summary-card bg-page/60 /60 mb-6 overflow-hidden rounded-3xl border shadow-sm transition-all"
     :class="{ 'is-loading': loading }"
   >
     <!-- Header -->
@@ -174,7 +174,7 @@ async function switchToChat() {
       <template v-if="cardMode === CardMode.SUMMARY">
         <select
           v-model="selectedModel"
-          class="border-border/70 bg-surface/40 text-ink dark:border-border/70 dark:bg-surface/30 dark:text-ink focus:ring-ring cursor-pointer rounded-md border px-2.5 py-1.5 text-sm transition-colors focus:ring-1 focus:outline-none"
+          class="/70 bg-surface/40 text-ink dark:/70 dark:bg-surface/30 dark:text-ink focus:ring-ring cursor-pointer rounded-md border px-2.5 py-1.5 text-sm transition-colors focus:ring-1 focus:outline-none"
           :disabled="loading"
         >
           <option
@@ -241,7 +241,7 @@ async function switchToChat() {
 
     <!-- Summary content -->
     <template v-if="cardMode === CardMode.SUMMARY">
-      <div class="border-border/40 border-t px-5 pt-4 pb-5">
+      <div class="/40 border-t px-5 pt-4 pb-5">
         <ModalFadeTransition mode="out-in">
           <div
             v-if="summary"
@@ -284,7 +284,7 @@ async function switchToChat() {
 
     <!-- Chat content -->
     <template v-else>
-      <div class="border-border/40 border-t">
+      <div class="/40 border-t">
         <template v-if="!hasGenerated">
           <div class="px-5 py-6 text-center">
             <p class="text-muted text-base">
@@ -334,14 +334,12 @@ async function switchToChat() {
             </div>
           </div>
 
-          <div
-            class="border-border/40 flex items-center gap-2 border-t px-4 py-3"
-          >
+          <div class="/40 flex items-center gap-2 border-t px-4 py-3">
             <input
               v-model="chatInput"
               type="text"
               placeholder="继续提问..."
-              class="border-border/70 bg-surface/30 text-ink placeholder-muted focus:border-ring focus:ring-ring dark:border-border/70 dark:bg-surface/20 dark:text-ink dark:placeholder-muted dark:focus:border-ring dark:focus:ring-ring flex-1 rounded-lg border px-3.5 py-2.5 text-base transition-colors focus:ring-1 focus:outline-none"
+              class="/70 bg-surface/30 text-ink placeholder-muted focus:border-ring focus:ring-ring dark:/70 dark:bg-surface/20 dark:text-ink dark:placeholder-muted dark:focus:border-ring dark:focus:ring-ring flex-1 rounded-lg border px-3.5 py-2.5 text-base transition-colors focus:ring-1 focus:outline-none"
               :disabled="loading"
               @keydown="onChatKeydown"
             />

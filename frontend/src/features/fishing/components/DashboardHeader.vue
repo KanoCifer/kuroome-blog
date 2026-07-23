@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Button } from '@/components';
 /**
  * Dashboard 顶部 sticky header。
  *
@@ -13,15 +14,13 @@ defineProps<{
 }>();
 
 defineEmits<{
-  (e: 'toggle-analysis'): void;
-  (e: 'add-spot'): void;
+  'toggle-analysis': [];
+  'add-spot': [];
 }>();
 </script>
 
 <template>
-  <header
-    class="border-border/40 bg-page/80 top-0 z-30 border-b backdrop-blur-sm"
-  >
+  <header class="bg-page/80 border-border top-0 z-30 border-b backdrop-blur-sm">
     <div
       class="mx-auto flex max-w-screen-2xl items-center justify-between px-4 py-3 sm:px-6"
     >
@@ -33,11 +32,7 @@ defineEmits<{
       </div>
 
       <div class="flex items-center gap-2">
-        <button
-          class="bg-accent text-ink hover:bg-accent/90 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors"
-          type="button"
-          @click="$emit('add-spot')"
-        >
+        <Button size="md" @click="$emit('add-spot')">
           <svg
             viewBox="0 0 24 24"
             width="16"
@@ -52,12 +47,12 @@ defineEmits<{
             <path d="M12 5v14M5 12h14" />
           </svg>
           <span class="hidden sm:inline">添加钓点</span>
-        </button>
+        </Button>
 
-        <button
-          class="border-border bg-page hover:bg-surface text-ink inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors"
+        <Button
+          size="md"
+          variant="outline"
           :class="analysisOpen ? 'border-accent text-ink bg-accent/5' : ''"
-          type="button"
           :aria-pressed="analysisOpen"
           @click="$emit('toggle-analysis')"
         >
@@ -82,7 +77,7 @@ defineEmits<{
             />
           </span>
           <span class="hidden sm:inline">AI 分析</span>
-        </button>
+        </Button>
       </div>
     </div>
   </header>

@@ -23,7 +23,7 @@ defineEmits<{
   >
     <section
       v-if="!disabled"
-      class="border-border bg-surface/30 flex flex-col items-start gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5"
+      class="bg-surface/30 flex flex-col items-start gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5"
     >
       <div>
         <p class="text-ink font-family-averia text-base italic">

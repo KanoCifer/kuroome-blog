@@ -15,8 +15,8 @@ export function TwikooComments({ path }: TwikooCommentsProps) {
   }, [path, initTwikoo]);
 
   return (
-    <div className="border-border bg-page overflow-hidden rounded-2xl border shadow-sm">
-      <div className="border-border flex gap-2 border-b px-8 py-5">
+    <div className="bg-page overflow-hidden rounded-2xl border shadow-sm">
+      <div className="flex gap-2 border-b px-8 py-5">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"

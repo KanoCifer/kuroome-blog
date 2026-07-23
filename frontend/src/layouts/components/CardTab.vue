@@ -12,7 +12,7 @@ const { cardIndex, cardImages, setCardIndex } = useCardImage();
 
       <!-- 当前选中卡片预览 — 横版 -->
       <div
-        class="border-border/60 relative mx-auto aspect-[16/9] w-full max-w-xs overflow-hidden rounded-xl border shadow-sm transition-all duration-200"
+        class="/60 relative mx-auto aspect-[16/9] w-full max-w-xs overflow-hidden rounded-xl border shadow-sm transition-all duration-200"
       >
         <div
           class="h-full w-full transition-[background] duration-300"
@@ -34,7 +34,7 @@ const { cardIndex, cardImages, setCardIndex } = useCardImage();
           :class="
             cardIndex === i
               ? 'border-accent scale-105 !shadow-sm'
-              : 'border-border/60 hover:border-accent opacity-70 hover:opacity-100'
+              : '/60 hover:border-accent opacity-70 hover:opacity-100'
           "
           :aria-label="`卡片 ${i + 1}`"
           :aria-pressed="cardIndex === i"

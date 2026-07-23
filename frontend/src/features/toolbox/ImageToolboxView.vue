@@ -1,13 +1,11 @@
 <template>
   <BasicDetail title="图片工具箱" subtitle="本地压缩与格式转换">
     <div class="col-span-full">
-      <div
-        class="squircle border-border/60 bg-page/50 overflow-hidden border shadow-sm"
-      >
+      <div class="squircle /60 bg-page/50 overflow-hidden border shadow-sm">
         <div class="flex flex-col lg:flex-row lg:items-stretch">
           <!-- 左侧配置面板 -->
           <aside
-            class="border-border/60 w-full shrink-0 border-b p-6 lg:w-80 lg:border-r lg:border-b-0"
+            class="/60 w-full shrink-0 border-b p-6 lg:w-80 lg:border-r lg:border-b-0"
           >
             <header class="mb-8">
               <h2 class="text-ink text-xl font-bold">参数配置</h2>
@@ -55,7 +53,7 @@
                     type="number"
                     min="1"
                     :disabled="!enableMaxWidth"
-                    class="text-ink placeholder:text-muted focus:border-ink border-border bg-page disabled:bg-surface disabled:text-muted w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
+                    class="text-ink placeholder:text-muted focus:border-ink bg-page disabled:bg-surface disabled:text-muted w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
                   />
                   <span
                     class="text-muted absolute top-1/2 right-4 -translate-y-1/2 text-xs"
@@ -101,7 +99,7 @@
                     :class="
                       outputType === option.value
                         ? 'border-ink bg-ink text-page'
-                        : 'border-border bg-page text-muted hover:border-muted'
+                        : 'bg-page text-muted hover:border-muted'
                     "
                     @click="outputType = option.value"
                   >
@@ -128,7 +126,7 @@
                   type="text"
                   spellcheck="false"
                   placeholder="留空则使用原文件名"
-                  class="text-ink placeholder:text-muted focus:border-ink border-border bg-page w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
+                  class="text-ink placeholder:text-muted focus:border-ink bg-page w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
                 />
               </div>
 
@@ -168,7 +166,7 @@
                 <button
                   type="button"
                   :disabled="!processedBlob"
-                  class="text-ink hover:bg-surface border-border bg-page flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium shadow-md transition-all hover:scale-105 hover:shadow-lg disabled:opacity-50"
+                  class="text-ink hover:bg-surface bg-page flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium shadow-md transition-all hover:scale-105 hover:shadow-lg disabled:opacity-50"
                   @click="download"
                 >
                   <svg
@@ -210,7 +208,7 @@
                     ? 'border-ink bg-ink/5'
                     : originalFile
                       ? 'bg-page border-transparent shadow-sm'
-                      : 'border-border bg-page hover:border-muted'
+                      : 'bg-page hover:border-muted'
                 "
                 @click="triggerFilePicker"
               >
@@ -300,7 +298,7 @@
                   class="group bg-page relative flex flex-col overflow-hidden rounded-3xl shadow-sm"
                 >
                   <div
-                    class="border-border/50 flex items-center justify-between border-b p-4"
+                    class="/50 flex items-center justify-between border-b p-4"
                   >
                     <span
                       class="text-muted text-xs font-bold tracking-wider uppercase"
@@ -357,7 +355,7 @@
                   class="group bg-page relative flex flex-col overflow-hidden rounded-3xl shadow-sm"
                 >
                   <div
-                    class="border-border/50 flex items-center justify-between border-b p-4"
+                    class="/50 flex items-center justify-between border-b p-4"
                   >
                     <div class="flex items-center gap-2">
                       <span

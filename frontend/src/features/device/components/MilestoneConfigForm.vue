@@ -19,9 +19,7 @@
           class="bg-page max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl shadow-2xl dark:shadow-xl dark:shadow-slate-900/60"
         >
           <!-- Header -->
-          <div
-            class="bg-page border-border sticky top-0 z-10 border-b px-6 pt-6 pb-4"
-          >
+          <div class="bg-page sticky top-0 z-10 border-b px-6 pt-6 pb-4">
             <div class="flex items-start justify-between gap-3">
               <div class="flex items-center gap-3">
                 <div
@@ -62,7 +60,7 @@
           <form @submit.prevent="handleSubmit" class="bg-page space-y-6 p-6">
             <!-- Enable Toggle -->
             <div
-              class="border-border bg-page flex items-center justify-between rounded-2xl border px-5 py-4 shadow-sm"
+              class="bg-page flex items-center justify-between rounded-2xl border px-5 py-4 shadow-sm"
             >
               <div class="flex items-center gap-3">
                 <div
@@ -154,7 +152,7 @@
                     'relative flex flex-col items-center gap-1 rounded-xl px-3 py-3 text-xs font-semibold transition-all duration-200',
                     form.milestones.includes(preset.days)
                       ? 'bg-accent text-ink shadow-accent/25 shadow-lg'
-                      : 'bg-page text-muted hover:bg-surface border-border border shadow-sm',
+                      : 'bg-page text-muted hover:bg-surface border shadow-sm',
                   ]"
                 >
                   <span class="text-base">{{
@@ -199,7 +197,7 @@
                     type="number"
                     min="1"
                     placeholder="自定义天数..."
-                    class="text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 border-border bg-page w-full rounded-xl border py-2.5 pr-12 pl-4 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                    class="text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 bg-page w-full rounded-xl border py-2.5 pr-12 pl-4 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                   />
                   <span
                     class="text-muted pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-xs"
@@ -209,7 +207,7 @@
                 <button
                   type="button"
                   @click="addCustomMilestone"
-                  class="border-border bg-page text-muted hover:border-accent/30 hover:bg-accent/10 hover:text-ink flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-all active:scale-95"
+                  class="bg-page text-muted hover:border-accent/30 hover:bg-accent/10 hover:text-ink flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-all active:scale-95"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -326,7 +324,7 @@
                     'flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold transition-all duration-200',
                     form.channels.includes(opt.value)
                       ? 'bg-accent text-ink shadow-accent/25 shadow-lg'
-                      : 'bg-page text-muted hover:bg-surface border-border border shadow-sm',
+                      : 'bg-page text-muted hover:bg-surface border shadow-sm',
                   ]"
                 >
                   <span v-html="opt.icon" />
@@ -346,7 +344,7 @@
                   v-model="form.email"
                   type="email"
                   placeholder="example@domain.com"
-                  class="text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 border-border bg-page w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                  class="text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 bg-page w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
 
@@ -361,7 +359,7 @@
                   v-model="form.feishu_webhook_url"
                   type="url"
                   placeholder="https://open.feishu.cn/open-apis/bot/v2/hook/..."
-                  class="text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 border-border bg-page w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                  class="text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 bg-page w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
 
@@ -376,7 +374,7 @@
                   v-model="form.bark_device_key"
                   type="text"
                   placeholder="设备Key或完整推送URL"
-                  class="text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 border-border bg-page w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
+                  class="text-ink placeholder:text-muted focus:border-accent focus:ring-accent/30 bg-page w-full rounded-xl border px-4 py-2.5 text-sm font-medium ring-2 ring-transparent transition-all outline-none"
                 />
               </label>
             </div>

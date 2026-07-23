@@ -150,7 +150,7 @@ export function FishingSpotDetailSheet({
       lockScroll
       renderHeader={() => (
         <header className="shrink-0 px-5 pt-3 pb-4">
-          <div className="border-border/60 flex items-center justify-between border-b px-0 pb-3">
+          <div className="/60 flex items-center justify-between border-b px-0 pb-3">
             <div className="min-w-0 flex-1">
               <h2 className="text-ink truncate text-base font-semibold">
                 {spot?.name || '钓点详情'}
@@ -245,7 +245,7 @@ export function FishingSpotDetailSheet({
                 <button
                   type="button"
                   onClick={startEdit}
-                  className="border-border text-muted hover:bg-surface flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full border px-5 text-sm font-medium transition-colors"
+                  className="text-muted hover:bg-surface flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full border px-5 text-sm font-medium transition-colors"
                 >
                   <Pencil className="h-4 w-4" />
                   编辑
@@ -265,7 +265,7 @@ export function FishingSpotDetailSheet({
 
         {/* 删除确认 */}
         {deleteOpen && (
-          <div className="border-border/60 border-t pt-4">
+          <div className="/60 border-t pt-4">
             <p className="text-muted mb-3 text-sm">
               删除钓点「{spot?.name ?? ''}」？软删可在后端恢复。
             </p>
@@ -273,7 +273,7 @@ export function FishingSpotDetailSheet({
               <button
                 type="button"
                 onClick={() => setDeleteOpen(false)}
-                className="border-border text-muted hover:bg-surface min-h-11 flex-1 rounded-full border px-5 text-sm font-medium transition-colors"
+                className="text-muted hover:bg-surface min-h-11 flex-1 rounded-full border px-5 text-sm font-medium transition-colors"
               >
                 取消
               </button>
@@ -421,7 +421,7 @@ function EditForm({
         <button
           type="button"
           onClick={onCancel}
-          className="border-border text-muted hover:bg-surface min-h-11 flex-1 rounded-full border px-5 text-sm font-medium transition-colors"
+          className="text-muted hover:bg-surface min-h-11 flex-1 rounded-full border px-5 text-sm font-medium transition-colors"
         >
           取消
         </button>
