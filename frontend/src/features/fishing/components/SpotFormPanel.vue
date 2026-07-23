@@ -15,6 +15,7 @@ import type { CreateFishingSpotPayload } from '@/features/fishing/api';
 import { fishingSpotsGateway } from '@/features/fishing/api';
 import { DEFAULT_MAP_CENTER } from '@/features/fishing/stores/fishingMap';
 import { useUpload } from '@/features/upload/composables';
+import { UploadDropzone, UploadProgress } from '@/features/upload/components';
 import { rewriteMediaUrl } from '@/composables';
 import { useNotificationStore } from '@/stores';
 import {
@@ -29,7 +30,7 @@ import {
 import dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
 import { computed, nextTick, ref, watch } from 'vue';
-import { SlideFadeTransitionX } from '@/components';
+import { SlideFadeTransitionX, Button as UiButton } from '@/components';
 
 const props = withDefaults(
   defineProps<{
@@ -79,7 +80,7 @@ const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 const pictures = ref<SpotPicture[]>([]);
 const pendingError = ref<string | null>(null);
 
-const { upload, isUploading } = useUpload({
+const { upload, isUploading, progress } = useUpload({
   type: 'gallery',
   maxSize: MAX_UPLOAD_BYTES,
   allowedTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
@@ -119,6 +120,12 @@ const handleDrop = (event: DragEvent) => {
   if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
     processFile(event.dataTransfer.files[0]);
   }
+};
+
+// 通用 UploadDropzone `@select` 适配：取首个文件走原有校验/预览/自动上传链。
+const handleDropzoneSelect = (files: File[]) => {
+  const f = files[0];
+  if (f) processFile(f);
 };
 
 // 释放旧预览 object URL,避免内存泄漏(对齐旧 useGalleryUpload 的 watch)
@@ -455,7 +462,7 @@ watch(
                 >图片</span
               >
 
-              <!-- 隐藏 file input:由空态按钮 / + 瓦片 click() 触发 -->
+              <!-- 隐藏 file input:由 + 瓦片 click() 触发(空态改用 UploadDropzone 自管 input) -->
               <input
                 ref="fileInputRef"
                 type="file"
@@ -464,30 +471,15 @@ watch(
                 @change="onPickerChange"
               />
 
-              <!-- 空态:大块 drop-zone -->
-              <button
+              <!-- 空态:通用 UploadDropzone -->
+              <UploadDropzone
                 v-if="pictures.length === 0 && !previewUrl"
-                type="button"
-                class="bg-surface hover:bg-surface/70 group flex w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed py-10 transition-colors"
-                :class="{ 'border-ink bg-surface': isDragging }"
-                @click="triggerFileInput"
-                @dragover.prevent
-                @dragleave.prevent="isDragging = false"
-                @drop.prevent="handleDrop"
-              >
-                <div
-                  class="bg-page ring-border/5 mb-3 flex h-12 w-12 items-center justify-center rounded-full shadow-sm ring-1 transition-transform group-hover:scale-110"
-                >
-                  <ImagePlus
-                    class="text-muted group-hover:text-ink h-5 w-5 transition-colors"
-                    :stroke-width="1.5"
-                  />
-                </div>
-                <p class="text-ink text-sm font-medium">点击或拖拽图片到此处</p>
-                <p class="text-muted mt-1.5 text-xs">
-                  最多 {{ MAX_PICTURES }} 张,单张 ≤5MB
-                </p>
-              </button>
+                accept="image/*"
+                :disabled="isUploading"
+                prompt="点击或拖拽图片到此处"
+                :hint="`最多 ${MAX_PICTURES} 张,单张 ≤5MB`"
+                @select="handleDropzoneSelect"
+              />
 
               <!-- 非空态:3 列缩略图网格 -->
               <div v-else class="grid grid-cols-3 gap-2">
@@ -521,13 +513,19 @@ watch(
                     class="h-full w-full object-cover"
                   />
 
-                  <!-- 上传中:中央 spinner -->
-                  <div
-                    v-if="!pendingError"
-                    class="absolute inset-0 flex items-center justify-center bg-black/30"
-                  >
-                    <Loader2 class="h-5 w-5 animate-spin text-white" />
-                  </div>
+                  <!-- 上传中:中央暗罩 + 底部进度条 -->
+                  <template v-if="!pendingError">
+                    <div
+                      class="absolute inset-0 flex items-center justify-center bg-black/30"
+                    >
+                      <Loader2 class="h-5 w-5 animate-spin text-white" />
+                    </div>
+                    <UploadProgress
+                      :progress="progress"
+                      height="h-1"
+                      class="absolute right-2 bottom-2 left-2"
+                    />
+                  </template>
 
                   <!-- 失败:错误态 -->
                   <div
@@ -603,15 +601,14 @@ watch(
           >
             取消
           </button>
-          <button
-            type="button"
-            class="bg-accent text-ink hover:bg-accent/90 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+          <UiButton
+            size="md"
             :disabled="!canSubmit || submitting"
             @click="handleSubmit"
           >
             <Loader2 v-if="submitting" class="h-4 w-4 animate-spin" />
             {{ submitting ? '创建中...' : '添加钓点' }}
-          </button>
+          </UiButton>
         </footer>
       </aside>
     </SlideFadeTransitionX>

@@ -16,7 +16,7 @@
 import { useNotificationStore } from '@/stores';
 import { formatDate } from '@/lib/dayjs';
 import { llmGateway } from '@/features/blog';
-import { HoverDropdown } from '@/components';
+import { HoverDropdown, Button as UiButton } from '@/components';
 import { renderMarkdown } from '@/composables';
 import { Check, ChevronDown } from '@lucide/vue';
 import dayjs from 'dayjs';
@@ -312,9 +312,10 @@ onUnmounted(() => {
         </HoverDropdown>
       </div>
 
-      <button
+      <UiButton
         v-if="loading"
-        type="button"
+        size="sm"
+        variant="ghost"
         class="bg-destructive text-ink hover:bg-destructive/90 inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition"
         @click="cancelAnalysis"
       >
@@ -322,16 +323,15 @@ onUnmounted(() => {
           <rect x="6" y="6" width="12" height="12" rx="1" fill="currentColor" />
         </svg>
         取消分析
-      </button>
-      <button
+      </UiButton>
+      <UiButton
         v-else
-        type="button"
-        class="bg-accent text-ink hover:bg-accent/90 disabled:bg-surface disabled:text-muted inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition disabled:cursor-not-allowed"
+        size="sm"
         :disabled="!canGenerate"
         @click="fetchWeatherAnalysis"
       >
         {{ hasGenerated ? '重新分析' : '生成分析' }}
-      </button>
+      </UiButton>
     </div>
 
     <!-- 无数据空态 -->

@@ -9,7 +9,7 @@
           </h2>
           <span
             v-if="frontierTasks.length"
-            class="bg-accent/15 text-ink inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
+            class="bg-accent/15 text-ink inline-block min-w-5 rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
           >
             {{ frontierTasks.length }}
           </span>
@@ -22,12 +22,12 @@
 
       <div
         v-if="frontierTasks.length"
-        class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+        class="columns-1 gap-x-3 sm:columns-2 lg:columns-3"
       >
         <div
           v-for="(task, i) in frontierTasks"
           :key="task.slug"
-          class="frontier-card-enter"
+          class="frontier-card-enter mb-3 break-inside-avoid"
           :style="{ '--stagger': `${Math.min(i, 8) * 40}ms` }"
         >
           <FrontierCard
@@ -81,7 +81,7 @@
             </h3>
             <span
               v-if="inProgressTasks.length"
-              class="bg-surface/10 text-muted inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
+              class="bg-surface/10 text-muted inline-block min-w-5 rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
             >
               {{ inProgressTasks.length }}
             </span>
@@ -121,7 +121,7 @@
             </h3>
             <span
               v-if="doneThisWeek.length"
-              class="bg-surface/10 text-muted inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
+              class="bg-surface/10 text-muted inline-block min-w-5 rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
             >
               {{ doneThisWeek.length }}
             </span>

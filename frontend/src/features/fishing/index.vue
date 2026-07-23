@@ -5,6 +5,7 @@ import WeatherCard from '@/features/fishing/components/WeatherCard.vue';
 import AnalysisPanel from '@/features/fishing/components/AnalysisPanel.vue';
 import DashboardHeader from '@/features/fishing/components/DashboardHeader.vue';
 import FeedbackFormDialog from '@/features/fishing/components/FeedbackFormDialog.vue';
+import FishingAmbient from '@/features/fishing/components/FishingAmbient.vue';
 import HourlyChartCard from '@/features/fishing/components/HourlyChartCard.vue';
 import IndexHeroCard from '@/features/fishing/components/IndexHeroCard.vue';
 import MapContainer from '@/features/fishing/components/MapContainer.vue';
@@ -25,8 +26,11 @@ onMounted(dash.init);
 </script>
 
 <template>
-  <div class="bg-page min-h-screen">
+  <div class="bg-page relative min-h-screen">
+    <FishingAmbient />
+
     <DashboardHeader
+      class="relative z-10"
       :analysis-open="dash.analysisOpen.value"
       :analysis-has-data="dash.analysisHasData.value"
       @toggle-analysis="dash.toggleAnalysis"
@@ -34,7 +38,7 @@ onMounted(dash.init);
     />
 
     <main
-      class="mx-auto flex max-w-screen-2xl flex-col gap-6 px-4 py-5 sm:px-6 sm:py-8"
+      class="relative z-10 mx-auto flex max-w-screen-2xl flex-col gap-6 px-4 py-5 sm:px-6 sm:py-8"
     >
       <QuickFeedbackBanner
         :disabled="!dash.indexData.value"

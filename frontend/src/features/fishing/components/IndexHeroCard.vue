@@ -4,8 +4,9 @@ import type { FishingIndexData } from '@/features/fishing/types';
 import DashboardCard from '@/features/fishing/components/DashboardCard.vue';
 import { ChevronRight, FishingRod, Loader, MapPin } from '@lucide/vue';
 import { storeToRefs } from 'pinia';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { Button } from '@/components';
+import { useAnimateNumber } from '@/composables';
 
 /**
  * Hero 钓鱼指数卡。
@@ -71,6 +72,19 @@ const handleFeedback = () => {
 
 /** 特征详情折叠状态 (false = 默认展开,与原 `<details open>` 行为一致) */
 const featureCollapsed = ref(false);
+
+/**
+ * Hero 大数字滚动动画 —— 复用 useAnimateNumber,数据到位/刷新时从 0 缓动到目标值,
+ * 与水波浮漂母题呼应(数字「浮上来」)。immediate 覆盖首屏已有数据的场景。
+ */
+const { displayValue: displayIndex, animateTo } = useAnimateNumber();
+watch(
+  () => indexData.value?.fishing_index,
+  (val) => {
+    if (typeof val === 'number') animateTo(val);
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -94,7 +108,7 @@ const featureCollapsed = ref(false);
         <div
           class="bg-accent text-contrast flex h-11 w-11 items-center justify-center rounded-2xl shadow-sm transition-all duration-300 group-hover:rounded-xl"
         >
-          <FishingRod class="h-5 w-5" />
+          <FishingRod class="hero-rod h-5 w-5" />
         </div>
       </div>
     </div>
@@ -105,16 +119,19 @@ const featureCollapsed = ref(false);
       {{ error }}
     </p>
     <template v-else-if="indexData">
-      <!-- Hero 数字:主导视觉,撑满卡片上半部 -->
-      <div class="flex items-end gap-3">
-        <span
-          class="text-7xl leading-none font-bold tracking-tight tabular-nums"
-          :class="levelTextColor[indexData.level] || 'text-muted'"
-        >
-          {{ indexData.fishing_index }}
+      <!-- Hero 数字:主导视觉,撑满卡片上半部。数字如浮漂,坐落于水波之上 -->
+      <div class="hero-number relative flex items-end gap-3">
+        <span class="hero-ripple" aria-hidden="true">
+          <i></i><i></i><i></i>
         </span>
         <span
-          class="mb-2 text-base font-medium"
+          class="relative z-[1] text-7xl leading-none font-bold tracking-tight tabular-nums"
+          :class="levelTextColor[indexData.level] || 'text-muted'"
+        >
+          {{ displayIndex }}
+        </span>
+        <span
+          class="relative z-[1] mb-2 text-base font-medium"
           :class="levelTextColor[indexData.level] || 'text-muted'"
         >
           {{ indexData.level }}
@@ -232,6 +249,93 @@ const featureCollapsed = ref(false);
 @media (prefers-reduced-motion: reduce) {
   .feature-collapse {
     transition: none;
+  }
+}
+
+/*
+ * —— 钓鱼野趣 · 水波与鱼竿 ——
+ * 大数字如浮漂坐落水面,水波自数字基部缓缓漾开(5.4s 一轮,三环错峰)。
+ * 全部走 oklch(from var(--color-accent)) —— 不硬编码颜色,随主题自适应。
+ */
+.hero-ripple {
+  position: absolute;
+  left: 1.1rem;
+  bottom: 0.35rem;
+  width: 0;
+  height: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.hero-ripple i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 132px;
+  height: 132px;
+  margin: -66px 0 0 -66px;
+  border-radius: 50%;
+  border: 1px solid oklch(from var(--color-accent) l c h / 0.45);
+  opacity: 0;
+  transform: scale(0.35);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-ripple i {
+    animation: hero-ripple-out 5.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+  .hero-ripple i:nth-child(2) {
+    animation-delay: 1.8s;
+  }
+  .hero-ripple i:nth-child(3) {
+    animation-delay: 3.6s;
+  }
+}
+@keyframes hero-ripple-out {
+  0% {
+    opacity: 0;
+    transform: scale(0.35);
+  }
+  18% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+
+/* 鱼竿图标:idle 时极轻摇曳,hover 时一记「甩竿咬钩」 */
+.hero-rod {
+  transform-origin: 60% 90%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-rod {
+    animation: hero-rod-sway 4.2s ease-in-out infinite;
+  }
+  .group:hover .hero-rod {
+    animation: hero-rod-cast 640ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+@keyframes hero-rod-sway {
+  0%,
+  100% {
+    transform: rotate(-2.5deg);
+  }
+  50% {
+    transform: rotate(2.5deg);
+  }
+}
+@keyframes hero-rod-cast {
+  0% {
+    transform: rotate(0);
+  }
+  32% {
+    transform: rotate(-16deg);
+  }
+  58% {
+    transform: rotate(9deg);
+  }
+  100% {
+    transform: rotate(0);
   }
 }
 </style>

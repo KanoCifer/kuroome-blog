@@ -10,14 +10,35 @@
  * 数据流:FishingSpot 经 toMapMarker 拆为 position + extraData,
  * 本组件同时消费两者(详情字段 + 迷你地图 / 路线规划都需要)。
  */
-import { ConfirmDialog } from '@/components';
+import {
+  ConfirmDialog,
+  Button as UiButton,
+  SlideFadeTransitionX,
+} from '@/components';
 import SpotMiniMap from '@/features/fishing/components/SpotMiniMap.vue';
 import SpotPhotoLightbox from '@/features/fishing/components/SpotPhotoLightbox.vue';
 import type { MapMarker } from '@/features/fishing/types';
 import type { SpotDetail } from '@/features/fishing/types';
 import type { UpdateFishingSpotPayload } from '@/features/fishing/api';
 import { fishingSpotsGateway } from '@/features/fishing/api';
+import { useUpload } from '@/features/upload/composables';
+import { UploadDropzone, UploadProgress } from '@/features/upload/components';
+import { rewriteMediaUrl } from '@/composables';
+import { useNotificationStore } from '@/stores';
+import {
+  ImageOff,
+  ImagePlus,
+  Loader2,
+  MapPin,
+  Navigation,
+  Pencil,
+  RefreshCw,
+  Star,
+  Trash2,
+  X,
+} from '@lucide/vue';
 import dayjs from 'dayjs';
+import { v4 as uuidv4 } from 'uuid';
 import { computed, nextTick, ref, watch } from 'vue';
 
 /*
@@ -31,10 +52,6 @@ const CARD_SHADOW = [
   '0 -24px 40px color-mix(in oklch, var(--ink) 5%, transparent)',
   'inset 0 1px 0 0 oklch(from var(--page) l c h / 0.6)',
 ].join(', ');
-import { MapPin, Navigation, Pencil, Star, Trash2, X } from '@lucide/vue';
-import { useNotificationStore } from '@/stores';
-import { SlideFadeTransitionX } from '@/components';
-import type { AxiosError } from 'axios';
 
 const props = defineProps<{
   open: boolean;
@@ -90,15 +107,100 @@ const editTags = ref('');
 const editRating = ref(0);
 const saving = ref(false);
 
+// ── 编辑模式 · 图片上传 ──
+// 与 SpotFormPanel 同套交互(最多 9 张,5MB,串行上传),但还要叠加「保留/移除已有图片」。
+// 引入 isExisting 标记,save 时把整张列表提交,后端按整列替换语义覆盖。
+interface EditPicture {
+  id: string;
+  url: string;
+  uploadedAt: string;
+  description: string;
+  isExisting: boolean;
+}
+const MAX_PICTURES = 9;
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+const editPictures = ref<EditPicture[]>([]);
+const pendingError = ref<string | null>(null);
+
+const { upload, isUploading, progress } = useUpload({
+  type: 'gallery',
+  maxSize: MAX_UPLOAD_BYTES,
+  allowedTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+});
+
+// 文件选择 / 预览状态
+const fileInputRef = ref<HTMLInputElement | null>(null);
+const selectedFile = ref<File | null>(null);
+const previewUrl = ref<string | null>(null);
+const isDragging = ref(false);
+
+const triggerFileInput = () => fileInputRef.value?.click();
+
+const processFile = (file: File) => {
+  if (!file.type.startsWith('image/')) {
+    useNotificationStore().error('请选择图片文件');
+    return;
+  }
+  if (file.size > MAX_UPLOAD_BYTES) {
+    useNotificationStore().error('图片大小不能超过 5MB');
+    return;
+  }
+  selectedFile.value = file;
+  previewUrl.value = URL.createObjectURL(file);
+};
+
+const handleFileSelect = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  if (target.files && target.files.length > 0) {
+    processFile(target.files[0]);
+  }
+};
+
+const handleDrop = (event: DragEvent) => {
+  isDragging.value = false;
+  if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
+    processFile(event.dataTransfer.files[0]);
+  }
+};
+
+const handleDropzoneSelect = (files: File[]) => {
+  const f = files[0];
+  if (f) processFile(f);
+};
+
+watch(previewUrl, (_, prev) => {
+  if (prev) URL.revokeObjectURL(prev);
+});
+
+const canAddMore = computed(() => editPictures.value.length < MAX_PICTURES);
+
+function resetEditPictures(): void {
+  editPictures.value = [];
+  pendingError.value = null;
+  selectedFile.value = null;
+  previewUrl.value = null;
+}
+
 function startEdit(): void {
   editName.value = spot.value?.name ?? '';
   editDescription.value = spot.value?.description ?? '';
   editTags.value = (spot.value?.tags ?? []).join(', ');
   editRating.value = spot.value?.rating ?? 0;
+  editPictures.value = (spot.value?.images ?? []).map((url) => ({
+    id: uuidv4().slice(0, 8),
+    url,
+    uploadedAt: '',
+    description: '',
+    isExisting: true,
+  }));
+  pendingError.value = null;
+  selectedFile.value = null;
+  previewUrl.value = null;
   editing.value = true;
 }
 
 function cancelEdit(): void {
+  resetEditPictures();
   editing.value = false;
 }
 
@@ -110,11 +212,13 @@ async function saveEdit(): Promise<void> {
       .split(',')
       .map((t) => t.trim())
       .filter(Boolean);
+    const images = editPictures.value.map((p) => p.url);
     const payload: UpdateFishingSpotPayload = {
       name: editName.value.trim(),
       description: editDescription.value.trim(),
       tags,
       rating: editRating.value,
+      images,
     };
     await fishingSpotsGateway.update(spot.value.id, payload);
     editing.value = false;
@@ -125,10 +229,13 @@ async function saveEdit(): Promise<void> {
         ...spot.value,
         ...payload,
         tags,
+        images,
         updated_at: new Date().toISOString(),
       },
     };
     emit('spot-updated', updated);
+    // 提交成功后再清理临时预览/upload 状态;editPictures 列表本身已固化到 spot.images
+    resetEditPictures();
   } catch (err: unknown) {
     useNotificationStore().error(
       err instanceof Error ? err.message : '更新钓点失败',
@@ -136,6 +243,65 @@ async function saveEdit(): Promise<void> {
   } finally {
     saving.value = false;
   }
+}
+
+// ── 上传流:选中文件后立刻触发 upload(串行) ──
+watch(selectedFile, async (file) => {
+  if (!file) return;
+  if (!canAddMore.value) {
+    selectedFile.value = null;
+    previewUrl.value = null;
+    return;
+  }
+  pendingError.value = null;
+  try {
+    const url = await upload(file);
+    editPictures.value.push({
+      id: uuidv4().slice(0, 8),
+      uploadedAt: dayjs().toISOString(),
+      url: rewriteMediaUrl(url),
+      description: '',
+      isExisting: false,
+    });
+    selectedFile.value = null;
+    previewUrl.value = null;
+  } catch {
+    pendingError.value = '图片上传失败,请重试';
+  }
+});
+
+async function retryUpload(): Promise<void> {
+  if (!selectedFile.value || isUploading.value) return;
+  pendingError.value = null;
+  try {
+    const url = await upload(selectedFile.value);
+    editPictures.value.push({
+      id: uuidv4().slice(0, 8),
+      uploadedAt: dayjs().toISOString(),
+      url: rewriteMediaUrl(url),
+      description: '',
+      isExisting: false,
+    });
+    selectedFile.value = null;
+    previewUrl.value = null;
+  } catch {
+    pendingError.value = '图片上传失败,请重试';
+  }
+}
+
+function removePicture(p: EditPicture): void {
+  editPictures.value = editPictures.value.filter((x) => x.id !== p.id);
+}
+
+function removeFailed(): void {
+  selectedFile.value = null;
+  previewUrl.value = null;
+  pendingError.value = null;
+}
+
+function onPickerChange(event: Event): void {
+  handleFileSelect(event);
+  (event.target as HTMLInputElement).value = '';
 }
 
 // ── 删除 ──
@@ -212,7 +378,7 @@ watch(
       <aside
         v-if="open"
         ref="panelRef"
-        class="bg-page /60 fixed top-6 right-6 bottom-6 z-50 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
+        class="bg-page border-border fixed top-6 right-6 bottom-6 z-50 flex w-full max-w-[480px] flex-col overflow-hidden rounded-3xl border"
         :style="CARD_SHADOW"
         role="dialog"
         aria-modal="true"
@@ -222,7 +388,7 @@ watch(
       >
         <!-- 顶栏 -->
         <header
-          class="flex items-start justify-between gap-3 border-b px-6 pt-6 pb-5"
+          class="border-border flex items-start justify-between gap-3 border-b px-6 pt-6 pb-5"
         >
           <div class="min-w-0 space-y-1.5">
             <!-- 名称 -->
@@ -349,23 +515,162 @@ watch(
                 </span>
               </div>
             </div>
+
+            <!-- 图片(编辑:已上传 + 新增,最多 9 张) -->
+            <div>
+              <span class="text-ink mb-1.5 block text-sm font-medium"
+                >图片</span
+              >
+
+              <!-- 隐藏 file input:由 + 瓦片 click() 触发(空态改用 UploadDropzone 自管 input) -->
+              <input
+                ref="fileInputRef"
+                type="file"
+                accept="image/*"
+                class="hidden"
+                @change="onPickerChange"
+              />
+
+              <!-- 空态:通用 UploadDropzone -->
+              <UploadDropzone
+                v-if="
+                  editPictures.length === 0 &&
+                  !previewUrl &&
+                  !spot?.images.length
+                "
+                accept="image/*"
+                :disabled="isUploading"
+                prompt="点击或拖拽图片到此处"
+                :hint="`最多 ${MAX_PICTURES} 张,单张 ≤5MB`"
+                @select="handleDropzoneSelect"
+              />
+
+              <!-- 非空态:3 列缩略图网格(已有 + 新增 + 在传 + +瓦片) -->
+              <div v-else class="grid grid-cols-3 gap-2">
+                <!-- 已有 / 新增图片(均支持移除) -->
+                <div
+                  v-for="p in editPictures"
+                  :key="p.id"
+                  class="group bg-surface relative aspect-square overflow-hidden rounded-xl"
+                  :class="{ 'opacity-60': !p.isExisting && !pendingError }"
+                >
+                  <img :src="p.url" alt="" class="h-full w-full object-cover" />
+                  <button
+                    type="button"
+                    class="bg-page/80 text-ink hover:bg-page absolute top-1.5 right-1.5 inline-flex h-6 w-6 items-center justify-center rounded-full opacity-0 shadow-sm backdrop-blur-md transition-opacity group-hover:opacity-100"
+                    :aria-label="p.isExisting ? '移除旧图片' : '移除新图片'"
+                    @click="removePicture(p)"
+                  >
+                    <X class="h-3.5 w-3.5" />
+                  </button>
+                </div>
+
+                <!-- 上传中 / 失败瓦片 -->
+                <div
+                  v-if="previewUrl"
+                  class="bg-surface relative aspect-square overflow-hidden rounded-xl"
+                  :class="pendingError ? '' : 'opacity-60'"
+                  aria-busy="true"
+                >
+                  <img
+                    :src="previewUrl"
+                    alt=""
+                    class="h-full w-full object-cover"
+                  />
+
+                  <!-- 上传中:中央暗罩 + 底部进度条 -->
+                  <template v-if="!pendingError">
+                    <div
+                      class="absolute inset-0 flex items-center justify-center bg-black/30"
+                    >
+                      <Loader2 class="h-5 w-5 animate-spin text-white" />
+                    </div>
+                    <UploadProgress
+                      :progress="progress"
+                      height="h-1"
+                      class="absolute right-2 bottom-2 left-2"
+                    />
+                  </template>
+
+                  <!-- 失败:错误态 -->
+                  <div
+                    v-else
+                    class="border-destructive bg-page/95 absolute inset-0 flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 p-2 text-center backdrop-blur-md"
+                    role="alert"
+                  >
+                    <ImageOff class="text-destructive h-5 w-5" />
+                    <p
+                      class="text-destructive text-xs leading-tight font-medium"
+                    >
+                      {{ pendingError }}
+                    </p>
+                    <div class="flex gap-1.5">
+                      <button
+                        type="button"
+                        class="bg-accent text-ink hover:bg-accent/90 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium"
+                        @click="retryUpload"
+                      >
+                        <RefreshCw class="h-3 w-3" />
+                        重试
+                      </button>
+                      <button
+                        type="button"
+                        class="bg-surface text-ink hover:bg-surface/70 rounded-md px-2 py-1 text-xs font-medium"
+                        @click="removeFailed"
+                      >
+                        移除
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- + 瓦片 -->
+                <button
+                  v-if="canAddMore && !previewUrl"
+                  type="button"
+                  class="bg-surface hover:bg-surface/70 group relative aspect-square overflow-hidden rounded-xl border-2 border-dashed transition-colors"
+                  :class="{ 'border-ink': isDragging }"
+                  :aria-label="'添加图片'"
+                  :title="`还可上传 ${MAX_PICTURES - editPictures.length} 张`"
+                  @click="triggerFileInput"
+                  @dragover.prevent
+                  @dragleave.prevent="isDragging = false"
+                  @drop.prevent="handleDrop"
+                >
+                  <div
+                    class="absolute inset-0 flex flex-col items-center justify-center"
+                  >
+                    <ImagePlus
+                      class="text-muted group-hover:text-ink h-5 w-5 transition-colors"
+                      :stroke-width="1.5"
+                    />
+                    <span class="text-muted mt-1 text-xs">添加</span>
+                  </div>
+                </button>
+              </div>
+
+              <p class="text-muted mt-1.5 text-xs tabular-nums">
+                {{ editPictures.length }} / {{ MAX_PICTURES }}
+              </p>
+            </div>
+
             <div class="flex items-center gap-2 pt-1">
               <button
                 type="button"
                 class="text-muted hover:bg-surface rounded-lg px-4 py-2 text-sm font-medium transition-colors"
-                :disabled="saving"
+                :disabled="saving || isUploading"
                 @click="cancelEdit"
               >
                 取消
               </button>
-              <button
+              <UiButton
+                size="sm"
                 type="button"
-                class="bg-accent text-ink hover:bg-accent/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
-                :disabled="saving"
+                :disabled="saving || isUploading"
                 @click="saveEdit"
               >
                 {{ saving ? '保存中...' : '保存' }}
-              </button>
+              </UiButton>
             </div>
           </div>
 
@@ -414,16 +719,12 @@ watch(
         </div>
 
         <!-- 底栏 -->
-        <footer class="space-y-3 border-t px-6 py-4">
+        <footer class="border-border space-y-3 border-t px-6 py-4">
           <!-- 主操作:规划路线 -->
-          <button
-            type="button"
-            class="bg-accent text-ink hover:bg-accent/90 inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium shadow-sm transition-colors"
-            @click="onRoute"
-          >
+          <UiButton class="w-full rounded-full! px-4 py-2.5" @click="onRoute">
             <Navigation class="h-4 w-4" />
             从这里规划路线
-          </button>
+          </UiButton>
           <!-- 管理操作 -->
           <div class="flex items-center justify-end gap-1">
             <button
