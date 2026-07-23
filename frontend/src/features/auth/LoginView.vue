@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { AuthLayout } from './components';
-import { IconCloud, IconKey, IconLock } from '@/components';
+import { Button, FieldError, IconCloud, IconKey, IconLock } from '@/components';
 import type { LoginForm } from '@/features/auth/types';
-import { ShieldUser } from '@lucide/vue';
+import { Check, Loader2, LogIn, ShieldUser } from '@lucide/vue';
+import { AnimatePresence, motion } from 'motion-v';
 import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
 import { useAuthenticate } from '@/features/auth';
@@ -22,6 +23,7 @@ const form = ref<LoginForm>({
 });
 
 const showPassword = ref<boolean>(false);
+const isLoginHovered = ref<boolean>(false);
 </script>
 
 <template>
@@ -88,23 +90,7 @@ const showPassword = ref<boolean>(false);
             }"
           />
         </div>
-        <span
-          v-if="errors.username"
-          class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
-        >
-          <svg
-            class="size-4 shrink-0"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-          {{ errors.username }}
-        </span>
+        <FieldError :message="errors.username" />
       </div>
 
       <!-- 密码 -->
@@ -168,115 +154,75 @@ const showPassword = ref<boolean>(false);
             </svg>
           </button>
         </div>
-        <span
-          v-if="errors.password"
-          class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
-        >
-          <svg
-            class="size-4 shrink-0"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-          {{ errors.password }}
-        </span>
+        <FieldError :message="errors.password" />
       </div>
 
       <!-- 提交按钮 -->
       <div class="mt-6">
         <button
           type="submit"
-          class="bg-accent text-ink shadow-accent/30 hover:bg-accent/90 focus:ring-accent/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
+          @mouseenter="isLoginHovered = true"
+          @mouseleave="isLoginHovered = false"
+          class="bg-accent text-contrast shadow-accent/30 hover:bg-accent/90 focus:ring-accent/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
           :disabled="isSubmitting"
         >
           <!-- SVG 加载动画 -->
-          <svg
-            v-if="isSubmitting"
-            class="h-5 w-5 animate-spin"
-            viewBox="0 0 24 24"
-            fill="none"
-          >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            />
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
+          <Loader2 v-if="isSubmitting" class="h-5 w-5 animate-spin" />
+          <!-- hover morph: LogIn ↔ Check -->
+          <div v-else class="relative flex h-5 w-5 items-center justify-center">
+            <AnimatePresence mode="popLayout" :initial="false">
+              <motion.div
+                v-if="!isLoginHovered"
+                key="login"
+                :initial="{ scale: 0.5, opacity: 0 }"
+                :animate="{ scale: 1, opacity: 1 }"
+                :exit="{ scale: 0.5, opacity: 0 }"
+                :transition="{ type: 'spring', stiffness: 600, damping: 25 }"
+                class="absolute inset-0 flex items-center justify-center"
+              >
+                <LogIn class="h-5 w-5" />
+              </motion.div>
+              <motion.div
+                v-else
+                key="check"
+                :initial="{ scale: 0.5, opacity: 0 }"
+                :animate="{ scale: 1, opacity: 1 }"
+                :exit="{ scale: 0.5, opacity: 0 }"
+                :transition="{ type: 'spring', stiffness: 600, damping: 25 }"
+                class="absolute inset-0 flex items-center justify-center"
+              >
+                <Check class="h-5 w-5" />
+              </motion.div>
+            </AnimatePresence>
+          </div>
           {{ isSubmitting ? null : 'Login' }}
         </button>
       </div>
 
       <!-- Passkey 登录按钮 -->
       <div class="mt-8">
-        <button
-          type="button"
+        <Button
           @click="handlePasskeyLogin"
           :disabled="isPasskeySubmitting"
-          class="bg-success text-ink shadow-success/30 hover:bg-success/90 focus:ring-success/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          class="bg-success group text-contrast shadow-success/30 hover:bg-success/90 focus:ring-success/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 px-8 py-2.5 font-bold! transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <IconKey />
+          <IconKey
+            class="transition-transform duration-200 ease-in-out group-hover:rotate-12"
+          />
           <!-- SVG 加载动画 -->
-          <svg
-            v-if="isPasskeySubmitting"
-            class="h-5 w-5 animate-spin"
-            viewBox="0 0 24 24"
-            fill="none"
-          >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            />
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
+          <Loader2 v-if="isSubmitting" class="h-5 w-5 animate-spin" />
           <span v-if="isPasskeySubmitting">Logging in with Passkey...</span>
           <span v-else>Login with Passkey</span>
-        </button>
-        <span
-          v-if="errors.passkey"
-          class="text-destructive mt-2 flex items-center justify-center gap-1.5 text-center text-sm"
-        >
-          <svg
-            class="size-4 shrink-0"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-          {{ errors.passkey }}
-        </span>
+        </Button>
+        <FieldError :message="errors.passkey" />
       </div>
 
       <div class="relative mt-8">
         <div class="absolute inset-0 flex items-center">
           <span class="w-full border-t"></span>
         </div>
-        <div class="relative flex justify-center text-xs uppercase">
-          <span class="bg-page text-muted px-2"> Or continue with </span>
+        <div class="relative flex justify-center">
+          <span class="text-muted bg-page px-2"> Or continue with </span>
         </div>
       </div>
 
@@ -285,7 +231,7 @@ const showPassword = ref<boolean>(false);
         <button
           type="button"
           @click="handleGitHubLogin"
-          class="text-ink focus:ring-accent inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-black px-8 py-2.5 font-bold shadow-lg transition-colors hover:bg-black/90 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:text-white"
+          class="text-contrast focus:ring-accent inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-black px-8 py-2.5 font-bold shadow-lg transition-colors hover:bg-black/90 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:text-white"
         >
           <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
             <path

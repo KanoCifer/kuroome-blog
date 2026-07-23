@@ -1,16 +1,29 @@
 <template>
   <div
-    class="transition-transform duration-800 ease-in-out"
+    class="transition-transform duration-800 ease-out"
     :class="!floatingIn ? 'translate-x-full' : 'translate-x-0'"
   >
     <!-- Settings button -->
     <div class="fixed top-4 right-4 z-50 flex flex-col gap-2">
       <button
         @click="$emit('openSettings')"
+        @mouseenter="isSettingsHovered = true"
+        @mouseleave="isSettingsHovered = false"
         class="fab group bg-secondary hover:bg-accent"
         aria-label="偏好设置"
       >
-        <Settings class="fab-icon text-ink group-hover:text-contrast" />
+        <motion.div
+          class="flex items-center justify-center"
+          :animate="{ rotate: isSettingsHovered ? 180 : 0 }"
+          :transition="{
+            type: 'spring',
+            stiffness: 400,
+            damping: 25,
+            delay: 0.3,
+          }"
+        >
+          <Settings class="fab-icon text-ink group-hover:text-contrast" />
+        </motion.div>
         <span class="fab-label">偏好设置</span>
       </button>
     </div>
@@ -31,13 +44,21 @@
     <div class="fixed top-28 right-4 z-50 flex flex-col gap-2">
       <button
         @click="handleLike"
+        @mouseenter="isHeartHovered = true"
+        @mouseleave="isHeartHovered = false"
         :class="[
           'fab group text-contrast',
           liked ? 'bg-rose-500' : 'bg-accent hover:bg-rose-500',
         ]"
         aria-label="点赞"
       >
-        <Heart class="fab-icon" :class="liked ? 'fill-current' : ''" />
+        <motion.div
+          class="flex items-center justify-center"
+          :animate="isHeartHovered ? { scale: [1, 1.25, 1] } : { scale: 1 }"
+          :transition="{ duration: 0.4, ease: 'easeInOut' }"
+        >
+          <Heart class="fab-icon" :class="liked ? 'fill-current' : ''" />
+        </motion.div>
         <span class="fab-label">{{ likesCount }}</span>
       </button>
     </div>
@@ -132,6 +153,7 @@ import {
   Smartphone,
   Wrench,
 } from '@lucide/vue';
+import { motion } from 'motion-v';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -142,6 +164,8 @@ const floatingIn = ref(false);
 
 const liked = ref(false);
 const likesCount = ref(0);
+const isHeartHovered = ref(false);
+const isSettingsHovered = ref(false);
 
 function toggleEditLayout() {
   if (layoutStore.isEditing) {

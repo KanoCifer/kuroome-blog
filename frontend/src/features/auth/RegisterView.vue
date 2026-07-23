@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { authGateway } from '@/features/auth';
 import { AuthLayout } from './components';
-import { IconCloud, IconLock } from '@/components';
+import { Button, FieldError, IconCloud, IconLock } from '@/components';
 import { useNotificationStore } from '@/stores';
 import type { RegisterForm } from '@/features/auth/types';
 import axios from 'axios';
@@ -126,8 +126,8 @@ const handleSubmit = async () => {
   <AuthLayout brand-width="w-1/2" form-width="lg:w-1/2">
     <template #branding>
       <div class="flex items-center gap-2 text-xl font-bold tracking-tight">
-        <IconCloud class="text-ink size-8" />
-        <span>Kanocifer<span class="text-ink">.chat</span></span>
+        <IconCloud class="text-accent size-8" />
+        <span>Kanocifer<span class="text-accent">.chat</span></span>
       </div>
       <div class="z-10 my-auto">
         <div class="flex flex-col">
@@ -187,23 +187,7 @@ const handleSubmit = async () => {
             required
           />
         </div>
-        <span
-          v-if="errors.username"
-          class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
-        >
-          <svg
-            class="size-4 shrink-0"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-          {{ errors.username }}
-        </span>
+        <FieldError :message="errors.username" />
       </div>
 
       <!-- 邮箱 -->
@@ -227,23 +211,7 @@ const handleSubmit = async () => {
             required
           />
         </div>
-        <span
-          v-if="errors.email"
-          class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
-        >
-          <svg
-            class="size-4 shrink-0"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-          {{ errors.email }}
-        </span>
+        <FieldError :message="errors.email" />
       </div>
 
       <!-- 密码 -->
@@ -267,23 +235,7 @@ const handleSubmit = async () => {
             required
           />
         </div>
-        <span
-          v-if="errors.password"
-          class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
-        >
-          <svg
-            class="size-4 shrink-0"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-          {{ errors.password }}
-        </span>
+        <FieldError :message="errors.password" />
       </div>
 
       <!-- 确认密码 -->
@@ -307,23 +259,7 @@ const handleSubmit = async () => {
             required
           />
         </div>
-        <span
-          v-if="errors.confirmPassword"
-          class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
-        >
-          <svg
-            class="size-4 shrink-0"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-          {{ errors.confirmPassword }}
-        </span>
+        <FieldError :message="errors.confirmPassword" />
       </div>
 
       <!-- 邮箱验证码 -->
@@ -346,44 +282,29 @@ const handleSubmit = async () => {
             }"
             required
           />
-          <button
-            type="button"
-            class="bg-accent text-ink hover:bg-accent/90 focus:ring-accent/30 disabled:bg-accent/50 absolute top-1/2 right-2 z-10 -translate-y-1/2 rounded-lg px-4 py-1.5 text-sm font-bold transition-colors focus:ring-2 focus:outline-none disabled:cursor-progress"
+          <Button
+            class="absolute top-1/2 right-2 z-10 -translate-y-1/2"
+            size="md"
             :disabled="isSendingCode || isSent"
             @click="sendEmailCode"
           >
             {{ sendCodeText }}
-          </button>
+          </Button>
         </div>
-        <span
-          v-if="errors.emailCode"
-          class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
-        >
-          <svg
-            class="size-4 shrink-0"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-          {{ errors.emailCode }}
-        </span>
+        <FieldError :message="errors.emailCode" />
       </div>
 
       <!-- 提交按钮 -->
       <div class="mt-6">
-        <button
+        <Button
+          size="lg"
+          class="w-full font-serif"
           type="submit"
-          class="bg-accent text-ink shadow-accent/30 hover:bg-accent/90 focus:ring-accent/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           :disabled="isSubmitting"
         >
           <Loader2 v-if="isSubmitting" class="h-5 w-5 animate-spin" />
-          {{ isSubmitting ? '注册中...' : '注册' }}
-        </button>
+          {{ isSubmitting ? 'Registering...' : 'Register' }}
+        </Button>
       </div>
 
       <span

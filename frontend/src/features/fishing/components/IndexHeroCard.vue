@@ -96,20 +96,16 @@ watch(
         <p class="text-muted mt-0.5 text-sm">基于天气、潮汐综合计算</p>
       </div>
       <div class="flex shrink-0 items-center gap-2">
-        <button
-          class="text-muted hover:bg-surface hover:text-ink inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+        <Button
+          variant="ghost"
           type="button"
+          size="sm"
           :disabled="loading"
           @click="emit('refresh')"
         >
           <Loader v-if="loading" class="h-3 w-3 animate-spin" />
           {{ loading ? '刷新中' : '刷新' }}
-        </button>
-        <div
-          class="bg-accent text-contrast flex h-11 w-11 items-center justify-center rounded-2xl shadow-sm transition-all duration-300 group-hover:rounded-xl"
-        >
-          <FishingRod class="hero-rod h-5 w-5" />
-        </div>
+        </Button>
       </div>
     </div>
 
@@ -136,6 +132,10 @@ watch(
         >
           {{ indexData.level }}
         </span>
+        <FishingRod
+          class="hero-rod mr-2 ml-auto size-20 opacity-70"
+          :class="levelTextColor[indexData.level] || 'text-muted'"
+        />
       </div>
 
       <!-- 三联指标 (扁平 prose 行:label · value · label · value) -->
@@ -189,7 +189,9 @@ watch(
               >
                 <div class="mb-0.5 flex items-baseline justify-between gap-2">
                   <span class="text-ink">{{ formatFeatureName(keyName) }}</span>
-                  <span class="text-muted tabular-nums">{{ Math.round(value * 100) }}</span>
+                  <span class="text-muted tabular-nums">{{
+                    Math.round(value * 100)
+                  }}</span>
                 </div>
                 <div
                   class="bg-surface relative h-1.5 w-full overflow-hidden rounded-full"
@@ -209,7 +211,7 @@ watch(
       <!-- Footer:定位 (store 真实字段) -->
       <p
         v-if="locationName"
-        class="text-muted mt-6 flex items-center gap-1.5 border-t border-border pt-4 text-xs"
+        class="text-muted border-border mt-6 flex items-center gap-1.5 border-t pt-4 text-xs"
       >
         <MapPin class="h-3 w-3 shrink-0" />
         <span class="truncate">{{ locationName }}</span>

@@ -98,7 +98,7 @@ watch(
       >
         <!-- 顶栏 -->
         <header
-          class="flex items-start justify-between gap-3 border-b px-6 pt-6 pb-5"
+          class="border-border flex items-start justify-between gap-3 border-b px-6 pt-6 pb-5"
         >
           <div class="min-w-0">
             <h2 class="text-ink font-family-averia text-2xl leading-snug">

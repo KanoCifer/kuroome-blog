@@ -3,7 +3,7 @@ import { authGateway, useProfileForm } from '@/features/auth';
 import { useAuthStore } from '@/features/auth';
 import { useUpload } from '@/features/upload';
 import { AuthLayout } from './components';
-import { IconCloud } from '@/components';
+import { FieldError, IconCloud } from '@/components';
 import {
   AlertCircle,
   AtSign,
@@ -295,13 +295,7 @@ onMounted(() => {
             }"
           />
         </div>
-        <span
-          v-if="errors.name"
-          class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
-        >
-          <AlertCircle class="size-4 shrink-0" />
-          {{ errors.name }}
-        </span>
+        <FieldError :message="errors.name" />
       </div>
 
       <div>
@@ -323,13 +317,7 @@ onMounted(() => {
             }"
           />
         </div>
-        <span
-          v-if="errors.username"
-          class="text-destructive mt-1.5 flex items-center gap-1.5 text-sm"
-        >
-          <AlertCircle class="size-4 shrink-0" />
-          {{ errors.username }}
-        </span>
+        <FieldError :message="errors.username" />
       </div>
 
       <div class="my-3">

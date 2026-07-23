@@ -1,5 +1,5 @@
 <template>
-  <motion.nav aria-label="主导航" class="nav liquid-glass px-9 py-1">
+  <motion.nav aria-label="主导航" class="nav liquid-glass px-12 py-1">
     <ul class="flex items-center gap-2 font-medium">
       <!-- Brand: avatar + 文字 logo -->
       <li class="ml-1 flex shrink-0 items-center gap-2 pr-2">
@@ -50,7 +50,7 @@
       <!-- Others: hover dropdown — routes not shown in the pill strip -->
       <li>
         <HoverDropdown
-          panel-class="bg-page/80 absolute top-full right-0 z-50 mt-2 w-52 rounded-2xl p-1.5 ring-1 ring-black/5 backdrop-blur-xs dark:ring-white/10"
+          panel-class="bg-page/80 absolute top-full right-0 z-50 mt-2 w-52 rounded-2xl p-1 ring-1 ring-black/5 backdrop-blur-xs dark:ring-white/10"
           class="flex items-center"
         >
           <template #trigger="{ isOpen }">
@@ -58,7 +58,7 @@
               type="button"
               :aria-expanded="isOpen || undefined"
               aria-haspopup="true"
-              class="nav-text nav-link liquid-glass-button relative flex h-11 items-center gap-1.5 rounded-full px-4 text-[13px] leading-none transition-[transform,background-color,color] duration-150 ease-out active:scale-[0.96]"
+              class="nav-text nav-link liquid-glass-button relative flex h-11 items-center gap-1.5 rounded-full px-1 text-[13px] leading-none transition-[transform,background-color,color] duration-150 ease-out active:scale-[0.96]"
               :class="{
                 'opacity-100': isOthersActive,
                 'opacity-40 hover:opacity-70': !isOthersActive,

@@ -6,7 +6,7 @@
       class="bg-surface text-muted flex h-12 w-12 items-center justify-center rounded-full"
       aria-hidden="true"
     >
-      <MomentIcon />
+      <MessageCircleHeart />
     </div>
     <div>
       <h3 class="text-ink font-serif text-lg">
@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import MomentIcon from '@/features/moments/components/MomentIcon.vue';
+import { MessageCircleHeart } from '@lucide/vue';
 withDefaults(
   defineProps<{
     title?: string;

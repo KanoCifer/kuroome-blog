@@ -119,16 +119,13 @@
               </svg>
             </button>
           </div>
-          <p
-            v-if="hasFieldError"
-            id="api-key-error"
-            class="text-destructive mt-1 text-xs"
-          >
-            {{ fieldError }}
-          </p>
-          <p v-else id="api-key-hint" class="text-muted mt-1 text-xs">
-            API Key 仅保存在您的服务端账户中，不会在浏览器本地留存。
-          </p>
+          <FieldError
+            :message="fieldError"
+            hint="API Key 仅保存在您的服务端账户中，不会在浏览器本地留存。"
+            size="xs"
+            hide-icon
+            id="api-key"
+          />
           <a
             href="https://weread.qq.com/r/weread-skills"
             target="_blank"
@@ -193,6 +190,7 @@
 
 <script setup lang="ts">
 import { wereadGateway } from '@/features/books/api';
+import { FieldError } from '@/components';
 import { useNotificationStore } from '@/stores';
 import { computed, ref } from 'vue';
 

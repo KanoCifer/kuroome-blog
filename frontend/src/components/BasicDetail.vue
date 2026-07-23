@@ -100,29 +100,14 @@
       </div>
 
       <div class="relative mt-12 flex justify-center pb-12 sm:pb-16">
-        <button
-          type="button"
+        <Button
           :aria-label="onBack ? '返回' : '返回上一页'"
-          class="bg-accent text-ink hover:bg-accent/90 focus-visible:ring-ring inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium shadow-sm transition-[background-color,transform,box-shadow] duration-300 hover:scale-[1.02] hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.96]"
+          size="lg"
+          class="rounded-full!"
           @click="onBack === undefined ? $router.back() : onBack()"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-          <span>返回上一页</span>
-        </button>
+          <Undo2 class="h-5 w-5" /><span>返回上一页</span>
+        </Button>
       </div>
     </section>
   </div>
@@ -131,6 +116,8 @@
 <script setup lang="ts">
 import { useMediaQuery, useScroll } from '@vueuse/core';
 import { computed, onMounted, ref, watch } from 'vue';
+import { Button } from './ui/button';
+import { Undo2 } from '@lucide/vue';
 
 const { y } = useScroll(window);
 const isSmallScreen = useMediaQuery('(max-width: 768px)');

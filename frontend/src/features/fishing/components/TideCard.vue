@@ -194,7 +194,6 @@ const tideOptions = computed(() => {
     backgroundColor: 'transparent',
     // 关键:禁用 animation 避免 setOption 时 echarts interpolate1DArray 崩
     // (3-stop 渐变 + markPoint pin coord 都参与动画时容易出问题)
-    animation: false,
     tooltip: {
       trigger: 'axis',
       backgroundColor: p.card,
