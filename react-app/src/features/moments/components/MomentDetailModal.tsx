@@ -1,8 +1,9 @@
 import { PinIcon } from '@/components';
-import type { Moment, MomentStatus, MomentVisibility } from '@/types';
+import type { Moment, MomentAttachment, MomentStatus, MomentVisibility } from '@/types';
 import { isPureEmoji } from '@/lib/emoji';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { MomentTagChip } from './MomentTagChip';
 import { IconClose, IconChevronLeft, IconChevronRight } from './InlineIcons';
 
@@ -43,9 +44,34 @@ export function MomentDetailModal({
   onEdit,
   onDelete,
 }: MomentDetailModalProps) {
-  // 键盘：J/K 切换、Esc 关闭
+  // ── 图片附件(详情查看,不引入新组件,inline lightbox) ──
+  const imageAttachments = useMemo<MomentAttachment[]>(
+    () => (moment?.attachments ?? []).filter((a) => a.type === 'image'),
+    [moment?.attachments],
+  );
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  function openLightbox(idx: number): void {
+    setLightboxIndex(idx);
+  }
+  function closeLightbox(): void {
+    setLightboxIndex(null);
+  }
+  function lightboxPrev(): void {
+    const n = imageAttachments.length;
+    if (n === 0 || lightboxIndex === null) return;
+    setLightboxIndex(lightboxIndex <= 0 ? n - 1 : lightboxIndex - 1);
+  }
+  function lightboxNext(): void {
+    const n = imageAttachments.length;
+    if (n === 0 || lightboxIndex === null) return;
+    setLightboxIndex(lightboxIndex >= n - 1 ? 0 : lightboxIndex + 1);
+  }
+
+  // 键盘：J/K 切换、Esc 关闭（lightbox 打开时让位给 lightbox 自己的 effect）
   useEffect(() => {
     if (!open) return;
+    if (lightboxIndex !== null) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
@@ -64,7 +90,27 @@ export function MomentDetailModal({
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [open, hasNext, hasPrev, onClose, onNavigate]);
+  }, [open, lightboxIndex, hasNext, hasPrev, onClose, onNavigate]);
+
+  // lightbox 专用键盘 ←/→/Esc（与 modal 互斥，lightbox 优先）
+  useEffect(() => {
+    if (lightboxIndex === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeLightbox();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        lightboxPrev();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        lightboxNext();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lightboxIndex, imageAttachments.length]);
 
   return (
     <AnimatePresence>
@@ -184,6 +230,28 @@ export function MomentDetailModal({
                 >
                   {moment.content}
                 </div>
+
+                {/* 附件图片网格(点击放大查看) */}
+                {imageAttachments.length > 0 && (
+                  <div className="mt-6 grid grid-cols-3 gap-2">
+                    {imageAttachments.map((att, idx) => (
+                      <button
+                        key={att.url}
+                        type="button"
+                        className="bg-surface group relative aspect-square overflow-hidden rounded-xl"
+                        aria-label={`查看图片 ${idx + 1}`}
+                        onClick={() => openLightbox(idx)}
+                      >
+                        <img
+                          src={att.url}
+                          alt=""
+                          className="h-full w-full object-cover transition-transform group-hover:scale-[1.02]"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 {moment.tags.length > 0 && (
                   <div className="text-muted mt-8 flex flex-wrap items-center gap-2 text-[12px]">
                     {moment.tags.map((tag) => (
@@ -250,6 +318,78 @@ export function MomentDetailModal({
               </aside>
             </div>
           </motion.div>
+
+            {/* 图片放大查看(inline lightbox,portal 到 body,沿用图片墙看图态) */}
+            {imageAttachments.length > 0 &&
+              createPortal(
+                <AnimatePresence>
+                  {lightboxIndex !== null && (
+                    <motion.div
+                      key="moment-lightbox"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.18 }}
+                      className="fixed inset-0 z-[60] flex items-center justify-center"
+                      role="dialog"
+                      aria-modal="true"
+                    >
+                      {/* 遮罩 */}
+                      <div
+                        className="bg-ink/80 absolute inset-0 backdrop-blur-sm"
+                        onClick={closeLightbox}
+                      />
+
+                      {/* 顶部工具条 */}
+                      <div className="text-page absolute top-0 right-0 left-0 z-10 flex items-center justify-between px-5 py-4">
+                        <span className="font-mono text-sm tabular-nums">
+                          {lightboxIndex + 1} / {imageAttachments.length}
+                        </span>
+                        <button
+                          type="button"
+                          className="hover:bg-page/20 inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+                          aria-label="关闭"
+                          onClick={closeLightbox}
+                        >
+                          <IconClose className="h-5 w-5" />
+                        </button>
+                      </div>
+
+                      {/* 左切换 */}
+                      {imageAttachments.length > 1 && (
+                        <button
+                          type="button"
+                          className="text-page hover:bg-page/20 absolute left-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
+                          aria-label="上一张"
+                          onClick={lightboxPrev}
+                        >
+                          <IconChevronLeft className="h-6 w-6" />
+                        </button>
+                      )}
+
+                      {/* 主图 */}
+                      <img
+                        src={imageAttachments[lightboxIndex]?.url ?? ''}
+                        alt={`附件图片 ${lightboxIndex + 1}`}
+                        className="relative z-[1] max-h-[85vh] max-w-[90vw] rounded-lg object-contain shadow-2xl"
+                      />
+
+                      {/* 右切换 */}
+                      {imageAttachments.length > 1 && (
+                        <button
+                          type="button"
+                          className="text-page hover:bg-page/20 absolute right-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
+                          aria-label="下一张"
+                          onClick={lightboxNext}
+                        >
+                          <IconChevronRight className="h-6 w-6" />
+                        </button>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>,
+                document.body,
+              )}
         </motion.div>
       )}
     </AnimatePresence>

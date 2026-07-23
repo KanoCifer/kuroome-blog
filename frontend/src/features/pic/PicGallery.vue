@@ -24,9 +24,10 @@
     />
 
     <!--
-      Gallery Container — 最短列优先瀑布流
-      Native CSS grid masonry 优先（现代浏览器左→右填充），不支持时回退到多列布局。
-      卡片已通过 aspect-ratio 预留图片高度，加载时不跳动。
+      Gallery Container —— 纯 CSS 多列瀑布流
+      columns 控制列数、column-gap 控制间距；卡片 break-inside: avoid 防拆断、
+      margin-bottom 提供列内垂直间距。卡片已在组件内通过 aspect-ratio 预留高度，
+      加载时不跳动。
     -->
     <div
       class="gallery-masonry relative z-10 mx-auto w-full max-w-[1400px] px-4 pt-24 pb-32 sm:px-6"
@@ -257,11 +258,12 @@ onMounted(async () => {
 
 <style scoped>
 /* ============================================================
-   瀑布流布局：native CSS grid masonry 优先 + 多列回退
-   - 现代浏览器：grid-template-rows: masonry（左→右最短列填充）
-   - 旧浏览器：CSS multi-column（上→右排列，每卡片 break-inside: avoid）
-   - 响应式列数通过 CSS 变量 + 媒体查询集中管理
-   - 卡片已在组件内通过 aspect-ratio 预留高度，加载无跳动
+   瀑布流布局：纯 CSS multi-column
+   - columns 控制列数，column-gap 控制列间水平间距
+   - gallery-item 的 margin-bottom 提供列内垂直间距，break-inside: avoid 防止卡片被拆断
+   - gallery-empty 用 column-span: all 占满整行
+   - 响应式列数与间距通过 CSS 变量集中管理
+   - 卡片在组件内已通过 aspect-ratio 预留高度，加载无跳动
    ============================================================ */
 
 .gallery-masonry {
@@ -270,7 +272,6 @@ onMounted(async () => {
   /* 列数响应式：<480→2, <768→3, <1100→4, <1400→5, ≥1400→6 */
   --gallery-cols: 2;
 
-  /* 回退：CSS multi-column（旧浏览器上→右排列） */
   columns: var(--gallery-cols);
   column-gap: var(--gallery-gap);
 }
@@ -285,25 +286,7 @@ onMounted(async () => {
   column-span: all;
 }
 
-@supports (grid-template-rows: masonry) {
-  .gallery-masonry {
-    display: grid;
-    grid-template-columns: repeat(var(--gallery-cols), 1fr);
-    grid-template-rows: masonry;
-    gap: var(--gallery-gap);
-    columns: unset;
-  }
-
-  .gallery-item {
-    margin-bottom: 0;
-  }
-
-  .gallery-empty {
-    grid-column: 1 / -1;
-  }
-}
-
-/* 响应式列数与间距（native masonry 与多列回退共用变量） */
+/* 响应式列数与间距 */
 @media (min-width: 480px) {
   .gallery-masonry {
     --gallery-cols: 3;

@@ -1,11 +1,21 @@
 import type {
   Moment,
+  MomentAttachment,
   MomentStatus,
   MomentUpdatePayload,
   MomentVisibility,
 } from '@/types';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import {
+  ImageOff,
+  ImagePlus,
+  Loader2,
+  RefreshCw,
+  X,
+} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { useUpload } from '@/features/upload';
+import { UploadDropzone, UploadProgress } from '@/features/upload';
 import { IconClose } from './InlineIcons';
 
 const EMOJI_PRESETS = [
@@ -55,7 +65,33 @@ export function MomentEditorModal({
   const [isPinned, setIsPinned] = useState(false);
   const [allowComment, setAllowComment] = useState(true);
 
-  // 同步 moment → 表单
+  // ── 附件(图片) ──
+  // 复用 React 端 useUpload(type='gallery')，与 Vue 端同源。
+  const MAX_ATTACHMENTS = 9;
+  const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+  const ALLOWED_IMAGE_TYPES = [
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+  ];
+
+  const [attachments, setAttachments] = useState<MomentAttachment[]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [pendingError, setPendingError] = useState<string | null>(null);
+  const attachmentFileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const { upload, isUploading, progress } = useUpload({
+    type: 'gallery',
+    maxSize: MAX_UPLOAD_BYTES,
+    allowedTypes: ALLOWED_IMAGE_TYPES,
+  });
+
+  const canAddMore =
+    attachments.length < MAX_ATTACHMENTS && !previewUrl && !isUploading;
+
+  // 同步 moment → 表单(包括 attachments)。
   useEffect(() => {
     if (open) {
       if (moment) {
@@ -67,6 +103,9 @@ export function MomentEditorModal({
         setStatus(moment.status);
         setIsPinned(moment.is_pinned);
         setAllowComment(moment.allow_comment);
+        setAttachments(
+          moment.attachments.filter((a) => a.type === 'image'),
+        );
       } else {
         setContent('');
         setMood('');
@@ -76,9 +115,93 @@ export function MomentEditorModal({
         setStatus('published');
         setIsPinned(false);
         setAllowComment(true);
+        setAttachments([]);
       }
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      setPendingError(null);
     }
   }, [open, moment]);
+
+  // 释放旧预览 object URL，避免内存泄漏。
+  useEffect(() => {
+    if (!previewUrl) return;
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [previewUrl]);
+
+  // 选中文件后立刻触发 upload(串行)。
+  useEffect(() => {
+    if (!selectedFile) return;
+    let cancelled = false;
+    runUpload(selectedFile, () => cancelled);
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedFile, upload]);
+
+  /**
+   * 选中文件后立刻触发 upload(串行)。
+   * 与 retryUpload 共用一条上传链 — 失败保留 preview，可重试。
+   * `isCancelled` 用于丢弃过期闭包的结果：组件卸载或 selectedFile 被替换时不写入 state。
+   */
+  async function runUpload(file: File, isCancelled?: () => boolean): Promise<void> {
+    setPendingError(null);
+    try {
+      const url = await upload(file);
+      if (isCancelled?.()) return;
+      setAttachments((prev) => [...prev, { type: 'image', url }]);
+      setSelectedFile(null);
+      setPreviewUrl(null);
+    } catch {
+      if (isCancelled?.()) return;
+      setPendingError('图片上传失败，请重试');
+    }
+  }
+
+  function handleDropzoneSelect(files: File[]) {
+    const f = files[0];
+    if (f) startUpload(f);
+  }
+
+  function startUpload(file: File) {
+    if (!canAddMore) return;
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+  }
+
+  function removeAttachment(idx: number) {
+    // 编辑模式：对已存在的服务器附件删除走 confirm，避免误删。
+    if (
+      isEdit &&
+      !window.confirm('确定删除这张图片吗？')
+    ) {
+      return;
+    }
+    setAttachments((prev) => prev.filter((_, i) => i !== idx));
+  }
+
+  async function retryUpload(): Promise<void> {
+    if (!selectedFile || isUploading) return;
+    await runUpload(selectedFile);
+  }
+
+  function removeFailed(): void {
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setPendingError(null);
+  }
+
+  function onAttachmentInput(event: React.ChangeEvent<HTMLInputElement>) {
+    const target = event.target;
+    const f = target.files?.[0];
+    if (f) startUpload(f);
+    // 重置 input value，使再次选择同一文件能触发 change。
+    target.value = '';
+  }
+
+  function triggerAttachmentPicker(): void {
+    attachmentFileInputRef.current?.click();
+  }
 
   function toggleMood(emoji: string) {
     setMood((cur) => (cur === emoji ? '' : emoji));
@@ -104,6 +227,8 @@ export function MomentEditorModal({
     if (e) e.preventDefault();
     const trimmed = content.trim();
     if (!trimmed || trimmed.length > 2000) return;
+    // 上传未完成时禁止提交，避免丢失未持久化的附件。
+    if (isUploading) return;
     onSubmit({
       content: trimmed,
       mood: mood || null,
@@ -112,6 +237,7 @@ export function MomentEditorModal({
       status,
       is_pinned: isPinned,
       allow_comment: allowComment,
+      attachments,
     });
   }
 
@@ -195,6 +321,139 @@ export function MomentEditorModal({
                       {content.length} / 2000
                     </span>
                   </div>
+                </div>
+
+                {/* Attachments (image) */}
+                <div>
+                  <div className="mb-1.5 flex items-baseline gap-2">
+                    <span className="text-ink font-serif text-sm font-medium">
+                      附件
+                    </span>
+                    <span className="text-muted text-[11px]">
+                      图片 · 最多 {MAX_ATTACHMENTS} 张 · 单张 ≤5MB
+                    </span>
+                    <span className="text-muted ml-auto font-mono text-[10px] tabular-nums">
+                      {attachments.length} / {MAX_ATTACHMENTS}
+                    </span>
+                  </div>
+
+                  {/* Empty state: UploadDropzone */}
+                  {attachments.length === 0 && !previewUrl && (
+                    <UploadDropzone
+                      accept="image/*"
+                      disabled={isUploading}
+                      prompt="点击或拖拽图片到此处"
+                      hint={`最多 ${MAX_ATTACHMENTS} 张，单张 ≤5MB`}
+                      onSelect={handleDropzoneSelect}
+                    />
+                  )}
+
+                  {/* Non-empty: 3-col grid */}
+                  {!(attachments.length === 0 && !previewUrl) && (
+                    <div className="grid grid-cols-3 gap-2">
+                      {attachments.map((att, idx) => (
+                        <div
+                          key={att.url}
+                          className="group bg-surface relative aspect-square overflow-hidden rounded-xl"
+                        >
+                          <img
+                            src={att.url}
+                            alt=""
+                            className="h-full w-full object-cover"
+                          />
+                          <button
+                            type="button"
+                            className="bg-page/80 text-ink hover:bg-page absolute top-1.5 right-1.5 inline-flex h-6 w-6 items-center justify-center rounded-full opacity-0 shadow-sm backdrop-blur-md transition-opacity group-hover:opacity-100"
+                            aria-label={`删除图片 ${idx + 1}`}
+                            onClick={() => removeAttachment(idx)}
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ))}
+
+                      {/* Uploading / failed tile */}
+                      {previewUrl && (
+                        <div
+                          className={[
+                            'bg-surface relative aspect-square overflow-hidden rounded-xl',
+                            pendingError ? '' : 'opacity-60',
+                          ].join(' ')}
+                          aria-busy="true"
+                        >
+                          <img
+                            src={previewUrl}
+                            alt=""
+                            className="h-full w-full object-cover"
+                          />
+                          {!pendingError && (
+                            <>
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                                <Loader2 className="h-5 w-5 animate-spin text-white" />
+                              </div>
+                              <div className="absolute right-2 bottom-2 left-2">
+                                <UploadProgress
+                                  progress={progress}
+                                  height="h-1"
+                                />
+                              </div>
+                            </>
+                          )}
+                          {pendingError && (
+                            <div className="border-destructive bg-page/95 absolute inset-0 flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 p-2 text-center backdrop-blur-md">
+                              <ImageOff className="text-destructive h-5 w-5" />
+                              <p className="text-destructive text-xs leading-tight font-medium">
+                                {pendingError}
+                              </p>
+                              <div className="flex gap-1.5">
+                                <button
+                                  type="button"
+                                  className="bg-accent text-ink hover:bg-accent/90 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium"
+                                  onClick={retryUpload}
+                                >
+                                  <RefreshCw className="h-3 w-3" />
+                                  重试
+                                </button>
+                                <button
+                                  type="button"
+                                  className="bg-surface text-ink hover:bg-surface/70 rounded-md px-2 py-1 text-xs font-medium"
+                                  onClick={removeFailed}
+                                >
+                                  移除
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* + tile */}
+                      {canAddMore && (
+                        <button
+                          type="button"
+                          className="bg-surface hover:bg-surface/70 relative flex aspect-square flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed transition-colors"
+                          aria-label="添加图片"
+                          title={`还可上传 ${MAX_ATTACHMENTS - attachments.length} 张`}
+                          onClick={triggerAttachmentPicker}
+                        >
+                          <ImagePlus
+                            className="text-muted h-5 w-5"
+                            strokeWidth={1.5}
+                          />
+                          <span className="text-muted mt-1 text-xs">添加</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Hidden file input for + tile */}
+                  <input
+                    ref={attachmentFileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={onAttachmentInput}
+                  />
                 </div>
 
                 {/* Mood */}

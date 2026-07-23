@@ -103,6 +103,27 @@
           {{ moment.content }}
         </div>
 
+        <!-- 附件图片网格（点击放大查看） -->
+        <div
+          v-if="imageAttachments.length"
+          class="mt-6 grid grid-cols-3 gap-2"
+        >
+          <button
+            v-for="(att, idx) in imageAttachments"
+            :key="att.url"
+            type="button"
+            class="bg-surface group relative aspect-square overflow-hidden rounded-xl"
+            :aria-label="`查看图片 ${idx + 1}`"
+            @click="openLightbox(idx)"
+          >
+            <img
+              :src="att.url"
+              alt=""
+              class="h-full w-full object-cover transition-transform group-hover:scale-[1.02]"
+            />
+          </button>
+        </div>
+
         <!-- 标签 -->
         <div
           v-if="moment.tags.length"
@@ -161,6 +182,67 @@
         </ul>
       </aside>
     </div>
+
+    <!-- 图片放大查看(内联 lightbox,沿用图片墙看图态) -->
+    <Teleport to="body">
+      <div
+        v-if="lightboxIndex !== null"
+        class="fixed inset-0 z-[60] flex items-center justify-center"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div
+          class="bg-ink/80 absolute inset-0 backdrop-blur-sm"
+          @click="closeLightbox"
+        />
+
+        <!-- 顶部工具条 -->
+        <div
+          class="text-page absolute top-0 right-0 left-0 z-10 flex items-center justify-between px-5 py-4"
+        >
+          <span class="font-mono text-sm tabular-nums">
+            {{ lightboxIndex + 1 }} / {{ imageAttachments.length }}
+          </span>
+          <button
+            type="button"
+            class="hover:bg-page/20 inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+            aria-label="关闭"
+            @click="closeLightbox"
+          >
+            <IconClose class="h-5 w-5" />
+          </button>
+        </div>
+
+        <!-- 左切换 -->
+        <button
+          v-if="imageAttachments.length > 1"
+          type="button"
+          class="text-page hover:bg-page/20 absolute left-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
+          aria-label="上一张"
+          @click="lightboxPrev"
+        >
+          <ChevronLeft class="h-6 w-6" />
+        </button>
+
+        <!-- 主图 -->
+        <img
+          :src="imageAttachments[lightboxIndex]?.url"
+          :alt="`附件图片 ${lightboxIndex + 1}`"
+          class="relative z-[1] max-h-[85vh] max-w-[90vw] rounded-lg object-contain shadow-2xl"
+        />
+
+        <!-- 右切换 -->
+        <button
+          v-if="imageAttachments.length > 1"
+          type="button"
+          class="text-page hover:bg-page/20 absolute right-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
+          aria-label="下一张"
+          @click="lightboxNext"
+        >
+          <ChevronRight class="h-6 w-6" />
+        </button>
+      </div>
+    </Teleport>
   </Modal>
 </template>
 
@@ -173,11 +255,12 @@ import { PinIcon } from '@/components';
 import { Modal } from '@/components';
 import type {
   Moment,
+  MomentAttachment,
   MomentStatus,
   MomentVisibility,
 } from '@/features/moments/types';
 import dayjs from 'dayjs';
-import { computed, defineComponent, h } from 'vue';
+import { computed, defineComponent, h, onBeforeUnmount, ref, watch } from 'vue';
 import MomentTagChip from './MomentTagChip.vue';
 
 const props = defineProps<{
@@ -234,6 +317,54 @@ const statusLabel = computed(() => {
   };
   return props.moment ? map[props.moment.status] : '—';
 });
+
+// ── 图片附件(详情查看,不引入新组件,inline lightbox) ──
+const imageAttachments = computed<MomentAttachment[]>(() =>
+  (props.moment?.attachments ?? []).filter((a) => a.type === 'image'),
+);
+const lightboxIndex = ref<number | null>(null);
+
+// 切换 moment 时复位 lightbox —— 上一个 moment 的索引可能落在新数组范围外。
+watch(
+  () => props.moment?.id,
+  () => {
+    lightboxIndex.value = null;
+  },
+);
+
+function openLightbox(idx: number): void {
+  lightboxIndex.value = idx;
+}
+function closeLightbox(): void {
+  lightboxIndex.value = null;
+}
+function lightboxPrev(): void {
+  const n = imageAttachments.value.length;
+  if (n === 0 || lightboxIndex.value === null) return;
+  lightboxIndex.value =
+    lightboxIndex.value <= 0 ? n - 1 : lightboxIndex.value - 1;
+}
+function lightboxNext(): void {
+  const n = imageAttachments.value.length;
+  if (n === 0 || lightboxIndex.value === null) return;
+  lightboxIndex.value =
+    lightboxIndex.value >= n - 1 ? 0 : lightboxIndex.value + 1;
+}
+function onLightboxKey(e: KeyboardEvent): void {
+  if (e.key === 'Escape') closeLightbox();
+  else if (e.key === 'ArrowLeft') lightboxPrev();
+  else if (e.key === 'ArrowRight') lightboxNext();
+}
+
+// 监听 lightbox 开关,挂载 / 卸载键盘。
+watch(lightboxIndex, (idx) => {
+  if (idx !== null) {
+    window.addEventListener('keydown', onLightboxKey);
+  } else {
+    window.removeEventListener('keydown', onLightboxKey);
+  }
+});
+onBeforeUnmount(() => window.removeEventListener('keydown', onLightboxKey));
 
 // 内部小组件：元数据行
 const MetaRow = defineComponent({
