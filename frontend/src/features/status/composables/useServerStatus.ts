@@ -94,12 +94,21 @@ export function useServerStatus(): UseServerStatusReturn {
   const apiHealthy = ref(true);
 
   async function pingApi() {
-    const base = import.meta.env.VITE_API_BASE || '';
-    const protocol = window.location.protocol;
-    const host = window.location.host;
+    const apiBase = import.meta.env.VITE_API_BASE || '';
     const start = performance.now();
+
+    let url: string;
+    if (apiBase.startsWith('http://') || apiBase.startsWith('https://')) {
+      // VITE_API_BASE 是绝对 URL（如 https://api.kanocifer.chat），直接使用
+      url = `${apiBase}/v3/status/detail`;
+    } else {
+      const protocol = window.location.protocol;
+      const host = window.location.host;
+      url = `${protocol}//${host}${apiBase}/v3/status/detail`;
+    }
+
     try {
-      const res = await fetch(`${protocol}//${host}${base}/v3/status/detail`, {
+      const res = await fetch(url, {
         method: 'GET',
         cache: 'no-store',
         signal: AbortSignal.timeout(5000),

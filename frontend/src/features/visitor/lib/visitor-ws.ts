@@ -16,6 +16,13 @@ export let isConnected: ReturnType<typeof useWebSocket>['isConnected'] | null =
 
 function buildWsUrl(): string {
   const apiBase = import.meta.env.VITE_API_BASE || '';
+
+  // VITE_API_BASE 是绝对 URL（如 https://api.kanocifer.chat）时，
+  // 直接从中派生 wss URL，忽略当前页面的 host
+  if (apiBase.startsWith('http://') || apiBase.startsWith('https://')) {
+    return apiBase.replace(/^http/, 'ws') + '/v3/public/ws';
+  }
+
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const host = window.location.host;
   return `${protocol}//${host}${apiBase}/v3/public/ws`;
