@@ -148,10 +148,10 @@ const statusLabel = computed(() => {
 });
 
 const statusClass = computed(() => {
-  if (loading.value) return 'bg-accent/15 text-accent';
+  if (loading.value) return 'bg-accent/15 text-ink';
   if (errorMessage.value) return 'bg-destructive/15 text-destructive';
   if (hasGenerated.value) return 'bg-success/15 text-success';
-  return 'bg-muted text-muted';
+  return 'bg-surface text-muted';
 });
 
 const resetState = () => {
@@ -263,7 +263,7 @@ onUnmounted(() => {
         <select
           v-if="!loading"
           v-model="selectedModel"
-          class="border-border bg-muted text-ink min-w-0 truncate rounded-lg border px-2 py-1 text-xs"
+          class="border-border bg-surface text-ink min-w-0 truncate rounded-lg border px-2 py-1 text-xs"
           aria-label="选择模型"
         >
           <option v-for="model in AI_MODELS" :key="model.id" :value="model.id">
@@ -275,7 +275,7 @@ onUnmounted(() => {
       <button
         v-if="loading"
         type="button"
-        class="bg-destructive text-accent hover:bg-destructive/90 inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition"
+        class="bg-destructive text-ink hover:bg-destructive/90 inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition"
         @click="cancelAnalysis"
       >
         <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -286,7 +286,7 @@ onUnmounted(() => {
       <button
         v-else
         type="button"
-        class="bg-accent text-accent hover:bg-accent/90 disabled:bg-muted disabled:text-muted inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition disabled:cursor-not-allowed"
+        class="bg-accent text-ink hover:bg-accent/90 disabled:bg-surface disabled:text-muted inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition disabled:cursor-not-allowed"
         :disabled="!canGenerate"
         @click="fetchWeatherAnalysis"
       >
@@ -300,7 +300,7 @@ onUnmounted(() => {
       class="flex flex-1 flex-col items-center justify-center text-center"
     >
       <div
-        class="bg-muted mb-3 flex h-14 w-14 items-center justify-center rounded-2xl"
+        class="bg-surface mb-3 flex h-14 w-14 items-center justify-center rounded-2xl"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -324,10 +324,10 @@ onUnmounted(() => {
 
     <!-- 有数据: 结果区 + 脚注 -->
     <div v-else class="flex min-h-0 flex-1 flex-col gap-3">
-      <div class="bg-muted/40 flex-1 overflow-auto rounded-xl p-4">
+      <div class="bg-surface/40 flex-1 overflow-auto rounded-xl p-4">
         <div class="text-muted mb-3 flex items-center gap-2 text-xs">
           <span
-            class="bg-muted/40 h-1.5 w-1.5 rounded-full"
+            class="bg-surface/40 h-1.5 w-1.5 rounded-full"
             aria-hidden="true"
           ></span>
           AI 分析输出
@@ -343,9 +343,9 @@ onUnmounted(() => {
           >
             <p>{{ textShimmer[0] }}</p>
             <div class="mt-3 space-y-2">
-              <div class="bg-muted h-3 w-full animate-pulse rounded"></div>
-              <div class="bg-muted h-3 w-5/6 animate-pulse rounded"></div>
-              <div class="bg-muted h-3 w-2/3 animate-pulse rounded"></div>
+              <div class="bg-surface h-3 w-full animate-pulse rounded"></div>
+              <div class="bg-surface h-3 w-5/6 animate-pulse rounded"></div>
+              <div class="bg-surface h-3 w-2/3 animate-pulse rounded"></div>
             </div>
           </motion.div>
           <motion.div

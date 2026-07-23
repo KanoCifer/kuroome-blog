@@ -81,7 +81,7 @@
             </h3>
             <span
               v-if="inProgressTasks.length"
-              class="bg-muted/10 text-muted inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
+              class="bg-surface/10 text-muted inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
             >
               {{ inProgressTasks.length }}
             </span>
@@ -121,7 +121,7 @@
             </h3>
             <span
               v-if="doneThisWeek.length"
-              class="bg-muted/10 text-muted inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
+              class="bg-surface/10 text-muted inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
             >
               {{ doneThisWeek.length }}
             </span>

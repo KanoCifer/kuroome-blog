@@ -65,7 +65,7 @@ export function MomentCard({
           <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100">
             <button
               type="button"
-              className="text-muted hover:text-accent border-border/40 bg-paper/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
+              className="text-muted hover:text-ink border-border/40 bg-paper/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
               aria-label={`编辑 ${moment.id}`}
               onClick={(e) => {
                 e.stopPropagation();

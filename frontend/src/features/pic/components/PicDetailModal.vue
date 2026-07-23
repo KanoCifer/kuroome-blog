@@ -28,7 +28,7 @@
         >
           <!-- ============= 左侧：胶片查看 ============= -->
           <section
-            class="bg-muted/80 relative flex min-h-0 flex-col gap-4 p-8 pb-6"
+            class="bg-surface/80 relative flex min-h-0 flex-col gap-4 p-8 pb-6"
             aria-label="胶片查看区"
           >
             <header class="flex items-center justify-between gap-3">
@@ -94,19 +94,19 @@
                 <dt class="sr-only">感光度</dt>
                 <dd>{{ iso }}</dd>
                 <span
-                  class="bg-muted/30 h-1 w-1 rounded-full"
+                  class="bg-surface/30 h-1 w-1 rounded-full"
                   aria-hidden="true"
                 ></span>
                 <dt class="sr-only">快门</dt>
                 <dd>{{ exposure }}</dd>
                 <span
-                  class="bg-muted/30 h-1 w-1 rounded-full"
+                  class="bg-surface/30 h-1 w-1 rounded-full"
                   aria-hidden="true"
                 ></span>
                 <dt class="sr-only">光圈</dt>
                 <dd>{{ aperture }}</dd>
                 <span
-                  class="bg-muted/30 h-1 w-1 rounded-full"
+                  class="bg-surface/30 h-1 w-1 rounded-full"
                   aria-hidden="true"
                 ></span>
                 <dt class="sr-only">焦距</dt>
@@ -161,19 +161,19 @@
 
           <!-- ============= 右侧：元数据 ============= -->
           <section
-            class="bg-muted flex min-h-0 flex-col gap-5 p-8 pb-6"
+            class="bg-surface flex min-h-0 flex-col gap-5 p-8 pb-6"
             aria-label="图片信息"
           >
             <header class="flex items-center justify-between">
               <span
-                class="text-accent text-[10.5px] tracking-[0.22em] uppercase"
+                class="text-ink text-[10.5px] tracking-[0.22em] uppercase"
                 style="font-family: var(--font-mono)"
               >
                 No. {{ frameNo }} / 档案
               </span>
               <button
                 type="button"
-                class="text-muted hover:text-ink hover:bg-muted inline-flex h-8 w-8 items-center justify-center rounded-full border border-[color-mix(in_oklch,var(--ink)_12%,transparent)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+                class="text-muted hover:text-ink hover:bg-surface inline-flex h-8 w-8 items-center justify-center rounded-full border border-[color-mix(in_oklch,var(--ink)_12%,transparent)] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
                 aria-label="关闭详情"
                 @click="$emit('close')"
               >
@@ -303,7 +303,7 @@
                 <button
                   v-if="editable"
                   type="button"
-                  class="text-muted hover:text-accent rounded-md px-1.5 py-1 text-[10px] tracking-[0.16em] uppercase transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
+                  class="text-muted hover:text-ink rounded-md px-1.5 py-1 text-[10px] tracking-[0.16em] uppercase transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--accent)]"
                   style="font-family: var(--font-mono)"
                   aria-label="编辑描述"
                   @click="toggleEdit"

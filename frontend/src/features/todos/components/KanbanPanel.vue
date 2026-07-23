@@ -21,7 +21,7 @@
         v-for="col in KANBAN_COLUMNS"
         :key="col.id"
         role="listitem"
-        class="bg-muted/40 border-border flex min-h-96 flex-col rounded-xl border p-3 transition-colors"
+        class="bg-surface/40 border-border flex min-h-96 flex-col rounded-xl border p-3 transition-colors"
         :class="
           dragOverColumn === col.id
             ? 'border-accent/60 bg-accent/5 ring-accent/30 ring-1'
@@ -158,7 +158,7 @@ const KANBAN_COLUMNS: KanbanColumn[] = [
     label: '待办',
     statuses: ['待评估', '待排期'],
     targetStatus: '待评估',
-    dotClass: 'bg-muted',
+    dotClass: 'bg-surface',
   },
   {
     id: 'doing',

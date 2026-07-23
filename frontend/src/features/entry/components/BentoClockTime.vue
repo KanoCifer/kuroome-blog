@@ -37,7 +37,7 @@ onUnmounted(() => {
 
 <template>
   <p
-    class="text-accent/80 font-family-harmonyos mt-2 text-6xl font-bold tracking-tight"
+    class="text-ink/80 font-family-harmonyos mt-2 text-6xl font-bold tracking-tight"
   >
     {{ hourLabel }}<span class="animate-timer-blink mx-1">:</span
     >{{ minuteLabel }}

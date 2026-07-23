@@ -77,8 +77,8 @@ const authorSize = computed(() =>
 
 const badgeCls = computed(() =>
   readingState.value === 'finished'
-    ? 'bg-success/90 text-accent'
-    : 'bg-accent/85 text-accent backdrop-blur-sm',
+    ? 'bg-success/90 text-ink'
+    : 'bg-accent/85 text-ink backdrop-blur-sm',
 );
 
 const gridAnimStyle = computed(() => ({
@@ -103,10 +103,10 @@ function onImgError(e: Event) {
     <!-- ─── List variant: 横向单行 ────────────────────────────── -->
     <div
       v-if="isList"
-      class="border-border/60 bg-paper hover:bg-muted/40 hover:shadow-accent/5 flex items-center gap-3 rounded-xl border p-3 transition-all duration-300 sm:gap-4 sm:p-4"
+      class="border-border/60 bg-paper hover:bg-surface/40 hover:shadow-accent/5 flex items-center gap-3 rounded-xl border p-3 transition-all duration-300 sm:gap-4 sm:p-4"
     >
       <div
-        class="bg-muted relative h-16 w-12 flex-shrink-0 overflow-hidden rounded-md shadow-sm sm:h-20 sm:w-14"
+        class="bg-surface relative h-16 w-12 flex-shrink-0 overflow-hidden rounded-md shadow-sm sm:h-20 sm:w-14"
       >
         <img
           v-if="book.cover"

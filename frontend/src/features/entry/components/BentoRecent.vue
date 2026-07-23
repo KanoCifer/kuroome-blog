@@ -4,18 +4,18 @@
       class="from-gradient-decorative-from to-gradient-decorative-to absolute inset-0 bg-linear-to-br opacity-10 transition-opacity group-hover:opacity-20"
     ></div>
     <div class="relative z-10 flex h-full flex-col justify-between">
-      <div class="bg-muted mb-4 h-32 w-full overflow-hidden rounded-xl">
+      <div class="bg-surface mb-4 h-32 w-full overflow-hidden rounded-xl">
         <!-- Mock Thumbnail -->
         <div
           class="from-gradient-primary-from to-gradient-primary-to h-full w-full bg-linear-to-r"
         ></div>
       </div>
       <div>
-        <div class="text-accent mb-1 text-xs font-semibold">
+        <div class="text-ink mb-1 text-xs font-semibold">
           {{ post.date }}
         </div>
         <h3
-          class="text-ink group-hover:text-accent mb-2 text-lg leading-tight font-bold transition-colors"
+          class="text-ink group-hover:text-ink mb-2 text-lg leading-tight font-bold transition-colors"
         >
           {{ post.title }}
         </h3>

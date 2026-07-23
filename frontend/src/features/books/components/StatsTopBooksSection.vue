@@ -35,7 +35,7 @@ const visible = computed(() => topBooks.value.length > 0);
           {{ i + 1 }}
         </span>
         <div
-          class="bg-muted relative h-[42px] w-8 flex-shrink-0 overflow-hidden rounded-sm shadow-sm"
+          class="bg-surface relative h-[42px] w-8 flex-shrink-0 overflow-hidden rounded-sm shadow-sm"
         >
           <img
             v-if="book.cover"
@@ -59,14 +59,14 @@ const visible = computed(() => topBooks.value.length > 0);
             <span
               v-for="tag in book.tags"
               :key="tag"
-              class="bg-accent/15 text-accent rounded-full px-2 py-0.5 text-xs font-medium"
+              class="bg-accent/15 text-ink rounded-full px-2 py-0.5 text-xs font-medium"
             >
               {{ tag }}
             </span>
           </div>
         </div>
         <div class="flex flex-1 items-center gap-3">
-          <div class="bg-muted h-1 flex-1 overflow-hidden rounded-full">
+          <div class="bg-surface h-1 flex-1 overflow-hidden rounded-full">
             <div
               class="bg-accent h-full rounded-full transition-all duration-700"
               :style="{ width: `${barPercent(book.readTime)}%` }"

@@ -216,8 +216,8 @@ export function TideCard() {
               onClick={() => setSelectedDate(opt.value)}
               className={`min-h-9 shrink-0 rounded-full px-3 text-xs font-medium transition-colors ${
                 isActive
-                  ? 'bg-accent text-accent'
-                  : 'bg-muted text-ink hover:bg-muted/70'
+                  ? 'bg-accent text-ink'
+                  : 'bg-surface text-ink hover:bg-surface/70'
               }`}
             >
               {opt.label} {opt.weekday}

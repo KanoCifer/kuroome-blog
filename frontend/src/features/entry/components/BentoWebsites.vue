@@ -10,7 +10,7 @@
     </div>
     <div class="my-1 flex items-center">
       <div
-        class="bg-muted text-muted group-hover:bg-secondary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors duration-300"
+        class="bg-surface text-muted group-hover:bg-secondary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors duration-300"
       >
         <img
           v-if="randomSite?.icon"

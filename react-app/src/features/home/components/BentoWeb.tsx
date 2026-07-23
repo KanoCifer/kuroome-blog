@@ -95,7 +95,7 @@ export function BentoWeb() {
           <div className="flex gap-1">
             <button
               onClick={() => navigate(-1)}
-              className="text-muted hover:bg-muted rounded-full p-1.5 transition-colors"
+              className="text-muted hover:bg-surface rounded-full p-1.5 transition-colors"
               aria-label="上一个"
             >
               <svg
@@ -114,7 +114,7 @@ export function BentoWeb() {
             </button>
             <button
               onClick={() => navigate(1)}
-              className="text-muted hover:bg-muted rounded-full p-1.5 transition-colors"
+              className="text-muted hover:bg-surface rounded-full p-1.5 transition-colors"
               aria-label="下一个"
             >
               <svg
@@ -157,7 +157,7 @@ export function BentoWeb() {
             >
               {/* 站点图标 + 名字 */}
               <div className="my-1 flex items-center">
-                <div className="bg-muted text-muted group-hover:bg-secondary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors duration-300">
+                <div className="bg-surface text-muted group-hover:bg-secondary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors duration-300">
                   {currentSite.icon && (
                     <img
                       src={currentSite.icon}

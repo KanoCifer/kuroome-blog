@@ -27,7 +27,9 @@ const coverInputRef = ref<HTMLInputElement | null>(null);
 const error = ref('');
 
 // 封面上传：统一 useUpload 原语，保留 spinner + toast 行为
-const { upload: uploadCover, isUploading: coverUploading } = useUpload({ type: 'blog' });
+const { upload: uploadCover, isUploading: coverUploading } = useUpload({
+  type: 'blog',
+});
 
 // Markdown state
 const markdownBody = ref('');
@@ -367,8 +369,8 @@ onBeforeUnmount(() => {
     标题就是输入框，编辑器就是主角，元数据折叠在抽屉里。
 
     视觉策略：
-    · 页面底色 = bg-muted (warm-gray)，像书桌的木板
-    · 编辑器在它之上浮起 = bg-muted (paper)，靠 inset highlight + 软阴影分层
+    · 页面底色 = bg-surface (warm-gray)，像书桌的木板
+    · 编辑器在它之上浮起 = bg-surface (paper)，靠 inset highlight + 软阴影分层
     · 状态不用彩色 chip（bg-warning/10 等），改用单一字色 + 留白 + 描线
     · 所有动画 honor prefers-reduced-motion
   -->
@@ -417,7 +419,7 @@ onBeforeUnmount(() => {
       <div
         v-if="showDraftRestore"
         role="status"
-        class="bg-muted border-border mb-6 flex items-center gap-3 rounded-2xl border px-4 py-3 shadow-sm"
+        class="bg-surface border-border mb-6 flex items-center gap-3 rounded-2xl border px-4 py-3 shadow-sm"
       >
         <span
           class="text-muted ring-border inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full ring-1"
@@ -454,7 +456,7 @@ onBeforeUnmount(() => {
           </button>
           <button
             type="button"
-            class="text-ink hover:text-accent font-serif transition-colors"
+            class="text-ink hover:text-ink font-serif transition-colors"
             @click="adoptDraft"
           >
             续写 →
@@ -466,7 +468,7 @@ onBeforeUnmount(() => {
       <div
         v-if="error"
         role="alert"
-        class="text-muted border-border bg-muted/70 mb-6 flex items-start gap-2 rounded-xl border px-4 py-3 text-sm"
+        class="text-muted border-border bg-surface/70 mb-6 flex items-start gap-2 rounded-xl border px-4 py-3 text-sm"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -526,7 +528,7 @@ onBeforeUnmount(() => {
         <div class="flex flex-wrap items-center gap-2 text-xs">
           <!-- Tags input -->
           <div
-            class="border-border bg-muted flex flex-wrap items-center gap-1.5 rounded-full border px-2 py-1"
+            class="border-border bg-surface flex flex-wrap items-center gap-1.5 rounded-full border px-2 py-1"
           >
             <span class="text-muted/70 tracking-wider">标签</span>
             <span
@@ -565,7 +567,7 @@ onBeforeUnmount(() => {
               'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 transition-colors',
               pin
                 ? 'border-ink/40 bg-ink text-paper'
-                : 'border-border bg-muted text-muted hover:text-ink',
+                : 'border-border bg-surface text-muted hover:text-ink',
             ]"
             :aria-pressed="pin"
             @click="pin = !pin"
@@ -593,8 +595,8 @@ onBeforeUnmount(() => {
             :class="[
               'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 transition-colors',
               metaOpen
-                ? 'border-ink/30 bg-muted text-ink'
-                : 'border-border bg-muted text-muted hover:text-ink',
+                ? 'border-ink/30 bg-surface text-ink'
+                : 'border-border bg-surface text-muted hover:text-ink',
             ]"
             :aria-expanded="metaOpen"
             aria-controls="meta-drawer"
@@ -634,7 +636,7 @@ onBeforeUnmount(() => {
           <div
             v-if="metaOpen"
             id="meta-drawer"
-            class="border-border bg-muted/60 space-y-4 rounded-2xl border p-5"
+            class="border-border bg-surface/60 space-y-4 rounded-2xl border p-5"
           >
             <!-- Summary -->
             <div>
@@ -648,7 +650,7 @@ onBeforeUnmount(() => {
                 rows="2"
                 maxlength="200"
                 placeholder="两三行，写给读者的开场白…"
-                class="text-ink placeholder:text-muted/60 border-border bg-muted focus:border-ink/40 focus:ring-ink/10 w-full resize-none rounded-lg border px-3 py-2 font-serif text-sm leading-relaxed outline-0 focus:ring-1"
+                class="text-ink placeholder:text-muted/60 border-border bg-surface focus:border-ink/40 focus:ring-ink/10 w-full resize-none rounded-lg border px-3 py-2 font-serif text-sm leading-relaxed outline-0 focus:ring-1"
               />
               <p class="text-muted/60 mt-1 text-right font-mono text-[10px]">
                 {{ summary.length }} / 200
@@ -668,7 +670,7 @@ onBeforeUnmount(() => {
                     v-model="cover"
                     type="text"
                     placeholder="粘贴封面 URL"
-                    class="text-ink placeholder:text-muted/60 border-border bg-muted focus:border-ink/40 focus:ring-ink/10 w-full rounded-lg border px-3 py-2 font-mono text-sm outline-0 focus:ring-1"
+                    class="text-ink placeholder:text-muted/60 border-border bg-surface focus:border-ink/40 focus:ring-ink/10 w-full rounded-lg border px-3 py-2 font-mono text-sm outline-0 focus:ring-1"
                   />
                   <div class="flex items-center gap-3 text-xs">
                     <input
@@ -697,7 +699,7 @@ onBeforeUnmount(() => {
                   </div>
                 </div>
                 <div
-                  class="border-border bg-muted h-20 w-28 shrink-0 overflow-hidden rounded-lg border"
+                  class="border-border bg-surface h-20 w-28 shrink-0 overflow-hidden rounded-lg border"
                 >
                   <img
                     v-if="cover"
@@ -719,11 +721,11 @@ onBeforeUnmount(() => {
 
         <!-- ─── The writing canvas ─── -->
         <!--
-          桌面 · 抬起的一张纸。页面底色是 --warm-gray (bg-muted)，
-          编辑器在它之上用 --paper (bg-muted) 浮起，靠阴影分层。
+          桌面 · 抬起的一张纸。页面底色是 --warm-gray (bg-surface)，
+          编辑器在它之上用 --paper (bg-surface) 浮起，靠阴影分层。
         -->
         <div
-          class="bg-muted border-border/60 overflow-hidden rounded-2xl border shadow-[0_1px_0_0_oklch(from_var(--paper)_l_c_h_/_0.6)_inset,0_2px_4px_-1px_oklch(from_var(--ink)_l_c_h_/_0.04),0_8px_24px_-8px_oklch(from_var(--ink)_l_c_h_/_0.12)]"
+          class="bg-surface border-border/60 overflow-hidden rounded-2xl border shadow-[0_1px_0_0_oklch(from_var(--paper)_l_c_h_/_0.6)_inset,0_2px_4px_-1px_oklch(from_var(--ink)_l_c_h_/_0.04),0_8px_24px_-8px_oklch(from_var(--ink)_l_c_h_/_0.12)]"
         >
           <div class="h-full">
             <MarkdownEditor ref="markdownEditorRef" v-model="markdownBody" />
@@ -734,10 +736,10 @@ onBeforeUnmount(() => {
         <!--
           简化成三段：左 = 计量 · 中 = 自动保存（不用 bg-success/10 灯拼色，
           改用一行的字色 + 描线开关）· 右 = 取消 + 发布。
-          用 sticky bottom 跟随滚动，bg-muted/85 backdrop-blur 与纸面对齐。
+          用 sticky bottom 跟随滚动，bg-surface/85 backdrop-blur 与纸面对齐。
         -->
         <div
-          class="text-muted border-border/70 bg-muted/85 sticky bottom-3 -mx-3 flex items-center gap-3 rounded-2xl border px-4 py-2.5 text-xs shadow-sm backdrop-blur-md sm:mx-0"
+          class="text-muted border-border/70 bg-surface/85 sticky bottom-3 -mx-3 flex items-center gap-3 rounded-2xl border px-4 py-2.5 text-xs shadow-sm backdrop-blur-md sm:mx-0"
         >
           <!-- 计量 -->
           <span class="hidden items-center gap-2 font-serif sm:inline-flex">
@@ -752,8 +754,8 @@ onBeforeUnmount(() => {
             :class="[
               'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 transition-colors',
               autoSaveEnabled
-                ? 'border-ink/30 bg-muted text-ink'
-                : 'border-border bg-muted text-muted hover:text-ink',
+                ? 'border-ink/30 bg-surface text-ink'
+                : 'border-border bg-surface text-muted hover:text-ink',
             ]"
             :title="
               autoSaveEnabled ? '自动保存 · ⌘S 手动触发' : '自动保存已关闭'
@@ -765,7 +767,7 @@ onBeforeUnmount(() => {
             <span
               :class="[
                 'h-1.5 w-1.5 rounded-full transition-colors',
-                autoSaveEnabled ? 'bg-ink/70' : 'bg-muted/30',
+                autoSaveEnabled ? 'bg-ink/70' : 'bg-surface/30',
               ]"
               aria-hidden="true"
             ></span>

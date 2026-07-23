@@ -52,7 +52,7 @@
         <template v-if="isAdmin">
           <button
             type="button"
-            class="bg-accent text-accent hover:bg-accent/90 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-medium shadow-sm transition-colors"
+            class="bg-accent text-ink hover:bg-accent/90 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-medium shadow-sm transition-colors"
             @click="emit('edit', moment)"
           >
             <EditIcon class="h-3.5 w-3.5" />
@@ -125,7 +125,7 @@
 
       <!-- 右侧：元数据 sticky -->
       <aside
-        class="bg-muted/30 border-border/40 hidden border-l px-5 py-6 md:block"
+        class="bg-surface/30 border-border/40 hidden border-l px-5 py-6 md:block"
       >
         <div
           class="text-muted sticky top-4 font-mono text-[10px] tracking-[0.18em] uppercase"

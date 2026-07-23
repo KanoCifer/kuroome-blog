@@ -58,7 +58,7 @@ const emit = defineEmits<{
         </div>
 
         <div class="grid grid-cols-2 gap-3 text-sm">
-          <div class="bg-muted/80 rounded-xl px-3 py-2">
+          <div class="bg-surface/80 rounded-xl px-3 py-2">
             <p class="text-muted text-xs">价格</p>
             <p class="text-ink mt-1 font-medium">
               {{
@@ -69,19 +69,19 @@ const emit = defineEmits<{
               }}
             </p>
           </div>
-          <div class="bg-muted/80 rounded-xl px-3 py-2">
+          <div class="bg-surface/80 rounded-xl px-3 py-2">
             <p class="text-muted text-xs">周期</p>
             <p class="text-ink mt-1 font-medium">
               {{ getCycleLabel(selectedSubscription.billing_cycle) }}
             </p>
           </div>
-          <div class="bg-muted/80 rounded-xl px-3 py-2">
+          <div class="bg-surface/80 rounded-xl px-3 py-2">
             <p class="text-muted text-xs">下次扣费</p>
             <p class="text-ink mt-1 font-medium">
               {{ toDateInputValue(selectedSubscription.next_billing_date) }}
             </p>
           </div>
-          <div class="bg-muted/80 rounded-xl px-3 py-2">
+          <div class="bg-surface/80 rounded-xl px-3 py-2">
             <p class="text-muted text-xs">更新时间</p>
             <p class="text-ink mt-1 font-medium">
               {{ formatDate(selectedSubscription.updated_at) }}
@@ -104,7 +104,7 @@ const emit = defineEmits<{
         </div>
 
         <div
-          class="border-border bg-muted/70 text-ink rounded-xl border px-3 py-2 text-sm"
+          class="border-border bg-surface/70 text-ink rounded-xl border px-3 py-2 text-sm"
         >
           {{ selectedSubscription.notes?.trim() || '暂无备注' }}
         </div>
@@ -112,21 +112,21 @@ const emit = defineEmits<{
         <div class="grid grid-cols-2 gap-2">
           <button
             type="button"
-            class="border-border bg-paper text-ink hover:bg-muted rounded-xl border px-3 py-2 text-sm font-medium transition"
+            class="border-border bg-paper text-ink hover:bg-surface rounded-xl border px-3 py-2 text-sm font-medium transition"
             @click="emit('edit', selectedSubscription)"
           >
             编辑订阅
           </button>
           <button
             type="button"
-            class="border-accent/30 bg-accent/15 text-accent hover:bg-muted rounded-xl border px-3 py-2 text-sm font-medium transition"
+            class="border-accent/30 bg-accent/15 text-ink hover:bg-surface rounded-xl border px-3 py-2 text-sm font-medium transition"
             @click="emit('reminder', selectedSubscription)"
           >
             通知配置
           </button>
           <button
             type="button"
-            class="border-border bg-paper text-ink hover:bg-muted rounded-xl border px-3 py-2 text-sm font-medium transition disabled:opacity-60"
+            class="border-border bg-paper text-ink hover:bg-surface rounded-xl border px-3 py-2 text-sm font-medium transition disabled:opacity-60"
             :disabled="pendingStatusId === selectedSubscription.id"
             @click="emit('toggleStatus', selectedSubscription)"
           >

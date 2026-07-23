@@ -134,7 +134,7 @@ export function FishingFeedbackForm({
               type="button"
               aria-label="关闭"
               onClick={() => onCancel?.()}
-              className="hover:bg-muted text-muted inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+              className="hover:bg-surface text-muted inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
@@ -185,7 +185,7 @@ export function FishingFeedbackForm({
             <button
               type="button"
               onClick={() => onCancel?.()}
-              className="bg-muted text-ink hover:bg-muted/70 min-h-11 flex-1 rounded-full px-4 text-sm font-medium transition-colors"
+              className="bg-surface text-ink hover:bg-surface/70 min-h-11 flex-1 rounded-full px-4 text-sm font-medium transition-colors"
               disabled={loading}
             >
               取消
@@ -193,7 +193,7 @@ export function FishingFeedbackForm({
             <button
               type="submit"
               disabled={!selectedFeedback || loading}
-              className="bg-accent text-accent hover:bg-accent/90 min-h-11 flex-1 rounded-full px-4 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+              className="bg-accent text-ink hover:bg-accent/90 min-h-11 flex-1 rounded-full px-4 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? '提交中...' : '确认提交'}
             </button>

@@ -255,7 +255,7 @@ watch(
           </div>
           <button
             type="button"
-            class="text-muted hover:bg-muted hover:text-ink inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors"
+            class="text-muted hover:bg-surface hover:text-ink inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors"
             aria-label="关闭详情"
             @click="emit('close')"
           >
@@ -293,7 +293,7 @@ watch(
                 id="edit-name"
                 v-model="editName"
                 type="text"
-                class="bg-muted text-ink focus:ring-accent/30 w-full rounded-xl border-0 px-4 py-3 text-sm focus:ring-2 focus:outline-none"
+                class="bg-surface text-ink focus:ring-accent/30 w-full rounded-xl border-0 px-4 py-3 text-sm focus:ring-2 focus:outline-none"
               />
             </div>
             <div>
@@ -306,7 +306,7 @@ watch(
                 id="edit-desc"
                 v-model="editDescription"
                 rows="4"
-                class="bg-muted text-ink focus:ring-accent/30 w-full resize-none rounded-xl border-0 px-4 py-3 text-sm leading-relaxed focus:ring-2 focus:outline-none"
+                class="bg-surface text-ink focus:ring-accent/30 w-full resize-none rounded-xl border-0 px-4 py-3 text-sm leading-relaxed focus:ring-2 focus:outline-none"
               />
             </div>
             <div>
@@ -319,7 +319,7 @@ watch(
                 id="edit-tags"
                 v-model="editTags"
                 type="text"
-                class="bg-muted text-ink focus:ring-accent/30 w-full rounded-xl border-0 px-4 py-3 text-sm focus:ring-2 focus:outline-none"
+                class="bg-surface text-ink focus:ring-accent/30 w-full rounded-xl border-0 px-4 py-3 text-sm focus:ring-2 focus:outline-none"
               />
             </div>
             <div>
@@ -352,7 +352,7 @@ watch(
             <div class="flex items-center gap-2 pt-1">
               <button
                 type="button"
-                class="text-muted hover:bg-muted rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                class="text-muted hover:bg-surface rounded-lg px-4 py-2 text-sm font-medium transition-colors"
                 :disabled="saving"
                 @click="cancelEdit"
               >
@@ -360,7 +360,7 @@ watch(
               </button>
               <button
                 type="button"
-                class="bg-accent text-accent hover:bg-accent/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
+                class="bg-accent text-ink hover:bg-accent/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
                 :disabled="saving"
                 @click="saveEdit"
               >
@@ -418,7 +418,7 @@ watch(
           <!-- 主操作:规划路线 -->
           <button
             type="button"
-            class="bg-accent text-accent hover:bg-accent/90 inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium shadow-sm transition-colors"
+            class="bg-accent text-ink hover:bg-accent/90 inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium shadow-sm transition-colors"
             @click="onRoute"
           >
             <Navigation class="h-4 w-4" />
@@ -429,7 +429,7 @@ watch(
             <button
               v-if="!editing"
               type="button"
-              class="text-muted hover:bg-muted hover:text-ink inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+              class="text-muted hover:bg-surface hover:text-ink inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
               @click="startEdit"
             >
               <Pencil class="h-3.5 w-3.5" />

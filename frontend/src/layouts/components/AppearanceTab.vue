@@ -90,7 +90,7 @@ const smallCardBase =
         </div>
         <div
           class="h-6 w-11 rounded-full p-0.5 transition-colors"
-          :class="themeStore.showFooter === 'true' ? 'bg-accent' : 'bg-muted'"
+          :class="themeStore.showFooter === 'true' ? 'bg-accent' : 'bg-surface'"
         >
           <div
             class="bg-paper h-5 w-5 rounded-full shadow-md transition-transform"
@@ -123,15 +123,13 @@ const smallCardBase =
         >
           <component
             :is="theme.icon"
-            :class="
-              themeStore.theme === theme.value ? 'text-accent' : 'text-ink'
-            "
+            :class="themeStore.theme === theme.value ? 'text-ink' : 'text-ink'"
           />
           <span
             class="text-xs"
             :class="
               themeStore.theme === theme.value
-                ? 'text-accent font-semibold'
+                ? 'text-ink font-semibold'
                 : 'text-ink'
             "
           >
@@ -158,7 +156,7 @@ const smallCardBase =
         >
           <span
             class="text-sm font-semibold"
-            :class="themeStore.font === 'default' ? 'text-accent' : 'text-ink'"
+            :class="themeStore.font === 'default' ? 'text-ink' : 'text-ink'"
           >
             默认字体
           </span>
@@ -175,9 +173,7 @@ const smallCardBase =
         >
           <span
             class="text-sm font-semibold"
-            :class="
-              themeStore.font === 'harmonyos' ? 'text-accent' : 'text-ink'
-            "
+            :class="themeStore.font === 'harmonyos' ? 'text-ink' : 'text-ink'"
             style="font-family: 'Noto Sans SC', sans-serif; font-weight: 500"
           >
             HarmonyOS Sans

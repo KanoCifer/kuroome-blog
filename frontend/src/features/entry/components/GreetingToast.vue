@@ -46,7 +46,7 @@ const goToChangelog = () => {
           <!-- 关闭按钮 -->
           <button
             @click="closeToast"
-            class="text-muted/60 hover:bg-muted hover:text-ink absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full transition-all duration-200 hover:scale-110"
+            class="text-muted/60 hover:bg-surface hover:text-ink absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full transition-all duration-200 hover:scale-110"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -121,7 +121,7 @@ const goToChangelog = () => {
           <!-- CTA 按钮：hover 流光 -->
           <button
             @click="goToChangelog"
-            class="group/btn bg-accent text-accent hover:bg-accent/90 relative mt-3 flex w-full items-center justify-center gap-1.5 overflow-hidden rounded-xl py-2 text-xs font-medium shadow-sm transition-all duration-300 hover:shadow-md active:scale-[0.97]"
+            class="group/btn bg-accent text-ink hover:bg-accent/90 relative mt-3 flex w-full items-center justify-center gap-1.5 overflow-hidden rounded-xl py-2 text-xs font-medium shadow-sm transition-all duration-300 hover:shadow-md active:scale-[0.97]"
           >
             <span class="relative z-10">查看更新日志</span>
             <svg

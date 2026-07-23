@@ -318,7 +318,7 @@ watch(
           </div>
           <button
             type="button"
-            class="text-muted hover:bg-muted hover:text-ink inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors"
+            class="text-muted hover:bg-surface hover:text-ink inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors"
             aria-label="关闭"
             @click="emit('close')"
           >
@@ -350,7 +350,7 @@ watch(
               @update:position="coordinate = $event"
             />
             <div
-              class="bg-muted flex items-center justify-between rounded-xl px-4 py-2.5"
+              class="bg-surface flex items-center justify-between rounded-xl px-4 py-2.5"
             >
               <span class="text-muted text-xs">坐标</span>
               <span
@@ -380,7 +380,7 @@ watch(
                 v-model="name"
                 type="text"
                 placeholder="例如:南沙天后宫矶钓位"
-                class="bg-muted text-ink placeholder:text-muted/60 focus:ring-accent/30 w-full rounded-xl border-0 px-4 py-3 text-sm focus:ring-2 focus:outline-none"
+                class="bg-surface text-ink placeholder:text-muted/60 focus:ring-accent/30 w-full rounded-xl border-0 px-4 py-3 text-sm focus:ring-2 focus:outline-none"
               />
             </div>
 
@@ -396,7 +396,7 @@ watch(
                 v-model="description"
                 rows="3"
                 placeholder="水情、目标鱼、最佳出钓时段..."
-                class="bg-muted text-ink placeholder:text-muted/60 focus:ring-accent/30 w-full resize-none rounded-xl border-0 px-4 py-3 text-sm leading-relaxed focus:ring-2 focus:outline-none"
+                class="bg-surface text-ink placeholder:text-muted/60 focus:ring-accent/30 w-full resize-none rounded-xl border-0 px-4 py-3 text-sm leading-relaxed focus:ring-2 focus:outline-none"
               />
             </div>
 
@@ -412,7 +412,7 @@ watch(
                 v-model="tags"
                 type="text"
                 placeholder="矶钓, 海鲈, 夜钓(逗号分隔)"
-                class="bg-muted text-ink placeholder:text-muted/60 focus:ring-accent/30 w-full rounded-xl border-0 px-4 py-3 text-sm focus:ring-2 focus:outline-none"
+                class="bg-surface text-ink placeholder:text-muted/60 focus:ring-accent/30 w-full rounded-xl border-0 px-4 py-3 text-sm focus:ring-2 focus:outline-none"
               />
               <p class="text-muted mt-1 text-xs">多个标签以逗号分隔</p>
             </div>
@@ -468,8 +468,8 @@ watch(
               <button
                 v-if="pictures.length === 0 && !previewUrl"
                 type="button"
-                class="border-border bg-muted hover:bg-muted/70 group flex w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed py-10 transition-colors"
-                :class="{ 'border-ink bg-muted': isDragging }"
+                class="border-border bg-surface hover:bg-surface/70 group flex w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed py-10 transition-colors"
+                :class="{ 'border-ink bg-surface': isDragging }"
                 @click="triggerFileInput"
                 @dragover.prevent
                 @dragleave.prevent="isDragging = false"
@@ -479,7 +479,7 @@ watch(
                   class="bg-paper ring-border/5 mb-3 flex h-12 w-12 items-center justify-center rounded-full shadow-sm ring-1 transition-transform group-hover:scale-110"
                 >
                   <ImagePlus
-                    class="text-muted group-hover:text-accent h-5 w-5 transition-colors"
+                    class="text-muted group-hover:text-ink h-5 w-5 transition-colors"
                     :stroke-width="1.5"
                   />
                 </div>
@@ -495,7 +495,7 @@ watch(
                 <div
                   v-for="p in pictures"
                   :key="p.id"
-                  class="group bg-muted relative aspect-square overflow-hidden rounded-xl"
+                  class="group bg-surface relative aspect-square overflow-hidden rounded-xl"
                 >
                   <img :src="p.url" alt="" class="h-full w-full object-cover" />
                   <button
@@ -511,7 +511,7 @@ watch(
                 <!-- 上传中 / 失败瓦片 -->
                 <div
                   v-if="previewUrl"
-                  class="bg-muted relative aspect-square overflow-hidden rounded-xl"
+                  class="bg-surface relative aspect-square overflow-hidden rounded-xl"
                   :class="pendingError ? '' : 'opacity-60'"
                   aria-busy="true"
                 >
@@ -544,7 +544,7 @@ watch(
                     <div class="flex gap-1.5">
                       <button
                         type="button"
-                        class="bg-accent text-accent hover:bg-accent/90 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium"
+                        class="bg-accent text-ink hover:bg-accent/90 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium"
                         @click="retryUpload"
                       >
                         <RefreshCw class="h-3 w-3" />
@@ -552,7 +552,7 @@ watch(
                       </button>
                       <button
                         type="button"
-                        class="bg-muted text-ink hover:bg-muted/70 rounded-md px-2 py-1 text-xs font-medium"
+                        class="bg-surface text-ink hover:bg-surface/70 rounded-md px-2 py-1 text-xs font-medium"
                         @click="removeFailed"
                       >
                         移除
@@ -565,7 +565,7 @@ watch(
                 <button
                   v-if="canAddMore && !previewUrl"
                   type="button"
-                  class="border-border bg-muted hover:bg-muted/70 group relative aspect-square overflow-hidden rounded-xl border-2 border-dashed transition-colors"
+                  class="border-border bg-surface hover:bg-surface/70 group relative aspect-square overflow-hidden rounded-xl border-2 border-dashed transition-colors"
                   :class="{ 'border-ink': isDragging }"
                   :aria-label="'添加图片'"
                   :title="`还可上传 ${MAX_PICTURES - pictures.length} 张`"
@@ -599,7 +599,7 @@ watch(
         >
           <button
             type="button"
-            class="text-muted hover:bg-muted rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+            class="text-muted hover:bg-surface rounded-lg px-4 py-2 text-sm font-medium transition-colors"
             :disabled="submitting"
             @click="emit('close')"
           >
@@ -607,7 +607,7 @@ watch(
           </button>
           <button
             type="button"
-            class="bg-accent text-accent hover:bg-accent/90 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+            class="bg-accent text-ink hover:bg-accent/90 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
             :disabled="!canSubmit || submitting"
             @click="handleSubmit"
           >

@@ -135,7 +135,7 @@ export function MomentDetailModal({
                     <button
                       type="button"
                       onClick={() => onEdit?.(moment)}
-                      className="bg-accent text-accent hover:bg-accent/90 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-medium shadow-sm transition-colors"
+                      className="bg-accent text-ink hover:bg-accent/90 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-medium shadow-sm transition-colors"
                     >
                       <span>编辑</span>
                     </button>
@@ -205,7 +205,7 @@ export function MomentDetailModal({
               </div>
 
               {/* Right: meta */}
-              <aside className="bg-muted/30 border-border/40 hidden border-l px-5 py-6 md:block">
+              <aside className="bg-surface/30 border-border/40 hidden border-l px-5 py-6 md:block">
                 <div className="text-muted sticky top-4 font-mono text-[10px] tracking-[0.18em] uppercase">
                   META
                 </div>

@@ -22,7 +22,7 @@ export function CategorySidebar({
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="bg-muted h-10 w-full animate-pulse rounded-lg"
+              className="bg-surface h-10 w-full animate-pulse rounded-lg"
             />
           ))}
         </div>
@@ -41,14 +41,14 @@ export function CategorySidebar({
           onClick={() => onSelectTag(null)}
           className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
             activeTag === null
-              ? 'bg-accent text-accent'
-              : 'bg-muted text-ink hover:bg-muted'
+              ? 'bg-accent text-ink'
+              : 'bg-surface text-ink hover:bg-surface'
           }`}
         >
           <span>全部</span>
           <span
             className={`rounded-full px-1.5 py-0.5 text-xs ${
-              activeTag === null ? 'bg-accent/80 text-accent' : 'bg-muted/20'
+              activeTag === null ? 'bg-accent/80 text-ink' : 'bg-surface/20'
             }`}
           >
             {tags.reduce((a, b) => a + b.count, 0)}
@@ -61,16 +61,16 @@ export function CategorySidebar({
             onClick={() => onSelectTag(tag.name)}
             className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
               activeTag === tag.name
-                ? 'bg-accent text-accent'
-                : 'bg-muted text-ink hover:bg-muted'
+                ? 'bg-accent text-ink'
+                : 'bg-surface text-ink hover:bg-surface'
             }`}
           >
             <span>{tag.name}</span>
             <span
               className={`rounded-full px-1.5 py-0.5 text-xs ${
                 activeTag === tag.name
-                  ? 'bg-accent/80 text-accent'
-                  : 'bg-muted/20'
+                  ? 'bg-accent/80 text-ink'
+                  : 'bg-surface/20'
               }`}
             >
               {tag.count}

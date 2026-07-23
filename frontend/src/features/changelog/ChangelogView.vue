@@ -45,10 +45,10 @@ const getTypeClass = (type: string): string => {
     fix: 'bg-destructive/15 text-destructive ring-1 ring-destructive/30',
     refactor: 'bg-chart-2/15 text-chart-2 ring-1 ring-chart-2/30',
     style: 'bg-chart-4/15 text-chart-4 ring-1 ring-chart-4/30',
-    docs: 'bg-accent/15 text-accent ring-1 ring-accent/30',
+    docs: 'bg-accent/15 text-ink ring-1 ring-accent/30',
     perf: 'bg-warning/15 text-warning ring-1 ring-warning/30',
     test: 'bg-chart-1/15 text-chart-1 ring-1 ring-chart-1/30',
-    chore: 'bg-muted text-muted ring-1 ring-border/30',
+    chore: 'bg-surface text-muted ring-1 ring-border/30',
   };
   return classes[type] ?? classes.chore ?? '';
 };
@@ -63,7 +63,7 @@ const getTypeClass = (type: string): string => {
       <!-- Header Section -->
       <div class="mb-16 text-center">
         <div
-          class="bg-accent/15 text-accent mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium"
+          class="bg-accent/15 text-ink mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium"
         >
           <svg
             class="h-4 w-4"
@@ -119,7 +119,7 @@ const getTypeClass = (type: string): string => {
                 <!-- Version Badge & Date -->
                 <div class="mb-4 flex flex-wrap items-center gap-3">
                   <span
-                    class="from-gradient-primary-from to-gradient-primary-to text-accent shadow-accent/25 inline-flex items-center gap-2 rounded-full bg-linear-to-r px-4 py-2 text-sm font-bold shadow-lg"
+                    class="from-gradient-primary-from to-gradient-primary-to text-ink shadow-accent/25 inline-flex items-center gap-2 rounded-full bg-linear-to-r px-4 py-2 text-sm font-bold shadow-lg"
                   >
                     <svg
                       class="h-4 w-4"

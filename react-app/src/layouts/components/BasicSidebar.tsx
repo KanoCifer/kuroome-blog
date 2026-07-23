@@ -55,7 +55,7 @@ function DropDownItems() {
       <>
         <Link
           to="/settings"
-          className="hover:bg-muted flex items-center gap-2 rounded-xl p-2 select-none"
+          className="hover:bg-surface flex items-center gap-2 rounded-xl p-2 select-none"
         >
           <User className="h-4 w-4" /> Profile
         </Link>
@@ -75,13 +75,13 @@ function DropDownItems() {
       <>
         <Link
           to="/login"
-          className="hover:bg-muted flex items-center gap-2 rounded-xl p-2 select-none"
+          className="hover:bg-surface flex items-center gap-2 rounded-xl p-2 select-none"
         >
           <LogIn className="h-4 w-4" /> Login
         </Link>
         <Link
           to="/register"
-          className="hover:bg-muted flex items-center gap-2 rounded-xl p-2 select-none"
+          className="hover:bg-surface flex items-center gap-2 rounded-xl p-2 select-none"
         >
           <UserPlus className="h-4 w-4" /> Register
         </Link>
@@ -99,8 +99,8 @@ function DelayStatus({ ms, onClick }: { ms: number; onClick?: () => void }) {
         className="text-muted inline-flex items-center gap-1.5 text-xs"
       >
         <span className="relative flex h-2 w-2">
-          <span className="bg-muted absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
-          <span className="bg-muted relative inline-flex h-2 w-2 rounded-full" />
+          <span className="bg-surface absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
+          <span className="bg-surface relative inline-flex h-2 w-2 rounded-full" />
         </span>
         延迟 -- ms
         <ExternalLink className="h-3 w-3 opacity-60" />
@@ -294,7 +294,7 @@ export const BentoNavSidebar: React.FC = () => {
                 }}
                 className={`flex h-full w-full items-center gap-4 rounded-2xl px-4 font-medium transition-colors ${
                   hoverNavIndex === index
-                    ? 'text-accent'
+                    ? 'text-ink'
                     : 'text-base-content/70 hover:text-base-content'
                 }`}
               >

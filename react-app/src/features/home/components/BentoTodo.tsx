@@ -94,7 +94,7 @@ export function BentoTodo() {
             </span>
             <Link
               to="/todos"
-              className="text-muted hover:bg-muted hover:text-ink cursor-pointer rounded-md p-2 outline-0 transition-colors"
+              className="text-muted hover:bg-surface hover:text-ink cursor-pointer rounded-md p-2 outline-0 transition-colors"
               title="查看详情"
             >
               <svg
@@ -115,7 +115,7 @@ export function BentoTodo() {
         </div>
 
         {/* 进度条 */}
-        <div className="bg-muted mb-4 h-1.5 overflow-hidden rounded-full">
+        <div className="bg-surface mb-4 h-1.5 overflow-hidden rounded-full">
           <motion.div
             className="bg-accent h-full rounded-full"
             initial={false}

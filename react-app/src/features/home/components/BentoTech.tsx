@@ -20,7 +20,7 @@ export function BentoTech() {
       <div className="h-full p-2">
         <h3 className="text-ink mb-3 flex items-center gap-2 text-sm font-bold">
           <svg
-            className="text-accent h-5 w-5"
+            className="text-ink h-5 w-5"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -40,7 +40,7 @@ export function BentoTech() {
               key={tech}
               whileTap={{ scale: 0.95 }}
               transition={SPRING.snappy}
-              className="border-border/60 bg-muted text-muted cursor-default rounded-full border px-2.5 py-1 text-xs font-semibold"
+              className="border-border/60 bg-surface text-muted cursor-default rounded-full border px-2.5 py-1 text-xs font-semibold"
             >
               {tech}
             </motion.span>

@@ -211,8 +211,8 @@ onMounted(() => {
   >
     <template #branding>
       <div class="flex items-center gap-2 text-xl font-bold tracking-tight">
-        <IconCloud class="text-accent size-8" />
-        <span>Kanocifer<span class="text-accent">.chat</span></span>
+        <IconCloud class="text-ink size-8" />
+        <span>Kanocifer<span class="text-ink">.chat</span></span>
       </div>
       <div class="z-10 my-auto">
         <div class="flex flex-col">
@@ -232,7 +232,7 @@ onMounted(() => {
     <template #header>
       <div class="mb-8 flex flex-col items-center lg:items-start">
         <div
-          class="bg-accent text-accent mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)] lg:hidden"
+          class="bg-accent text-ink mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)] lg:hidden"
         >
           <IconCloud class="size-8" />
         </div>
@@ -269,7 +269,7 @@ onMounted(() => {
         />
         <label
           for="photo-upload"
-          class="bg-accent text-accent hover:bg-accent/90 focus:ring-accent/30 absolute -right-1 -bottom-1 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
+          class="bg-accent text-ink hover:bg-accent/90 focus:ring-accent/30 absolute -right-1 -bottom-1 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none"
         >
           <Camera class="size-4" />
         </label>
@@ -290,7 +290,7 @@ onMounted(() => {
             type="text"
             autocomplete="off"
             placeholder="display name"
-            class="border-border bg-muted text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="border-border bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.name,
@@ -318,7 +318,7 @@ onMounted(() => {
             type="text"
             autocomplete="off"
             placeholder="username"
-            class="border-border bg-muted text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="border-border bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.username,
@@ -349,10 +349,10 @@ onMounted(() => {
               @click="toggleGender('male')"
             />
             <div
-              class="border-border bg-muted peer-checked:border-accent peer-checked:bg-accent/10 peer-checked:shadow-accent/10 hover:border-accent/30 flex items-center justify-center rounded-xl border-2 px-4 py-2.5 transition-all duration-200 select-none group-active:scale-95"
+              class="border-border bg-surface peer-checked:border-accent peer-checked:bg-accent/10 peer-checked:shadow-accent/10 hover:border-accent/30 flex items-center justify-center rounded-xl border-2 px-4 py-2.5 transition-all duration-200 select-none group-active:scale-95"
             >
               <span
-                class="text-muted peer-checked:text-accent text-sm font-bold transition-colors"
+                class="text-muted peer-checked:text-ink text-sm font-bold transition-colors"
                 >Male</span
               >
             </div>
@@ -366,10 +366,10 @@ onMounted(() => {
               @click="toggleGender('female')"
             />
             <div
-              class="border-border bg-muted peer-checked:border-accent peer-checked:bg-accent/10 peer-checked:shadow-accent/10 hover:border-accent/30 flex items-center justify-center rounded-xl border-2 px-4 py-2.5 transition-all duration-200 select-none group-active:scale-95"
+              class="border-border bg-surface peer-checked:border-accent peer-checked:bg-accent/10 peer-checked:shadow-accent/10 hover:border-accent/30 flex items-center justify-center rounded-xl border-2 px-4 py-2.5 transition-all duration-200 select-none group-active:scale-95"
             >
               <span
-                class="text-muted peer-checked:text-accent text-sm font-bold transition-colors"
+                class="text-muted peer-checked:text-ink text-sm font-bold transition-colors"
                 >Female</span
               >
             </div>
@@ -389,7 +389,7 @@ onMounted(() => {
             type="email"
             autocomplete="off"
             placeholder="email"
-            class="border-border bg-muted text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="border-border bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.email,
@@ -417,7 +417,7 @@ onMounted(() => {
             type="tel"
             autocomplete="off"
             placeholder="mobile"
-            class="border-border bg-muted text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="border-border bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.mobile,
@@ -445,7 +445,7 @@ onMounted(() => {
             type="password"
             autocomplete="off"
             placeholder="new password (leave empty to keep current)"
-            class="border-border bg-muted text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
+            class="border-border bg-surface text-ink focus:ring-accent/30 w-full rounded-xl py-3 pr-4 pl-11 transition-colors placeholder:font-serif placeholder:italic focus:ring-2 focus:outline-none"
             :class="{
               'border-destructive focus:border-destructive focus:ring-destructive/30':
                 errors.password,
@@ -464,7 +464,7 @@ onMounted(() => {
       <div class="mt-6">
         <button
           type="submit"
-          class="bg-accent text-accent shadow-accent/30 hover:bg-accent/90 focus:ring-accent/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          class="bg-accent text-ink shadow-accent/30 hover:bg-accent/90 focus:ring-accent/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           :disabled="saving"
         >
           <Loader2 v-if="saving" class="h-5 w-5 animate-spin" />
@@ -501,7 +501,7 @@ onMounted(() => {
         type="button"
         @click="handleAddPasskey"
         :disabled="addingPasskey"
-        class="bg-success text-accent shadow-success/30 hover:bg-success/90 focus:ring-success/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+        class="bg-success text-ink shadow-success/30 hover:bg-success/90 focus:ring-success/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
       >
         <Loader2 v-if="addingPasskey" class="h-5 w-5 animate-spin" />
         <KeyRound v-else class="h-5 w-5" />
@@ -512,7 +512,7 @@ onMounted(() => {
           <button
             type="button"
             :disabled="deletingPasskey"
-            class="bg-destructive text-accent shadow-destructive/30 hover:bg-destructive/90 focus:ring-destructive/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            class="bg-destructive text-ink shadow-destructive/30 hover:bg-destructive/90 focus:ring-destructive/30 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Loader2 v-if="deletingPasskey" class="h-5 w-5 animate-spin" />
             <Trash2 v-else class="h-5 w-5" />
@@ -566,7 +566,7 @@ onMounted(() => {
         type="button"
         @click="handleBindGitHub"
         :disabled="bindingGitHub"
-        class="text-accent focus:ring-accent inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-black px-8 py-2.5 font-bold shadow-lg transition-colors hover:bg-black/90 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+        class="text-ink focus:ring-accent inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-black px-8 py-2.5 font-bold shadow-lg transition-colors hover:bg-black/90 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
       >
         <Loader2 v-if="bindingGitHub" class="h-5 w-5 animate-spin" />
         <svg
@@ -587,7 +587,7 @@ onMounted(() => {
           <button
             type="button"
             :disabled="unbindingGitHub"
-            class="text-accent focus:ring-accent inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-black px-8 py-2.5 font-bold shadow-lg transition-colors hover:bg-black/90 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:text-white"
+            class="text-ink focus:ring-accent inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-black px-8 py-2.5 font-bold shadow-lg transition-colors hover:bg-black/90 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:text-white"
           >
             <Loader2 v-if="unbindingGitHub" class="h-5 w-5 animate-spin" />
             <Trash2 v-else class="h-5 w-5" />

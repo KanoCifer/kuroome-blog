@@ -37,21 +37,21 @@ const emit = defineEmits<{
         <button
           type="button"
           :disabled="isLoading || isRefreshing"
-          class="border-border bg-paper text-ink hover:bg-muted inline-flex items-center rounded-xl border px-4 py-2.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60"
+          class="border-border bg-paper text-ink hover:bg-surface inline-flex items-center rounded-xl border px-4 py-2.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60"
           @click="emit('refresh')"
         >
           {{ isRefreshing ? '刷新中...' : '刷新列表' }}
         </button>
         <button
           type="button"
-          class="from-brand-devices hover:from-brand-devices to-brand-devices text-accent shadow-brand-devices/30 hover:to-brand-devices/80 inline-flex items-center rounded-xl bg-linear-to-r px-4 py-2.5 text-sm font-semibold shadow-lg transition"
+          class="from-brand-devices hover:from-brand-devices to-brand-devices text-ink shadow-brand-devices/30 hover:to-brand-devices/80 inline-flex items-center rounded-xl bg-linear-to-r px-4 py-2.5 text-sm font-semibold shadow-lg transition"
           @click="emit('add')"
         >
           新增订阅
         </button>
         <RouterLink
           to="/device-tracker"
-          class="border-border bg-paper text-ink hover:bg-muted inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition"
+          class="border-border bg-paper text-ink hover:bg-surface inline-flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -86,8 +86,8 @@ const emit = defineEmits<{
         </p>
       </article>
       <article class="border-accent/30 bg-accent/20 rounded-2xl border p-4">
-        <p class="text-accent">月度估算</p>
-        <p class="text-accent mt-2 text-2xl font-semibold">
+        <p class="text-ink">月度估算</p>
+        <p class="text-ink mt-2 text-2xl font-semibold">
           ¥{{ monthlyEstimate.toFixed(2) }}
         </p>
       </article>

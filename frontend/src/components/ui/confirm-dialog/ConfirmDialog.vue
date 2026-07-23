@@ -35,7 +35,7 @@
         <button
           type="button"
           @click="handleCancel"
-          class="text-muted hover:bg-muted focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+          class="text-muted hover:bg-surface focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
           {{ cancelText }}
         </button>
@@ -82,9 +82,9 @@ const emit = defineEmits<{
 const VARIANT_STYLE = {
   default: {
     iconBg: 'bg-accent/10',
-    iconColor: 'text-accent',
+    iconColor: 'text-ink',
     iconPath: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-    confirmClass: 'bg-accent text-accent hover:bg-accent/90',
+    confirmClass: 'bg-accent text-ink hover:bg-accent/90',
   },
   destructive: {
     iconBg: 'bg-destructive/10',

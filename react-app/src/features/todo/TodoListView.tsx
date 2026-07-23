@@ -168,7 +168,7 @@ export default function TodoListView() {
             <>
               <button
                 onClick={() => setMcpTokenOpen(true)}
-                className="text-muted hover:bg-muted hover:text-ink focus-visible:ring-ring border-border inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                className="text-muted hover:bg-surface hover:text-ink focus-visible:ring-ring border-border inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                 title="签发 MCP 服务 Token"
               >
                 <svg
@@ -190,7 +190,7 @@ export default function TodoListView() {
               <button
                 onClick={handleRefresh}
                 disabled={loading}
-                className="text-muted hover:bg-muted hover:text-ink focus-visible:ring-ring border-border inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-2 text-sm transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-50"
+                className="text-muted hover:bg-surface hover:text-ink focus-visible:ring-ring border-border inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-2 text-sm transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-50"
                 title="刷新任务列表"
               >
                 <svg
@@ -210,7 +210,7 @@ export default function TodoListView() {
 
               <button
                 onClick={openCreate}
-                className="bg-accent text-accent hover:bg-accent/90 focus-visible:ring-ring inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                className="bg-accent text-ink hover:bg-accent/90 focus-visible:ring-ring inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
               >
                 <svg
                   className="h-4 w-4"
@@ -268,7 +268,7 @@ export default function TodoListView() {
                   className={`ml-3 inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[10px] font-medium tabular-nums transition-[background-color,color] duration-150 ${
                     index === activeTabIndex
                       ? 'bg-accent/15 text-ink'
-                      : 'bg-muted/10 text-muted'
+                      : 'bg-surface/10 text-muted'
                   }`}
                 >
                   {tab.id === 'frontier'
@@ -287,7 +287,7 @@ export default function TodoListView() {
           <nav
             role="tablist"
             aria-label="工作台视角"
-            className="bg-muted mb-5 flex gap-0.5 rounded-lg p-1 lg:hidden"
+            className="bg-surface mb-5 flex gap-0.5 rounded-lg p-1 lg:hidden"
           >
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;
@@ -308,7 +308,7 @@ export default function TodoListView() {
                     className={`ml-1.5 inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[10px] font-medium tabular-nums ${
                       isActive
                         ? 'text-ink bg-accent/15'
-                        : 'text-muted bg-muted/10'
+                        : 'text-muted bg-surface/10'
                     }`}
                   >
                     {tab.id === 'frontier'
@@ -346,7 +346,7 @@ export default function TodoListView() {
               </p>
               <a
                 href="/login"
-                className="bg-accent text-accent hover:bg-accent/90 focus-visible:ring-ring mt-1 cursor-pointer rounded-lg px-5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                className="bg-accent text-ink hover:bg-accent/90 focus-visible:ring-ring mt-1 cursor-pointer rounded-lg px-5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
               >
                 去登录
               </a>
@@ -356,12 +356,12 @@ export default function TodoListView() {
           {/* 加载态 */}
           {isAuthenticated && loading && (
             <div className="space-y-3">
-              <div className="bg-muted h-8 w-40 animate-pulse rounded-md" />
+              <div className="bg-surface h-8 w-40 animate-pulse rounded-md" />
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {[1, 2, 3].map((n) => (
                   <div
                     key={n}
-                    className="bg-muted h-28 animate-pulse rounded-xl"
+                    className="bg-surface h-28 animate-pulse rounded-xl"
                   />
                 ))}
               </div>

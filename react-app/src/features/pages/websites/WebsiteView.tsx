@@ -37,7 +37,7 @@ export default function WebsiteView() {
         className="squircle bg-secondary mx-4 p-5 shadow-lg"
       >
         <div className="mb-4 flex items-start gap-4">
-          <div className="bg-muted flex h-14 w-14 shrink-0 items-center justify-center rounded-xl">
+          <div className="bg-surface flex h-14 w-14 shrink-0 items-center justify-center rounded-xl">
             <img
               src={t.icon}
               alt={t.name}

@@ -345,7 +345,7 @@ onUnmounted(() => {
     <div class="mx-auto max-w-[42rem] px-6 pt-10 sm:pt-14">
       <router-link
         to="/blog"
-        class="text-muted hover:text-accent group inline-flex items-center gap-1.5 text-[13px] font-medium tracking-wide transition-colors"
+        class="text-muted hover:text-ink group inline-flex items-center gap-1.5 text-[13px] font-medium tracking-wide transition-colors"
       >
         <span
           class="transition-transform duration-200 group-hover:-translate-x-0.5"
@@ -357,15 +357,17 @@ onUnmounted(() => {
 
     <!-- Loading -->
     <div v-if="isLoading" class="mx-auto max-w-[42rem] px-6 py-16">
-      <div class="bg-muted/70 skeleton-pulse mb-8 h-5 w-20 rounded" />
-      <div class="bg-muted/70 skeleton-pulse mb-4 h-9 w-4/5 rounded" />
-      <div class="bg-muted/70 skeleton-pulse mb-12 h-4 w-2/5 rounded" />
-      <div class="bg-muted/70 skeleton-pulse aspect-[16/9] w-full rounded-xl" />
+      <div class="bg-surface/70 skeleton-pulse mb-8 h-5 w-20 rounded" />
+      <div class="bg-surface/70 skeleton-pulse mb-4 h-9 w-4/5 rounded" />
+      <div class="bg-surface/70 skeleton-pulse mb-12 h-4 w-2/5 rounded" />
+      <div
+        class="bg-surface/70 skeleton-pulse aspect-[16/9] w-full rounded-xl"
+      />
       <div class="mt-10 space-y-4">
-        <div class="bg-muted/70 skeleton-pulse h-4 w-full rounded" />
-        <div class="bg-muted/70 skeleton-pulse h-4 w-full rounded" />
-        <div class="bg-muted/70 skeleton-pulse h-4 w-5/6 rounded" />
-        <div class="bg-muted/70 skeleton-pulse h-4 w-full rounded" />
+        <div class="bg-surface/70 skeleton-pulse h-4 w-full rounded" />
+        <div class="bg-surface/70 skeleton-pulse h-4 w-full rounded" />
+        <div class="bg-surface/70 skeleton-pulse h-4 w-5/6 rounded" />
+        <div class="bg-surface/70 skeleton-pulse h-4 w-full rounded" />
       </div>
     </div>
 
@@ -414,7 +416,7 @@ onUnmounted(() => {
       >
         <router-link
           :to="`/blog/${post._id}/edit`"
-          class="bg-muted text-ink hover:bg-muted/80 inline-flex cursor-pointer items-center gap-2 rounded-lg px-3.5 py-1.5 text-[13px] font-medium transition-all duration-150 active:scale-[0.96]"
+          class="bg-surface text-ink hover:bg-surface/80 inline-flex cursor-pointer items-center gap-2 rounded-lg px-3.5 py-1.5 text-[13px] font-medium transition-all duration-150 active:scale-[0.96]"
         >
           <EditIcon />
           编辑
@@ -430,7 +432,7 @@ onUnmounted(() => {
 
       <!-- 封面置顶：主视觉先行 -->
       <figure v-if="post.cover" class="mb-10 overflow-hidden rounded-xl">
-        <div class="bg-muted aspect-[16/9] w-full overflow-hidden">
+        <div class="bg-surface aspect-[16/9] w-full overflow-hidden">
           <img
             :src="coverSrc"
             :alt="`${post.title} 封面`"
@@ -460,7 +462,7 @@ onUnmounted(() => {
 
         <!-- Eyebrow / kicker — accent 唯一一次正式出场 -->
         <div
-          class="text-accent mb-5 flex items-center gap-2 text-[11px] font-semibold tracking-[0.14em] uppercase"
+          class="text-ink mb-5 flex items-center gap-2 text-[11px] font-semibold tracking-[0.14em] uppercase"
         >
           <span class="bg-accent h-px w-5"></span>
           {{ post.tags?.[0] || '未分类' }}
@@ -495,7 +497,7 @@ onUnmounted(() => {
               "
               :disabled="isLiked || isLiking"
               class="inline-flex cursor-pointer items-center gap-1 rounded transition-colors duration-150 active:scale-[0.96] disabled:cursor-default"
-              :class="isLiked ? 'text-accent' : 'text-muted hover:text-ink'"
+              :class="isLiked ? 'text-ink' : 'text-muted hover:text-ink'"
               @click="handleLike"
             >
               <Heart
@@ -544,7 +546,7 @@ onUnmounted(() => {
         <div class="flex flex-wrap items-start justify-between gap-5">
           <div class="flex items-center gap-3.5">
             <span
-              class="text-ink ring-border bg-muted flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-serif text-sm font-semibold ring-1"
+              class="text-ink ring-border bg-surface flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-serif text-sm font-semibold ring-1"
               >{{ (post.author || 'K').slice(0, 1) }}</span
             >
             <div class="min-w-0">
@@ -565,7 +567,7 @@ onUnmounted(() => {
           <button
             type="button"
             @click="handleCopyLink"
-            class="text-muted hover:text-accent inline-flex cursor-pointer items-center gap-1.5 text-[12px] font-medium tracking-[0.02em] transition-all duration-150 active:scale-[0.96]"
+            class="text-muted hover:text-ink inline-flex cursor-pointer items-center gap-1.5 text-[12px] font-medium tracking-[0.02em] transition-all duration-150 active:scale-[0.96]"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

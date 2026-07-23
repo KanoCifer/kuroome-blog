@@ -44,7 +44,7 @@ export function FishingAnalysisDrawer({
                 type="button"
                 aria-label="关闭分析"
                 onClick={onClose}
-                className="text-muted hover:bg-muted hover:text-ink inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+                className="text-muted hover:bg-surface hover:text-ink inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -97,7 +97,7 @@ export function FishingAnalysisDrawer({
               type="button"
               aria-label="关闭分析"
               onClick={onClose}
-              className="text-muted hover:bg-muted hover:text-ink inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+              className="text-muted hover:bg-surface hover:text-ink inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
             >
               <X className="h-4 w-4" />
             </button>

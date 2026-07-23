@@ -25,7 +25,7 @@
           <!-- Close Button -->
           <button
             @click="$emit('close')"
-            class="text-muted hover:bg-muted hover:text-ink absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+            class="text-muted hover:bg-surface hover:text-ink absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full transition-colors"
           >
             <X class="h-5 w-5" />
           </button>
@@ -33,7 +33,7 @@
           <!-- Header -->
           <div class="mb-6 text-center">
             <div
-              class="bg-accent/10 text-accent mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full"
+              class="bg-accent/10 text-ink mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full"
             >
               <UploadCloud class="h-6 w-6" />
             </div>
@@ -90,7 +90,9 @@
           </div>
 
           <!-- Upload Error -->
-          <p v-if="error" class="text-danger mt-2 text-xs">{{ error.message }}</p>
+          <p v-if="error" class="text-danger mt-2 text-xs">
+            {{ error.message }}
+          </p>
 
           <!-- Actions -->
           <div class="mt-8 flex gap-3">
@@ -102,7 +104,7 @@
               取消
             </Button>
             <Button
-              class="bg-accent text-accent hover:bg-accent/90 flex-1 rounded-xl shadow-md"
+              class="bg-accent text-ink hover:bg-accent/90 flex-1 rounded-xl shadow-md"
               :disabled="!canSubmit"
               @click="onConfirm"
             >

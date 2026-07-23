@@ -76,7 +76,7 @@
           class="flex items-center gap-3"
         >
           <span class="text-ink w-16 shrink-0 text-sm">{{ row.type }}</span>
-          <div class="bg-muted h-2 flex-1 overflow-hidden rounded-full">
+          <div class="bg-surface h-2 flex-1 overflow-hidden rounded-full">
             <div
               class="animate-progress h-full rounded-full transition-transform"
               :style="{
@@ -104,7 +104,7 @@
           </h2>
           <span
             v-if="doneThisWeek.length"
-            class="text-muted bg-muted/10 inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
+            class="text-muted bg-surface/10 inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
           >
             {{ doneThisWeek.length }}
           </span>

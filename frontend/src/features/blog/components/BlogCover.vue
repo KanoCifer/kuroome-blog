@@ -2,7 +2,7 @@
   <div
     :class="[
       'relative overflow-hidden rounded-xl',
-      'border-border/60 bg-muted border',
+      'border-border/60 bg-surface border',
       sizeClasses,
     ]"
   >
@@ -32,7 +32,7 @@
 
       <!-- 顶部条：分类 + 章节标 -->
       <div
-        class="text-accent/95 absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3 sm:p-3.5"
+        class="text-ink/95 absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3 sm:p-3.5"
       >
         <span
           v-if="categoryName"
@@ -42,7 +42,7 @@
           <span class="truncate">{{ categoryName }}</span>
         </span>
         <span
-          class="text-accent/75 ml-auto font-mono text-[10px] tracking-[0.2em] uppercase"
+          class="text-ink/75 ml-auto font-mono text-[10px] tracking-[0.2em] uppercase"
           >{{ chapterLabel }}</span
         >
       </div>
@@ -52,14 +52,14 @@
         <div class="flex items-center gap-1.5">
           <div class="bg-accent/70 h-px w-5" />
           <span
-            class="text-accent/80 font-serif text-[10px] tracking-[0.2em] italic"
+            class="text-ink/80 font-serif text-[10px] tracking-[0.2em] italic"
             >cover</span
           >
         </div>
         <h3
           v-if="title"
           :class="[
-            'text-accent font-serif leading-tight font-semibold drop-shadow-sm',
+            'text-ink font-serif leading-tight font-semibold drop-shadow-sm',
             titleClass,
           ]"
           style="text-wrap: balance"

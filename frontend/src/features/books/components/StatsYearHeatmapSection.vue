@@ -31,7 +31,7 @@ const WEEKDAY_LABELS = ['', '一', '', '三', '', '五', ''] as const;
 const WEEKDAY_CN = ['日', '一', '二', '三', '四', '五', '六'] as const;
 // L0(无数据 / 越界空槽) 用 muted,1..4 走 primary 的 4 级透明度
 const INTENSITY_CLASS = [
-  'bg-muted',
+  'bg-surface',
   'bg-accent/20',
   'bg-accent/40',
   'bg-accent/70',

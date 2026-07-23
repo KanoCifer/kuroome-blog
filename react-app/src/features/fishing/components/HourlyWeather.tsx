@@ -32,9 +32,7 @@ export function HourlyWeather() {
                 }`}
               >
                 <span
-                  className={`text-xs font-medium ${
-                    isNow ? 'text-accent' : ''
-                  }`}
+                  className={`text-xs font-medium ${isNow ? 'text-ink' : ''}`}
                 >
                   {isNow ? '现在' : dayjs(h.fxTime).format('HH:mm')}
                 </span>
@@ -61,9 +59,9 @@ export function HourlyWeather() {
               key={i}
               className="flex w-[54px] shrink-0 flex-col items-center gap-2 py-2"
             >
-              <div className="bg-muted/15 skeleton-pulse h-3 w-8 rounded" />
-              <div className="bg-muted/15 skeleton-pulse h-5 w-5 rounded-full" />
-              <div className="bg-muted/15 skeleton-pulse h-3.5 w-6 rounded" />
+              <div className="bg-surface/15 skeleton-pulse h-3 w-8 rounded" />
+              <div className="bg-surface/15 skeleton-pulse h-5 w-5 rounded-full" />
+              <div className="bg-surface/15 skeleton-pulse h-3.5 w-6 rounded" />
             </div>
           ))}
         </div>

@@ -179,19 +179,19 @@ const handlePrivacyScroll = (e: Event) => {
           <!-- 操作按钮 -->
           <div class="flex items-center gap-2">
             <button
-              class="border-border text-muted hover:bg-muted hover:text-ink flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-[background-color,color,transform] duration-200 active:scale-[0.97]"
+              class="border-border text-muted hover:bg-surface hover:text-ink flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-[background-color,color,transform] duration-200 active:scale-[0.97]"
               @click="openSettings"
             >
               自定义
             </button>
             <button
-              class="border-border text-muted hover:bg-muted hover:text-ink flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-[background-color,color,transform] duration-200 active:scale-[0.97]"
+              class="border-border text-muted hover:bg-surface hover:text-ink flex-1 rounded-xl border px-3 py-2 text-[12px] font-medium transition-[background-color,color,transform] duration-200 active:scale-[0.97]"
               @click="rejectAll"
             >
               拒绝
             </button>
             <button
-              class="bg-accent text-accent hover:bg-accent/90 flex-1 rounded-xl px-3 py-2 text-[12px] font-medium shadow-sm transition-[background-color,color,transform] duration-200 active:scale-[0.97]"
+              class="bg-accent text-ink hover:bg-accent/90 flex-1 rounded-xl px-3 py-2 text-[12px] font-medium shadow-sm transition-[background-color,color,transform] duration-200 active:scale-[0.97]"
               @click="acceptAll"
             >
               全部接受
@@ -279,12 +279,12 @@ const handlePrivacyScroll = (e: Event) => {
 
         <AlertDialogFooter class="mt-4">
           <AlertDialogCancel
-            class="border-border text-muted hover:bg-muted hover:text-ink h-9 rounded-xl border px-4 text-[12px] font-medium"
+            class="border-border text-muted hover:bg-surface hover:text-ink h-9 rounded-xl border px-4 text-[12px] font-medium"
           >
             返回
           </AlertDialogCancel>
           <AlertDialogAction
-            class="bg-accent text-accent hover:bg-accent/90 h-9 rounded-xl px-4 text-[12px] font-medium shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
+            class="bg-accent text-ink hover:bg-accent/90 h-9 rounded-xl px-4 text-[12px] font-medium shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
             @click="acceptAll"
             :disabled="!hasReadPrivacy"
           >
@@ -342,12 +342,12 @@ const handlePrivacyScroll = (e: Event) => {
 
         <AlertDialogFooter>
           <AlertDialogCancel
-            class="border-border text-muted hover:bg-muted hover:text-ink h-9 rounded-xl border px-4 text-[12px] font-medium transition-all duration-200"
+            class="border-border text-muted hover:bg-surface hover:text-ink h-9 rounded-xl border px-4 text-[12px] font-medium transition-all duration-200"
           >
             取消
           </AlertDialogCancel>
           <AlertDialogAction
-            class="bg-accent text-accent hover:bg-accent/90 h-9 rounded-xl px-4 text-[12px] font-medium shadow-sm transition-all duration-200"
+            class="bg-accent text-ink hover:bg-accent/90 h-9 rounded-xl px-4 text-[12px] font-medium shadow-sm transition-all duration-200"
             @click="saveSettings"
           >
             保存设置

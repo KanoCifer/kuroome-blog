@@ -77,7 +77,7 @@ export function McpTokenModal({ open, onClose }: McpTokenModalProps) {
           </div>
           <button
             type="button"
-            className="text-muted hover:bg-muted hover:text-ink cursor-pointer rounded-md p-1.5 transition-colors"
+            className="text-muted hover:bg-surface hover:text-ink cursor-pointer rounded-md p-1.5 transition-colors"
             aria-label="关闭"
             onClick={onClose}
           >
@@ -110,7 +110,7 @@ export function McpTokenModal({ open, onClose }: McpTokenModalProps) {
                   onClick={() => setDays(opt.days)}
                   className={`cursor-pointer rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
                     days === opt.days
-                      ? 'border-accent/40 bg-accent/10 text-accent'
+                      ? 'border-accent/40 bg-accent/10 text-ink'
                       : 'border-border text-muted hover:text-ink'
                   }`}
                 >
@@ -124,7 +124,7 @@ export function McpTokenModal({ open, onClose }: McpTokenModalProps) {
             type="button"
             onClick={handleGenerate}
             disabled={loading}
-            className="bg-accent text-accent hover:bg-accent/90 focus-visible:ring-ring inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+            className="bg-accent text-ink hover:bg-accent/90 focus-visible:ring-ring inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading && (
               <svg
@@ -175,14 +175,14 @@ export function McpTokenModal({ open, onClose }: McpTokenModalProps) {
 
               <div className="relative">
                 <textarea
-                  className="bg-muted border-border text-ink block w-full resize-none rounded-lg border px-3 py-2 pr-10 font-mono text-[11px] leading-relaxed outline-none"
+                  className="bg-surface border-border text-ink block w-full resize-none rounded-lg border px-3 py-2 pr-10 font-mono text-[11px] leading-relaxed outline-none"
                   rows={4}
                   readOnly
                   value={result.token}
                 />
                 <button
                   type="button"
-                  className="text-muted hover:bg-muted hover:text-ink absolute top-2 right-2 cursor-pointer rounded-md p-1.5 transition-colors"
+                  className="text-muted hover:bg-surface hover:text-ink absolute top-2 right-2 cursor-pointer rounded-md p-1.5 transition-colors"
                   title={copied ? '已复制' : '复制'}
                   onClick={handleCopy}
                 >
@@ -229,7 +229,7 @@ export function McpTokenModal({ open, onClose }: McpTokenModalProps) {
               <p className="text-muted text-[11px] leading-relaxed">
                 Token 拥有完整的 devtask
                 读写权限。生成后请妥善保管，泄露后请尽快在服务端轮换
-                <code className="bg-muted px-1 py-0.5 font-mono text-[10px]">
+                <code className="bg-surface px-1 py-0.5 font-mono text-[10px]">
                   DEV_TASK_SECRET
                 </code>
                 。

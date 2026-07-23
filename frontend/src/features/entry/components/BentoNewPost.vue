@@ -7,7 +7,7 @@
     class="w-auto"
   >
     <button
-      class="squircle bg-accent/80 text-accent ring-border/30 focus-visible:outline-accent flex cursor-pointer items-center px-4 py-2 text-2xl font-semibold ring focus-visible:outline-2 focus-visible:outline-offset-2"
+      class="squircle bg-accent/80 text-ink ring-border/30 focus-visible:outline-accent flex cursor-pointer items-center px-4 py-2 text-2xl font-semibold ring focus-visible:outline-2 focus-visible:outline-offset-2"
       @click="handleClick"
     >
       <svg

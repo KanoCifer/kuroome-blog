@@ -93,7 +93,7 @@ onUnmounted(() => {
     <div class="relative">
       <button
         @click.stop="isSchemeOpen = !isSchemeOpen"
-        class="text-ink hover:bg-muted focus:ring-ring dark:text-ink dark:hover:bg-muted flex cursor-pointer items-center gap-1 rounded-lg px-2 py-2 text-sm font-medium transition-all focus:ring-2 focus:outline-none"
+        class="text-ink hover:bg-surface focus:ring-ring dark:text-ink dark:hover:bg-surface flex cursor-pointer items-center gap-1 rounded-lg px-2 py-2 text-sm font-medium transition-all focus:ring-2 focus:outline-none"
         aria-label="Select color scheme"
         title="Color Scheme"
       >
@@ -134,9 +134,10 @@ onUnmounted(() => {
             v-for="(schemeItem, index) in schemes"
             :key="schemeItem.value"
             @click="selectScheme(schemeItem.value)"
-            class="text-ink hover:bg-muted dark:text-ink dark:hover:bg-muted flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm transition-colors"
+            class="text-ink hover:bg-surface dark:text-ink dark:hover:bg-surface flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm transition-colors"
             :class="{
-              'bg-muted dark:bg-muted': themeStore.scheme === schemeItem.value,
+              'bg-surface dark:bg-surface':
+                themeStore.scheme === schemeItem.value,
               'rounded-t-lg': index === 0,
               'rounded-b-lg': index === schemes.length - 1,
             }"
@@ -161,7 +162,7 @@ onUnmounted(() => {
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="text-accent ml-auto"
+              class="text-ink ml-auto"
             >
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
@@ -178,7 +179,7 @@ onUnmounted(() => {
     >
       <button
         @click.stop="toggleDropdown"
-        class="text-ink hover:bg-muted focus:ring-ring dark:text-ink dark:hover:bg-muted flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all focus:ring-2 focus:outline-none"
+        class="text-ink hover:bg-surface focus:ring-ring dark:text-ink dark:hover:bg-surface flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all focus:ring-2 focus:outline-none"
         aria-label="Toggle theme"
       >
         <span v-html="currentTheme.icon"></span>
@@ -210,9 +211,9 @@ onUnmounted(() => {
             v-for="(theme, index) in themes"
             :key="theme.value"
             @click="selectTheme(theme.value, $event)"
-            class="text-ink hover:bg-muted dark:text-ink dark:hover:bg-muted flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm transition-colors"
+            class="text-ink hover:bg-surface dark:text-ink dark:hover:bg-surface flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm transition-colors"
             :class="{
-              'bg-muted dark:bg-muted': themeStore.theme === theme.value,
+              'bg-surface dark:bg-surface': themeStore.theme === theme.value,
               'rounded-t-lg': index === 0,
               'rounded-b-lg': index === themes.length - 1,
             }"
@@ -230,7 +231,7 @@ onUnmounted(() => {
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="text-accent ml-auto"
+              class="text-ink ml-auto"
             >
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>

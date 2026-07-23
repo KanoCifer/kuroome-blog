@@ -49,7 +49,7 @@ export function TaskRow({
           <button
             type="button"
             onClick={() => onCycle(task.slug)}
-            className="text-muted hover:bg-muted hover:text-accent focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96]"
+            className="text-muted hover:bg-surface hover:text-ink focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96]"
             title="推进状态"
             aria-label="推进状态"
           >

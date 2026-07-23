@@ -17,17 +17,15 @@
           class="focus-visible:ring-ring inline-flex cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-[background-color,color] duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none sm:px-4 sm:text-[0.9375rem]"
           :class="
             activeSlug === opt.slug
-              ? 'bg-accent text-accent shadow-sm'
-              : 'text-muted hover:bg-muted hover:text-ink'
+              ? 'bg-accent text-ink shadow-sm'
+              : 'text-muted hover:bg-surface hover:text-ink'
           "
           @click="setCategory(opt.slug)"
         >
           <span>{{ opt.label }}</span>
           <span
             class="text-xs tabular-nums"
-            :class="
-              activeSlug === opt.slug ? 'text-accent/70' : 'text-muted/70'
-            "
+            :class="activeSlug === opt.slug ? 'text-ink/70' : 'text-muted/70'"
           >
             {{ opt.count }}
           </span>
@@ -45,7 +43,7 @@
           试试别的分类，或者
           <button
             type="button"
-            class="text-accent focus-visible:ring-ring rounded-sm underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:outline-none"
+            class="text-ink focus-visible:ring-ring rounded-sm underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:outline-none"
             @click="setCategory('all')"
           >
             全部展开
@@ -95,7 +93,7 @@
             <!-- 顶部：图标 + 名称 + 分类 chip -->
             <div class="mb-4 flex items-start gap-3">
               <div
-                class="bg-muted flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl transition-transform duration-300 group-hover:scale-105"
+                class="bg-surface flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl transition-transform duration-300 group-hover:scale-105"
               >
                 <img
                   v-if="site.icon"
@@ -113,7 +111,7 @@
                   {{ site.name }}
                 </h3>
                 <span
-                  class="bg-accent/10 text-accent mt-1.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                  class="bg-accent/10 text-ink mt-1.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold"
                 >
                   {{ site.category }}
                 </span>
@@ -122,13 +120,9 @@
 
             <!-- 中段：note（书房语气的视觉重心） -->
             <p class="text-ink/85 mb-3 text-sm leading-relaxed text-pretty">
-              <span class="text-accent/70 font-serif" aria-hidden="true"
-                >「</span
-              >
+              <span class="text-ink/70 font-serif" aria-hidden="true">「</span>
               {{ site.note }}
-              <span class="text-accent/70 font-serif" aria-hidden="true"
-                >」</span
-              >
+              <span class="text-ink/70 font-serif" aria-hidden="true">」</span>
             </p>
 
             <!-- 底段：description + tags -->

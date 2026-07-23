@@ -27,7 +27,7 @@ const {
 /** 顶部大数字配色 (text-* 语义 token) */
 const levelTextColor: Record<string, string> = {
   爆护: 'text-success',
-  好: 'text-accent',
+  好: 'text-ink',
   一般: 'text-warning',
   差: 'text-destructive',
   空军: 'text-muted',
@@ -76,7 +76,7 @@ const handleFeedback = () => {
       </div>
       <div class="flex shrink-0 items-center gap-2">
         <button
-          class="text-muted hover:bg-muted hover:text-ink inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+          class="text-muted hover:bg-surface hover:text-ink inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           type="button"
           :disabled="loading"
           @click="emit('refresh')"
@@ -85,7 +85,7 @@ const handleFeedback = () => {
           {{ loading ? '刷新中' : '刷新' }}
         </button>
         <div
-          class="bg-accent text-accent flex h-11 w-11 items-center justify-center rounded-2xl shadow-sm transition-all duration-300 group-hover:rounded-xl"
+          class="bg-accent text-ink flex h-11 w-11 items-center justify-center rounded-2xl shadow-sm transition-all duration-300 group-hover:rounded-xl"
         >
           <FishingRod class="h-5 w-5" />
         </div>
@@ -115,19 +115,19 @@ const handleFeedback = () => {
 
       <!-- 三联指标 -->
       <div class="mb-4 grid grid-cols-3 gap-2 text-center text-xs">
-        <div class="bg-muted/40 rounded-lg px-2 py-2">
+        <div class="bg-surface/40 rounded-lg px-2 py-2">
           <p class="text-muted">默认权重</p>
           <p class="text-ink mt-1 font-medium tabular-nums">
             {{ indexData.expert_score }}
           </p>
         </div>
-        <div class="bg-muted/40 rounded-lg px-2 py-2">
+        <div class="bg-surface/40 rounded-lg px-2 py-2">
           <p class="text-muted">权重调整</p>
           <p class="text-ink mt-1 font-medium tabular-nums">
             {{ indexData.residual > 0 ? '+' : '' }}{{ indexData.residual }}
           </p>
         </div>
-        <div class="bg-muted/40 rounded-lg px-2 py-2">
+        <div class="bg-surface/40 rounded-lg px-2 py-2">
           <p class="text-muted">综合</p>
           <p class="text-ink mt-1 font-medium tabular-nums">
             {{ indexData.fishing_index }}
@@ -148,11 +148,11 @@ const handleFeedback = () => {
           <div
             v-for="(value, keyName) in indexData.feature_breakdown"
             :key="keyName"
-            class="border-border/60 bg-muted/30 rounded-xl border p-2.5"
+            class="border-border/60 bg-surface/30 rounded-xl border p-2.5"
           >
             <p class="text-ink">{{ formatFeatureName(keyName) }}</p>
             <div
-              class="bg-muted relative mt-1.5 h-1.5 w-full overflow-hidden rounded-full"
+              class="bg-surface relative mt-1.5 h-1.5 w-full overflow-hidden rounded-full"
             >
               <div
                 class="absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out"
@@ -165,7 +165,7 @@ const handleFeedback = () => {
       </details>
 
       <button
-        class="bg-accent text-accent hover:bg-accent/90 mt-auto w-full rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+        class="bg-accent text-ink hover:bg-accent/90 mt-auto w-full rounded-lg px-3 py-2 text-sm font-medium transition-colors"
         type="button"
         @click="handleFeedback"
       >

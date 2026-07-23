@@ -165,13 +165,13 @@
           <span class="bg-border mx-1 h-5 w-px" aria-hidden="true" />
           <button
             @click="layoutStore.cancelEditing()"
-            class="border-border text-muted hover:bg-muted cursor-pointer rounded-xl border px-4 py-2 text-sm font-medium transition-colors active:scale-[0.96]"
+            class="border-border text-muted hover:bg-surface cursor-pointer rounded-xl border px-4 py-2 text-sm font-medium transition-colors active:scale-[0.96]"
           >
             取消
           </button>
           <button
             @click="layoutStore.saveEditing()"
-            class="bg-accent text-accent hover:bg-accent/90 cursor-pointer rounded-xl px-4 py-2 text-sm font-medium transition-colors active:scale-[0.96]"
+            class="bg-accent text-ink hover:bg-accent/90 cursor-pointer rounded-xl px-4 py-2 text-sm font-medium transition-colors active:scale-[0.96]"
           >
             保存
           </button>

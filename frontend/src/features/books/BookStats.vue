@@ -18,8 +18,8 @@
             class="flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors"
             :class="
               activeMode === m.key
-                ? 'bg-accent text-accent shadow-sm'
-                : 'text-muted hover:bg-muted hover:text-ink'
+                ? 'bg-accent text-ink shadow-sm'
+                : 'text-muted hover:bg-surface hover:text-ink'
             "
             @click="switchMode(m.key)"
           >
@@ -34,7 +34,7 @@
         >
           <button
             type="button"
-            class="text-muted hover:text-ink hover:bg-muted inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+            class="text-muted hover:text-ink hover:bg-surface inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
             :disabled="statsStore.isLoading"
             @click="goPrev"
             aria-label="上一周期"
@@ -60,7 +60,7 @@
           </span>
           <button
             type="button"
-            class="text-muted hover:text-ink hover:bg-muted inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+            class="text-muted hover:text-ink hover:bg-surface inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
             :disabled="statsStore.isLoading || isAtCurrent"
             @click="goNext"
             aria-label="下一周期"
@@ -86,11 +86,11 @@
         <!-- Loading skeleton -->
         <div v-if="statsStore.isLoading && !activeSnapshot" class="space-y-12">
           <div class="space-y-3">
-            <div class="bg-muted h-4 w-24 animate-pulse rounded" />
-            <div class="bg-muted h-16 w-3/4 animate-pulse rounded" />
-            <div class="bg-muted h-4 w-1/2 animate-pulse rounded" />
+            <div class="bg-surface h-4 w-24 animate-pulse rounded" />
+            <div class="bg-surface h-16 w-3/4 animate-pulse rounded" />
+            <div class="bg-surface h-4 w-1/2 animate-pulse rounded" />
           </div>
-          <div class="bg-muted h-72 animate-pulse rounded" />
+          <div class="bg-surface h-72 animate-pulse rounded" />
         </div>
 
         <!-- Error -->

@@ -33,7 +33,7 @@
                     viewBox="0 0 24 24"
                     stroke-width="2"
                     stroke="currentColor"
-                    class="text-accent h-5 w-5"
+                    class="text-ink h-5 w-5"
                   >
                     <path
                       stroke-linecap="round"
@@ -75,7 +75,7 @@
                     viewBox="0 0 24 24"
                     stroke-width="2"
                     stroke="currentColor"
-                    class="text-accent h-4 w-4"
+                    class="text-ink h-4 w-4"
                   >
                     <path
                       stroke-linecap="round"
@@ -86,7 +86,7 @@
                 </div>
                 <div
                   v-else
-                  class="bg-muted flex h-9 w-9 items-center justify-center rounded-xl"
+                  class="bg-surface flex h-9 w-9 items-center justify-center rounded-xl"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -117,7 +117,7 @@
                 @click="form.enabled = !form.enabled"
                 :class="[
                   'relative flex h-6 w-11 shrink-0 rounded-full transition-colors duration-300',
-                  form.enabled ? 'bg-accent' : 'bg-muted/30',
+                  form.enabled ? 'bg-accent' : 'bg-surface/30',
                 ]"
               >
                 <span
@@ -153,8 +153,8 @@
                   :class="[
                     'relative flex flex-col items-center gap-1 rounded-xl px-3 py-3 text-xs font-semibold transition-all duration-200',
                     form.milestones.includes(preset.days)
-                      ? 'bg-accent text-accent shadow-accent/25 shadow-lg'
-                      : 'bg-paper text-muted hover:bg-muted border-border border shadow-sm',
+                      ? 'bg-accent text-ink shadow-accent/25 shadow-lg'
+                      : 'bg-paper text-muted hover:bg-surface border-border border shadow-sm',
                   ]"
                 >
                   <span class="text-base">{{
@@ -164,7 +164,7 @@
                     :class="[
                       'text-[10px] font-medium',
                       form.milestones.includes(preset.days)
-                        ? 'text-accent/70'
+                        ? 'text-ink/70'
                         : 'text-muted/60',
                     ]"
                     >Day {{ preset.days }}</span
@@ -179,7 +179,7 @@
                       viewBox="0 0 24 24"
                       stroke-width="3"
                       stroke="currentColor"
-                      class="text-accent h-2 w-2"
+                      class="text-ink h-2 w-2"
                     >
                       <path
                         stroke-linecap="round"
@@ -209,7 +209,7 @@
                 <button
                   type="button"
                   @click="addCustomMilestone"
-                  class="border-border bg-paper text-muted hover:border-accent/30 hover:bg-accent/10 hover:text-accent flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-all active:scale-95"
+                  class="border-border bg-paper text-muted hover:border-accent/30 hover:bg-accent/10 hover:text-ink flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-all active:scale-95"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -236,7 +236,7 @@
                 <span
                   v-for="d in form.milestones"
                   :key="d"
-                  class="bg-accent/15 text-accent inline-flex items-center gap-1 rounded-full py-0.5 pr-1.5 pl-2.5 text-xs font-semibold"
+                  class="bg-accent/15 text-ink inline-flex items-center gap-1 rounded-full py-0.5 pr-1.5 pl-2.5 text-xs font-semibold"
                 >
                   {{ formatMilestone(d) }}
                   <button
@@ -277,7 +277,7 @@
                   type="button"
                   :disabled="testLoading"
                   @click="handleTestNotification"
-                  class="border-accent/20 bg-accent/10 text-accent hover:bg-accent/20 ml-auto flex shrink-0 items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                  class="border-accent/20 bg-accent/10 text-ink hover:bg-accent/20 ml-auto flex shrink-0 items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <svg
                     v-if="testLoading"
@@ -325,8 +325,8 @@
                   :class="[
                     'flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-semibold transition-all duration-200',
                     form.channels.includes(opt.value)
-                      ? 'bg-accent text-accent shadow-accent/25 shadow-lg'
-                      : 'bg-paper text-muted hover:bg-muted border-border border shadow-sm',
+                      ? 'bg-accent text-ink shadow-accent/25 shadow-lg'
+                      : 'bg-paper text-muted hover:bg-surface border-border border shadow-sm',
                   ]"
                 >
                   <span v-html="opt.icon" />
@@ -393,7 +393,7 @@
             <button
               type="submit"
               :disabled="isSubmitting"
-              class="bg-accent text-accent hover:shadow-accent/40 shadow-accent/30 flex w-full items-center justify-center gap-2 rounded-full py-4 text-sm font-extrabold shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+              class="bg-accent text-ink hover:shadow-accent/40 shadow-accent/30 flex w-full items-center justify-center gap-2 rounded-full py-4 text-sm font-extrabold shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
             >
               <svg
                 v-if="isSubmitting"

@@ -24,7 +24,7 @@
         :aria-label="collapsed ? '展开工作台' : '收起工作台'"
         :aria-expanded="!collapsed"
         aria-controls="todo-sidebar-nav"
-        class="text-muted hover:bg-muted hover:text-ink focus-visible:ring-ring rounded-md p-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+        class="text-muted hover:bg-surface hover:text-ink focus-visible:ring-ring rounded-md p-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         @click="collapsed = !collapsed"
       >
         <ChevronLeft v-if="!collapsed" class="h-4 w-4" aria-hidden="true" />
@@ -66,7 +66,7 @@
             'inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[10px] font-medium tabular-nums transition-[background-color,color] duration-150',
             index === activeTabIndex
               ? 'bg-accent/15 text-ink'
-              : 'bg-muted/10 text-muted',
+              : 'bg-surface/10 text-muted',
           ]"
         >
           {{ tab.count }}

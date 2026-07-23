@@ -13,8 +13,8 @@
             :class="[
               'flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
               activeTag === null
-                ? 'bg-accent/15 text-accent font-medium'
-                : 'text-muted hover:bg-muted hover:text-ink',
+                ? 'bg-accent/15 text-ink font-medium'
+                : 'text-muted hover:bg-surface hover:text-ink',
             ]"
           >
             <span class="flex items-center gap-2">
@@ -32,8 +32,8 @@
             :class="[
               'flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors',
               activeTag === tag.name
-                ? 'bg-accent/15 text-accent font-medium'
-                : 'text-muted hover:bg-muted hover:text-ink',
+                ? 'bg-accent/15 text-ink font-medium'
+                : 'text-muted hover:bg-surface hover:text-ink',
             ]"
           >
             <span class="flex items-center gap-2">

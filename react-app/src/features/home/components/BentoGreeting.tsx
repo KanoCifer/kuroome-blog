@@ -15,19 +15,19 @@ export function BentoGreeting() {
   return (
     <BentoCard className="border-accent/30! from-accent/90 to-accent/90 relative overflow-hidden bg-linear-to-br p-8 shadow-xl">
       <div className="relative z-10 flex flex-col justify-center">
-        <h3 className="text-accent/80 mb-1 font-serif text-sm font-medium">
+        <h3 className="text-ink/80 mb-1 font-serif text-sm font-medium">
           {greeting}
         </h3>
-        <h4 className="text-accent font-serif text-3xl leading-tight font-extrabold">
+        <h4 className="text-ink font-serif text-3xl leading-tight font-extrabold">
           Ready for a productive
         </h4>
-        <h4 className="text-accent mb-4 font-serif text-3xl leading-tight font-extrabold">
+        <h4 className="text-ink mb-4 font-serif text-3xl leading-tight font-extrabold">
           session now?
         </h4>
         <div className="mt-2">
           <button
             onClick={() => navigate('/todos')}
-            className="bg-accent/20 text-accent hover:bg-accent/30 rounded-full px-6 py-2.5 text-sm font-semibold backdrop-blur-md transition-all active:scale-95"
+            className="bg-accent/20 text-ink hover:bg-accent/30 rounded-full px-6 py-2.5 text-sm font-semibold backdrop-blur-md transition-all active:scale-95"
           >
             Check Today's Tasks
           </button>
@@ -38,7 +38,7 @@ export function BentoGreeting() {
         <div className="absolute top-1/2 right-4 -translate-y-1/2 opacity-20">
           {isEvening ? (
             <svg
-              className="text-accent h-24 w-24"
+              className="text-ink h-24 w-24"
               fill="currentColor"
               viewBox="0 0 24 24"
             >
@@ -50,7 +50,7 @@ export function BentoGreeting() {
             </svg>
           ) : (
             <svg
-              className="text-accent h-24 w-24"
+              className="text-ink h-24 w-24"
               fill="currentColor"
               viewBox="0 0 24 24"
             >

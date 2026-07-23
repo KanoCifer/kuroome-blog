@@ -29,7 +29,7 @@ const openQWeather = () => {
  */
 const forecastIconClass = (textDay: string): string => {
   if (textDay.includes('雷')) return 'text-warning';
-  if (textDay.includes('雨')) return 'text-accent';
+  if (textDay.includes('雨')) return 'text-ink';
   return 'text-ink';
 };
 </script>
@@ -222,7 +222,7 @@ const forecastIconClass = (textDay: string): string => {
       class="relative z-10 flex flex-1 flex-col items-center justify-center py-8 text-center"
     >
       <div
-        class="bg-muted mb-3 flex h-12 w-12 items-center justify-center rounded-2xl"
+        class="bg-surface mb-3 flex h-12 w-12 items-center justify-center rounded-2xl"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

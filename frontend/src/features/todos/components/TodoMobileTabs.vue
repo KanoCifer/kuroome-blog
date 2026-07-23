@@ -2,7 +2,7 @@
   <nav
     role="tablist"
     aria-label="工作台视角"
-    class="bg-muted mb-5 flex gap-0.5 rounded-lg p-1 lg:hidden"
+    class="bg-surface mb-5 flex gap-0.5 rounded-lg p-1 lg:hidden"
   >
     <button
       v-for="tab in tabs"
@@ -23,7 +23,7 @@
         :class="
           activeTab === tab.id
             ? 'text-ink bg-accent/15'
-            : 'text-muted bg-muted/10'
+            : 'text-muted bg-surface/10'
         "
       >
         {{ tab.count }}

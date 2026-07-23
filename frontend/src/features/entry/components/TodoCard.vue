@@ -11,7 +11,7 @@
       <div
         class="bg-accent-500/15 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110"
       >
-        <CircleCheckBig class="text-accent-600 size-4.5" />
+        <CircleCheckBig class="text-ink size-4.5" />
       </div>
       <span class="text-ink text-sm font-medium">开发任务</span>
       <svg

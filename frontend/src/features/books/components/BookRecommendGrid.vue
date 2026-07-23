@@ -83,10 +83,10 @@ function ratingScore(v: number): string {
           :key="i"
           class="w-28 flex-shrink-0 animate-pulse sm:w-32 md:w-36"
         >
-          <div class="bg-muted aspect-3/4 rounded-xl" />
+          <div class="bg-surface aspect-3/4 rounded-xl" />
           <div class="mt-2 space-y-1.5 px-1">
-            <div class="bg-muted h-3 w-5/6 rounded" />
-            <div class="bg-muted h-2.5 w-1/2 rounded" />
+            <div class="bg-surface h-3 w-5/6 rounded" />
+            <div class="bg-surface h-2.5 w-1/2 rounded" />
           </div>
         </div>
       </div>

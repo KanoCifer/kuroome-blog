@@ -178,12 +178,12 @@ export default function Register() {
             isReady ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}
         >
-          <div className="bg-accent text-accent mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)]">
+          <div className="bg-accent text-ink mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)]">
             <IconCloud className="size-8" />
           </div>
           <h2 className="font-headline text-ink text-center text-[28px] font-extrabold tracking-tight">
             Join kanocifer
-            <span className="text-accent">.chat</span>
+            <span className="text-ink">.chat</span>
           </h2>
           <p className="text-muted mt-1 text-center text-[15px] font-medium">
             Create your account to start managing your reading list!
@@ -296,7 +296,7 @@ export default function Register() {
                 />
                 <button
                   type="button"
-                  className="text-muted hover:text-accent absolute inset-y-0 right-0 flex items-center pr-4 transition-all duration-200"
+                  className="text-muted hover:text-ink absolute inset-y-0 right-0 flex items-center pr-4 transition-all duration-200"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -349,7 +349,7 @@ export default function Register() {
                 />
                 <button
                   type="button"
-                  className="text-muted hover:text-accent absolute inset-y-0 right-0 flex items-center pr-4 transition-all duration-200"
+                  className="text-muted hover:text-ink absolute inset-y-0 right-0 flex items-center pr-4 transition-all duration-200"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? (
@@ -407,7 +407,7 @@ export default function Register() {
                   id="send-code"
                   onClick={sendEmailCode}
                   disabled={isSendingCode || isSent}
-                  className="bg-accent text-accent hover:bg-accent/90 shrink-0 rounded-full px-6 py-3.5 text-[14px] font-bold shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all active:scale-[0.98] disabled:opacity-70"
+                  className="bg-accent text-ink hover:bg-accent/90 shrink-0 rounded-full px-6 py-3.5 text-[14px] font-bold shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all active:scale-[0.98] disabled:opacity-70"
                 >
                   {isSendingCode ? '...' : isSent ? 'Sent!' : sendCodeText}
                 </button>
@@ -423,7 +423,7 @@ export default function Register() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-accent text-accent hover:bg-accent/90 mb-4 w-full rounded-full py-4 text-[15px] font-bold shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all active:scale-[0.98] disabled:opacity-70"
+              className="bg-accent text-ink hover:bg-accent/90 mb-4 w-full rounded-full py-4 text-[15px] font-bold shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all active:scale-[0.98] disabled:opacity-70"
             >
               {isSubmitting ? 'Creating Account...' : 'Create Account'}
             </button>
@@ -441,7 +441,7 @@ export default function Register() {
               Already have an account?
               <Link
                 to="/login"
-                className="text-accent ml-1 font-bold hover:underline"
+                className="text-ink ml-1 font-bold hover:underline"
               >
                 Login here
               </Link>

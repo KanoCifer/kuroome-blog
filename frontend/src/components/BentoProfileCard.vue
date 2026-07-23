@@ -41,7 +41,7 @@
 
       <!-- Name -->
       <h2 class="text-ink font-family-averia mb-2 text-2xl">
-        I'm <span class="text-accent text-3xl font-bold">Kuroome</span>.
+        I'm <span class="text-ink text-3xl font-bold">Kuroome</span>.
       </h2>
       <p class="font-family-averia text-ink mb-2 text-2xl">
         Welcome to my site!

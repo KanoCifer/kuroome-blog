@@ -30,7 +30,7 @@
             <button
               type="button"
               @click="toggleCollapsed"
-              class="bg-muted text-ink hover:bg-muted/80 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors"
+              class="bg-surface text-ink hover:bg-surface/80 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors"
               :aria-expanded="!collapsed"
               aria-controls="server-monitor-detail"
             >
@@ -39,7 +39,7 @@
             <button
               type="button"
               @click="toggleAutoRefresh"
-              class="bg-muted text-ink hover:bg-muted/80 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors"
+              class="bg-surface text-ink hover:bg-surface/80 rounded-xl px-3 py-1.5 text-xs font-medium transition-colors"
             >
               {{ isSSEConnected ? '暂停' : '开始' }} 自动刷新
             </button>
@@ -82,7 +82,7 @@
               <div class="h-44">
                 <div
                   v-if="!serverStatus"
-                  class="bg-muted h-full w-full animate-pulse rounded-xl"
+                  class="bg-surface h-full w-full animate-pulse rounded-xl"
                 ></div>
                 <v-chart
                   v-else
@@ -125,7 +125,7 @@
               <div class="h-44">
                 <div
                   v-if="!serverStatus"
-                  class="bg-muted h-full w-full animate-pulse rounded-xl"
+                  class="bg-surface h-full w-full animate-pulse rounded-xl"
                 ></div>
                 <v-chart
                   v-else
@@ -219,7 +219,7 @@
           </h3>
           <div
             v-if="!hasHistory"
-            class="bg-muted h-64 animate-pulse rounded-xl"
+            class="bg-surface h-64 animate-pulse rounded-xl"
           ></div>
           <div v-else class="h-64 w-full overflow-hidden">
             <v-chart
@@ -295,7 +295,7 @@
       <div class="flex items-center gap-2">
         <!-- Connection status -->
         <div
-          class="bg-muted text-muted flex items-center gap-2 rounded-full px-3 py-1 text-xs"
+          class="bg-surface text-muted flex items-center gap-2 rounded-full px-3 py-1 text-xs"
         >
           <div
             :class="[
@@ -312,7 +312,7 @@
         <button
           type="button"
           @click="toggleCollapsed"
-          class="bg-muted text-ink hover:bg-muted/80 rounded-full px-3 py-1 text-xs font-medium transition-colors"
+          class="bg-surface text-ink hover:bg-surface/80 rounded-full px-3 py-1 text-xs font-medium transition-colors"
           :aria-expanded="!collapsed"
           aria-controls="server-monitor-detail"
         >

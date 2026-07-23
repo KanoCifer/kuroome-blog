@@ -13,11 +13,11 @@
       <!-- 添加钓点按钮 -->
       <button
         type="button"
-        class="bg-secondary/90 text-accent hover:bg-accent absolute right-2.5 bottom-36 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm transition-all duration-200 ease-out active:scale-95"
+        class="bg-secondary/90 text-ink hover:bg-accent absolute right-2.5 bottom-36 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm transition-all duration-200 ease-out active:scale-95"
         aria-label="添加钓点"
         @click="emit('addSpot')"
       >
-        <Plus class="text-accent h-5 w-5" />
+        <Plus class="text-ink h-5 w-5" />
       </button>
 
       <!-- 定位按钮：浏览器原生方式获取 -->
@@ -25,7 +25,7 @@
         type="button"
         :class="[
           'bg-paper/90 text-ink hover:bg-paper border-border/40 absolute right-2.5 bottom-5 z-60 flex h-11 w-11 items-center justify-center rounded-xl border shadow-sm backdrop-blur-md transition-all duration-200 ease-out active:scale-95 disabled:opacity-50',
-          isLocating && 'text-accent',
+          isLocating && 'text-ink',
         ]"
         :disabled="isLocating"
         aria-label="定位到当前位置"
@@ -98,7 +98,7 @@
               </p>
             </div>
             <button
-              class="bg-destructive text-accent hover:bg-destructive/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+              class="bg-destructive text-ink hover:bg-destructive/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
               type="button"
               @click="emit('clearRoute')"
             >

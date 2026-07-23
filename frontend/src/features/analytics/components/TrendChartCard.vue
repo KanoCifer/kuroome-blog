@@ -8,7 +8,7 @@
     </h2>
     <div
       v-if="loading && !overviewData"
-      class="bg-muted h-72 animate-pulse rounded-xl"
+      class="bg-surface h-72 animate-pulse rounded-xl"
     ></div>
     <!-- Empty state -->
     <div

@@ -7,19 +7,19 @@
       <div class="flex flex-wrap items-center gap-3">
         <a
           href="#rss-parse"
-          class="bg-accent/15 text-accent hover:bg-muted rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+          class="bg-accent/15 text-ink hover:bg-surface rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
         >
           解析订阅
         </a>
         <a
           href="#rss-subscriptions"
-          class="bg-accent/15 text-accent hover:bg-muted rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+          class="bg-accent/15 text-ink hover:bg-surface rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
         >
           我的订阅
         </a>
         <a
           href="#rss-articles"
-          class="bg-accent/15 text-accent hover:bg-muted rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+          class="bg-accent/15 text-ink hover:bg-surface rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
         >
           文章列表
         </a>

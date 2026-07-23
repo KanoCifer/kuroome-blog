@@ -35,7 +35,7 @@ export function AlertDialog({
         <div className="flex justify-end gap-3">
           <button
             onClick={() => onOpenChange(false)}
-            className="bg-secondary text-ink hover:bg-muted rounded-full border-0 px-5 py-2.5 text-sm font-medium transition-all"
+            className="bg-secondary text-ink hover:bg-surface rounded-full border-0 px-5 py-2.5 text-sm font-medium transition-all"
           >
             {cancelText}
           </button>
@@ -47,7 +47,7 @@ export function AlertDialog({
             className={`rounded-full px-5 py-2.5 text-sm font-medium transition-all ${
               destructive
                 ? 'bg-destructive hover:bg-destructive/90 text-white'
-                : 'bg-accent text-accent hover:bg-accent/90'
+                : 'bg-accent text-ink hover:bg-accent/90'
             }`}
           >
             {confirmText}

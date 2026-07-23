@@ -278,10 +278,10 @@ export default function BlogListView() {
             {activeTag && (
               <button
                 type="button"
-                className="border-border bg-paper text-muted hover:bg-muted hover:text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+                className="border-border bg-paper text-muted hover:bg-surface hover:text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
                 onClick={handleResetFilter}
               >
-                <span className="text-accent/70 font-serif italic">#</span>
+                <span className="text-ink/70 font-serif italic">#</span>
                 <span className="font-serif">{activeTag}</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -323,7 +323,7 @@ export default function BlogListView() {
                 <h2 className="text-ink font-serif text-base font-semibold sm:text-lg">
                   {activeTag ? (
                     <>
-                      <span className="text-accent/70 mr-1">#</span>
+                      <span className="text-ink/70 mr-1">#</span>
                       {activeTag}
                     </>
                   ) : (
@@ -398,7 +398,7 @@ export default function BlogListView() {
                       aria-disabled={!pagination?.has_prev}
                       className={`focus-visible:ring-ring inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${
                         pagination?.has_prev
-                          ? 'text-muted hover:bg-muted hover:text-ink'
+                          ? 'text-muted hover:bg-surface hover:text-ink'
                           : 'text-muted/50 cursor-not-allowed'
                       }`}
                       onClick={() => handlePageChange(pagination!.prev_num!)}
@@ -429,8 +429,8 @@ export default function BlogListView() {
                           }
                           className={`focus-visible:ring-ring inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${
                             item === pagination?.page
-                              ? 'bg-accent text-accent'
-                              : 'text-muted hover:bg-muted hover:text-ink'
+                              ? 'bg-accent text-ink'
+                              : 'text-muted hover:bg-surface hover:text-ink'
                           }`}
                           onClick={() => handlePageChange(item)}
                         >
@@ -447,7 +447,7 @@ export default function BlogListView() {
                       aria-disabled={!pagination?.has_next}
                       className={`focus-visible:ring-ring inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${
                         pagination?.has_next
-                          ? 'text-muted hover:bg-muted hover:text-ink'
+                          ? 'text-muted hover:bg-surface hover:text-ink'
                           : 'text-muted/50 cursor-not-allowed'
                       }`}
                       onClick={() => handlePageChange(pagination!.next_num!)}

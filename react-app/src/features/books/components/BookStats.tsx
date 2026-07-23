@@ -113,7 +113,7 @@ function RecommendSection({
         </div>
         <button
           type="button"
-          className="text-muted hover:text-ink hover:bg-muted inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          className="text-muted hover:text-ink hover:bg-surface inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40"
           disabled={loading}
           onClick={onRefresh}
           aria-label="换一批"
@@ -132,9 +132,9 @@ function RecommendSection({
               key={i}
               className="flex w-40 flex-shrink-0 animate-pulse flex-col gap-2"
             >
-              <div className="bg-muted aspect-[2/3] w-full rounded-md" />
-              <div className="bg-muted h-3 w-3/4 rounded" />
-              <div className="bg-muted h-3 w-1/2 rounded" />
+              <div className="bg-surface aspect-[2/3] w-full rounded-md" />
+              <div className="bg-surface h-3 w-3/4 rounded" />
+              <div className="bg-surface h-3 w-1/2 rounded" />
             </div>
           ))}
         </div>
@@ -166,7 +166,7 @@ function RecommendSection({
               rel="noopener noreferrer"
               className="group bg-paper hover:border-accent/40 flex w-40 flex-shrink-0 snap-start flex-col gap-2 rounded-xl border border-transparent p-2 transition-colors"
             >
-              <div className="bg-muted relative aspect-[2/3] w-full overflow-hidden rounded-md shadow-sm">
+              <div className="bg-surface relative aspect-[2/3] w-full overflow-hidden rounded-md shadow-sm">
                 {book.cover && (
                   <img
                     src={book.cover}
@@ -177,7 +177,7 @@ function RecommendSection({
                 )}
                 {book.newRating > 0 && (
                   <span className="bg-paper/80 text-ink absolute top-1.5 right-1.5 inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium tabular-nums backdrop-blur-md">
-                    <Star className="text-accent h-2.5 w-2.5 fill-current" />
+                    <Star className="text-ink h-2.5 w-2.5 fill-current" />
                     {ratingScore(book.newRating)}
                   </span>
                 )}
@@ -643,7 +643,7 @@ export default function BookStats() {
         <div className="absolute top-0 right-0 left-0 z-10 flex items-center px-4 py-4 md:px-6">
           <button
             type="button"
-            className="border-border bg-paper/60 hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
+            className="border-border bg-paper/60 hover:bg-surface flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
             onClick={handleBack}
             aria-label="返回"
           >
@@ -655,7 +655,7 @@ export default function BookStats() {
         <div className="absolute top-0 right-0 z-10 flex items-center px-4 py-4 md:px-6">
           <button
             type="button"
-            className="border-border bg-paper/60 hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
+            className="border-border bg-paper/60 hover:bg-surface flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
             onClick={handleRefresh}
             aria-label="刷新统计"
           >
@@ -689,11 +689,11 @@ export default function BookStats() {
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                 {Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="animate-pulse">
-                    <div className="bg-muted h-24 rounded-xl" />
+                    <div className="bg-surface h-24 rounded-xl" />
                   </div>
                 ))}
               </div>
-              <div className="bg-muted h-80 animate-pulse rounded-xl" />
+              <div className="bg-surface h-80 animate-pulse rounded-xl" />
             </div>
           )}
 
@@ -723,8 +723,8 @@ export default function BookStats() {
                     type="button"
                     className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${
                       activeMode === mode.key
-                        ? 'bg-accent text-accent shadow-sm'
-                        : 'text-muted hover:bg-muted hover:text-ink'
+                        ? 'bg-accent text-ink shadow-sm'
+                        : 'text-muted hover:bg-surface hover:text-ink'
                     }`}
                     onClick={() => setActiveMode(mode.key)}
                   >
@@ -873,7 +873,7 @@ export default function BookStats() {
                           {formatDuration(activeSnapshot!.wrReadTime)}
                         </span>
                       </div>
-                      <div className="bg-muted h-2 overflow-hidden rounded-full">
+                      <div className="bg-surface h-2 overflow-hidden rounded-full">
                         <div
                           className="bg-accent h-full rounded-full transition-all"
                           style={{ width: `${readPercent}%` }}
@@ -887,7 +887,7 @@ export default function BookStats() {
                           {formatDuration(activeSnapshot!.wrListenTime)}
                         </span>
                       </div>
-                      <div className="bg-muted h-2 overflow-hidden rounded-full">
+                      <div className="bg-surface h-2 overflow-hidden rounded-full">
                         <div
                           className="bg-success h-full rounded-full transition-all"
                           style={{ width: `${listenPercent}%` }}
@@ -934,7 +934,7 @@ export default function BookStats() {
                             className="flex items-center justify-between"
                           >
                             <div className="flex items-center gap-3">
-                              <span className="bg-muted text-muted flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium">
+                              <span className="bg-surface text-muted flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium">
                                 {index + 1}
                               </span>
                               <span className="text-ink text-sm font-medium">
@@ -966,7 +966,7 @@ export default function BookStats() {
                             className="flex items-center justify-between"
                           >
                             <div className="flex items-center gap-3">
-                              <span className="bg-muted text-muted flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium">
+                              <span className="bg-surface text-muted flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium">
                                 {index + 1}
                               </span>
                               <span className="text-ink text-sm font-medium">

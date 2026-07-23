@@ -76,7 +76,7 @@ const ResourceBar = defineComponent({
         ),
         h(
           'div',
-          { class: 'bg-muted relative h-1 overflow-hidden rounded-full' },
+          { class: 'bg-surface relative h-1 overflow-hidden rounded-full' },
           [
             h('div', {
               class: `absolute inset-y-0 left-0 rounded-full transition-[width] duration-700 ease-out ${TONE_DOT[props.tone]}`,
@@ -147,9 +147,9 @@ const ResourceBar = defineComponent({
         />
       </div>
       <div v-else class="space-y-4">
-        <div class="bg-muted h-3 w-full animate-pulse rounded" />
-        <div class="bg-muted h-3 w-2/3 animate-pulse rounded" />
-        <div class="bg-muted h-3 w-1/2 animate-pulse rounded" />
+        <div class="bg-surface h-3 w-full animate-pulse rounded" />
+        <div class="bg-surface h-3 w-2/3 animate-pulse rounded" />
+        <div class="bg-surface h-3 w-1/2 animate-pulse rounded" />
       </div>
     </section>
 

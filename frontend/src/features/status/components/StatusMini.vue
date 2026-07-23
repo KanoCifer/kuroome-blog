@@ -98,7 +98,7 @@ const wsLatency = computed(() => {
 
 const wsDotClass = computed(() => {
   const ms = connectionDelay?.value ?? 0;
-  if (!ms) return 'bg-muted/40';
+  if (!ms) return 'bg-surface/40';
   if (ms < 200) return 'bg-emerald-500';
   if (ms < 2000) return 'bg-yellow-500';
   return 'bg-red-500';
@@ -161,8 +161,8 @@ const rows = computed<ServiceRow[]>(() => {
       label: 'Database',
       status: dbOk ? '连接正常' : '检测中…',
       value: dbOk ? 'OK' : '--',
-      dotClass: dbOk ? 'bg-emerald-500' : 'bg-muted/40',
-      pingClass: dbOk ? 'bg-emerald-500' : 'bg-muted/40',
+      dotClass: dbOk ? 'bg-emerald-500' : 'bg-surface/40',
+      pingClass: dbOk ? 'bg-emerald-500' : 'bg-surface/40',
     },
   ];
 });

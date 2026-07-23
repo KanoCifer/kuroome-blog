@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-muted flex flex-wrap items-center gap-2 rounded-xl px-4 py-3"
+    class="bg-surface flex flex-wrap items-center gap-2 rounded-xl px-4 py-3"
     role="group"
     aria-label="筛选条件"
   >
@@ -11,7 +11,7 @@
       class="rounded-full border px-2.5 py-0.5 text-xs transition-colors"
       :class="
         filterType.has(t)
-          ? 'border-accent/40 bg-accent/10 text-accent'
+          ? 'border-accent/40 bg-accent/10 text-ink'
           : 'border-border text-muted hover:text-ink'
       "
       :aria-pressed="filterType.has(t)"
@@ -29,7 +29,7 @@
       class="rounded-full border px-2.5 py-0.5 text-xs transition-colors"
       :class="
         filterPriority.has(p)
-          ? 'border-accent/40 bg-accent/10 text-accent'
+          ? 'border-accent/40 bg-accent/10 text-ink'
           : 'border-border text-muted hover:text-ink'
       "
       :aria-pressed="filterPriority.has(p)"
@@ -47,7 +47,7 @@
         class="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs transition-colors"
         :class="
           filterMember.has(m.userId)
-            ? 'border-accent/40 bg-accent/10 text-accent'
+            ? 'border-accent/40 bg-accent/10 text-ink'
             : 'border-border text-muted hover:text-ink'
         "
         :aria-pressed="filterMember.has(m.userId)"

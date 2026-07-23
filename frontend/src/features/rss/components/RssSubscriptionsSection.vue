@@ -5,14 +5,14 @@
   >
     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
       <div>
-        <h2 class="text-accent text-xl font-bold">我的订阅</h2>
+        <h2 class="text-ink text-xl font-bold">我的订阅</h2>
         <p class="text-muted mt-1 text-sm">
           共 {{ subscriptions.length }} 个订阅源
         </p>
       </div>
       <button
         type="button"
-        class="bg-accent text-accent hover:bg-accent/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+        class="bg-accent text-ink hover:bg-accent/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
         :disabled="subscriptionsLoading"
         @click="$emit('refreshList')"
       >
@@ -31,13 +31,13 @@
       <div
         v-for="skeleton in 3"
         :key="skeleton"
-        class="border-border bg-muted/40 h-24 animate-pulse rounded-xl border"
+        class="border-border bg-surface/40 h-24 animate-pulse rounded-xl border"
       />
     </div>
 
     <div
       v-else-if="subscriptions.length === 0"
-      class="border-border bg-muted/40 text-muted rounded-xl border border-dashed p-8 text-center text-sm"
+      class="border-border bg-surface/40 text-muted rounded-xl border border-dashed p-8 text-center text-sm"
     >
       暂无订阅，先在上方解析并保存一个 RSS 地址吧。
     </div>
@@ -58,11 +58,11 @@
         >
           <div class="min-w-0">
             <div class="flex flex-wrap items-center gap-2">
-              <h3 class="text-accent truncate text-base font-semibold">
+              <h3 class="text-ink truncate text-base font-semibold">
                 {{ getSubscriptionTitle(subscription) }}
               </h3>
               <span
-                class="bg-accent/15 text-accent rounded-full px-2 py-0.5 text-xs font-medium"
+                class="bg-accent/15 text-ink rounded-full px-2 py-0.5 text-xs font-medium"
               >
                 {{ getFeedProtocol(subscription.rssUrl) }}
               </span>
@@ -84,21 +84,21 @@
           <div class="flex shrink-0 flex-wrap items-center gap-2">
             <button
               type="button"
-              class="bg-accent text-accent hover:bg-accent/90 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+              class="bg-accent text-ink hover:bg-accent/90 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
               @click="$emit('filterByFeed', subscription)"
             >
               查看文章
             </button>
             <button
               type="button"
-              class="bg-success text-accent hover:bg-success/90 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+              class="bg-success text-ink hover:bg-success/90 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
               @click="$emit('refresh', subscription)"
             >
               刷新文章
             </button>
             <button
               type="button"
-              class="bg-destructive text-accent hover:bg-destructive/90 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+              class="bg-destructive text-ink hover:bg-destructive/90 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
               @click="$emit('delete', subscription)"
             >
               删除订阅

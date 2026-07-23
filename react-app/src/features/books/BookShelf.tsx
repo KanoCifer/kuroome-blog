@@ -105,7 +105,7 @@ export default function BookShelf() {
         <div className="absolute top-0 right-0 left-0 z-10 flex items-center px-4 py-4 md:px-6">
           <button
             type="button"
-            className="border-border bg-paper/60 hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
+            className="border-border bg-paper/60 hover:bg-surface flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors"
             onClick={handleBack}
             aria-label="返回"
           >
@@ -117,7 +117,7 @@ export default function BookShelf() {
         <div className="absolute top-0 right-0 z-10 flex items-center px-4 py-4 md:px-6">
           <button
             type="button"
-            className="border-border bg-paper/60 hover:bg-muted flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors disabled:opacity-50"
+            className="border-border bg-paper/60 hover:bg-surface flex h-10 w-10 items-center justify-center rounded-full border backdrop-blur-md transition-colors disabled:opacity-50"
             disabled={isSyncing}
             onClick={handleSync}
             aria-label="同步书架"
@@ -210,11 +210,11 @@ export default function BookShelf() {
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="animate-pulse">
-                  <div className="bg-muted aspect-3/4 rounded-xl" />
+                  <div className="bg-surface aspect-3/4 rounded-xl" />
                   <div className="mt-2 space-y-1.5 px-1.5">
-                    <div className="bg-muted h-3 w-5/6 rounded" />
-                    <div className="bg-muted h-3 w-3/4 rounded" />
-                    <div className="bg-muted h-2.5 w-1/2 rounded" />
+                    <div className="bg-surface h-3 w-5/6 rounded" />
+                    <div className="bg-surface h-3 w-3/4 rounded" />
+                    <div className="bg-surface h-2.5 w-1/2 rounded" />
                   </div>
                 </div>
               ))}
@@ -277,7 +277,7 @@ export default function BookShelf() {
                           }}
                         />
                       ) : (
-                        <div className="bg-muted flex h-full w-full items-center justify-center">
+                        <div className="bg-surface flex h-full w-full items-center justify-center">
                           <span className="text-muted/40 font-serif text-2xl">
                             {book.title.slice(0, 1)}
                           </span>

@@ -33,7 +33,7 @@ function gaugeClass(p: number): string {
   if (p >= 70) return 'bg-accent';
   if (p >= 50) return 'bg-warning';
   if (p <= 30) return 'bg-destructive';
-  return 'bg-muted';
+  return 'bg-surface';
 }
 
 // SnapSheet 档位: 初始 1/3, 中档 60vh, 大档 4/5 (80vh)
@@ -61,7 +61,7 @@ export function FishingIndexDetailSheet({ open, data, onClose }: Props) {
               type="button"
               onClick={onClose}
               aria-label="关闭"
-              className="hover:bg-muted text-muted inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+              className="hover:bg-surface text-muted inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
             >
               <X className="h-4 w-4" />
             </button>

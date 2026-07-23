@@ -135,7 +135,7 @@ export function BottomSheet({
               <div className="shrink-0 px-5 pt-3 pb-2">
                 {/* 拖拽把手 */}
                 {draggable && (
-                  <div className="bg-muted mx-auto mb-3 h-1.5 w-10 rounded-full" />
+                  <div className="bg-surface mx-auto mb-3 h-1.5 w-10 rounded-full" />
                 )}
                 {title && (
                   <h2 className="text-ink text-center text-base font-semibold">

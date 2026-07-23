@@ -32,7 +32,7 @@ export function BentoCalendar() {
               whileTap={{ scale: 0.94 }}
               transition={SPRING.snappy}
               onClick={() => setExpanded(true)}
-              className="text-muted hover:bg-muted rounded-full p-1.5 transition-colors"
+              className="text-muted hover:bg-surface rounded-full p-1.5 transition-colors"
               aria-label="展开日历"
             >
               <svg
@@ -73,7 +73,7 @@ export function BentoCalendar() {
                 key={idx}
                 className={`mx-auto flex aspect-square w-full max-w-8 items-center justify-center rounded-full text-sm transition-colors ${
                   isToday
-                    ? 'bg-accent text-accent font-bold'
+                    ? 'bg-accent text-ink font-bold'
                     : 'text-muted hover:bg-accent/10'
                 }`}
               >
@@ -133,7 +133,7 @@ export function BentoCalendar() {
                     }}
                     transition={SPRING.reveal}
                     className={`mx-auto flex aspect-square w-full max-w-8 items-center justify-center rounded-full text-sm ${
-                      isToday ? 'bg-accent text-accent font-bold' : 'text-ink'
+                      isToday ? 'bg-accent text-ink font-bold' : 'text-ink'
                     }`}
                   >
                     {dayNum}

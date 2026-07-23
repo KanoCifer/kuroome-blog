@@ -10,7 +10,7 @@
     >
       <!-- badges -->
       <span class="mb-2 flex flex-wrap items-center gap-1">
-        <CircleCheckBig class="text-accent size-5" />
+        <CircleCheckBig class="text-ink size-5" />
         <TypeBadge :type="task.type" />
         <PriorityBadge :priority="task.priority" />
         <KindBadge :kind="task.kind" />
@@ -22,7 +22,7 @@
         </span>
         <span
           v-if="task.slug"
-          class="bg-accent/10 text-accent rounded-full px-1.5 py-px text-[10px] font-medium"
+          class="bg-accent/10 text-ink rounded-full px-1.5 py-px text-[10px] font-medium"
         >
           {{ task.slug }}
         </span>
@@ -63,7 +63,7 @@
       >
         <button
           type="button"
-          class="text-muted hover:bg-muted hover:text-accent focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
+          class="text-muted hover:bg-surface hover:text-ink focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
           title="推进状态"
           aria-label="推进状态"
           @click="$emit('cycle', task.slug)"

@@ -341,7 +341,7 @@ onMounted(() => {
 
         <div class="bg-accent/10 border-accent/20 rounded-xl border p-3">
           <div class="flex items-baseline justify-between gap-2">
-            <p class="text-accent text-xs font-medium">最低潮</p>
+            <p class="text-ink text-xs font-medium">最低潮</p>
             <p class="text-muted text-xs tabular-nums">
               {{ lowTide?.time ?? '--:--' }}
             </p>
@@ -356,7 +356,7 @@ onMounted(() => {
     <!-- 空态 -->
     <div v-else class="flex flex-1 flex-col items-center justify-center py-8">
       <div
-        class="bg-muted mb-3 flex h-12 w-12 items-center justify-center rounded-2xl"
+        class="bg-surface mb-3 flex h-12 w-12 items-center justify-center rounded-2xl"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

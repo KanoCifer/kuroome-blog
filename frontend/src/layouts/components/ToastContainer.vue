@@ -51,7 +51,7 @@ function iconColorForType(type: string) {
     case 'warning':
       return 'text-warning';
     default:
-      return 'text-accent';
+      return 'text-ink';
   }
 }
 

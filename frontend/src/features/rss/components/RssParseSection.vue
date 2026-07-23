@@ -2,7 +2,7 @@
   <section id="rss-parse" class="border-border bg-paper rounded-2xl border p-6">
     <div class="mb-5 flex items-center justify-between gap-3">
       <div>
-        <h2 class="text-accent text-xl font-bold">解析订阅地址</h2>
+        <h2 class="text-ink text-xl font-bold">解析订阅地址</h2>
         <p class="text-muted mt-1 text-sm">
           支持 RSS/Atom，解析后可直接保存到我的订阅
         </p>
@@ -14,7 +14,7 @@
       @submit.prevent="$emit('parse')"
     >
       <div class="flex-1">
-        <label for="rss-url" class="text-accent mb-2 block text-sm font-medium">
+        <label for="rss-url" class="text-ink mb-2 block text-sm font-medium">
           RSS/Atom 地址
         </label>
         <input
@@ -31,7 +31,7 @@
 
       <button
         type="button"
-        class="border-accent/30 bg-accent/15 text-accent hover:bg-muted rounded-xl border px-5 py-3 text-sm font-medium transition-colors"
+        class="border-accent/30 bg-accent/15 text-ink hover:bg-surface rounded-xl border px-5 py-3 text-sm font-medium transition-colors"
         @click="$emit('update:saveToDb', !saveToDb)"
       >
         {{ saveToDb ? '已启用保存' : '保存到订阅' }}
@@ -52,7 +52,7 @@
         v-for="feed in exampleFeeds"
         :key="feed.url"
         type="button"
-        class="bg-accent/15 text-accent hover:bg-muted rounded-full px-3 py-1 text-xs font-medium transition-colors"
+        class="bg-accent/15 text-ink hover:bg-surface rounded-full px-3 py-1 text-xs font-medium transition-colors"
         @click="$emit('update:rssUrl', feed.url)"
       >
         {{ feed.name }}
@@ -68,7 +68,7 @@
         v-for="historyUrl in rssHistory.slice(0, 3)"
         :key="historyUrl"
         type="button"
-        class="bg-accent/15 text-accent hover:bg-muted rounded-full px-3 py-1 text-xs font-medium transition-colors"
+        class="bg-accent/15 text-ink hover:bg-surface rounded-full px-3 py-1 text-xs font-medium transition-colors"
         @click="$emit('update:rssUrl', historyUrl)"
       >
         {{ historyUrl }}
@@ -77,9 +77,9 @@
 
     <div
       v-if="parseMetadata"
-      class="border-border bg-muted/40 mt-6 rounded-xl border p-5"
+      class="border-border bg-surface/40 mt-6 rounded-xl border p-5"
     >
-      <h3 class="text-accent text-lg font-bold">
+      <h3 class="text-ink text-lg font-bold">
         {{ parseMetadata.title }}
       </h3>
       <p v-if="parseMetadata.description" class="text-muted mt-2 text-sm">
@@ -93,7 +93,7 @@
           :href="parseMetadata.link"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-accent hover:text-accent font-medium"
+          class="text-ink hover:text-ink font-medium"
         >
           访问原站
         </a>
@@ -114,7 +114,7 @@
             :href="entry.link"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-accent hover:text-accent font-medium transition-colors"
+            class="text-ink hover:text-ink font-medium transition-colors"
           >
             {{ entry.title }}
           </a>

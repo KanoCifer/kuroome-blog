@@ -23,7 +23,7 @@ defineEmits<{
   >
     <section
       v-if="!disabled"
-      class="border-border bg-muted/30 flex flex-col items-start gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5"
+      class="border-border bg-surface/30 flex flex-col items-start gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5"
     >
       <div>
         <p class="text-ink font-family-averia text-base italic">
@@ -35,7 +35,7 @@ defineEmits<{
       </div>
       <button
         v-if="!disabled"
-        class="bg-accent text-accent hover:bg-accent/90 rounded-lg px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors"
+        class="bg-accent text-ink hover:bg-accent/90 rounded-lg px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors"
         type="button"
         @click="$emit('submit')"
       >

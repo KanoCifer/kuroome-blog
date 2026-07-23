@@ -84,7 +84,7 @@ export function BlogListItem({ post, index }: BlogListItemProps) {
               {/* 顶部元数据：置顶 / 分类 / 日期 */}
               <div className="text-muted mb-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px]">
                 {post.is_pinned && (
-                  <span className="bg-accent/15 text-accent inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold">
+                  <span className="bg-accent/15 text-ink inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       className="h-3 w-3"
@@ -99,7 +99,7 @@ export function BlogListItem({ post, index }: BlogListItemProps) {
                 )}
                 {post.tags?.length && (
                   <span className="text-ink/70 inline-flex items-center gap-1 font-medium">
-                    <span className="text-accent/70 font-serif">#</span>
+                    <span className="text-ink/70 font-serif">#</span>
                     {post.tags[0]}
                   </span>
                 )}
@@ -114,7 +114,7 @@ export function BlogListItem({ post, index }: BlogListItemProps) {
               {/* 标题：衬线大字 */}
               <h2
                 className={[
-                  'text-ink group-hover:text-accent font-serif leading-snug font-semibold transition-colors duration-300 ease-out',
+                  'text-ink group-hover:text-ink font-serif leading-snug font-semibold transition-colors duration-300 ease-out',
                   isFeatured ? 'text-2xl sm:text-3xl' : 'text-lg sm:text-xl',
                 ].join(' ')}
                 style={{ textWrap: 'balance' }}

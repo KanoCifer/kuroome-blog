@@ -8,7 +8,7 @@
     <p class="text-muted mb-4 text-xs">浏览量前 {{ MAX_ITEMS - 1 }} 的文章</p>
     <div
       v-if="loading && !data"
-      class="bg-muted h-full min-h-[14rem] animate-pulse rounded-xl"
+      class="bg-surface h-full min-h-[14rem] animate-pulse rounded-xl"
     ></div>
     <!-- Empty state -->
     <div

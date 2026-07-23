@@ -20,7 +20,7 @@ interface Verdict {
 
 const VERDICT: Record<FishingLevel, Verdict> = {
   爆护: { text: '今日爆护', tone: 'text-success' },
-  好: { text: '今日宜出钓', tone: 'text-accent' },
+  好: { text: '今日宜出钓', tone: 'text-ink' },
   一般: { text: '今日可一试', tone: 'text-warning' },
   差: { text: '今日不宜出钓', tone: 'text-destructive' },
   空军: { text: '今日恐空军', tone: 'text-muted' },
@@ -67,8 +67,8 @@ export function WeatherHero({
           onClick={onToggleAnalysis}
           className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
             analysisOpen
-              ? 'bg-accent text-accent'
-              : 'text-muted hover:bg-muted hover:text-ink'
+              ? 'bg-accent text-ink'
+              : 'text-muted hover:bg-surface hover:text-ink'
           }`}
         >
           <span className="relative inline-flex">
@@ -153,10 +153,10 @@ function HeroSkeleton() {
   return (
     <div className="mt-3 flex flex-col gap-3">
       <div className="flex items-start justify-between">
-        <div className="bg-muted/15 skeleton-pulse h-16 w-28 rounded-xl" />
-        <div className="bg-muted/15 skeleton-pulse h-14 w-14 rounded-xl" />
+        <div className="bg-surface/15 skeleton-pulse h-16 w-28 rounded-xl" />
+        <div className="bg-surface/15 skeleton-pulse h-14 w-14 rounded-xl" />
       </div>
-      <div className="bg-muted/15 skeleton-pulse h-3.5 w-40 rounded-md" />
+      <div className="bg-surface/15 skeleton-pulse h-3.5 w-40 rounded-md" />
     </div>
   );
 }

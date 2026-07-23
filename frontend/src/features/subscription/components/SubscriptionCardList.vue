@@ -62,16 +62,16 @@ const emit = defineEmits<{
       <div
         v-for="idx in 3"
         :key="idx"
-        class="border-border/70 bg-muted/80 animate-pulse rounded-2xl border p-6"
+        class="border-border/70 bg-surface/80 animate-pulse rounded-2xl border p-6"
       >
-        <div class="bg-muted mb-4 h-5 w-36 rounded-full" />
-        <div class="bg-muted h-10 rounded-2xl" />
+        <div class="bg-surface mb-4 h-5 w-36 rounded-full" />
+        <div class="bg-surface h-10 rounded-2xl" />
       </div>
     </div>
 
     <div
       v-else-if="subscriptions.length === 0"
-      class="border-border bg-muted/50 text-muted rounded-2xl border border-dashed px-5 py-10 text-center text-sm"
+      class="border-border bg-surface/50 text-muted rounded-2xl border border-dashed px-5 py-10 text-center text-sm"
     >
       还没有订阅记录，点击「新增订阅」开始管理。
     </div>
@@ -117,7 +117,7 @@ const emit = defineEmits<{
         </div>
 
         <div
-          class="bg-muted/50 mt-4 flex items-center gap-2 rounded-2xl px-4 py-3"
+          class="bg-surface/50 mt-4 flex items-center gap-2 rounded-2xl px-4 py-3"
         >
           <span class="text-muted text-sm">下次扣费:</span>
           <span class="text-ink text-sm font-bold">
@@ -139,13 +139,13 @@ const emit = defineEmits<{
         </div>
 
         <div class="mt-4 grid grid-cols-2 gap-3 text-xs">
-          <div class="border-border bg-muted/70 rounded-xl border px-3 py-2">
+          <div class="border-border bg-surface/70 rounded-xl border px-3 py-2">
             <p class="text-muted">提醒渠道</p>
             <p class="text-ink mt-1 font-medium">
               {{ getReminderChannelsText(subscription.reminder_config) }}
             </p>
           </div>
-          <div class="border-border bg-muted/70 rounded-xl border px-3 py-2">
+          <div class="border-border bg-surface/70 rounded-xl border px-3 py-2">
             <p class="text-muted">提醒节点</p>
             <p class="text-ink mt-1 font-medium">
               {{ getReminderPointsText(subscription.reminder_config) }}
@@ -154,7 +154,7 @@ const emit = defineEmits<{
         </div>
 
         <p
-          class="border-border bg-muted/70 text-ink mt-3 line-clamp-2 rounded-xl border px-3 py-2 text-sm"
+          class="border-border bg-surface/70 text-ink mt-3 line-clamp-2 rounded-xl border px-3 py-2 text-sm"
         >
           {{ subscription.notes?.trim() || '暂无备注' }}
         </p>
@@ -162,21 +162,21 @@ const emit = defineEmits<{
         <div class="mt-4 grid grid-cols-4 gap-2">
           <button
             type="button"
-            class="border-border bg-paper text-ink hover:bg-muted rounded-xl border px-3 py-2 text-xs font-medium transition"
+            class="border-border bg-paper text-ink hover:bg-surface rounded-xl border px-3 py-2 text-xs font-medium transition"
             @click.stop="emit('edit', subscription)"
           >
             编辑
           </button>
           <button
             type="button"
-            class="border-accent/30 bg-accent/15 text-accent hover:bg-muted rounded-xl border px-3 py-2 text-xs font-medium transition"
+            class="border-accent/30 bg-accent/15 text-ink hover:bg-surface rounded-xl border px-3 py-2 text-xs font-medium transition"
             @click.stop="emit('reminder', subscription)"
           >
             通知
           </button>
           <button
             type="button"
-            class="border-border bg-paper text-ink hover:bg-muted rounded-xl border px-3 py-2 text-xs font-medium transition disabled:opacity-60"
+            class="border-border bg-paper text-ink hover:bg-surface rounded-xl border px-3 py-2 text-xs font-medium transition disabled:opacity-60"
             :disabled="pendingStatusId === subscription.id"
             @click.stop="emit('toggleStatus', subscription)"
           >

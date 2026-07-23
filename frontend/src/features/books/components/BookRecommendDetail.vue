@@ -81,7 +81,7 @@ onUnmounted(() => {
           <div class="grid grid-cols-1 sm:grid-cols-[200px_1fr]">
             <!-- Cover column — the morph happens here -->
             <div
-              class="bg-muted relative aspect-[2/3] w-full overflow-hidden sm:aspect-auto sm:h-full sm:w-[200px]"
+              class="bg-surface relative aspect-[2/3] w-full overflow-hidden sm:aspect-auto sm:h-full sm:w-[200px]"
             >
               <img
                 v-if="book.cover"
@@ -97,7 +97,7 @@ onUnmounted(() => {
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
-                  class="text-accent h-3 w-3"
+                  class="text-ink h-3 w-3"
                   aria-hidden="true"
                 >
                   <path
@@ -122,7 +122,7 @@ onUnmounted(() => {
               <div class="mb-3 flex items-start justify-between gap-3">
                 <span
                   v-if="book.category"
-                  class="bg-accent/15 text-accent inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                  class="bg-accent/15 text-ink inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
                 >
                   {{ book.category }}
                 </span>
@@ -130,7 +130,7 @@ onUnmounted(() => {
 
                 <button
                   type="button"
-                  class="text-muted hover:bg-muted hover:text-ink -mt-1 -mr-1 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-colors"
+                  class="text-muted hover:bg-surface hover:text-ink -mt-1 -mr-1 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full transition-colors"
                   aria-label="关闭"
                   @click="emit('close')"
                 >
@@ -192,7 +192,7 @@ onUnmounted(() => {
               <div class="mt-auto pt-6">
                 <a
                   :href="wereadHref"
-                  class="bg-accent text-accent hover:bg-accent/90 inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-colors sm:w-auto"
+                  class="bg-accent text-ink hover:bg-accent/90 inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-colors sm:w-auto"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

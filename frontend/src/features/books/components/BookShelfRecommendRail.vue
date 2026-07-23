@@ -59,7 +59,7 @@
           />
           <div
             v-else
-            class="bg-muted flex h-full w-full items-center justify-center"
+            class="bg-surface flex h-full w-full items-center justify-center"
           >
             <span class="text-muted/40 font-serif text-2xl">
               {{ book.title.slice(0, 1) }}
@@ -70,7 +70,7 @@
             v-if="book.newRating > 0"
             class="bg-paper/85 text-ink absolute top-2 right-2 inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium tabular-nums backdrop-blur-md"
           >
-            <Star class="text-accent h-2.5 w-2.5 fill-current" />
+            <Star class="text-ink h-2.5 w-2.5 fill-current" />
             {{ ratingScore(book.newRating) }}
           </span>
         </Motion>

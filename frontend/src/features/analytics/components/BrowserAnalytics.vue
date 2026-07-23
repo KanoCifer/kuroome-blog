@@ -6,7 +6,7 @@
     <p class="text-muted mb-3 text-xs">按浏览器分类的访问占比</p>
     <div
       v-if="loading && !hasBrowserData"
-      class="bg-muted h-56 animate-pulse rounded-xl"
+      class="bg-surface h-56 animate-pulse rounded-xl"
     ></div>
     <div
       v-else-if="!hasBrowserData"

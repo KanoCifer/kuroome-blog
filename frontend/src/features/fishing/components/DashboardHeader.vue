@@ -34,7 +34,7 @@ defineEmits<{
 
       <div class="flex items-center gap-2">
         <button
-          class="bg-accent text-accent hover:bg-accent/90 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors"
+          class="bg-accent text-ink hover:bg-accent/90 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors"
           type="button"
           @click="$emit('add-spot')"
         >
@@ -55,8 +55,8 @@ defineEmits<{
         </button>
 
         <button
-          class="border-border bg-paper hover:bg-muted text-ink inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors"
-          :class="analysisOpen ? 'border-accent text-accent bg-accent/5' : ''"
+          class="border-border bg-paper hover:bg-surface text-ink inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors"
+          :class="analysisOpen ? 'border-accent text-ink bg-accent/5' : ''"
           type="button"
           :aria-pressed="analysisOpen"
           @click="$emit('toggle-analysis')"

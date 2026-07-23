@@ -69,7 +69,7 @@
         class="absolute top-2 left-2 z-20 flex h-7 w-7 items-center justify-center rounded-full border-2 backdrop-blur-sm transition-all duration-200"
         :class="
           selected
-            ? 'border-accent bg-accent text-accent shadow-sm'
+            ? 'border-accent bg-accent text-ink shadow-sm'
             : 'border-white/80 bg-black/20 text-transparent hover:bg-black/40'
         "
         :aria-pressed="selected"

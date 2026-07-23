@@ -90,7 +90,7 @@ const handleSubmit = () => {
         <h3 class="text-ink mb-3 flex items-center gap-2 text-sm font-bold">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="text-accent h-4 w-4"
+            class="text-ink h-4 w-4"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -106,26 +106,26 @@ const handleSubmit = () => {
         </h3>
         <ul class="text-muted space-y-2 text-sm">
           <li class="flex items-start gap-2">
-            <span class="text-accent mt-0.5 shrink-0 text-xs">●</span>
+            <span class="text-ink mt-0.5 shrink-0 text-xs">●</span>
             <span>网站需符合中国大陆相关法律法规</span>
           </li>
           <li class="flex items-start gap-2">
-            <span class="text-accent mt-0.5 shrink-0 text-xs">●</span>
+            <span class="text-ink mt-0.5 shrink-0 text-xs">●</span>
             <span>网站内容原创、非商业推广</span>
           </li>
           <li class="flex items-start gap-2">
-            <span class="text-accent mt-0.5 shrink-0 text-xs">●</span>
+            <span class="text-ink mt-0.5 shrink-0 text-xs">●</span>
             <span
               >已在您的网站添加本站友链（<a
                 href="https://kanocifer.chat"
                 target="_blank"
-                class="text-accent underline"
+                class="text-ink underline"
                 >kanocifer.chat</a
               >）</span
             >
           </li>
           <li class="flex items-start gap-2">
-            <span class="text-accent mt-0.5 shrink-0 text-xs">●</span>
+            <span class="text-ink mt-0.5 shrink-0 text-xs">●</span>
             <span>网站可正常访问</span>
           </li>
         </ul>
@@ -135,7 +135,7 @@ const handleSubmit = () => {
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="text-accent h-4 w-4"
+            class="text-ink h-4 w-4"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -151,7 +151,7 @@ const handleSubmit = () => {
         </h3>
         <ul class="text-muted space-y-2 text-sm">
           <li class="flex items-start gap-2">
-            <span class="text-accent mt-0.5 shrink-0 text-xs">●</span>
+            <span class="text-ink mt-0.5 shrink-0 text-xs">●</span>
             <span>网站名称、描述、地址、Favicon 地址</span>
           </li>
         </ul>
@@ -167,7 +167,7 @@ const handleSubmit = () => {
       </h2>
       <p class="my-4">
         <span
-          class="border-accent/30 bg-accent/20 text-accent rounded-full border px-4 py-2 text-xs font-medium"
+          class="border-accent/30 bg-accent/20 text-ink rounded-full border px-4 py-2 text-xs font-medium"
         >
           填写以下信息，通过邮件提交友链申请
         </span>
@@ -186,7 +186,7 @@ const handleSubmit = () => {
               id="fl-name"
               v-model="name"
               type="text"
-              class="border-border bg-muted focus:border-ring focus:ring-ring text-ink placeholder:text-muted w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
+              class="border-border bg-surface focus:border-ring focus:ring-ring text-ink placeholder:text-muted w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
               :disabled="submitting"
               placeholder="怎么称呼您"
             />
@@ -210,7 +210,7 @@ const handleSubmit = () => {
               id="fl-email"
               v-model="email"
               type="email"
-              class="border-border bg-muted focus:border-ring focus:ring-ring text-ink placeholder:text-muted w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
+              class="border-border bg-surface focus:border-ring focus:ring-ring text-ink placeholder:text-muted w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
               :disabled="submitting"
               placeholder="your@email.com"
             />
@@ -234,7 +234,7 @@ const handleSubmit = () => {
               id="fl-site-name"
               v-model="siteName"
               type="text"
-              class="border-border bg-muted focus:border-ring focus:ring-ring text-ink placeholder:text-muted w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
+              class="border-border bg-surface focus:border-ring focus:ring-ring text-ink placeholder:text-muted w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
               :disabled="submitting"
               placeholder="您的网站名称"
             />
@@ -258,7 +258,7 @@ const handleSubmit = () => {
               id="fl-site-url"
               v-model="siteUrl"
               type="text"
-              class="border-border bg-muted focus:border-ring focus:ring-ring text-ink placeholder:text-muted w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
+              class="border-border bg-surface focus:border-ring focus:ring-ring text-ink placeholder:text-muted w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
               :disabled="submitting"
               placeholder="https://example.com"
             />
@@ -283,7 +283,7 @@ const handleSubmit = () => {
               v-model="description"
               rows="3"
               maxlength="200"
-              class="border-border bg-muted focus:border-ring focus:ring-ring text-ink placeholder:text-muted w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
+              class="border-border bg-surface focus:border-ring focus:ring-ring text-ink placeholder:text-muted w-full rounded-3xl border px-3 py-2 focus:ring-2 focus:outline-none motion-safe:transition-all motion-safe:duration-300"
               :disabled="submitting"
               placeholder="用简短的一段话介绍您的网站（不超过 200 字）"
             ></textarea>
@@ -304,7 +304,7 @@ const handleSubmit = () => {
           <div class="md:col-span-2">
             <button
               type="submit"
-              class="bg-accent text-accent shadow-accent/30 hover:bg-accent/90 focus:ring-ring dark:ring-offset-paper flex cursor-pointer items-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg ring-offset-2 focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+              class="bg-accent text-ink shadow-accent/30 hover:bg-accent/90 focus:ring-ring dark:ring-offset-paper flex cursor-pointer items-center gap-2 rounded-xl px-8 py-2.5 font-bold shadow-lg ring-offset-2 focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
               :disabled="submitting"
             >
               {{ submitting ? '正在打开邮件客户端...' : '提交申请' }}

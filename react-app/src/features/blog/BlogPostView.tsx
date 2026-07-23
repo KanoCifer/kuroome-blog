@@ -16,15 +16,15 @@ import { useNavigate, useParams } from 'react-router-dom';
 function LoadingSkeleton() {
   return (
     <div className="mx-auto max-w-[42rem] px-6 py-16">
-      <div className="bg-muted/70 skeleton-pulse mb-8 h-5 w-20 rounded" />
-      <div className="bg-muted/70 skeleton-pulse mb-4 h-9 w-4/5 rounded" />
-      <div className="bg-muted/70 skeleton-pulse mb-12 h-4 w-2/5 rounded" />
-      <div className="bg-muted/70 skeleton-pulse aspect-[16/9] w-full rounded-xl" />
+      <div className="bg-surface/70 skeleton-pulse mb-8 h-5 w-20 rounded" />
+      <div className="bg-surface/70 skeleton-pulse mb-4 h-9 w-4/5 rounded" />
+      <div className="bg-surface/70 skeleton-pulse mb-12 h-4 w-2/5 rounded" />
+      <div className="bg-surface/70 skeleton-pulse aspect-[16/9] w-full rounded-xl" />
       <div className="mt-10 space-y-4">
-        <div className="bg-muted/70 skeleton-pulse h-4 w-full rounded" />
-        <div className="bg-muted/70 skeleton-pulse h-4 w-full rounded" />
-        <div className="bg-muted/70 skeleton-pulse h-4 w-5/6 rounded" />
-        <div className="bg-muted/70 skeleton-pulse h-4 w-full rounded" />
+        <div className="bg-surface/70 skeleton-pulse h-4 w-full rounded" />
+        <div className="bg-surface/70 skeleton-pulse h-4 w-full rounded" />
+        <div className="bg-surface/70 skeleton-pulse h-4 w-5/6 rounded" />
+        <div className="bg-surface/70 skeleton-pulse h-4 w-full rounded" />
       </div>
     </div>
   );
@@ -82,7 +82,7 @@ function setupCodeCopy(
     btn.innerHTML = COPY_ICON_SVG;
     btn.title = '复制';
     btn.className =
-      'absolute top-2 right-2 p-1.5 rounded-md bg-muted/80 text-muted opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-muted cursor-pointer';
+      'absolute top-2 right-2 p-1.5 rounded-md bg-surface/80 text-muted opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-surface cursor-pointer';
     btn.setAttribute('aria-label', '复制代码');
 
     const handleClick = () => {
@@ -293,7 +293,7 @@ export default function BlogPostView() {
       <div className="mx-auto max-w-[42rem] px-6 pt-10 sm:pt-14">
         <a
           onClick={() => navigate('/blog')}
-          className="text-muted hover:text-accent group inline-flex cursor-pointer items-center gap-1.5 text-[13px] font-medium tracking-wide transition-colors"
+          className="text-muted hover:text-ink group inline-flex cursor-pointer items-center gap-1.5 text-[13px] font-medium tracking-wide transition-colors"
         >
           <span className="transition-transform duration-200 group-hover:-translate-x-0.5">
             ←
@@ -345,7 +345,7 @@ export default function BlogPostView() {
           </div>
 
           {/* Eyebrow / kicker — first tag (or fallback) */}
-          <div className="text-accent mb-5 flex items-center gap-2 text-[11px] font-semibold tracking-[0.14em] uppercase">
+          <div className="text-ink mb-5 flex items-center gap-2 text-[11px] font-semibold tracking-[0.14em] uppercase">
             <span className="bg-accent h-px w-5" />
             {post.tags?.[0] || '随笔'}
           </div>
@@ -378,7 +378,7 @@ export default function BlogPostView() {
                   disabled={isLiked || isLiking}
                   onClick={handleLike}
                   className={`inline-flex cursor-pointer items-center gap-1 rounded transition-colors duration-150 active:scale-[0.96] disabled:cursor-default ${
-                    isLiked ? 'text-accent' : 'text-muted hover:text-ink'
+                    isLiked ? 'text-ink' : 'text-muted hover:text-ink'
                   }`}
                 >
                   <Heart
@@ -416,7 +416,7 @@ export default function BlogPostView() {
           {/* 封面置顶：主视觉先行 */}
           {post.cover && (
             <figure className="mt-10 mb-10 overflow-hidden rounded-xl">
-              <div className="bg-muted aspect-[16/9] w-full overflow-hidden">
+              <div className="bg-surface aspect-[16/9] w-full overflow-hidden">
                 <img
                   src={coverSrc}
                   alt={`${post.title} 封面`}
@@ -454,7 +454,7 @@ export default function BlogPostView() {
           <footer className="border-border mt-14 border-t pt-8">
             <div className="flex flex-wrap items-start justify-between gap-5">
               <div className="flex items-center gap-3.5">
-                <span className="text-ink ring-border bg-muted flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-serif text-sm font-semibold ring-1">
+                <span className="text-ink ring-border bg-surface flex h-11 w-11 shrink-0 items-center justify-center rounded-full font-serif text-sm font-semibold ring-1">
                   {(post.author || 'K').slice(0, 1)}
                 </span>
                 <div className="min-w-0">
@@ -473,7 +473,7 @@ export default function BlogPostView() {
               <button
                 type="button"
                 onClick={handleCopyLink}
-                className="text-muted hover:text-accent inline-flex cursor-pointer items-center gap-1.5 text-[12px] font-medium tracking-[0.02em] transition-all duration-150 active:scale-[0.96]"
+                className="text-muted hover:text-ink inline-flex cursor-pointer items-center gap-1.5 text-[12px] font-medium tracking-[0.02em] transition-all duration-150 active:scale-[0.96]"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -516,7 +516,7 @@ export default function BlogPostView() {
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setShowDeleteDialog(false)}
-                className="bg-muted text-ink hover:bg-muted/80 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-150 active:scale-[0.96]"
+                className="bg-surface text-ink hover:bg-surface/80 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-150 active:scale-[0.96]"
               >
                 取消
               </button>

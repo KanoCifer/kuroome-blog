@@ -8,7 +8,7 @@
     @click="playAnimation"
   >
     <span
-      class="bg-accent text-accent absolute top-2 right-0 z-10 flex translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full px-1 py-0.5 text-[10px]"
+      class="bg-accent text-ink absolute top-2 right-0 z-10 flex translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full px-1 py-0.5 text-[10px]"
       >{{ likesCount }}</span
     >
     <div ref="containerRef" class="bento-like-animation h-12 w-12"></div>

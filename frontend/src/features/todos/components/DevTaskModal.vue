@@ -6,7 +6,7 @@
       <div class="bg-paper border-border border-b px-6 pt-5 pb-4">
         <div class="flex items-start gap-3">
           <span
-            class="bg-accent/10 text-accent mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+            class="bg-accent/10 text-ink mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
           >
             <svg
               class="h-[18px] w-[18px]"
@@ -64,7 +64,7 @@
                 :class="
                   form.type === t
                     ? typeChipActive(t)
-                    : 'border-border text-muted hover:bg-muted'
+                    : 'border-border text-muted hover:bg-surface'
                 "
               >
                 {{ t }}
@@ -87,7 +87,7 @@
                 :class="
                   form.priority === p
                     ? priorityChipActive(p)
-                    : 'border-border text-muted hover:bg-muted'
+                    : 'border-border text-muted hover:bg-surface'
                 "
               >
                 {{ p }}
@@ -136,8 +136,8 @@
                 class="cursor-pointer rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors"
                 :class="
                   form.status === s
-                    ? 'border-accent/40 bg-accent/10 text-accent'
-                    : 'border-border text-muted hover:bg-muted'
+                    ? 'border-accent/40 bg-accent/10 text-ink'
+                    : 'border-border text-muted hover:bg-surface'
                 "
               >
                 {{ s }}
@@ -239,14 +239,14 @@
         <div class="flex items-center gap-2">
           <button
             @click="emit('close')"
-            class="text-muted hover:bg-muted focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+            class="text-muted hover:bg-surface focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
             取消
           </button>
           <button
             @click="handleSave"
             :disabled="!form.title.trim()"
-            class="bg-accent text-accent hover:bg-accent/90 focus-visible:ring-ring cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            class="bg-accent text-ink hover:bg-accent/90 focus-visible:ring-ring cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           >
             {{ form.slug ? '保存' : '创建' }}
           </button>
@@ -300,15 +300,15 @@ const PRIORITY_ACTIVE: Record<DevTaskPriority, string> = {
   'P0 紧急': 'border-destructive/40 bg-destructive/10 text-destructive',
   'P1 高':
     'border-orange-300/60 bg-orange-50 text-orange-700 dark:border-orange-700/60 dark:bg-orange-950/30 dark:text-orange-400',
-  'P2 中': 'border-accent/40 bg-accent/10 text-accent',
-  'P3 低': 'border-border bg-muted text-muted',
+  'P2 中': 'border-accent/40 bg-accent/10 text-ink',
+  'P3 低': 'border-border bg-surface text-muted',
 };
 
 function typeChipActive(t: DevTaskType): string {
-  return TYPE_ACTIVE[t] ?? 'border-accent/40 bg-accent/10 text-accent';
+  return TYPE_ACTIVE[t] ?? 'border-accent/40 bg-accent/10 text-ink';
 }
 function priorityChipActive(p: DevTaskPriority): string {
-  return PRIORITY_ACTIVE[p] ?? 'border-accent/40 bg-accent/10 text-accent';
+  return PRIORITY_ACTIVE[p] ?? 'border-accent/40 bg-accent/10 text-ink';
 }
 
 interface FormState {

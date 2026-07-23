@@ -135,7 +135,7 @@ const coverGradient = computed(() =>
           >
             <!-- 封面 -->
             <div
-              class="bg-muted relative aspect-[3/4] overflow-hidden md:aspect-auto md:h-full"
+              class="bg-surface relative aspect-[3/4] overflow-hidden md:aspect-auto md:h-full"
             >
               <img
                 v-if="book.cover"
@@ -207,7 +207,7 @@ const coverGradient = computed(() =>
 
                 <!-- 进度条 -->
                 <div
-                  class="bg-muted relative h-1.5 overflow-hidden rounded-full"
+                  class="bg-surface relative h-1.5 overflow-hidden rounded-full"
                 >
                   <motion.div
                     :initial="{ width: '0%' }"
@@ -270,14 +270,14 @@ const coverGradient = computed(() =>
               >
                 <a
                   :href="`weread://reading?bId=${book.bookId}`"
-                  class="bg-accent text-accent hover:bg-accent/90 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-colors"
+                  class="bg-accent text-ink hover:bg-accent/90 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-colors"
                 >
                   <BookOpen class="h-4 w-4" />
                   继续阅读
                 </a>
                 <button
                   type="button"
-                  class="border-border text-ink hover:bg-muted inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm transition-colors"
+                  class="border-border text-ink hover:bg-surface inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm transition-colors"
                 >
                   <Eye class="h-4 w-4" />
                   标记读完

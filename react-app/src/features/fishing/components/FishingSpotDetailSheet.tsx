@@ -163,7 +163,7 @@ export function FishingSpotDetailSheet({
               type="button"
               aria-label="关闭钓点详情"
               onClick={onClose}
-              className="text-muted hover:bg-muted hover:text-ink ml-3 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors"
+              className="text-muted hover:bg-surface hover:text-ink ml-3 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
@@ -204,7 +204,7 @@ export function FishingSpotDetailSheet({
                 {spot.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="bg-muted text-muted rounded-full px-3 py-1 text-xs font-medium"
+                    className="bg-surface text-muted rounded-full px-3 py-1 text-xs font-medium"
                   >
                     {tag}
                   </span>
@@ -236,7 +236,7 @@ export function FishingSpotDetailSheet({
                 type="button"
                 onClick={() => onRoute?.(marker!)}
                 disabled={!marker}
-                className="bg-accent text-accent hover:bg-accent/90 flex min-h-11 w-full items-center justify-center gap-2 rounded-full px-5 text-sm font-medium transition-colors disabled:opacity-60"
+                className="bg-accent text-ink hover:bg-accent/90 flex min-h-11 w-full items-center justify-center gap-2 rounded-full px-5 text-sm font-medium transition-colors disabled:opacity-60"
               >
                 <Navigation className="h-4 w-4" />
                 导航到此处
@@ -245,7 +245,7 @@ export function FishingSpotDetailSheet({
                 <button
                   type="button"
                   onClick={startEdit}
-                  className="border-border text-muted hover:bg-muted flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full border px-5 text-sm font-medium transition-colors"
+                  className="border-border text-muted hover:bg-surface flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full border px-5 text-sm font-medium transition-colors"
                 >
                   <Pencil className="h-4 w-4" />
                   编辑
@@ -273,7 +273,7 @@ export function FishingSpotDetailSheet({
               <button
                 type="button"
                 onClick={() => setDeleteOpen(false)}
-                className="border-border text-muted hover:bg-muted min-h-11 flex-1 rounded-full border px-5 text-sm font-medium transition-colors"
+                className="border-border text-muted hover:bg-surface min-h-11 flex-1 rounded-full border px-5 text-sm font-medium transition-colors"
               >
                 取消
               </button>
@@ -281,7 +281,7 @@ export function FishingSpotDetailSheet({
                 type="button"
                 onClick={doDelete}
                 disabled={deleting}
-                className="bg-destructive text-accent hover:bg-destructive/90 min-h-11 flex-1 rounded-full px-5 text-sm font-medium transition-colors disabled:opacity-60"
+                className="bg-destructive text-ink hover:bg-destructive/90 min-h-11 flex-1 rounded-full px-5 text-sm font-medium transition-colors disabled:opacity-60"
               >
                 {deleting ? '删除中…' : '确认删除'}
               </button>
@@ -421,7 +421,7 @@ function EditForm({
         <button
           type="button"
           onClick={onCancel}
-          className="border-border text-muted hover:bg-muted min-h-11 flex-1 rounded-full border px-5 text-sm font-medium transition-colors"
+          className="border-border text-muted hover:bg-surface min-h-11 flex-1 rounded-full border px-5 text-sm font-medium transition-colors"
         >
           取消
         </button>
@@ -429,7 +429,7 @@ function EditForm({
           type="button"
           onClick={onSave}
           disabled={saving}
-          className="bg-accent text-accent hover:bg-accent/90 min-h-11 flex-1 rounded-full px-5 text-sm font-medium transition-colors disabled:opacity-60"
+          className="bg-accent text-ink hover:bg-accent/90 min-h-11 flex-1 rounded-full px-5 text-sm font-medium transition-colors disabled:opacity-60"
         >
           {saving ? '保存中…' : '保存'}
         </button>

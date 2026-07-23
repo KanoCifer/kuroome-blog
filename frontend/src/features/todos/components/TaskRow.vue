@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-surface border-border group hover:bg-muted flex items-center gap-3 rounded-xl border px-4 py-2.5 transition-[background-color] duration-200"
+    class="bg-surface border-border group hover:bg-surface flex items-center gap-3 rounded-xl border px-4 py-2.5 transition-[background-color] duration-200"
   >
     <!-- open affordance: real button (no nested interactives) -->
     <button
@@ -36,7 +36,7 @@
       <button
         v-if="!done"
         type="button"
-        class="text-muted hover:bg-muted hover:text-accent focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
+        class="text-muted hover:bg-surface hover:text-ink focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
         title="推进状态"
         aria-label="推进状态"
         @click="$emit('cycle', task.slug)"

@@ -68,7 +68,7 @@
           class="bg-paper border-border relative max-w-md rounded-3xl border p-10 text-center shadow-2xl"
         >
           <div
-            class="bg-accent/10 text-accent mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl"
+            class="bg-accent/10 text-ink mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl"
           >
             <ImageOff class="h-10 w-10" stroke-width="1.5" />
           </div>

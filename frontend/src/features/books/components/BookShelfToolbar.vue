@@ -30,8 +30,8 @@
           class="flex h-8 w-8 items-center justify-center rounded-lg transition-colors"
           :class="
             density === opt.key
-              ? 'bg-accent text-accent shadow-sm'
-              : 'text-muted hover:text-ink hover:bg-muted'
+              ? 'bg-accent text-ink shadow-sm'
+              : 'text-muted hover:text-ink hover:bg-surface'
           "
           :aria-pressed="density === opt.key"
           :aria-label="opt.label"
@@ -46,7 +46,7 @@
       <div class="relative">
         <button
           type="button"
-          class="border-border bg-paper hover:bg-muted text-ink inline-flex h-9 items-center gap-1.5 rounded-xl border px-3 text-sm transition-colors"
+          class="border-border bg-paper hover:bg-surface text-ink inline-flex h-9 items-center gap-1.5 rounded-xl border px-3 text-sm transition-colors"
           :aria-expanded="sortMenuOpen"
           aria-haspopup="menu"
           @click="sortMenuOpen = !sortMenuOpen"
@@ -65,13 +65,13 @@
             v-for="opt in SORT_OPTIONS"
             :key="opt.key"
             type="button"
-            class="text-ink hover:bg-muted flex w-full items-center justify-between px-3 py-2 text-left text-sm"
+            class="text-ink hover:bg-surface flex w-full items-center justify-between px-3 py-2 text-left text-sm"
             role="menuitemradio"
             :aria-checked="sort === opt.key"
             @click="onSelectSort(opt.key)"
           >
             <span>{{ opt.label }}</span>
-            <Check v-if="sort === opt.key" class="text-accent h-3.5 w-3.5" />
+            <Check v-if="sort === opt.key" class="text-ink h-3.5 w-3.5" />
           </button>
         </div>
       </div>
@@ -90,7 +90,7 @@
         class="flex h-8 flex-shrink-0 items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-colors"
         :class="
           filter === chip.key
-            ? 'border-accent bg-accent text-accent'
+            ? 'border-accent bg-accent text-ink'
             : 'border-border bg-paper text-muted hover:border-ink/20 hover:text-ink'
         "
         role="tab"

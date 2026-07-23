@@ -10,9 +10,9 @@ export function MomentTagChip({ name, to }: MomentTagChipProps) {
   return (
     <Link
       to={target}
-      className="text-muted hover:text-ink hover:bg-muted inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 font-serif text-[11px] tracking-wide transition-colors"
+      className="text-muted hover:text-ink hover:bg-surface inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 font-serif text-[11px] tracking-wide transition-colors"
     >
-      <span className="text-accent/70 font-serif">#</span>
+      <span className="text-ink/70 font-serif">#</span>
       <span>{name}</span>
     </Link>
   );

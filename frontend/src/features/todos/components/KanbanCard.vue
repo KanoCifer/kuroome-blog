@@ -1,6 +1,6 @@
 <template>
   <article
-    class="bg-muted/80 border-border group hover:bg-muted flex flex-col gap-2 rounded-xl border p-3 transition-[background-color,transform,opacity] duration-200"
+    class="bg-surface/80 border-border group hover:bg-surface flex flex-col gap-2 rounded-xl border p-3 transition-[background-color,transform,opacity] duration-200"
     :class="[
       isDragging ? 'cursor-grabbing opacity-50' : 'cursor-grab',
       done ? 'opacity-70' : '',
@@ -49,7 +49,7 @@
       </span>
       <span
         v-if="task.slug"
-        class="bg-accent/10 text-accent rounded-full px-1.5 py-px text-[10px] font-medium tabular-nums"
+        class="bg-accent/10 text-ink rounded-full px-1.5 py-px text-[10px] font-medium tabular-nums"
       >
         {{ task.slug }}
       </span>
@@ -83,7 +83,7 @@
         <button
           v-if="!done"
           type="button"
-          class="text-muted hover:bg-muted hover:text-accent focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
+          class="text-muted hover:bg-surface hover:text-ink focus-visible:ring-ring cursor-pointer rounded-md p-1 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
           title="推进状态"
           aria-label="推进状态"
           @click="$emit('cycle', task.slug)"

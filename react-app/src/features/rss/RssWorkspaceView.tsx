@@ -106,7 +106,7 @@ export default function RssWorkspaceView() {
       {/* Header */}
       <header className="bg-paper/85 sticky top-0 z-10 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-md items-center gap-3 px-4 py-3">
-          <Rss className="text-accent h-5 w-5" />
+          <Rss className="text-ink h-5 w-5" />
           <h1 className="text-ink text-lg font-bold">RSS 阅读</h1>
 
           {/* Feed selector */}
@@ -114,7 +114,7 @@ export default function RssWorkspaceView() {
             <button
               type="button"
               onClick={() => setShowFeedPicker((v) => !v)}
-              className="border-border bg-paper hover:bg-muted ml-auto flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+              className="border-border bg-paper hover:bg-surface ml-auto flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
             >
               <span className="max-w-32 truncate">
                 {selectedFeed?.feedTitle || '全部'}
@@ -139,8 +139,8 @@ export default function RssWorkspaceView() {
                   onClick={() => handleSelectFeed('')}
                   className={`flex w-full items-center rounded-lg px-3 py-2 text-sm transition-colors ${
                     !selectedFeedUrl
-                      ? 'bg-accent/10 text-accent'
-                      : 'text-muted hover:bg-muted hover:text-ink'
+                      ? 'bg-accent/10 text-ink'
+                      : 'text-muted hover:bg-surface hover:text-ink'
                   }`}
                 >
                   全部订阅
@@ -152,8 +152,8 @@ export default function RssWorkspaceView() {
                     onClick={() => handleSelectFeed(sub.rssUrl)}
                     className={`flex w-full items-center rounded-lg px-3 py-2 text-sm transition-colors ${
                       selectedFeedUrl === sub.rssUrl
-                        ? 'bg-accent/10 text-accent'
-                        : 'text-muted hover:bg-muted hover:text-ink'
+                        ? 'bg-accent/10 text-ink'
+                        : 'text-muted hover:bg-surface hover:text-ink'
                     }`}
                   >
                     {sub.feedTitle || new URL(sub.rssUrl).hostname}
@@ -171,7 +171,7 @@ export default function RssWorkspaceView() {
           <div className="space-y-3 pt-2">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="bg-muted h-14 rounded-xl" />
+                <div className="bg-surface h-14 rounded-xl" />
               </div>
             ))}
           </div>
@@ -181,7 +181,7 @@ export default function RssWorkspaceView() {
             <button
               type="button"
               onClick={() => void fetchSubscriptions()}
-              className="text-accent mt-3 cursor-pointer text-sm font-medium underline underline-offset-4"
+              className="text-ink mt-3 cursor-pointer text-sm font-medium underline underline-offset-4"
             >
               重试
             </button>
@@ -198,7 +198,7 @@ export default function RssWorkspaceView() {
           <div className="space-y-3 pt-2">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="bg-muted h-20 rounded-xl" />
+                <div className="bg-surface h-20 rounded-xl" />
               </div>
             ))}
           </div>
@@ -208,7 +208,7 @@ export default function RssWorkspaceView() {
             <button
               type="button"
               onClick={() => void fetchArticles()}
-              className="text-accent mt-3 cursor-pointer text-sm font-medium underline underline-offset-4"
+              className="text-ink mt-3 cursor-pointer text-sm font-medium underline underline-offset-4"
             >
               重试
             </button>
@@ -226,7 +226,7 @@ export default function RssWorkspaceView() {
               >
                 <Link
                   to={`/rss/articles/${article.id}`}
-                  className="bg-paper border-border/60 hover:bg-muted/50 block rounded-2xl border p-4 transition-colors active:scale-[0.99]"
+                  className="bg-paper border-border/60 hover:bg-surface/50 block rounded-2xl border p-4 transition-colors active:scale-[0.99]"
                 >
                   <h2 className="text-ink text-[15px] leading-snug font-semibold">
                     {article.title || '无标题'}
@@ -239,7 +239,7 @@ export default function RssWorkspaceView() {
                   <div className="text-muted/70 mt-2.5 flex items-center gap-2 text-xs">
                     {article.author && <span>{article.author}</span>}
                     {article.author && article.published && (
-                      <span className="bg-muted/40 h-1 w-1 rounded-full" />
+                      <span className="bg-surface/40 h-1 w-1 rounded-full" />
                     )}
                     {article.published && (
                       <span>{formatDate(article.published)}</span>

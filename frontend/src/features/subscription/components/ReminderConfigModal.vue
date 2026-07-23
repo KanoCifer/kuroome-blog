@@ -116,7 +116,7 @@ watch(
             </div>
             <button
               type="button"
-              class="border-border text-muted hover:bg-muted rounded-lg border px-3 py-1 text-xs transition"
+              class="border-border text-muted hover:bg-surface rounded-lg border px-3 py-1 text-xs transition"
               @click="emit('close')"
             >
               关闭
@@ -138,8 +138,8 @@ watch(
                   class="rounded-xl border px-3 py-2 text-sm transition"
                   :class="
                     localForm.channels.includes(channel.value)
-                      ? 'border-accent/30 bg-accent/15 text-accent'
-                      : 'border-border bg-paper text-ink hover:bg-muted'
+                      ? 'border-accent/30 bg-accent/15 text-ink'
+                      : 'border-border bg-paper text-ink hover:bg-surface'
                   "
                   @click="toggleChannel(channel.value)"
                 >
@@ -163,7 +163,7 @@ watch(
                   <input
                     v-model="localForm[point.key]"
                     type="checkbox"
-                    class="text-accent focus:ring-accent/30 border-border h-4 w-4 rounded"
+                    class="text-ink focus:ring-accent/30 border-border h-4 w-4 rounded"
                   />
                   {{ point.label }}
                 </label>
@@ -217,7 +217,7 @@ watch(
 
             <div
               v-if="testResult"
-              class="border-border bg-muted/50 text-ink rounded-xl border px-3 py-2 text-xs"
+              class="border-border bg-surface/50 text-ink rounded-xl border px-3 py-2 text-xs"
             >
               <p class="mb-2 font-medium">测试结果</p>
               <div class="flex flex-wrap gap-2">
@@ -246,7 +246,7 @@ watch(
             <footer class="flex flex-wrap justify-end gap-2">
               <button
                 type="button"
-                class="border-border text-muted hover:bg-muted rounded-xl border px-3 py-2 text-sm transition"
+                class="border-border text-muted hover:bg-surface rounded-xl border px-3 py-2 text-sm transition"
                 @click="emit('close')"
               >
                 取消
@@ -254,7 +254,7 @@ watch(
               <button
                 type="button"
                 :disabled="isTesting"
-                class="border-accent/30 bg-accent/15 text-accent hover:bg-muted rounded-xl border px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60"
+                class="border-accent/30 bg-accent/15 text-ink hover:bg-surface rounded-xl border px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60"
                 @click="emitTest"
               >
                 {{ isTesting ? '测试中...' : '发送测试通知' }}
@@ -262,7 +262,7 @@ watch(
               <button
                 type="button"
                 :disabled="isSaving"
-                class="bg-accent text-accent hover:bg-accent/90 rounded-xl px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60"
+                class="bg-accent text-ink hover:bg-accent/90 rounded-xl px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60"
                 @click="emitSave"
               >
                 {{ isSaving ? '保存中...' : '保存配置' }}

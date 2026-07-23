@@ -24,7 +24,7 @@ export const STATUS_STYLES: Record<
   待评估: {
     bg: 'bg-accent/10',
     border: 'border-accent/30',
-    text: 'text-accent',
+    text: 'text-ink',
   },
   待排期: {
     bg: 'bg-warning/10',

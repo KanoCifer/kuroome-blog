@@ -92,14 +92,14 @@ export function SettingModal({
       lockScroll
       renderHeader={() => (
         <header className="shrink-0 px-5 pt-3 pb-4">
-          <div className="bg-muted mx-auto mb-4 h-1.5 w-10 rounded-full" />
+          <div className="bg-surface mx-auto mb-4 h-1.5 w-10 rounded-full" />
           <div className="flex items-center justify-between">
             <h1 className="text-ink font-serif text-lg font-semibold">
               偏好设置
             </h1>
             <button
               onClick={onClose}
-              className="text-muted hover:bg-muted hover:text-ink flex h-9 w-9 items-center justify-center rounded-full transition-colors active:scale-[0.96]"
+              className="text-muted hover:bg-surface hover:text-ink flex h-9 w-9 items-center justify-center rounded-full transition-colors active:scale-[0.96]"
               aria-label="关闭"
             >
               <X className="h-5 w-5" />
@@ -130,10 +130,10 @@ export function SettingModal({
                   }`}
                 >
                   <Icon
-                    className={`h-5 w-5 ${theme === value ? 'text-accent' : 'text-ink'}`}
+                    className={`h-5 w-5 ${theme === value ? 'text-ink' : 'text-ink'}`}
                   />
                   <span
-                    className={`text-xs ${theme === value ? 'text-accent font-semibold' : 'text-ink'}`}
+                    className={`text-xs ${theme === value ? 'text-ink font-semibold' : 'text-ink'}`}
                   >
                     {label}
                   </span>
@@ -170,7 +170,7 @@ export function SettingModal({
                   }`}
                 >
                   <span
-                    className={`text-sm font-semibold ${font === o.value ? 'text-accent' : 'text-ink'}`}
+                    className={`text-sm font-semibold ${font === o.value ? 'text-ink' : 'text-ink'}`}
                     style={
                       o.value === 'harmonyos'
                         ? {

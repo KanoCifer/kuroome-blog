@@ -33,7 +33,7 @@ export function BlogEmptyState({
       {hasTag && onReset && (
         <button
           type="button"
-          className="border-border text-muted hover:bg-muted hover:text-ink mt-5 rounded-lg border px-4 py-2 text-sm font-medium"
+          className="border-border text-muted hover:bg-surface hover:text-ink mt-5 rounded-lg border px-4 py-2 text-sm font-medium"
           onClick={onReset}
         >
           翻看全卷

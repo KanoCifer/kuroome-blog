@@ -106,7 +106,7 @@ export default function PrivacyPolicyView() {
                 <a
                   href="https://support.google.com/chrome/answer/95647"
                   target="_blank"
-                  className="text-accent hover:underline"
+                  className="text-ink hover:underline"
                 >
                   在 Chrome 中删除、允许和管理 Cookie
                 </a>
@@ -186,7 +186,7 @@ export default function PrivacyPolicyView() {
                 <a
                   href="https://github.com/KanoCifer"
                   target="_blank"
-                  className="text-accent hover:underline"
+                  className="text-ink hover:underline"
                 >
                   KanoCifer
                 </a>
@@ -195,7 +195,7 @@ export default function PrivacyPolicyView() {
                 邮箱：
                 <a
                   href="mailto:kano3255@outlook.com"
-                  className="text-accent hover:underline"
+                  className="text-ink hover:underline"
                 >
                   kano3255@outlook.com
                 </a>

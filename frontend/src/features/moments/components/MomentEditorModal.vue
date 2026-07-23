@@ -80,7 +80,7 @@
                 'flex h-8 w-8 items-center justify-center rounded-lg border text-[16px] transition-colors',
                 form.mood === e
                   ? 'border-accent bg-accent/10'
-                  : 'border-border/40 bg-paper hover:bg-muted',
+                  : 'border-border/40 bg-paper hover:bg-surface',
               ]"
               @click="toggleMood(e)"
             >
@@ -108,9 +108,9 @@
             <span
               v-for="(tag, i) in form.tags"
               :key="tag + i"
-              class="bg-muted text-ink inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[12px]"
+              class="bg-surface text-ink inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[12px]"
             >
-              <span class="text-accent/70 font-serif">#</span>{{ tag }}
+              <span class="text-ink/70 font-serif">#</span>{{ tag }}
               <button
                 type="button"
                 class="text-muted hover:text-ink"
@@ -135,7 +135,7 @@
 
       <!-- 右侧设置 -->
       <aside
-        class="bg-muted/30 border-border/40 space-y-4 overflow-y-auto border-t px-5 py-6 md:border-t-0 md:border-l"
+        class="bg-surface/30 border-border/40 space-y-4 overflow-y-auto border-t px-5 py-6 md:border-t-0 md:border-l"
       >
         <div>
           <div
@@ -151,7 +151,7 @@
                 'flex cursor-pointer items-start gap-2 rounded-lg border px-2.5 py-2',
                 form.visibility === v
                   ? 'border-accent bg-accent/5'
-                  : 'border-border/40 bg-paper hover:bg-muted',
+                  : 'border-border/40 bg-paper hover:bg-surface',
               ]"
             >
               <input
@@ -206,14 +206,14 @@
           <button
             type="button"
             :disabled="submitting"
-            class="bg-accent text-accent hover:bg-accent/90 inline-flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-[13px] font-medium shadow-sm transition-colors disabled:opacity-50"
+            class="bg-accent text-ink hover:bg-accent/90 inline-flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-[13px] font-medium shadow-sm transition-colors disabled:opacity-50"
             @click="handleSubmit"
           >
             {{ submitting ? '保存中…' : isEdit ? '保存修改' : '发布' }}
           </button>
           <button
             type="button"
-            class="border-border/60 text-ink hover:bg-muted inline-flex w-full items-center justify-center rounded-lg border px-3 py-1.5 text-[12px] transition-colors"
+            class="border-border/60 text-ink hover:bg-surface inline-flex w-full items-center justify-center rounded-lg border px-3 py-1.5 text-[12px] transition-colors"
             @click="emit('update:open', false)"
           >
             取消

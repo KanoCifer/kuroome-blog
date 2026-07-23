@@ -12,7 +12,7 @@
             class="flex flex-col gap-4 sm:flex-row sm:items-center"
           >
             <div
-              class="bg-muted flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl"
+              class="bg-surface flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl"
             >
               <img
                 v-if="dailyPick?.icon"
@@ -31,7 +31,7 @@
                   >每日推荐</span
                 >
                 <span
-                  class="bg-accent/10 text-accent rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                  class="bg-accent/10 text-ink rounded-full px-2 py-0.5 text-[10px] font-semibold"
                 >
                   {{ dailyPick?.category }}
                 </span>
@@ -58,14 +58,14 @@
 
             <div class="flex shrink-0 items-center gap-3 sm:flex-col sm:gap-4">
               <button
-                class="bg-accent text-accent hover:bg-accent/90 flex cursor-pointer items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold shadow-sm transition-all duration-200 hover:shadow-md active:scale-95"
+                class="bg-accent text-ink hover:bg-accent/90 flex cursor-pointer items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold shadow-sm transition-all duration-200 hover:shadow-md active:scale-95"
                 @click.stop="$router.push('/websites')"
               >
                 <IconExternalLink class="h-3.5 w-3.5" />
                 <span class="hidden sm:inline">看更多</span>
               </button>
               <button
-                class="bg-muted hover:bg-secondary text-muted hover:text-ink flex cursor-pointer items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all duration-200 active:scale-95"
+                class="bg-surface hover:bg-secondary text-muted hover:text-ink flex cursor-pointer items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all duration-200 active:scale-95"
                 @click.stop="refreshDailyPick"
               >
                 <IconRefresh class="h-3.5 w-3.5" />
@@ -104,7 +104,7 @@
                     {{ selfInfo.name }}
                   </h3>
                   <span
-                    class="bg-accent/15 text-accent inline-block shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                    class="bg-accent/15 text-ink inline-block shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold"
                   >
                     本站
                   </span>
@@ -116,7 +116,7 @@
 
               <!-- 一键复制 -->
               <button
-                class="group bg-accent text-accent hover:bg-accent/90 flex shrink-0 cursor-pointer items-center rounded-xl px-4 py-2 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-md active:scale-95"
+                class="group bg-accent text-ink hover:bg-accent/90 flex shrink-0 cursor-pointer items-center rounded-xl px-4 py-2 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-md active:scale-95"
                 @click="copySelfInfo"
               >
                 <IconCopy class="h-4 w-4" />
@@ -175,12 +175,12 @@
               </div>
               <div class="min-w-0 flex-1">
                 <h3
-                  class="text-ink group-hover:text-accent text-xl font-bold transition-colors duration-300"
+                  class="text-ink group-hover:text-ink text-xl font-bold transition-colors duration-300"
                 >
                   {{ link.name }}
                 </h3>
                 <p
-                  class="text-muted group-hover:text-accent mt-2.5 leading-relaxed transition-colors duration-300"
+                  class="text-muted group-hover:text-ink mt-2.5 leading-relaxed transition-colors duration-300"
                 >
                   {{ link.description }}
                 </p>
@@ -223,7 +223,7 @@
               <h3
                 class="text-ink flex items-center gap-2 font-serif text-xl font-bold"
               >
-                <IconLinkChain class="text-accent h-5 w-5" />
+                <IconLinkChain class="text-ink h-5 w-5" />
                 申请友链
               </h3>
               <p class="text-muted mt-1.5 text-sm">
@@ -238,31 +238,31 @@
               <h4
                 class="text-ink mb-3 flex items-center gap-2 text-sm font-bold"
               >
-                <IconInfoCircle class="text-accent h-4 w-4" />
+                <IconInfoCircle class="text-ink h-4 w-4" />
                 接入须知
               </h4>
               <ul class="text-muted space-y-2 text-sm">
                 <li class="flex items-start gap-2">
-                  <span class="text-accent mt-0.5 shrink-0 text-xs">●</span>
+                  <span class="text-ink mt-0.5 shrink-0 text-xs">●</span>
                   <span>网站需符合中国大陆相关法律法规</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <span class="text-accent mt-0.5 shrink-0 text-xs">●</span>
+                  <span class="text-ink mt-0.5 shrink-0 text-xs">●</span>
                   <span>网站内容原创、非商业推广</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <span class="text-accent mt-0.5 shrink-0 text-xs">●</span>
+                  <span class="text-ink mt-0.5 shrink-0 text-xs">●</span>
                   <span
                     >已在您的网站添加本站友链（<a
                       href="https://kanocifer.chat"
                       target="_blank"
-                      class="text-accent underline"
+                      class="text-ink underline"
                       >kanocifer.chat</a
                     >）</span
                   >
                 </li>
                 <li class="flex items-start gap-2">
-                  <span class="text-accent mt-0.5 shrink-0 text-xs">●</span>
+                  <span class="text-ink mt-0.5 shrink-0 text-xs">●</span>
                   <span>网站可正常访问</span>
                 </li>
               </ul>
@@ -273,11 +273,11 @@
               <h4
                 class="text-ink mb-3 flex items-center gap-2 text-sm font-bold"
               >
-                <IconDocumentText class="text-accent h-4 w-4" />
+                <IconDocumentText class="text-ink h-4 w-4" />
                 申请格式
               </h4>
               <pre
-                class="bg-muted text-muted overflow-x-auto rounded-xl p-4 text-xs leading-relaxed"
+                class="bg-surface text-muted overflow-x-auto rounded-xl p-4 text-xs leading-relaxed"
               >
 - **站点名称**：
 - **描述**：
@@ -291,7 +291,7 @@
               href="https://github.com/KanoCifer/kuroome-blog/issues/1"
               target="_blank"
               rel="noopener noreferrer"
-              class="bg-accent text-accent hover:bg-accent/90 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-md active:scale-95"
+              class="bg-accent text-ink hover:bg-accent/90 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-md active:scale-95"
             >
               <IconExternalLink class="h-4 w-4" />
               前往 GitHub Issue 提交申请

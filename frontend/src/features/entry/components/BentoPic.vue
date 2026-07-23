@@ -9,7 +9,7 @@
       fetchpriority="high"
       decoding="async"
       :src="imageSrc"
-      class="squircle bg-muted mx-auto block h-50 w-82 object-cover p-0"
+      class="squircle bg-surface mx-auto block h-50 w-82 object-cover p-0"
       alt="Bento Card Image"
     />
   </BentoCard>

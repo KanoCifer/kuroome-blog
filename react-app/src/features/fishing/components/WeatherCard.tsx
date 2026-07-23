@@ -129,7 +129,7 @@ export function WeatherCard({
             <div className="flex items-center gap-3 px-4 py-2.5">
               <span
                 className={`h-2 w-2 shrink-0 rounded-full ${
-                  pressureLevel?.dot ?? 'bg-muted'
+                  pressureLevel?.dot ?? 'bg-surface'
                 }`}
                 aria-hidden
               />

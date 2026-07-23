@@ -217,7 +217,7 @@ export function MomentEditorModal({
                           'flex h-8 w-8 items-center justify-center rounded-lg border text-[16px] transition-colors',
                           mood === e
                             ? 'border-accent bg-accent/10'
-                            : 'border-border/40 bg-paper hover:bg-muted',
+                            : 'border-border/40 bg-paper hover:bg-surface',
                         ].join(' ')}
                       >
                         {e}
@@ -248,9 +248,9 @@ export function MomentEditorModal({
                     {tags.map((tag, i) => (
                       <span
                         key={tag + i}
-                        className="bg-muted text-ink inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[12px]"
+                        className="bg-surface text-ink inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[12px]"
                       >
-                        <span className="text-accent/70 font-serif">#</span>
+                        <span className="text-ink/70 font-serif">#</span>
                         {tag}
                         <button
                           type="button"
@@ -281,7 +281,7 @@ export function MomentEditorModal({
               </form>
 
               {/* Right: settings */}
-              <aside className="bg-muted/30 border-border/40 space-y-4 overflow-y-auto border-t px-5 py-6 md:border-t-0 md:border-l">
+              <aside className="bg-surface/30 border-border/40 space-y-4 overflow-y-auto border-t px-5 py-6 md:border-t-0 md:border-l">
                 <div>
                   <div className="text-muted mb-2 font-mono text-[10px] tracking-[0.15em] uppercase">
                     可见性
@@ -294,7 +294,7 @@ export function MomentEditorModal({
                           'flex cursor-pointer items-start gap-2 rounded-lg border px-2.5 py-2',
                           visibility === opt.value
                             ? 'border-accent bg-accent/5'
-                            : 'border-border/40 bg-paper hover:bg-muted',
+                            : 'border-border/40 bg-paper hover:bg-surface',
                         ].join(' ')}
                       >
                         <input
@@ -360,14 +360,14 @@ export function MomentEditorModal({
                     type="button"
                     onClick={() => handleSubmit()}
                     disabled={submitting}
-                    className="bg-accent text-accent hover:bg-accent/90 inline-flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-[13px] font-medium shadow-sm transition-colors disabled:opacity-50"
+                    className="bg-accent text-ink hover:bg-accent/90 inline-flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-[13px] font-medium shadow-sm transition-colors disabled:opacity-50"
                   >
                     {submitting ? '保存中…' : isEdit ? '保存修改' : '发布'}
                   </button>
                   <button
                     type="button"
                     onClick={onClose}
-                    className="border-border/60 text-ink hover:bg-muted inline-flex w-full items-center justify-center rounded-lg border px-3 py-1.5 text-[12px] transition-colors"
+                    className="border-border/60 text-ink hover:bg-surface inline-flex w-full items-center justify-center rounded-lg border px-3 py-1.5 text-[12px] transition-colors"
                   >
                     取消
                   </button>

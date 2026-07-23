@@ -102,7 +102,7 @@
 
   /* Secondary / Muted */
   --color-secondary: var(--secondary);
-  --color-muted: var(--warm-gray);
+  --color-muted: var(--muted-text);
 
   /* Border */
   --color-border: var(--border-color);

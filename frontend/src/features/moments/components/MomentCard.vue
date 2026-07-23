@@ -44,7 +44,7 @@
       >
         <button
           type="button"
-          class="text-muted hover:text-accent border-border/40 bg-paper/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
+          class="text-muted hover:text-ink border-border/40 bg-paper/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
           :aria-label="`编辑 ${moment.id}`"
           @click="emit('edit', moment)"
         >

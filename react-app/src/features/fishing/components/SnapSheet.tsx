@@ -203,7 +203,14 @@ export function SnapSheet({
       }
       // 不到阈值: spring 回当前 snap (animate() 在 useEffect[snap] 里已经会触发)
     },
-    [heightMV, snap, snapPoints.length, dragThreshold, velocityThreshold, onClose],
+    [
+      heightMV,
+      snap,
+      snapPoints.length,
+      dragThreshold,
+      velocityThreshold,
+      onClose,
+    ],
   );
 
   return createPortal(
@@ -248,9 +255,9 @@ export function SnapSheet({
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerEnd}
               onPointerCancel={handlePointerEnd}
-              className="shrink-0 cursor-grab touch-none select-none px-5 pt-3 pb-2 active:cursor-grabbing"
+              className="shrink-0 cursor-grab touch-none px-5 pt-3 pb-2 select-none active:cursor-grabbing"
             >
-              <div className="bg-muted mx-auto h-1.5 w-10 rounded-full" />
+              <div className="bg-surface mx-auto h-1.5 w-10 rounded-full" />
             </div>
 
             {renderHeader && renderHeader()}

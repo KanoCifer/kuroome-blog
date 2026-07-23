@@ -131,7 +131,7 @@ const handleSubmit = async () => {
           >
         </h3>
 
-        <div class="bg-muted mb-4 rounded-lg p-3 text-sm">
+        <div class="bg-surface mb-4 rounded-lg p-3 text-sm">
           <p class="text-muted">地点: {{ locationName }}</p>
           <p class="text-muted">
             当前指数: {{ fishingData.fishing_index }} ({{ fishingData.level }})
@@ -151,8 +151,8 @@ const handleSubmit = async () => {
                 class="rounded-lg px-3 py-2 text-sm font-medium transition-colors"
                 :class="
                   selectedFeedback === option.value
-                    ? 'bg-accent text-accent'
-                    : 'bg-muted text-ink hover:bg-muted'
+                    ? 'bg-accent text-ink'
+                    : 'bg-surface text-ink hover:bg-surface'
                 "
                 @click="selectedFeedback = option.value"
               >
@@ -164,7 +164,7 @@ const handleSubmit = async () => {
           <div class="flex gap-3 pt-2">
             <button
               type="button"
-              class="border-border text-ink hover:bg-muted flex-1 rounded-lg border px-4 py-2 text-sm font-medium"
+              class="border-border text-ink hover:bg-surface flex-1 rounded-lg border px-4 py-2 text-sm font-medium"
               :disabled="loading"
               @click="$emit('cancel')"
             >
@@ -172,7 +172,7 @@ const handleSubmit = async () => {
             </button>
             <button
               type="button"
-              class="bg-accent text-accent hover:bg-accent/90 flex-1 rounded-lg px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+              class="bg-accent text-ink hover:bg-accent/90 flex-1 rounded-lg px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
               :disabled="!selectedFeedback || loading"
               @click="handleSubmit"
             >

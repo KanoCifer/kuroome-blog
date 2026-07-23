@@ -57,7 +57,7 @@ export default function NotFound() {
           <button
             type="button"
             onClick={() => navigate('/')}
-            className="bg-accent text-accent hover:bg-accent/90 focus:ring-ring inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium transition-all hover:shadow-lg focus:ring-2 focus:ring-offset-2 focus:outline-none"
+            className="bg-accent text-ink hover:bg-accent/90 focus:ring-ring inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium transition-all hover:shadow-lg focus:ring-2 focus:ring-offset-2 focus:outline-none"
           >
             <svg
               className="mr-2 h-5 w-5"
@@ -78,7 +78,7 @@ export default function NotFound() {
           <button
             type="button"
             onClick={goBack}
-            className="bg-paper text-muted ring-border hover:bg-muted focus:ring-ring inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium ring-1 transition-all ring-inset focus:ring-2 focus:outline-none"
+            className="bg-paper text-muted ring-border hover:bg-surface focus:ring-ring inline-flex items-center justify-center rounded-lg px-6 py-3 text-sm font-medium ring-1 transition-all ring-inset focus:ring-2 focus:outline-none"
           >
             <svg
               className="mr-2 h-5 w-5"

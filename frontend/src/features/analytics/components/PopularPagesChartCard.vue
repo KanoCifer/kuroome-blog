@@ -8,7 +8,7 @@
     <p class="text-muted mb-4 text-xs">所选时段内浏览量前 8 的页面</p>
     <div
       v-if="loading && !overviewData"
-      class="bg-muted h-full min-h-[14rem] animate-pulse rounded-xl"
+      class="bg-surface h-full min-h-[14rem] animate-pulse rounded-xl"
     ></div>
     <!-- Empty state -->
     <div

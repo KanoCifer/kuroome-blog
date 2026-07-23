@@ -12,7 +12,7 @@
         <button
           type="button"
           @click="handleBack"
-          class="bg-accent text-accent shadow-accent/50 hover:bg-accent/90 min-h-11 rounded-2xl px-6 text-sm font-medium shadow-md transition disabled:cursor-not-allowed disabled:opacity-60"
+          class="bg-accent text-ink shadow-accent/50 hover:bg-accent/90 min-h-11 rounded-2xl px-6 text-sm font-medium shadow-md transition disabled:cursor-not-allowed disabled:opacity-60"
         >
           返回
         </button>

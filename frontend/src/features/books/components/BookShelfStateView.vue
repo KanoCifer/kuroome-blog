@@ -21,7 +21,7 @@
 <template>
   <!-- Loading skeleton -->
   <div v-if="isLoading" data-testid="shelf-state-loading">
-    <div class="bg-muted mb-4 h-9 w-full animate-pulse rounded-xl" />
+    <div class="bg-surface mb-4 h-9 w-full animate-pulse rounded-xl" />
     <div
       class="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
     >
@@ -34,11 +34,11 @@
           animationFillMode: 'backwards',
         }"
       >
-        <div class="bg-muted aspect-3/4 rounded-xl" />
+        <div class="bg-surface aspect-3/4 rounded-xl" />
         <div class="mt-2 space-y-1.5 px-1.5">
-          <div class="bg-muted h-3 w-5/6 rounded" />
-          <div class="bg-muted h-3 w-3/4 rounded" />
-          <div class="bg-muted h-2.5 w-1/2 rounded" />
+          <div class="bg-surface h-3 w-5/6 rounded" />
+          <div class="bg-surface h-3 w-3/4 rounded" />
+          <div class="bg-surface h-2.5 w-1/2 rounded" />
         </div>
       </div>
     </div>

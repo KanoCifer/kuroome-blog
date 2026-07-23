@@ -5,7 +5,7 @@
       <div class="bg-accent/40 mb-4 h-px w-8"></div>
       <div class="flex items-center gap-3">
         <span
-          class="bg-muted text-muted inline-block rounded-full px-2.5 py-0.5 font-mono text-[10px] font-medium tracking-[0.18em] uppercase"
+          class="bg-surface text-muted inline-block rounded-full px-2.5 py-0.5 font-mono text-[10px] font-medium tracking-[0.18em] uppercase"
         >
           仅管理员
         </span>
@@ -30,7 +30,7 @@
           <div
             role="radiogroup"
             aria-label="日期范围"
-            class="bg-muted flex rounded-xl p-1"
+            class="bg-surface flex rounded-xl p-1"
           >
             <button
               v-for="option in [7, 30, 90]"
@@ -55,7 +55,7 @@
             type="button"
             :disabled="loading && !!overviewData"
             @click="fetchAllData"
-            class="bg-accent text-accent hover:bg-accent/90 flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50"
+            class="bg-accent text-ink hover:bg-accent/90 flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50"
           >
             <svg
               :class="[
@@ -114,7 +114,7 @@
             <div
               v-for="i in 3"
               :key="i"
-              class="bg-muted/50 h-24 animate-pulse rounded-2xl"
+              class="bg-surface/50 h-24 animate-pulse rounded-2xl"
             ></div>
           </div>
           <div v-else-if="overviewData" class="grid grid-cols-3 gap-4">
@@ -122,8 +122,8 @@
               label="总访问量"
               :value="overviewData.total_visits"
               :sparkline="sparklinePoints"
-              sparkline-class="text-accent"
-              accent="bg-accent/10 text-accent"
+              sparkline-class="text-ink"
+              accent="bg-accent/10 text-ink"
             >
               <template #icon>
                 <svg
@@ -233,7 +233,7 @@
           >
             <button
               type="button"
-              class="text-ink hover:bg-muted/30 flex w-full items-center justify-between px-6 py-4 text-left transition-colors"
+              class="text-ink hover:bg-surface/30 flex w-full items-center justify-between px-6 py-4 text-left transition-colors"
               :aria-expanded="showOsBrowser"
               aria-controls="os-browser-panel"
               @click="showOsBrowser = !showOsBrowser"
@@ -306,7 +306,7 @@
                 <div
                   v-for="i in 5"
                   :key="i"
-                  class="bg-muted h-12 animate-pulse rounded-lg"
+                  class="bg-surface h-12 animate-pulse rounded-lg"
                 ></div>
               </div>
             </div>
@@ -342,12 +342,12 @@
                     <tr
                       v-for="log in loginLogsData?.list ?? []"
                       :key="log.user_id"
-                      class="hover:bg-muted/30 text-sm transition-colors"
+                      class="hover:bg-surface/30 text-sm transition-colors"
                     >
                       <td class="py-3.5">
                         <div class="flex items-center gap-3">
                           <div
-                            class="bg-accent/15 text-accent flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium"
+                            class="bg-accent/15 text-ink flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium"
                           >
                             {{ log.username?.charAt(0).toUpperCase() }}
                           </div>
@@ -413,7 +413,7 @@
                     "
                     :aria-label="`上一页，第 ${loginLogsData.page - 1} 页`"
                     @click="changePage(loginLogsData.page - 1)"
-                    class="hover:bg-muted text-ink rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                    class="hover:bg-surface text-ink rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     上一页
                   </button>
@@ -424,7 +424,7 @@
                     "
                     :aria-label="`下一页，第 ${loginLogsData.page + 1} 页`"
                     @click="changePage(loginLogsData.page + 1)"
-                    class="hover:bg-muted text-ink rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                    class="hover:bg-surface text-ink rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     下一页
                   </button>

@@ -101,7 +101,7 @@ export function TaskDetailPanel({
             </h2>
             <button
               type="button"
-              className="text-muted hover:bg-muted hover:text-ink focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96]"
+              className="text-muted hover:bg-surface hover:text-ink focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96]"
               aria-label="关闭"
               onClick={onClose}
             >
@@ -159,7 +159,7 @@ export function TaskDetailPanel({
                             i < statusIndex
                               ? 'border-success bg-success/10 text-success'
                               : i === statusIndex
-                                ? 'border-accent/40 bg-accent/10 text-accent'
+                                ? 'border-accent/40 bg-accent/10 text-ink'
                                 : 'border-border text-muted opacity-60'
                           }`}
                           aria-pressed={task.status === s}
@@ -196,7 +196,7 @@ export function TaskDetailPanel({
                   {task.status !== '已完成' && task.status !== '已搁置' && (
                     <button
                       type="button"
-                      className="text-muted hover:bg-muted focus-visible:ring-ring hover:text-ink mx-auto mt-2 block max-w-xs cursor-pointer rounded-md px-2 py-2 text-center text-[11px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
+                      className="text-muted hover:bg-surface focus-visible:ring-ring hover:text-ink mx-auto mt-2 block max-w-xs cursor-pointer rounded-md px-2 py-2 text-center text-[11px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
                       onClick={() => onSetStatus(task.slug, '已搁置')}
                     >
                       搁置此任务
@@ -355,14 +355,14 @@ export function TaskDetailPanel({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="text-muted hover:bg-muted focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                  className="text-muted hover:bg-surface focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                 >
                   关闭
                 </button>
                 <button
                   type="button"
                   onClick={() => onEdit(task.slug)}
-                  className="bg-accent text-accent hover:bg-accent/90 focus-visible:ring-ring cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                  className="bg-accent text-ink hover:bg-accent/90 focus-visible:ring-ring cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                 >
                   编辑
                 </button>

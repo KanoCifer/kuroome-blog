@@ -176,12 +176,12 @@ export default function Login() {
           transition={{ duration: 0.7, ease: 'easeOut', delay: 0.05 }}
           className={`mb-8 flex flex-col items-center justify-center`}
         >
-          <div className="bg-accent text-accent mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)]">
+          <div className="bg-accent text-ink mb-5 flex h-16 w-16 items-center justify-center rounded-full shadow-[0_8px_16px_rgba(37,99,235,0.25)]">
             <IconCloud className="size-8" />
           </div>
           <h2 className="font-headline text-ink text-center text-[28px] font-extrabold tracking-tight">
             kanocifer
-            <span className="text-accent">.chat</span>
+            <span className="text-ink">.chat</span>
           </h2>
           <p className="text-muted mt-1 text-center text-[15px] font-medium">
             Welcome back to the reading space.
@@ -244,7 +244,7 @@ export default function Login() {
                 />
                 <button
                   type="button"
-                  className="text-muted hover:text-accent absolute inset-y-0 right-0 flex items-center pr-4 transition-all duration-200"
+                  className="text-muted hover:text-ink absolute inset-y-0 right-0 flex items-center pr-4 transition-all duration-200"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -265,7 +265,7 @@ export default function Login() {
             <div className="mb-6 flex items-center justify-end px-1">
               <a
                 href="#"
-                className="text-accent text-[14px] font-bold hover:underline"
+                className="text-ink text-[14px] font-bold hover:underline"
               >
                 {' '}
                 Forgot?{' '}
@@ -276,7 +276,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-accent text-accent hover:bg-accent/90 mb-4 w-full rounded-full py-4 text-[15px] font-bold shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all active:scale-[0.98] disabled:opacity-70"
+              className="bg-accent text-ink hover:bg-accent/90 mb-4 w-full rounded-full py-4 text-[15px] font-bold shadow-[0_8px_16px_rgba(30,58,138,0.2)] transition-all active:scale-[0.98] disabled:opacity-70"
             >
               {isSubmitting ? 'Logging in...' : 'Login'}
             </button>
@@ -285,7 +285,7 @@ export default function Login() {
             <button
               type="button"
               disabled={isPasskeySubmitting}
-              className="bg-paper text-ink disabled:bg-muted flex w-full items-center justify-center space-x-2 rounded-full py-4 text-[15px] font-bold shadow-lg transition-all active:scale-[0.98] disabled:opacity-70"
+              className="bg-paper text-ink disabled:bg-surface flex w-full items-center justify-center space-x-2 rounded-full py-4 text-[15px] font-bold shadow-lg transition-all active:scale-[0.98] disabled:opacity-70"
               onClick={handlePasskeyLogin}
             >
               <IconKey className="size-5" />
@@ -328,7 +328,7 @@ export default function Login() {
               Don't have an account?
               <Link
                 to="/register"
-                className="text-accent ml-1 font-bold hover:underline"
+                className="text-ink ml-1 font-bold hover:underline"
               >
                 Register here
               </Link>

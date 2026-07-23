@@ -9,7 +9,7 @@
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="text-accent h-5 w-5 shrink-0 transition-colors duration-300 group-hover:text-white"
+          class="text-ink h-5 w-5 shrink-0 transition-colors duration-300 group-hover:text-white"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -55,13 +55,13 @@
               开发任务
               <span
                 v-if="activeCount"
-                class="text-muted bg-muted/10 inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
+                class="text-muted bg-surface/10 inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
                 >{{ activeCount }}</span
               >
             </h3>
             <button
               @click="close"
-              class="text-muted hover:bg-muted hover:text-ink focus-visible:ring-ring flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+              class="text-muted hover:bg-surface hover:text-ink focus-visible:ring-ring flex h-8 w-8 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
               aria-label="关闭"
             >
               <svg
@@ -102,7 +102,7 @@
               </svg>
               <p class="text-muted text-sm">请登录后使用</p>
               <button
-                class="bg-accent text-accent hover:bg-accent/90 focus-visible:ring-ring mt-1 cursor-pointer rounded-lg px-4 py-1.5 text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+                class="bg-accent text-ink hover:bg-accent/90 focus-visible:ring-ring mt-1 cursor-pointer rounded-lg px-4 py-1.5 text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                 @click="handleLogin"
               >
                 去登录
@@ -143,7 +143,7 @@
                   v-model="newTaskForm.title"
                   type="text"
                   placeholder="任务标题…"
-                  class="placeholder:text-muted/50 text-ink bg-muted focus:border-accent w-full rounded-lg border px-3 py-2 text-sm font-medium outline-none"
+                  class="placeholder:text-muted/50 text-ink bg-surface focus:border-accent w-full rounded-lg border px-3 py-2 text-sm font-medium outline-none"
                   @keydown.enter="submitCreateTask"
                 />
                 <div class="mt-3 space-y-3">
@@ -151,12 +151,12 @@
                     v-model="newTaskForm.description"
                     placeholder="描述… (可选)"
                     rows="3"
-                    class="border-border bg-muted focus:border-accent placeholder:text-muted/50 text-ink w-full resize-none rounded-lg border p-2.5 text-sm outline-none"
+                    class="border-border bg-surface focus:border-accent placeholder:text-muted/50 text-ink w-full resize-none rounded-lg border p-2.5 text-sm outline-none"
                   ></textarea>
                   <div class="flex flex-wrap items-center gap-2">
                     <select
                       v-model="newTaskForm.type"
-                      class="border-border bg-muted text-ink cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
+                      class="border-border bg-surface text-ink cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
                     >
                       <option v-for="t in TASK_TYPES" :key="t" :value="t">
                         {{ t }}
@@ -164,7 +164,7 @@
                     </select>
                     <select
                       v-model="newTaskForm.priority"
-                      class="border-border bg-muted text-ink cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
+                      class="border-border bg-surface text-ink cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
                     >
                       <option v-for="p in PRIORITIES" :key="p" :value="p">
                         {{ p }}
@@ -175,19 +175,19 @@
                     <input
                       v-model="newTaskForm.due_date"
                       type="date"
-                      class="border-border bg-muted text-ink cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
+                      class="border-border bg-surface text-ink cursor-pointer rounded-lg border px-3 py-1.5 text-sm outline-none"
                     />
                     <div class="ml-auto flex gap-2">
                       <button
                         @click="cancelAdd"
-                        class="bg-muted text-ink hover:bg-muted/80 cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
+                        class="bg-surface text-ink hover:bg-surface/80 cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium transition-colors"
                       >
                         取消
                       </button>
                       <button
                         @click="submitCreateTask"
                         :disabled="!newTaskForm.title.trim()"
-                        class="bg-accent text-accent hover:bg-accent/90 cursor-pointer rounded-lg px-4 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                        class="bg-accent text-ink hover:bg-accent/90 cursor-pointer rounded-lg px-4 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         添加
                       </button>
@@ -207,7 +207,7 @@
                     </h4>
                     <span
                       v-if="section.tasks.length"
-                      class="bg-muted/10 text-muted inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
+                      class="bg-surface/10 text-muted inline-block min-w-[1.25rem] rounded-full px-1.5 text-center text-[11px] font-medium tabular-nums"
                     >
                       {{ section.tasks.length }}
                     </span>

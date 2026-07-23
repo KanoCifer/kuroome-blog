@@ -103,10 +103,10 @@ export function AIAnalysisWidget({
   })();
 
   const statusClass = (() => {
-    if (analysisLoading) return 'bg-accent/15 text-accent';
+    if (analysisLoading) return 'bg-accent/15 text-ink';
     if (analysisError) return 'bg-destructive/15 text-destructive';
     if (analysisResult) return 'bg-success/15 text-success';
-    return 'bg-muted text-muted';
+    return 'bg-surface text-muted';
   })();
 
   // 内嵌模式：去掉 fixed + portal，改为流式容器
@@ -122,7 +122,7 @@ export function AIAnalysisWidget({
           {analysisOpen && (
             <button
               onClick={closeAnalysis}
-              className="text-muted hover:bg-muted rounded-full p-1"
+              className="text-muted hover:bg-surface rounded-full p-1"
               aria-label="关闭分析"
             >
               <X className="h-3.5 w-3.5" />
@@ -168,7 +168,7 @@ export function AIAnalysisWidget({
               onClick={() => {
                 abortAnalysis();
               }}
-              className="bg-destructive text-accent hover:bg-destructive/90 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors"
+              className="bg-destructive text-ink hover:bg-destructive/90 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors"
             >
               <svg
                 className="h-3.5 w-3.5"
@@ -194,7 +194,7 @@ export function AIAnalysisWidget({
                 setAnalysisLoading(true);
               }}
               disabled={!analysisHasData}
-              className="bg-accent text-accent hover:bg-accent/90 disabled:bg-muted disabled:text-muted relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors disabled:cursor-not-allowed"
+              className="bg-accent text-ink hover:bg-accent/90 disabled:bg-surface disabled:text-muted relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors disabled:cursor-not-allowed"
             >
               {analysisResult ? '重新分析' : '生成分析'}
             </button>
@@ -240,7 +240,7 @@ export function AIAnalysisWidget({
                     </span>
                     <button
                       onClick={closeAnalysis}
-                      className="text-muted hover:bg-muted rounded-full p-1"
+                      className="text-muted hover:bg-surface rounded-full p-1"
                       aria-label="关闭分析"
                     >
                       <X className="h-3.5 w-3.5" />
@@ -286,7 +286,7 @@ export function AIAnalysisWidget({
                       onClick={() => {
                         abortAnalysis();
                       }}
-                      className="bg-destructive text-accent hover:bg-destructive/90 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors"
+                      className="bg-destructive text-ink hover:bg-destructive/90 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors"
                     >
                       <svg
                         className="h-3.5 w-3.5"
@@ -312,7 +312,7 @@ export function AIAnalysisWidget({
                         setAnalysisLoading(true);
                       }}
                       disabled={!analysisHasData}
-                      className="bg-accent text-accent hover:bg-accent/90 disabled:bg-muted disabled:text-muted relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors disabled:cursor-not-allowed"
+                      className="bg-accent text-ink hover:bg-accent/90 disabled:bg-surface disabled:text-muted relative flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-medium transition-colors disabled:cursor-not-allowed"
                     >
                       {analysisResult ? '重新分析' : '生成分析'}
                     </button>
@@ -328,7 +328,7 @@ export function AIAnalysisWidget({
       {!hideFab && !analysisOpen && (
         <button
           onClick={toggleAnalysis}
-          className="bg-accent text-accent hover:bg-accent/90 active:bg-accent/85 fixed right-4 bottom-32 z-40 flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-transform hover:-translate-y-0.5 active:translate-y-0 sm:right-6 sm:bottom-28 sm:h-14 sm:w-14"
+          className="bg-accent text-ink hover:bg-accent/90 active:bg-accent/85 fixed right-4 bottom-32 z-40 flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-transform hover:-translate-y-0.5 active:translate-y-0 sm:right-6 sm:bottom-28 sm:h-14 sm:w-14"
           aria-label="打开 AI 分析"
           title="AI分析"
         >
@@ -353,7 +353,7 @@ function EmptyState({
 }) {
   return (
     <div className="flex flex-col items-center justify-center py-4 text-center">
-      <div className="bg-muted mb-3 flex h-12 w-12 items-center justify-center rounded-2xl">
+      <div className="bg-surface mb-3 flex h-12 w-12 items-center justify-center rounded-2xl">
         {icon}
       </div>
       <p className="text-muted text-sm">{title}</p>

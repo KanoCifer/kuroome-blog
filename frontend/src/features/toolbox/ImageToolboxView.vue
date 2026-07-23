@@ -55,7 +55,7 @@
                     type="number"
                     min="1"
                     :disabled="!enableMaxWidth"
-                    class="text-ink placeholder:text-muted focus:border-ink border-border bg-paper disabled:bg-muted disabled:text-muted w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
+                    class="text-ink placeholder:text-muted focus:border-ink border-border bg-paper disabled:bg-surface disabled:text-muted w-full rounded-xl border px-4 py-2.5 text-sm transition-all focus:ring-0 focus:outline-none"
                   />
                   <span
                     class="text-muted absolute top-1/2 right-4 -translate-y-1/2 text-xs"
@@ -168,7 +168,7 @@
                 <button
                   type="button"
                   :disabled="!processedBlob"
-                  class="text-ink hover:bg-muted border-border bg-paper flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium shadow-md transition-all hover:scale-105 hover:shadow-lg disabled:opacity-50"
+                  class="text-ink hover:bg-surface border-border bg-paper flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium shadow-md transition-all hover:scale-105 hover:shadow-lg disabled:opacity-50"
                   @click="download"
                 >
                   <svg
@@ -199,7 +199,7 @@
           </aside>
 
           <!-- 右侧工作区 -->
-          <main class="bg-muted/50 flex-1 p-6 dark:bg-black/20">
+          <main class="bg-surface/50 flex-1 p-6 dark:bg-black/20">
             <div class="mx-auto max-w-5xl space-y-6">
               <!-- 拖放上传区 -->
               <div
@@ -223,7 +223,7 @@
                 <div class="relative z-10 p-8 text-center">
                   <div v-if="!originalFile" class="space-y-4">
                     <div
-                      class="bg-muted text-muted mx-auto flex h-16 w-16 items-center justify-center rounded-2xl transition-transform group-hover:scale-110"
+                      class="bg-surface text-muted mx-auto flex h-16 w-16 items-center justify-center rounded-2xl transition-transform group-hover:scale-110"
                     >
                       <svg
                         class="h-8 w-8"
@@ -255,7 +255,7 @@
                   >
                     <div class="flex items-center gap-4">
                       <div
-                        class="bg-muted h-12 w-12 overflow-hidden rounded-lg"
+                        class="bg-surface h-12 w-12 overflow-hidden rounded-lg"
                       >
                         <img
                           :src="originalPreviewUrl"
@@ -273,7 +273,7 @@
                     </div>
                     <button
                       type="button"
-                      class="text-ink bg-paper ring-border hover:bg-muted rounded-full px-4 py-1.5 text-xs font-bold shadow-sm ring-1 transition-all"
+                      class="text-ink bg-paper ring-border hover:bg-surface rounded-full px-4 py-1.5 text-xs font-bold shadow-sm ring-1 transition-all"
                       @click.stop="triggerFilePicker"
                     >
                       更换图片
@@ -320,7 +320,7 @@
                     </div>
                   </div>
                   <div
-                    class="bg-muted/50 relative flex min-h-[320px] items-center justify-center overflow-auto p-8"
+                    class="bg-surface/50 relative flex min-h-[320px] items-center justify-center overflow-auto p-8"
                   >
                     <button
                       type="button"
@@ -387,7 +387,7 @@
                     </div>
                   </div>
                   <div
-                    class="bg-muted/50 relative flex min-h-[320px] items-center justify-center overflow-auto p-8"
+                    class="bg-surface/50 relative flex min-h-[320px] items-center justify-center overflow-auto p-8"
                   >
                     <div
                       v-if="processing"

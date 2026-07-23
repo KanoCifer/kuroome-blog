@@ -71,11 +71,11 @@ const heroStyle = computed(() => ({
           class="text-muted mt-4 max-w-2xl text-base leading-relaxed md:text-lg"
         >
           每个配色都共享同一组 CSS 变量（<code
-            class="bg-muted rounded px-1.5 py-0.5 font-mono text-sm"
+            class="bg-surface rounded px-1.5 py-0.5 font-mono text-sm"
             >--ink --paper --accent --chart-1..5</code
           >）。
           切换的是基色与饱和度，组件代码无需改动。下面四张卡分别嵌套了对应的
-          <code class="bg-muted rounded px-1.5 py-0.5 font-mono text-sm"
+          <code class="bg-surface rounded px-1.5 py-0.5 font-mono text-sm"
             >[data-color-scheme]</code
           >，点击「应用此配色」即可全站生效。
         </p>
@@ -157,9 +157,9 @@ const heroStyle = computed(() => ({
         💡
         <strong class="text-ink">暗色态预览</strong>
         来自根元素的
-        <code class="bg-muted rounded px-1 font-mono text-xs">.dark</code>
+        <code class="bg-surface rounded px-1 font-mono text-xs">.dark</code>
         类 + scheme 的
-        <code class="bg-muted rounded px-1 font-mono text-xs"
+        <code class="bg-surface rounded px-1 font-mono text-xs"
           >[data-color-scheme='x'].dark</code
         >
         选择器。切到 dark 模式时，4 张卡的 token

@@ -16,7 +16,7 @@ const props = defineProps<{ status: DevTaskStatus }>();
 const STATUS_CLASS: Record<DevTaskStatus, string> = {
   待评估: 'border-border text-muted',
   待排期: 'border-chart-3/40 bg-chart-3/10 text-chart-3',
-  进行中: 'border-accent/40 bg-accent/10 text-accent',
+  进行中: 'border-accent/40 bg-accent/10 text-ink',
   已搁置:
     'border-amber-300/50 bg-amber-50/60 text-amber-700 dark:border-amber-700/50 dark:bg-amber-950/20 dark:text-amber-400',
   已完成:
@@ -24,7 +24,7 @@ const STATUS_CLASS: Record<DevTaskStatus, string> = {
 };
 
 const STATUS_DOT: Record<DevTaskStatus, string> = {
-  待评估: 'bg-muted',
+  待评估: 'bg-surface',
   待排期: 'bg-chart-3',
   进行中: 'bg-accent',
   已搁置: 'bg-amber-500',
@@ -32,5 +32,5 @@ const STATUS_DOT: Record<DevTaskStatus, string> = {
 };
 
 const cls = STATUS_CLASS[props.status] ?? 'border-border text-muted';
-const dotCls = STATUS_DOT[props.status] ?? 'bg-muted';
+const dotCls = STATUS_DOT[props.status] ?? 'bg-surface';
 </script>

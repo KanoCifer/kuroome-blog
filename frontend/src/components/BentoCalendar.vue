@@ -33,7 +33,7 @@
         v-for="(label, idx) in weekdays"
         :key="idx"
         class="py-1 text-xs font-medium"
-        :class="idx === weekdayToday ? 'text-accent' : 'text-muted'"
+        :class="idx === weekdayToday ? 'text-ink' : 'text-ink'"
       >
         {{ label }}
       </span>
@@ -54,7 +54,7 @@
         class="mx-auto flex aspect-square w-full max-w-8 items-center justify-center rounded-lg text-sm transition-colors"
         :class="
           day === today
-            ? 'bg-accent text-accent font-bold'
+            ? 'bg-accent text-ink font-bold'
             : 'text-muted hover:bg-accent/10'
         "
       >

@@ -77,7 +77,7 @@ export default function AboutView() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.15 + i * 0.03, duration: 0.3 }}
-              className="bg-accent/10 text-accent hover:bg-accent/20 cursor-default rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
+              className="bg-accent/10 text-ink hover:bg-accent/20 cursor-default rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
             >
               {tech}
             </motion.span>

@@ -226,7 +226,7 @@ defineExpose({
         v-if="isDraggingOver"
         class="border-accent/50 bg-accent/10 pointer-events-none absolute inset-0 z-10 flex items-center justify-center border-2 border-dashed"
       >
-        <span class="text-accent text-sm font-semibold">释放以添加图片</span>
+        <span class="text-ink text-sm font-semibold">释放以添加图片</span>
       </div>
 
       <!-- Toolbar -->
@@ -236,7 +236,7 @@ defineExpose({
         <div class="flex items-center gap-1">
           <button
             type="button"
-            class="text-muted hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted hover:bg-surface/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="wrapBold"
             title="粗体 (Cmd+B)"
           >
@@ -244,7 +244,7 @@ defineExpose({
           </button>
           <button
             type="button"
-            class="text-muted hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium italic transition"
+            class="text-muted hover:bg-surface/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium italic transition"
             @click="wrapItalic"
             title="斜体 (Cmd+I)"
           >
@@ -253,7 +253,7 @@ defineExpose({
           <div class="bg-border mx-1 h-4 w-px"></div>
           <button
             type="button"
-            class="text-muted hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted hover:bg-surface/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="insertHeading"
             title="标题 (##)"
           >
@@ -261,7 +261,7 @@ defineExpose({
           </button>
           <button
             type="button"
-            class="text-muted hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted hover:bg-surface/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="insertQuote"
             title="引用 (> )"
           >
@@ -269,7 +269,7 @@ defineExpose({
           </button>
           <button
             type="button"
-            class="text-muted hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted hover:bg-surface/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="insertList"
             title="列表 (- )"
           >
@@ -277,7 +277,7 @@ defineExpose({
           </button>
           <button
             type="button"
-            class="text-muted hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted hover:bg-surface/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="wrapCode"
             title="行内代码"
           >
@@ -285,7 +285,7 @@ defineExpose({
           </button>
           <button
             type="button"
-            class="text-muted hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted hover:bg-surface/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="insertLink"
             title="链接 (Cmd+K)"
           >
@@ -301,7 +301,7 @@ defineExpose({
           />
           <button
             type="button"
-            class="text-muted hover:bg-muted/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
+            class="text-muted hover:bg-surface/50 hover:text-ink rounded-lg px-2 py-1.5 text-sm font-medium transition"
             @click="fileInputRef?.click()"
             title="插入图片"
           >
@@ -316,7 +316,7 @@ defineExpose({
               'rounded-lg px-3 py-1.5 text-xs font-medium transition',
               isFocusMode
                 ? 'bg-warning/10 text-warning'
-                : 'text-muted hover:bg-muted/50 hover:text-ink',
+                : 'text-muted hover:bg-surface/50 hover:text-ink',
             ]"
             @click="toggleFocusMode"
             title="聚焦模式 (Cmd+Shift+F)"
@@ -328,8 +328,8 @@ defineExpose({
             :class="[
               'rounded-lg px-3 py-1.5 text-xs font-medium transition',
               showPreview
-                ? 'bg-accent/10 text-accent'
-                : 'text-muted hover:bg-muted/50 hover:text-ink',
+                ? 'bg-accent/10 text-ink'
+                : 'text-muted hover:bg-surface/50 hover:text-ink',
             ]"
             @click="togglePreview"
             title="预览 (Cmd+Shift+P)"
@@ -352,7 +352,7 @@ defineExpose({
           @keydown="handleKeydown"
           @paste="handlePaste"
           :class="[
-            'placeholder:text-muted/60 bg-muted field-sizing-content h-full min-h-80 w-full outline-none focus:ring-0',
+            'placeholder:text-muted/60 bg-surface field-sizing-content h-full min-h-80 w-full outline-none focus:ring-0',
             'px-8 py-6 text-lg leading-relaxed',
             'font-serif',
           ]"

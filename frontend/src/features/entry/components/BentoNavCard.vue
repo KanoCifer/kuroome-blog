@@ -96,7 +96,7 @@ const userMenuItems: DropdownItem[] = [
   {
     icon: LogoutIcon,
     label: 'Logout',
-    class: 'text-accent font-bold',
+    class: 'text-ink font-bold',
     onClick: () => {
       auth.logout();
       router.push('/');

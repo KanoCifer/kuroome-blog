@@ -93,9 +93,9 @@ const onDrop = (event: DragEvent) => {
     role="button"
     :tabindex="disabled ? -1 : 0"
     :aria-disabled="disabled"
-    class="group border-border bg-muted/40 text-ink hover:border-muted-foreground hover:bg-muted relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-10 text-center transition-all select-none"
+    class="group border-border bg-surface/40 text-ink hover:border-muted-foreground hover:bg-surface relative flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-10 text-center transition-all select-none"
     :class="[
-      isDragging ? 'border-ink bg-muted scale-[0.99]' : '',
+      isDragging ? 'border-ink bg-surface scale-[0.99]' : '',
       disabled ? 'cursor-not-allowed opacity-60' : '',
     ]"
     @click="handleClick"
@@ -120,7 +120,7 @@ const onDrop = (event: DragEvent) => {
       class="bg-paper ring-border/5 mb-4 flex h-12 w-12 items-center justify-center rounded-full shadow-sm ring-1 transition-transform group-hover:scale-110"
     >
       <UploadCloud
-        class="text-muted group-hover:text-accent h-5 w-5 transition-colors"
+        class="text-muted group-hover:text-ink h-5 w-5 transition-colors"
         :stroke-width="1.5"
       />
     </div>

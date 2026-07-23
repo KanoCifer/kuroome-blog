@@ -6,7 +6,7 @@
     class="group relative rounded-xl px-3.5 py-2.5 transition-[box-shadow,background-color] duration-200"
     :class="
       done
-        ? 'bg-muted/40 ring-border/60 ring-1'
+        ? 'bg-surface/40 ring-border/60 ring-1'
         : 'bg-paper ring-border/60 hover:bg-paper hover:ring-border/80 ring-1 hover:shadow-[0_1px_1px_color-mix(in_oklch,var(--ink)_6%,transparent),0_6px_14px_color-mix(in_oklch,var(--ink)_10%,transparent)]'
     "
   >
@@ -69,7 +69,7 @@
           type="button"
           :aria-label="`推进状态：${task.title}`"
           :title="`推进状态 · ${task.title}`"
-          class="text-muted hover:bg-accent/10 hover:text-accent focus-visible:ring-ring cursor-pointer rounded-md p-1.5 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.94] active:not-focus-visible:ring-0"
+          class="text-muted hover:bg-accent/10 hover:text-ink focus-visible:ring-ring cursor-pointer rounded-md p-1.5 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.94] active:not-focus-visible:ring-0"
           @click="$emit('cycle-status', task.slug)"
         >
           <svg

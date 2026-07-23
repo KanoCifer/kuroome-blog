@@ -42,7 +42,7 @@ const getTypeClass = (type: string): string => {
       'bg-linear-to-r from-purple-100 to-violet-100 text-violet-700 ring-1 ring-violet-200/60 dark:from-purple-900/30 dark:to-violet-900/30 dark:text-violet-300 dark:ring-violet-800/60',
     style:
       'bg-linear-to-r from-pink-100 to-fuchsia-100 text-fuchsia-700 ring-1 ring-fuchsia-200/60 dark:from-pink-900/30 dark:to-fuchsia-900/30 dark:text-fuchsia-300 dark:ring-fuchsia-800/60',
-    docs: 'bg-linear-to-r from-accent/10 to-accent/10 text-accent ring-1 ring-accent/20',
+    docs: 'bg-linear-to-r from-accent/10 to-accent/10 text-ink ring-1 ring-accent/20',
     perf: 'bg-linear-to-r from-warning/10 to-warning/10 text-warning ring-1 ring-warning/20',
     test: 'bg-linear-to-r from-cyan-100 to-teal-100 text-teal-700 ring-1 ring-teal-200/60 dark:from-cyan-900/30 dark:to-teal-900/30 dark:text-teal-300 dark:ring-teal-800/60',
     chore:
@@ -78,7 +78,7 @@ export default function ChangelogView() {
     >
       <div className="w-full max-w-6xl px-4 max-sm:px-3">
         <div className="mb-16 text-center max-sm:mb-10">
-          <div className="bg-accent/10 text-accent mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium max-sm:mb-4 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
+          <div className="bg-accent/10 text-ink mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium max-sm:mb-4 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs">
             <svg
               className="h-4 w-4"
               fill="none"

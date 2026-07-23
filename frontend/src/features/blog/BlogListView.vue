@@ -67,10 +67,10 @@
           <button
             v-if="activeTag"
             type="button"
-            class="border-border bg-paper text-muted hover:bg-muted hover:text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
+            class="border-border bg-paper text-muted hover:bg-surface hover:text-ink inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors"
             @click="handleResetFilter"
           >
-            <span class="text-accent/70 font-serif italic">#</span>
+            <span class="text-ink/70 font-serif italic">#</span>
             <span class="font-serif">{{ activeTag }}</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -92,7 +92,7 @@
           <router-link
             v-if="user.isAuthenticated"
             to="/blog/new"
-            class="bg-accent text-accent hover:bg-accent/90 focus-visible:ring-ring inline-flex w-fit items-center rounded-lg px-4 py-2 text-sm font-semibold shadow-sm focus-visible:ring-2 focus-visible:ring-offset-2"
+            class="bg-accent text-ink hover:bg-accent/90 focus-visible:ring-ring inline-flex w-fit items-center rounded-lg px-4 py-2 text-sm font-semibold shadow-sm focus-visible:ring-2 focus-visible:ring-offset-2"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -156,7 +156,7 @@
               <h2
                 class="text-ink font-serif text-base font-semibold sm:text-lg"
               >
-                <span class="text-accent/70 mr-1">#</span>{{ activeTag }}
+                <span class="text-ink/70 mr-1">#</span>{{ activeTag }}
               </h2>
             </div>
             <div class="text-muted/70 flex items-center gap-1.5">
@@ -249,7 +249,7 @@
               <button
                 v-if="activeTag"
                 type="button"
-                class="border-border text-muted hover:bg-muted hover:text-ink rounded-lg border px-4 py-2 text-sm font-medium"
+                class="border-border text-muted hover:bg-surface hover:text-ink rounded-lg border px-4 py-2 text-sm font-medium"
                 @click="handleResetFilter"
               >
                 翻看全卷
@@ -257,7 +257,7 @@
               <router-link
                 v-if="user.isAuthenticated"
                 to="/blog/new"
-                class="bg-accent text-accent hover:bg-accent/90 rounded-lg px-4 py-2 text-sm font-semibold"
+                class="bg-accent text-ink hover:bg-accent/90 rounded-lg px-4 py-2 text-sm font-semibold"
               >
                 落笔第一篇
               </router-link>
@@ -300,7 +300,7 @@
                   class="focus-visible:ring-ring inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                   :class="
                     pagination?.has_prev
-                      ? 'text-muted hover:bg-muted hover:text-ink'
+                      ? 'text-muted hover:bg-surface hover:text-ink'
                       : 'text-muted/50 cursor-not-allowed'
                   "
                   @click="goToPage(pagination!.prev_num!)"
@@ -341,8 +341,8 @@
                     class="focus-visible:ring-ring inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                     :class="
                       item === pagination?.page
-                        ? 'bg-accent text-accent'
-                        : 'text-muted hover:bg-muted hover:text-ink'
+                        ? 'bg-accent text-ink'
+                        : 'text-muted hover:bg-surface hover:text-ink'
                     "
                     @click="goToPage(item)"
                   >
@@ -359,7 +359,7 @@
                   class="focus-visible:ring-ring inline-flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
                   :class="
                     pagination?.has_next
-                      ? 'text-muted hover:bg-muted hover:text-ink'
+                      ? 'text-muted hover:bg-surface hover:text-ink'
                       : 'text-muted/50 cursor-not-allowed'
                   "
                   @click="goToPage(pagination!.next_num!)"

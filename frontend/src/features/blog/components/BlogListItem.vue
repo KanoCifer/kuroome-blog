@@ -46,7 +46,7 @@
             >
               <span
                 v-if="post.is_pinned"
-                class="bg-accent/15 text-accent inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold"
+                class="bg-accent/15 text-ink inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -65,7 +65,7 @@
                 v-if="post.tags?.length"
                 class="text-ink/70 inline-flex items-center gap-1 font-medium"
               >
-                <span class="text-accent/70 font-serif">#</span>
+                <span class="text-ink/70 font-serif">#</span>
                 {{ post.tags![0] }}
               </span>
               <span aria-hidden="true" class="text-border">·</span>
@@ -77,7 +77,7 @@
             <!-- 标题：衬线大字，featured 用 text-3xl -->
             <h2
               :class="[
-                'text-ink group-hover:text-accent font-serif leading-snug font-semibold transition-colors duration-300 ease-out',
+                'text-ink group-hover:text-ink font-serif leading-snug font-semibold transition-colors duration-300 ease-out',
                 isFeatured ? 'text-2xl sm:text-3xl' : 'text-lg sm:text-xl',
               ]"
               style="text-wrap: balance"

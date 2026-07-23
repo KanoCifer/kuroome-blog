@@ -2,11 +2,11 @@
   <div ref="dropdownRef" class="relative">
     <button
       @click.stop="isOpen = !isOpen"
-      class="squircle hover:bg-muted rounded-xl p-2 transition-[background-color,transform] hover:scale-110"
+      class="squircle hover:bg-surface rounded-xl p-2 transition-[background-color,transform] hover:scale-110"
       title="选择背景图"
     >
       <svg
-        class="text-accent h-5 w-5"
+        class="text-ink h-5 w-5"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -29,8 +29,8 @@
         <!-- Random 选项 -->
         <button
           @click="handleRandom"
-          class="text-ink hover:bg-muted flex w-full cursor-pointer items-center gap-3 rounded-t-lg px-3 py-2.5 text-sm transition-colors"
-          :class="{ 'bg-muted': store.mode === 'random' }"
+          class="text-ink hover:bg-surface flex w-full cursor-pointer items-center gap-3 rounded-t-lg px-3 py-2.5 text-sm transition-colors"
+          :class="{ 'bg-surface': store.mode === 'random' }"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -61,7 +61,7 @@
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="text-accent"
+            class="text-ink"
           >
             <polyline points="20 6 9 17 4 12" />
           </svg>
@@ -74,9 +74,10 @@
             v-for="(bg, index) in store.backgrounds"
             :key="bg.id"
             @click="store.selectFixed(index)"
-            class="text-ink hover:bg-muted flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm transition-colors"
+            class="text-ink hover:bg-surface flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-sm transition-colors"
             :class="{
-              'bg-muted': store.mode === 'fixed' && store.fixedIndex === index,
+              'bg-surface':
+                store.mode === 'fixed' && store.fixedIndex === index,
               'rounded-b-lg': index === store.backgrounds.length - 1,
             }"
           >
@@ -98,7 +99,7 @@
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="text-accent"
+              class="text-ink"
             >
               <polyline points="20 6 9 17 4 12" />
             </svg>

@@ -40,7 +40,7 @@
             <!-- 关闭按钮 — 保留圆形 -->
             <button
               @click="close"
-              class="text-muted hover:bg-muted hover:text-ink absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full transition-colors active:scale-[0.96]"
+              class="text-muted hover:bg-surface hover:text-ink absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full transition-colors active:scale-[0.96]"
               aria-label="关闭"
             >
               <IconClose class="h-5 w-5" />
@@ -68,12 +68,12 @@
 
           <!--
             章节 Tab — 横向胶囊分段控件
-            底托 bg-muted + 激活项 bg-paper 给出"高度差"指示
+            底托 bg-surface + 激活项 bg-paper 给出"高度差"指示
           -->
           <nav
             ref="navRef"
             aria-label="设置分组"
-            class="bg-muted relative mx-8 flex items-stretch justify-between gap-1 rounded-xl p-1"
+            class="bg-surface relative mx-8 flex items-stretch justify-between gap-1 rounded-xl p-1"
           >
             <!-- Sliding pill indicator (transitions translateX + width). -->
             <span ref="pillRef" class="settings-tab-pill" aria-hidden="true" />
@@ -84,7 +84,7 @@
               class="relative flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ease-out active:scale-[0.97]"
               :class="
                 activeTab === tab.key
-                  ? 'bg-paper text-accent shadow-sm'
+                  ? 'bg-paper text-ink shadow-sm'
                   : 'hover:text-ink text-[color-mix(in_oklch,var(--ink)_55%,transparent)]'
               "
             >

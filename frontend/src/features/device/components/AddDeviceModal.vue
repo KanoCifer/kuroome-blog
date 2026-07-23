@@ -28,7 +28,7 @@
                 <p class="text-muted mt-1 text-xs">记录你的电子设备资产</p>
               </div>
               <span
-                class="bg-accent/15 text-accent shrink-0 rounded-full px-3 py-1 text-xs font-semibold"
+                class="bg-accent/15 text-ink shrink-0 rounded-full px-3 py-1 text-xs font-semibold"
               >
                 新建设备
               </span>
@@ -112,7 +112,7 @@
               <span class="text-muted ml-1 text-xs font-semibold">
                 设备状态
               </span>
-              <div class="bg-muted flex rounded-full p-1 backdrop-blur-sm">
+              <div class="bg-surface flex rounded-full p-1 backdrop-blur-sm">
                 <button
                   v-for="option in statusOptions"
                   :key="option.value"
@@ -121,8 +121,8 @@
                   :class="[
                     'flex-1 rounded-full px-3 py-2.5 text-xs font-semibold transition-all duration-200',
                     form.status === option.value
-                      ? 'bg-accent text-accent shadow-accent/25 shadow-lg'
-                      : 'text-muted hover:bg-muted',
+                      ? 'bg-accent text-ink shadow-accent/25 shadow-lg'
+                      : 'text-muted hover:bg-surface',
                   ]"
                 >
                   {{ option.label }}
@@ -143,7 +143,7 @@
             <button
               type="submit"
               :disabled="isSubmitting"
-              class="bg-accent text-accent shadow-accent/30 hover:shadow-accent/40 flex w-full items-center justify-center gap-2 rounded-full py-4 text-sm font-extrabold shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
+              class="bg-accent text-ink shadow-accent/30 hover:shadow-accent/40 flex w-full items-center justify-center gap-2 rounded-full py-4 text-sm font-extrabold shadow-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
             >
               <span v-if="isSubmitting">添加中...</span>
               <span v-else>添加设备</span>

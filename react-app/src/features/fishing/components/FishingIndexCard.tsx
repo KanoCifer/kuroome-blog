@@ -13,7 +13,7 @@ interface FishingIndexCardProps {
 
 const LEVEL_COLORS: Record<string, string> = {
   爆护: 'text-success',
-  好: 'text-accent',
+  好: 'text-ink',
   一般: 'text-warning',
   差: 'text-destructive',
   空军: 'text-muted',
@@ -62,7 +62,7 @@ export function FishingIndexCard({
           onClick={() => void refetch()}
           aria-label="刷新钓鱼指数"
           disabled={loading}
-          className="text-muted hover:text-ink hover:bg-muted inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+          className="text-muted hover:text-ink hover:bg-surface inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60"
         >
           <RotateCw
             className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`}
@@ -111,7 +111,7 @@ export function FishingIndexCard({
           <div className="flex gap-2 px-0.5">
             <button
               onClick={handleFeedback}
-              className="bg-accent text-accent hover:bg-accent/90 min-h-11 flex-1 rounded-full px-3 text-sm font-medium transition-colors"
+              className="bg-accent text-ink hover:bg-accent/90 min-h-11 flex-1 rounded-full px-3 text-sm font-medium transition-colors"
             >
               反馈今日指数
             </button>
@@ -119,7 +119,7 @@ export function FishingIndexCard({
               Object.keys(indexData.feature_breakdown).length > 0 && (
                 <button
                   onClick={handleDetail}
-                  className="bg-muted text-ink hover:bg-muted/70 min-h-11 rounded-full px-5 text-sm font-medium transition-colors"
+                  className="bg-surface text-ink hover:bg-surface/70 min-h-11 rounded-full px-5 text-sm font-medium transition-colors"
                 >
                   详情
                 </button>

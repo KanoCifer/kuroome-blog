@@ -21,7 +21,7 @@
         </div>
         <button
           type="button"
-          class="text-muted hover:text-ink hover:bg-muted inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          class="text-muted hover:text-ink hover:bg-surface inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
           :disabled="isLoading"
           @click="onRefresh"
           aria-label="换一批"
@@ -55,10 +55,10 @@
           :key="i"
           class="bg-paper flex w-56 flex-shrink-0 animate-pulse flex-col gap-3 rounded-2xl p-4"
         >
-          <div class="bg-muted aspect-[2/3] w-full rounded-md" />
-          <div class="bg-muted h-4 w-3/4 rounded" />
-          <div class="bg-muted h-3 w-1/2 rounded" />
-          <div class="bg-muted h-3 w-full rounded" />
+          <div class="bg-surface aspect-[2/3] w-full rounded-md" />
+          <div class="bg-surface h-4 w-3/4 rounded" />
+          <div class="bg-surface h-3 w-1/2 rounded" />
+          <div class="bg-surface h-3 w-full rounded" />
         </div>
       </div>
     </template>
@@ -71,7 +71,7 @@
       >
         <Motion
           :layoutId="RECOMMEND_COVER_LAYOUT_ID_PREFIX + book.bookId"
-          class="bg-muted relative aspect-[2/3] w-full overflow-hidden rounded-md shadow-sm"
+          class="bg-surface relative aspect-[2/3] w-full overflow-hidden rounded-md shadow-sm"
         >
           <img
             v-if="book.cover"
@@ -88,7 +88,7 @@
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="currentColor"
-              class="text-accent h-3 w-3"
+              class="text-ink h-3 w-3"
               aria-hidden="true"
             >
               <path

@@ -40,12 +40,12 @@
 
         <!-- 加载态 -->
         <div v-else-if="store.loading" class="space-y-3">
-          <div class="bg-muted h-8 w-40 animate-pulse rounded-md" />
+          <div class="bg-surface h-8 w-40 animate-pulse rounded-md" />
           <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <div
               v-for="n in 3"
               :key="n"
-              class="bg-muted h-28 animate-pulse rounded-xl"
+              class="bg-surface h-28 animate-pulse rounded-xl"
             />
           </div>
         </div>

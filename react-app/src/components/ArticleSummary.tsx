@@ -61,7 +61,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
               strokeWidth={2}
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="text-accent"
+              className="text-ink"
             >
               <path d="M12 8V4H8" />
               <rect width={16} height={12} x={4} y={8} rx={2} />
@@ -90,7 +90,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
 
         <div className="flex items-center gap-2">
           <select
-            className="bg-muted/50 text-ink border-border/60 cursor-pointer rounded-lg border px-2 py-1 text-xs transition-colors outline-none"
+            className="bg-surface/50 text-ink border-border/60 cursor-pointer rounded-lg border px-2 py-1 text-xs transition-colors outline-none"
             value={selectedModel}
             onChange={(e) => setSelectedModel(e.target.value)}
           >
@@ -101,7 +101,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
             ))}
           </select>
           <button
-            className="bg-accent text-accent disabled:bg-muted cursor-pointer rounded-full px-2.5 py-1.5 text-xs transition-colors disabled:cursor-not-allowed"
+            className="bg-accent text-ink disabled:bg-surface cursor-pointer rounded-full px-2.5 py-1.5 text-xs transition-colors disabled:cursor-not-allowed"
             disabled={!content.trim() || loading}
             onClick={() => generateSummary({ title, content })}
           >
@@ -119,7 +119,7 @@ export function ArticleSummaryCard({ title, content }: ArticleSummaryProps) {
           />
         ) : (
           <div className="flex items-center gap-3 py-3">
-            <div className="bg-muted/50 dark:bg-muted/30 flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
+            <div className="bg-surface/50 dark:bg-surface/30 flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width={16}

@@ -44,7 +44,7 @@ interface SelfInfo {
 
 function TagPill({ children }: { children: React.ReactNode }) {
   return (
-    <span className="bg-accent/10 text-accent inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold">
+    <span className="bg-accent/10 text-ink inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold">
       {children}
     </span>
   );
@@ -93,7 +93,7 @@ function DailyPickBanner() {
           transition={{ duration: 0.2 }}
           className="flex items-start gap-3.5"
         >
-          <div className="bg-muted flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">
+          <div className="bg-surface flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">
             {pick?.icon ? (
               <img
                 src={pick.icon}
@@ -111,7 +111,7 @@ function DailyPickBanner() {
               <span className="text-muted text-[10px] font-bold tracking-wide uppercase">
                 每日推荐
               </span>
-              <span className="bg-accent/10 text-accent rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
+              <span className="bg-accent/10 text-ink rounded-full px-1.5 py-0.5 text-[10px] font-semibold">
                 {pick?.category}
               </span>
             </div>
@@ -132,7 +132,7 @@ function DailyPickBanner() {
 
           <div className="flex shrink-0 flex-col gap-2">
             <button
-              className="bg-accent text-accent flex h-8 w-8 items-center justify-center rounded-lg transition-transform active:scale-95"
+              className="bg-accent text-ink flex h-8 w-8 items-center justify-center rounded-lg transition-transform active:scale-95"
               onClick={(e) => {
                 e.stopPropagation();
                 refreshPick();
@@ -142,7 +142,7 @@ function DailyPickBanner() {
               <RefreshCw className="h-3.5 w-3.5" />
             </button>
             <button
-              className="bg-muted text-muted flex h-8 w-8 items-center justify-center rounded-lg transition-transform active:scale-95"
+              className="bg-surface text-muted flex h-8 w-8 items-center justify-center rounded-lg transition-transform active:scale-95"
               onClick={(e) => {
                 e.stopPropagation();
                 navigate('/websites');
@@ -199,7 +199,7 @@ function SelfInfoCard() {
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <h3 className="text-ink text-base font-bold">{self.name}</h3>
-            <span className="bg-accent/15 text-accent rounded-full px-2 py-0.5 text-[10px] font-semibold">
+            <span className="bg-accent/15 text-ink rounded-full px-2 py-0.5 text-[10px] font-semibold">
               本站
             </span>
           </div>
@@ -209,7 +209,7 @@ function SelfInfoCard() {
         </div>
         <button
           onClick={copySelfInfo}
-          className="bg-accent text-accent flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-transform active:scale-95"
+          className="bg-accent text-ink flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-transform active:scale-95"
           title="复制友链信息"
         >
           <Copy className="h-4 w-4" />
@@ -259,7 +259,7 @@ function FriendLinkCard({ link, index }: { link: FriendLink; index: number }) {
       className="border-border bg-paper group hover:border-accent/25 block overflow-hidden rounded-2xl border p-4 shadow-sm transition-all duration-300 hover:shadow-md"
     >
       <div className="flex items-start gap-3.5">
-        <div className="bg-muted flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full">
+        <div className="bg-surface flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full">
           {link.icon ? (
             <img
               src={link.icon}
@@ -272,7 +272,7 @@ function FriendLinkCard({ link, index }: { link: FriendLink; index: number }) {
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-ink group-hover:text-accent text-base font-bold transition-colors">
+          <h3 className="text-ink group-hover:text-ink text-base font-bold transition-colors">
             {link.name}
           </h3>
           <p className="text-muted mt-1 line-clamp-2 text-xs leading-relaxed">
@@ -301,7 +301,7 @@ function ApplyCard() {
       className="border-border bg-paper overflow-hidden rounded-2xl border p-4"
     >
       <h3 className="text-ink mb-3 flex items-center gap-2 text-sm font-bold">
-        <Link2 className="text-accent h-4 w-4" />
+        <Link2 className="text-ink h-4 w-4" />
         申请友链
       </h3>
       <p className="text-muted mb-3 text-xs leading-relaxed">
@@ -310,26 +310,26 @@ function ApplyCard() {
 
       <div className="border-accent/15 bg-accent/5 mb-4 rounded-xl border p-3">
         <h4 className="text-ink mb-2 flex items-center gap-1.5 text-xs font-bold">
-          <Info className="text-accent h-3.5 w-3.5" />
+          <Info className="text-ink h-3.5 w-3.5" />
           接入须知
         </h4>
         <ul className="text-muted space-y-1.5 text-xs">
           <li className="flex items-start gap-2">
-            <span className="text-accent mt-0.5 shrink-0 text-[8px]">●</span>
+            <span className="text-ink mt-0.5 shrink-0 text-[8px]">●</span>
             <span>网站需符合中国大陆相关法律法规</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-accent mt-0.5 shrink-0 text-[8px]">●</span>
+            <span className="text-ink mt-0.5 shrink-0 text-[8px]">●</span>
             <span>网站内容原创、非商业推广</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-accent mt-0.5 shrink-0 text-[8px]">●</span>
+            <span className="text-ink mt-0.5 shrink-0 text-[8px]">●</span>
             <span>
               已在您的网站添加本站友链（
               <a
                 href="https://kanocifer.chat"
                 target="_blank"
-                className="text-accent underline"
+                className="text-ink underline"
                 rel="noreferrer"
               >
                 kanocifer.chat
@@ -338,7 +338,7 @@ function ApplyCard() {
             </span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="text-accent mt-0.5 shrink-0 text-[8px]">●</span>
+            <span className="text-ink mt-0.5 shrink-0 text-[8px]">●</span>
             <span>网站可正常访问</span>
           </li>
         </ul>
@@ -348,7 +348,7 @@ function ApplyCard() {
         href="https://github.com/KanoCifer/kuroome-blog/issues/1"
         target="_blank"
         rel="noopener noreferrer"
-        className="bg-accent text-accent flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-transform active:scale-95"
+        className="bg-accent text-ink flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-transform active:scale-95"
       >
         <ExternalLink className="h-4 w-4" />
         前往 GitHub Issue 提交申请

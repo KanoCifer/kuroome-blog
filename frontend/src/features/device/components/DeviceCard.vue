@@ -51,7 +51,7 @@
     <!-- Notes Banner -->
     <div
       v-if="device.notes"
-      class="bg-muted/50 mb-6 flex items-center gap-2 rounded-2xl px-4 py-3"
+      class="bg-surface/50 mb-6 flex items-center gap-2 rounded-2xl px-4 py-3"
     >
       <svg
         class="text-brand-devices h-4 w-4 scale-75"
@@ -76,14 +76,14 @@
         type="button"
         :disabled="isPending"
         @click="handleToggleStatus"
-        class="bg-brand-devices text-accent rounded-full px-4 py-3 text-sm font-bold shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+        class="bg-brand-devices text-ink rounded-full px-4 py-3 text-sm font-bold shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {{ isPending ? '处理中...' : isActive ? '标记退役' : '恢复使用' }}
       </button>
       <button
         type="button"
         @click="isMilestoneModalOpen = true"
-        class="bg-brand-devices text-accent rounded-full px-4 py-3 text-sm font-bold shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+        class="bg-brand-devices text-ink rounded-full px-4 py-3 text-sm font-bold shadow-md transition-all hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
       >
         编辑配置
       </button>

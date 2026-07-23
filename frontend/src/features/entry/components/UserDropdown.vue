@@ -20,7 +20,7 @@
               v-else-if="item.to"
               :to="item.to"
               @click="closeUserMenuImmediately"
-              class="text-ink hover:bg-muted hover:text-ink focus-visible:ring-ring flex items-center gap-2.5 rounded-xl px-3 py-2 font-serif text-sm transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
+              class="text-ink hover:bg-surface hover:text-ink focus-visible:ring-ring flex items-center gap-2.5 rounded-xl px-3 py-2 font-serif text-sm transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
               :class="item.class"
             >
               <component :is="item.icon" class="h-4 w-4 shrink-0" />
@@ -31,7 +31,7 @@
               v-else
               @click.prevent="handleItemClick(item)"
               :disabled="item.disabled"
-              class="text-ink hover:bg-muted hover:text-ink focus-visible:ring-ring flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 font-serif text-sm transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+              class="text-ink hover:bg-surface hover:text-ink focus-visible:ring-ring flex w-full cursor-pointer items-center gap-2.5 rounded-xl px-3 py-2 font-serif text-sm transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
               :class="item.class"
             >
               <component :is="item.icon" class="h-4 w-4 shrink-0" />
@@ -58,9 +58,7 @@
 
     <!-- 用户名 -->
     <div class="flex items-baseline gap-2">
-      <span
-        class="text-ink dark:text-ink font-serif text-2xl font-bold"
-      >
+      <span class="text-ink dark:text-ink font-serif text-2xl font-bold">
         {{ currentUserName }}
       </span>
       <ChevronDownIcon

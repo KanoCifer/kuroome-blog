@@ -41,7 +41,7 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
             <h3 class="text-ink text-base font-semibold">编辑图片</h3>
             <button
               type="button"
-              class="text-muted hover:bg-muted bg-muted rounded-full px-3 py-1 text-xs font-semibold transition"
+              class="text-muted hover:bg-surface bg-surface rounded-full px-3 py-1 text-xs font-semibold transition"
               @click="emit('close')"
             >
               关闭
@@ -50,7 +50,7 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
 
           <div class="p-6">
             <div
-              class="bg-muted mb-4 flex items-center justify-center rounded-2xl p-4"
+              class="bg-surface mb-4 flex items-center justify-center rounded-2xl p-4"
             >
               <img
                 :src="imageUrl"
@@ -115,7 +115,7 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
               />
               <button
                 type="button"
-                class="text-muted hover:bg-muted border-border rounded-xl border px-3 py-2 text-xs font-semibold transition"
+                class="text-muted hover:bg-surface border-border rounded-xl border px-3 py-2 text-xs font-semibold transition"
                 @click="replaceInputRef?.click()"
               >
                 替换图片
@@ -123,7 +123,7 @@ const replaceInputRef = ref<HTMLInputElement | null>(null);
             </div>
             <button
               type="button"
-              class="bg-accent text-accent hover:bg-accent/90 rounded-xl px-4 py-2 text-xs font-semibold transition"
+              class="bg-accent text-ink hover:bg-accent/90 rounded-xl px-4 py-2 text-xs font-semibold transition"
               @click="emit('close')"
             >
               完成

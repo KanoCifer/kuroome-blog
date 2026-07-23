@@ -36,7 +36,7 @@
           </h2>
           <button
             type="button"
-            class="text-muted hover:bg-muted hover:text-ink focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
+            class="text-muted hover:bg-surface hover:text-ink focus-visible:ring-ring cursor-pointer rounded-md p-2 transition-[color,transform] focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none active:scale-[0.96] active:not-focus-visible:ring-0"
             aria-label="关闭"
             @click="$emit('close')"
           >
@@ -108,7 +108,7 @@
                       i < statusIndex
                         ? 'border-success bg-success/10 text-success'
                         : i === statusIndex
-                          ? 'border-accent/40 bg-accent/10 text-accent'
+                          ? 'border-accent/40 bg-accent/10 text-ink'
                           : 'border-border text-muted opacity-60'
                     "
                     :aria-pressed="task.status === s"
@@ -143,7 +143,7 @@
               <button
                 v-if="task.status !== '已完成' && task.status !== '已搁置'"
                 type="button"
-                class="text-muted hover:bg-muted focus-visible:ring-ring hover:text-ink mx-auto mt-2 block max-w-xs cursor-pointer rounded-md px-2 py-2 text-center text-[11px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
+                class="text-muted hover:bg-surface focus-visible:ring-ring hover:text-ink mx-auto mt-2 block max-w-xs cursor-pointer rounded-md px-2 py-2 text-center text-[11px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-none"
                 @click="$emit('set-status', task.slug, '已搁置')"
               >
                 搁置此任务
@@ -171,7 +171,7 @@
                 </span>
                 <span
                   v-if="task.slug"
-                  class="bg-accent/10 text-accent rounded-full px-1.5 py-px text-[10px] font-medium"
+                  class="bg-accent/10 text-ink rounded-full px-1.5 py-px text-[10px] font-medium"
                 >
                   {{ task.slug }}
                 </span>
@@ -301,13 +301,13 @@
           </button>
           <div class="flex items-center gap-2">
             <button
-              class="text-muted hover:bg-muted focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+              class="text-muted hover:bg-surface focus-visible:ring-ring cursor-pointer rounded-lg px-3.5 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
               @click="$emit('close')"
             >
               关闭
             </button>
             <button
-              class="bg-accent text-accent hover:bg-accent/90 focus-visible:ring-ring cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+              class="bg-accent text-ink hover:bg-accent/90 focus-visible:ring-ring cursor-pointer rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
               @click="$emit('edit', task!.slug)"
             >
               编辑

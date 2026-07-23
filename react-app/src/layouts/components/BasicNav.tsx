@@ -66,7 +66,7 @@ function NavItem({ icon, to }: NavItemProps) {
     <div className="flex items-center justify-center">
       <Link
         to={to}
-        className="text-muted hover:text-accent flex h-14 w-16 items-center justify-center rounded-full transition duration-300 hover:scale-110 active:scale-[0.96]"
+        className="text-muted hover:text-ink flex h-14 w-16 items-center justify-center rounded-full transition duration-300 hover:scale-110 active:scale-[0.96]"
       >
         {icon}
       </Link>
@@ -128,7 +128,7 @@ export function BasicNav() {
         onClose={onClose}
         renderHeader={() => (
           <div className="shrink-0 px-5 pt-3 pb-2">
-            <div className="bg-muted mx-auto h-1.5 w-10 rounded-full" />
+            <div className="bg-surface mx-auto h-1.5 w-10 rounded-full" />
           </div>
         )}
       >
@@ -201,7 +201,7 @@ export function BasicNav() {
               <div className="flex items-center justify-center">
                 <button
                   onClick={() => setShowMenu((v) => !v)}
-                  className="text-muted hover:text-accent flex h-14 w-16 items-center justify-center rounded-full transition duration-200 hover:scale-110 active:scale-[0.96]"
+                  className="text-muted hover:text-ink flex h-14 w-16 items-center justify-center rounded-full transition duration-200 hover:scale-110 active:scale-[0.96]"
                   aria-label="更多导航"
                   aria-expanded={showMenu}
                 >

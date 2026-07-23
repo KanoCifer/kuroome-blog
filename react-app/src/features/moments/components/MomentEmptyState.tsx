@@ -15,7 +15,7 @@ export function MomentEmptyState({
     <div className="border-border/40 bg-paper/60 mx-auto flex max-w-md flex-col items-center gap-4 rounded-2xl border border-dashed px-6 py-12 text-center">
       <div
         aria-hidden="true"
-        className="bg-muted text-muted flex h-12 w-12 items-center justify-center rounded-full"
+        className="bg-surface text-muted flex h-12 w-12 items-center justify-center rounded-full"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

@@ -10,9 +10,7 @@
         class="fab group bg-secondary hover:bg-accent"
         aria-label="偏好设置"
       >
-        <SettingIcon
-          class="fab-icon text-accent group-hover:text-accent"
-        />
+        <SettingIcon class="fab-icon text-ink group-hover:text-ink" />
         <span class="fab-label">偏好设置</span>
       </button>
     </div>
@@ -25,7 +23,7 @@
         aria-label="写文章"
       >
         <svg
-          class="fab-icon text-accent"
+          class="fab-icon text-ink"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -35,7 +33,7 @@
         >
           <path d="M12 5v14M5 12h14" />
         </svg>
-        <span class="fab-label text-accent">新建</span>
+        <span class="fab-label text-ink">新建</span>
       </button>
     </div>
 
@@ -50,7 +48,7 @@
         aria-label="点赞"
       >
         <svg
-          :class="['fab-icon text-accent']"
+          :class="['fab-icon text-ink']"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -62,7 +60,7 @@
             d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
           />
         </svg>
-        <span class="fab-label text-accent">{{ likesCount }}</span>
+        <span class="fab-label text-ink">{{ likesCount }}</span>
       </button>
     </div>
 
@@ -74,7 +72,7 @@
         aria-label="友情链接"
       >
         <svg
-          class="fab-icon text-accent group-hover:text-accent"
+          class="fab-icon text-ink group-hover:text-ink"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -101,7 +99,7 @@
         :aria-label="layoutStore.isEditing ? '退出编辑' : '编辑布局'"
       >
         <svg
-          class="fab-icon text-accent group-hover:text-accent"
+          class="fab-icon text-ink group-hover:text-ink"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -126,9 +124,7 @@
         class="fab group bg-secondary hover:bg-accent"
         aria-label="切换到移动版"
       >
-        <Smartphone
-          class="fab-icon text-accent group-hover:text-accent"
-        />
+        <Smartphone class="fab-icon text-ink group-hover:text-ink" />
         <span class="fab-label">移动版</span>
       </button>
     </div>
@@ -140,9 +136,7 @@
         class="fab group bg-secondary hover:bg-accent"
         aria-label="RSS"
       >
-        <Rss
-          class="fab-icon text-accent group-hover:text-accent"
-        />
+        <Rss class="fab-icon text-ink group-hover:text-ink" />
         <span class="fab-label">RSS</span>
       </button>
     </div>
@@ -154,9 +148,7 @@
         class="fab group bg-secondary hover:bg-accent"
         aria-label="订阅管理"
       >
-        <CreditCard
-          class="fab-icon text-accent group-hover:text-accent"
-        />
+        <CreditCard class="fab-icon text-ink group-hover:text-ink" />
         <span class="fab-label">订阅</span>
       </button>
     </div>
@@ -168,9 +160,7 @@
         class="fab group bg-secondary hover:bg-accent"
         aria-label="图片工具"
       >
-        <Wrench
-          class="fab-icon text-accent group-hover:text-accent"
-        />
+        <Wrench class="fab-icon text-ink group-hover:text-ink" />
         <span class="fab-label">图片工具</span>
       </button>
     </div>

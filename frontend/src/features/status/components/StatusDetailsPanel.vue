@@ -118,8 +118,8 @@ function formatLogTime(iso: string): string {
         </dl>
       </div>
       <div v-else class="space-y-2">
-        <div class="bg-muted h-3 w-3/4 animate-pulse rounded" />
-        <div class="bg-muted h-3 w-1/2 animate-pulse rounded" />
+        <div class="bg-surface h-3 w-3/4 animate-pulse rounded" />
+        <div class="bg-surface h-3 w-1/2 animate-pulse rounded" />
       </div>
     </div>
 
@@ -157,8 +157,8 @@ function formatLogTime(iso: string): string {
         </dl>
       </div>
       <div v-else class="space-y-2">
-        <div class="bg-muted h-3 w-3/4 animate-pulse rounded" />
-        <div class="bg-muted h-3 w-1/2 animate-pulse rounded" />
+        <div class="bg-surface h-3 w-3/4 animate-pulse rounded" />
+        <div class="bg-surface h-3 w-1/2 animate-pulse rounded" />
       </div>
     </div>
 
@@ -198,8 +198,8 @@ function formatLogTime(iso: string): string {
         </ol>
       </div>
       <div v-else class="space-y-2">
-        <div class="bg-muted h-3 w-3/4 animate-pulse rounded" />
-        <div class="bg-muted h-3 w-1/2 animate-pulse rounded" />
+        <div class="bg-surface h-3 w-3/4 animate-pulse rounded" />
+        <div class="bg-surface h-3 w-1/2 animate-pulse rounded" />
       </div>
     </div>
 
@@ -210,7 +210,7 @@ function formatLogTime(iso: string): string {
     >
       <span>
         当前版本
-        <code class="bg-muted text-ink ml-1.5 rounded px-1.5 py-0.5 font-mono"
+        <code class="bg-surface text-ink ml-1.5 rounded px-1.5 py-0.5 font-mono"
           >v{{ serverStatus.version.current_version }}</code
         >
       </span>

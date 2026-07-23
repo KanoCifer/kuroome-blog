@@ -96,7 +96,7 @@ export function ProfileFormFields({
               className="peer sr-only"
             />
             <div className="border-border bg-paper/70 peer-checked:border-accent peer-checked:bg-accent/10 peer-checked:shadow-accent/10 hover:border-accent/30 flex items-center justify-center rounded-2xl border-2 py-3.5 transition-all duration-300 group-active:scale-95 peer-checked:shadow-lg">
-              <span className="text-muted peer-checked:text-accent text-sm font-medium transition-colors">
+              <span className="text-muted peer-checked:text-ink text-sm font-medium transition-colors">
                 Male
               </span>
             </div>
@@ -110,7 +110,7 @@ export function ProfileFormFields({
               className="peer sr-only"
             />
             <div className="border-border bg-paper/70 peer-checked:border-accent peer-checked:bg-accent/10 peer-checked:shadow-accent/10 hover:border-accent/30 flex items-center justify-center rounded-2xl border-2 py-3.5 transition-all duration-300 group-active:scale-95 peer-checked:shadow-lg">
-              <span className="text-muted peer-checked:text-accent text-sm font-medium transition-colors">
+              <span className="text-muted peer-checked:text-ink text-sm font-medium transition-colors">
                 Female
               </span>
             </div>
@@ -193,7 +193,7 @@ export function ProfileFormFields({
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            className="text-muted hover:text-accent absolute inset-y-0 right-0 flex items-center pr-4 transition-all duration-200"
+            className="text-muted hover:text-ink absolute inset-y-0 right-0 flex items-center pr-4 transition-all duration-200"
           >
             {showPassword ? (
               <EyeOff className="size-5" />

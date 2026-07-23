@@ -18,8 +18,8 @@
           :class="[
             'rounded-full px-3 py-1 font-medium transition-colors',
             activeTag === null
-              ? 'bg-accent text-accent shadow-sm'
-              : 'bg-paper text-muted hover:bg-muted border-border/60 border',
+              ? 'bg-accent text-ink shadow-sm'
+              : 'bg-paper text-muted hover:bg-surface border-border/60 border',
           ]"
           @click="setTag(null)"
         >
@@ -32,12 +32,12 @@
           :class="[
             'rounded-full px-3 py-1 font-medium transition-colors',
             activeTag === tag
-              ? 'bg-accent text-accent shadow-sm'
-              : 'bg-paper text-muted hover:bg-muted border-border/60 border',
+              ? 'bg-accent text-ink shadow-sm'
+              : 'bg-paper text-muted hover:bg-surface border-border/60 border',
           ]"
           @click="setTag(tag)"
         >
-          <span class="text-accent/70">#</span>{{ tag }}
+          <span class="text-ink/70">#</span>{{ tag }}
         </button>
       </div>
 
@@ -109,7 +109,7 @@
         <button
           type="button"
           :disabled="publicPage <= 1"
-          class="bg-paper text-ink hover:bg-muted border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          class="bg-paper text-ink hover:bg-surface border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
           @click="goPage(publicPage - 1)"
         >
           <svg
@@ -137,7 +137,7 @@
         <button
           type="button"
           :disabled="publicPage >= totalPages"
-          class="bg-paper text-ink hover:bg-muted border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          class="bg-paper text-ink hover:bg-surface border-border/60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
           @click="goPage(publicPage + 1)"
         >
           下一页
@@ -164,7 +164,7 @@
     <button
       v-if="isAdmin"
       type="button"
-      class="bg-accent text-accent hover:bg-accent/90 fixed right-6 bottom-6 z-[60] inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-[13px] font-medium shadow-lg transition-all hover:shadow-xl"
+      class="bg-accent text-ink hover:bg-accent/90 fixed right-6 bottom-6 z-[60] inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-[13px] font-medium shadow-lg transition-all hover:shadow-xl"
       aria-label="新建碎碎念"
       @click="openEditor(null)"
     >
@@ -232,7 +232,7 @@
         <button
           type="button"
           :disabled="deleting"
-          class="border-border/60 text-ink hover:bg-muted inline-flex items-center justify-center rounded-lg border px-4 py-1.5 text-[13px] transition-colors disabled:opacity-50"
+          class="border-border/60 text-ink hover:bg-surface inline-flex items-center justify-center rounded-lg border px-4 py-1.5 text-[13px] transition-colors disabled:opacity-50"
           @click="onDeleteCancel"
         >
           取消

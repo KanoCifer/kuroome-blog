@@ -107,7 +107,7 @@ async function switchToChat() {
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            class="text-accent"
+            class="text-ink"
           >
             <path d="M12 8V4H8" />
             <rect width="16" height="12" x="4" y="8" rx="2" />
@@ -138,7 +138,9 @@ async function switchToChat() {
 
       <div class="flex items-center gap-1.5">
         <!-- Mode tabs — segmented control -->
-        <div class="bg-muted/60 dark:bg-muted/40 inline-flex rounded-lg p-0.5">
+        <div
+          class="bg-surface/60 dark:bg-surface/40 inline-flex rounded-lg p-0.5"
+        >
           <button
             class="relative cursor-pointer rounded-md px-3 py-1 text-sm font-medium transition-all"
             :class="
@@ -172,7 +174,7 @@ async function switchToChat() {
       <template v-if="cardMode === CardMode.SUMMARY">
         <select
           v-model="selectedModel"
-          class="border-border/70 bg-muted/40 text-ink dark:border-border/70 dark:bg-muted/30 dark:text-ink focus:ring-ring cursor-pointer rounded-md border px-2.5 py-1.5 text-sm transition-colors focus:ring-1 focus:outline-none"
+          class="border-border/70 bg-surface/40 text-ink dark:border-border/70 dark:bg-surface/30 dark:text-ink focus:ring-ring cursor-pointer rounded-md border px-2.5 py-1.5 text-sm transition-colors focus:ring-1 focus:outline-none"
           :disabled="loading"
         >
           <option
@@ -184,7 +186,7 @@ async function switchToChat() {
           </option>
         </select>
         <button
-          class="bg-accent text-accent hover:bg-accent/90 disabled:bg-accent/30 dark:disabled:bg-accent/30 ml-auto inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed"
+          class="bg-accent text-ink hover:bg-accent/90 disabled:bg-accent/30 dark:disabled:bg-accent/30 ml-auto inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed"
           :disabled="!canSummarize"
           @click="onGenerate"
         >
@@ -249,7 +251,7 @@ async function switchToChat() {
           ></div>
           <div v-else key="placeholder" class="flex items-center gap-3 py-3">
             <div
-              class="bg-muted/50 dark:bg-muted/30 flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+              class="bg-surface/50 dark:bg-surface/30 flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -305,8 +307,8 @@ async function switchToChat() {
                 class="max-w-[80%] rounded-2xl px-3.5 py-2.5 text-base leading-relaxed"
                 :class="
                   msg.role === 'user'
-                    ? 'bg-accent text-accent whitespace-pre-line'
-                    : 'bg-muted/50 text-ink dark:bg-muted/30 dark:text-ink prose max-w-none'
+                    ? 'bg-accent text-ink whitespace-pre-line'
+                    : 'bg-surface/50 text-ink dark:bg-surface/30 dark:text-ink prose max-w-none'
                 "
               >
                 <template v-if="msg.role === 'user'">
@@ -339,12 +341,12 @@ async function switchToChat() {
               v-model="chatInput"
               type="text"
               placeholder="继续提问..."
-              class="border-border/70 bg-muted/30 text-ink placeholder-muted focus:border-ring focus:ring-ring dark:border-border/70 dark:bg-muted/20 dark:text-ink dark:placeholder-muted dark:focus:border-ring dark:focus:ring-ring flex-1 rounded-lg border px-3.5 py-2.5 text-base transition-colors focus:ring-1 focus:outline-none"
+              class="border-border/70 bg-surface/30 text-ink placeholder-muted focus:border-ring focus:ring-ring dark:border-border/70 dark:bg-surface/20 dark:text-ink dark:placeholder-muted dark:focus:border-ring dark:focus:ring-ring flex-1 rounded-lg border px-3.5 py-2.5 text-base transition-colors focus:ring-1 focus:outline-none"
               :disabled="loading"
               @keydown="onChatKeydown"
             />
             <button
-              class="bg-accent text-accent hover:bg-accent/90 disabled:bg-accent/30 dark:disabled:bg-accent/30 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg transition disabled:cursor-not-allowed"
+              class="bg-accent text-ink hover:bg-accent/90 disabled:bg-accent/30 dark:disabled:bg-accent/30 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg transition disabled:cursor-not-allowed"
               :disabled="!canChat"
               @click="onSendChat"
             >

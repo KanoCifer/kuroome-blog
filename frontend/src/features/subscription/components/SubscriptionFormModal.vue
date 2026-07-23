@@ -100,7 +100,7 @@ watch(
             </div>
             <button
               type="button"
-              class="border-border text-muted hover:bg-muted rounded-lg border px-3 py-1 text-xs transition"
+              class="border-border text-muted hover:bg-surface rounded-lg border px-3 py-1 text-xs transition"
               @click="emit('close')"
             >
               关闭
@@ -225,7 +225,7 @@ watch(
             <footer class="flex justify-end gap-2">
               <button
                 type="button"
-                class="border-border text-muted hover:bg-muted rounded-xl border px-3 py-2 text-sm transition"
+                class="border-border text-muted hover:bg-surface rounded-xl border px-3 py-2 text-sm transition"
                 @click="emit('close')"
               >
                 取消
@@ -233,7 +233,7 @@ watch(
               <button
                 type="submit"
                 :disabled="isSubmitting"
-                class="bg-accent text-accent hover:bg-accent/90 rounded-xl px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60"
+                class="bg-accent text-ink hover:bg-accent/90 rounded-xl px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {{ isSubmitting ? loadingText : submitText }}
               </button>

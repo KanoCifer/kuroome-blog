@@ -185,7 +185,7 @@ watch(
         <p class="text-destructive">{{ errorMessage }}</p>
         <button
           @click="handleRetry"
-          class="bg-accent text-accent hover:bg-accent/90 mt-4 rounded-full px-6 py-2 text-sm font-medium"
+          class="bg-accent text-ink hover:bg-accent/90 mt-4 rounded-full px-6 py-2 text-sm font-medium"
         >
           Retry
         </button>
@@ -201,8 +201,8 @@ watch(
             class="inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors"
             :class="
               article.is_read
-                ? 'bg-muted text-ink hover:bg-muted'
-                : 'bg-accent text-accent hover:bg-accent/90'
+                ? 'bg-surface text-ink hover:bg-surface'
+                : 'bg-accent text-ink hover:bg-accent/90'
             "
           >
             <svg
@@ -256,11 +256,11 @@ watch(
           class="border-border bg-paper overflow-hidden rounded-2xl border shadow-sm"
         >
           <div class="border-border border-border border-b p-8">
-            <h1 class="text-accent mb-4 text-3xl leading-tight font-bold">
+            <h1 class="text-ink mb-4 text-3xl leading-tight font-bold">
               {{ article.title }}
             </h1>
 
-            <div class="text-accent flex flex-wrap gap-x-6 gap-y-3 text-sm">
+            <div class="text-ink flex flex-wrap gap-x-6 gap-y-3 text-sm">
               <div
                 v-if="article.author"
                 class="flex items-center gap-1.5 font-medium"
@@ -325,7 +325,7 @@ watch(
                 :href="article.link"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-accent hover:text-accent flex items-center gap-1.5 hover:underline"
+                class="text-ink hover:text-ink flex items-center gap-1.5 hover:underline"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

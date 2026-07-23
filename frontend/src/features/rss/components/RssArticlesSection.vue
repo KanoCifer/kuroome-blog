@@ -5,12 +5,12 @@
   >
     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
       <div>
-        <h2 class="text-accent text-xl font-bold">文章列表</h2>
+        <h2 class="text-ink text-xl font-bold">文章列表</h2>
         <p class="text-muted mt-1 text-sm">搜索与分页阅读已保存文章</p>
       </div>
       <button
         type="button"
-        class="bg-accent text-accent hover:bg-accent/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+        class="bg-accent text-ink hover:bg-accent/90 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
         :disabled="articlesLoading"
         @click="$emit('refresh')"
       >
@@ -36,7 +36,7 @@
         <div class="absolute inset-y-0 right-2 flex items-center gap-1">
           <button
             type="button"
-            class="text-accent hover:bg-muted rounded-md px-2 py-1 text-xs font-medium transition-colors"
+            class="text-ink hover:bg-surface rounded-md px-2 py-1 text-xs font-medium transition-colors"
             @click="$emit('search')"
           >
             搜索
@@ -44,7 +44,7 @@
           <button
             v-if="searchQuery"
             type="button"
-            class="text-accent hover:bg-muted rounded-md px-2 py-1 text-xs font-medium transition-colors"
+            class="text-ink hover:bg-surface rounded-md px-2 py-1 text-xs font-medium transition-colors"
             @click="$emit('clearSearch')"
           >
             清空
@@ -55,13 +55,13 @@
 
     <div v-if="selectedFeedUrl" class="mb-4 flex items-center gap-2">
       <span
-        class="bg-accent/15 text-accent rounded-full px-3 py-1 text-xs font-medium"
+        class="bg-accent/15 text-ink rounded-full px-3 py-1 text-xs font-medium"
       >
         当前来源: {{ selectedFeedUrl }}
       </span>
       <button
         type="button"
-        class="border-accent/30 text-accent hover:bg-muted rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors"
+        class="border-accent/30 text-ink hover:bg-surface rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors"
         @click="$emit('clearFeedFilter')"
       >
         清除筛选
@@ -79,13 +79,13 @@
       <div
         v-for="skeleton in 5"
         :key="skeleton"
-        class="border-border bg-muted/40 h-24 animate-pulse rounded-xl border"
+        class="border-border bg-surface/40 h-24 animate-pulse rounded-xl border"
       />
     </div>
 
     <div
       v-else-if="articles.length === 0"
-      class="border-border bg-muted/40 text-muted rounded-xl border border-dashed p-8 text-center text-sm"
+      class="border-border bg-surface/40 text-muted rounded-xl border border-dashed p-8 text-center text-sm"
     >
       暂无文章，尝试刷新订阅或更换搜索条件。
     </div>
@@ -101,7 +101,7 @@
             <div class="flex flex-wrap items-start justify-between gap-2">
               <router-link
                 :to="`/rss/articles/${article.id}`"
-                class="text-accent hover:text-accent text-base font-semibold transition-colors"
+                class="text-ink hover:text-ink text-base font-semibold transition-colors"
               >
                 {{ article.title || '无标题' }}
               </router-link>
@@ -110,7 +110,7 @@
                 :class="
                   article.is_read
                     ? 'bg-success/20 text-success'
-                    : 'bg-accent/15 text-accent'
+                    : 'bg-accent/15 text-ink'
                 "
               >
                 {{ article.is_read ? '已读' : '未读' }}
@@ -127,7 +127,7 @@
                 :href="article.link"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-accent hover:text-accent font-medium"
+                class="text-ink hover:text-ink font-medium"
               >
                 阅读原文
               </a>
@@ -146,8 +146,8 @@
           class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
           :class="
             currentPage > 1
-              ? 'bg-accent text-accent hover:bg-accent/90'
-              : 'bg-muted text-muted cursor-not-allowed'
+              ? 'bg-accent text-ink hover:bg-accent/90'
+              : 'bg-surface text-muted cursor-not-allowed'
           "
           @click="$emit('goToPage', currentPage - 1)"
         >
@@ -162,8 +162,8 @@
           class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
           :class="
             currentPage < totalPages
-              ? 'bg-accent text-accent hover:bg-accent/90'
-              : 'bg-muted text-muted cursor-not-allowed'
+              ? 'bg-accent text-ink hover:bg-accent/90'
+              : 'bg-surface text-muted cursor-not-allowed'
           "
           @click="$emit('goToPage', currentPage + 1)"
         >

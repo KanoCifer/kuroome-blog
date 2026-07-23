@@ -73,7 +73,7 @@ export function RouteBanner({ onClearRoute }: RouteBannerProps) {
             type="button"
             onClick={onClearRoute}
             aria-label="清除路线"
-            className="bg-muted text-muted hover:bg-muted/70 inline-flex h-7 w-7 items-center justify-center rounded-full"
+            className="bg-surface text-muted hover:bg-surface/70 inline-flex h-7 w-7 items-center justify-center rounded-full"
           >
             <X className="h-3.5 w-3.5" />
           </button>

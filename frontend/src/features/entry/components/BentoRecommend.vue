@@ -6,7 +6,7 @@
     <div class="relative z-10 flex h-full flex-col justify-between p-2">
       <!-- Icon / Logo -->
       <div
-        class="bg-muted text-ink mb-4 flex h-12 w-12 items-center justify-center rounded-full"
+        class="bg-surface text-ink mb-4 flex h-12 w-12 items-center justify-center rounded-full"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

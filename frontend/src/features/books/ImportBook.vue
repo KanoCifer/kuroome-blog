@@ -13,7 +13,7 @@
         <p class="text-muted mt-4 text-base leading-relaxed">
           在下方输入您的微信读书
           <code
-            class="bg-muted text-ink rounded px-1.5 py-0.5 font-mono text-xs"
+            class="bg-surface text-ink rounded px-1.5 py-0.5 font-mono text-xs"
             >wrk-</code
           >
           开头的 API Key，服务端会保存它用于后续书架同步
@@ -135,7 +135,7 @@
             href="https://weread.qq.com/r/weread-skills"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-accent hover:text-accent/80 mt-2 inline-flex items-center gap-1 text-xs font-medium transition-colors"
+            class="text-ink hover:text-ink/80 mt-2 inline-flex items-center gap-1 text-xs font-medium transition-colors"
           >
             还没有 API Key？
             <span class="underline underline-offset-2"
@@ -162,7 +162,7 @@
         <button
           type="submit"
           :disabled="loading"
-          class="bg-accent text-accent hover:bg-accent/90 focus:ring-accent w-full rounded-2xl px-6 py-4 text-base font-medium shadow-lg transition-all duration-300 hover:scale-[1.02] focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+          class="bg-accent text-ink hover:bg-accent/90 focus:ring-accent w-full rounded-2xl px-6 py-4 text-base font-medium shadow-lg transition-all duration-300 hover:scale-[1.02] focus:ring-2 focus:ring-offset-2 focus:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span v-if="loading" class="flex items-center justify-center gap-2">
             <span

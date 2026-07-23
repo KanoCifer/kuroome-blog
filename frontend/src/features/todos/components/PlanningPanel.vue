@@ -100,7 +100,7 @@ const TYPE_BAR_CLASS: Record<DevTaskType, string> = {
   功能需求: 'bg-warning',
   问题: 'bg-destructive',
   优化: 'bg-success',
-  技术债: 'bg-muted',
+  技术债: 'bg-surface',
 };
 
 function typeBarClass(type: DevTaskType): string {

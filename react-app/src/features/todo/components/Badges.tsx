@@ -49,7 +49,7 @@ export function PriorityBadge({ priority }: { priority: DevTaskPriority }) {
 const STATUS_CLASS: Record<DevTaskStatus, string> = {
   待评估: 'border-border text-muted',
   待排期: 'border-chart-3/40 bg-chart-3/10 text-chart-3',
-  进行中: 'border-accent/40 bg-accent/10 text-accent',
+  进行中: 'border-accent/40 bg-accent/10 text-ink',
   已搁置:
     'border-amber-300/50 bg-amber-50/60 text-amber-700 dark:border-amber-700/50 dark:bg-amber-950/20 dark:text-amber-400',
   已完成:
@@ -57,7 +57,7 @@ const STATUS_CLASS: Record<DevTaskStatus, string> = {
 };
 
 const STATUS_DOT: Record<DevTaskStatus, string> = {
-  待评估: 'bg-muted',
+  待评估: 'bg-surface',
   待排期: 'bg-chart-3',
   进行中: 'bg-accent',
   已搁置: 'bg-amber-500',
@@ -70,7 +70,7 @@ export function StatusChip({ status }: { status: DevTaskStatus }) {
       className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium ${STATUS_CLASS[status] ?? 'border-border text-muted'}`}
     >
       <span
-        className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[status] ?? 'bg-muted'}`}
+        className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[status] ?? 'bg-surface'}`}
       />
       {status}
     </span>
@@ -80,7 +80,7 @@ export function StatusChip({ status }: { status: DevTaskStatus }) {
 // ── 任务角色 chip ──
 const KIND_CLASS: Record<DevTaskKind, string> = {
   spec: 'border-border text-muted bg-warning/20',
-  subtask: 'border-accent/30 bg-accent/5 text-accent',
+  subtask: 'border-accent/30 bg-accent/5 text-ink',
 };
 
 export function KindBadge({ kind }: { kind?: DevTaskKind | '' | null }) {
@@ -106,7 +106,7 @@ export function ScopeBadge({ scope }: { scope: string }) {
 // ── slug chip ──
 export function SlugBadge({ slug }: { slug: string }) {
   return (
-    <span className="bg-accent/10 text-accent rounded-full px-1.5 py-px text-[10px] font-medium">
+    <span className="bg-accent/10 text-ink rounded-full px-1.5 py-px text-[10px] font-medium">
       {slug}
     </span>
   );

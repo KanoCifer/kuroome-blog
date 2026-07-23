@@ -150,7 +150,7 @@ const ServiceRow = (props: {
   h(
     'li',
     {
-      class: 'bg-muted/25 border-border/60 rounded-2xl border p-4 sm:p-5',
+      class: 'bg-surface/25 border-border/60 rounded-2xl border p-4 sm:p-5',
     },
     [
       h('div', { class: 'flex flex-wrap items-center gap-2' }, [
@@ -259,7 +259,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
       ]),
       h(IconExternalLink, {
         class:
-          'text-muted group-hover:text-accent h-4 w-4 shrink-0 transition-colors',
+          'text-muted group-hover:text-ink h-4 w-4 shrink-0 transition-colors',
       }),
     ],
   );
@@ -402,7 +402,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
             desc="为提供登录、主题切换、偏好记忆等必要能力，本站会在你的浏览器中写入少量持久化数据。"
           />
           <div
-            class="bg-muted/40 border-border/70 mt-5 rounded-2xl border p-5 sm:p-6"
+            class="bg-surface/40 border-border/70 mt-5 rounded-2xl border p-5 sm:p-6"
           >
             <p class="text-ink/90">
               本站不会使用任何跨站跟踪 Cookie。
@@ -416,7 +416,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
               href="https://support.google.com/chrome/answer/95647"
               target="_blank"
               rel="noopener noreferrer"
-              class="text-accent mt-4 inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
+              class="text-ink mt-4 inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
             >
               在 Chrome 中管理 Cookie
               <IconExternalLink class="h-3.5 w-3.5" />
@@ -525,7 +525,8 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
 
           <p class="text-muted mt-7 text-sm leading-relaxed">
             媒体资源（背景图、文章内图片、你上传的图片）一律由本站
-            <code class="bg-muted rounded px-1.5 py-0.5 font-mono text-[0.85em]"
+            <code
+              class="bg-surface rounded px-1.5 py-0.5 font-mono text-[0.85em]"
               >/api/v1/media/*</code
             >
             自托管分发，不接入任何第三方 CDN。
@@ -554,7 +555,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
           </p>
 
           <div
-            class="bg-muted/30 border-border/60 mt-6 overflow-hidden rounded-2xl border"
+            class="bg-surface/30 border-border/60 mt-6 overflow-hidden rounded-2xl border"
           >
             <dl class="divide-border/60 divide-y text-sm">
               <RetentionRow
@@ -674,7 +675,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
                 <strong class="text-ink/90 font-medium">AI 文章摘要</strong>
                 — 把你提交的文章正文发给阿里云 Tbox
                 LLM，返回结构化摘要。多轮对话上下文
-                <code class="bg-muted rounded px-1 font-mono text-[0.85em]"
+                <code class="bg-surface rounded px-1 font-mono text-[0.85em]"
                   >num_history_runs=10</code
                 >
                 一并发送，用于回答的连续性。
@@ -840,9 +841,7 @@ const ContactCard = (props: { label: string; value: string; href: string }) =>
               >
                 <span
                   class="font-mono text-[10px] tabular-nums"
-                  :class="
-                    activeId === item.id ? 'text-accent' : 'text-muted/60'
-                  "
+                  :class="activeId === item.id ? 'text-ink' : 'text-muted/60'"
                 >
                   {{ item.number }}
                 </span>

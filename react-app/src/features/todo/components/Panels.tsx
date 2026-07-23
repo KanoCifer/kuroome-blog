@@ -177,7 +177,7 @@ export function PlanningPanel({ onOpen, onDelete }: PanelEmit) {
   return (
     <div className="space-y-4">
       <div
-        className="bg-muted flex flex-wrap items-center gap-2 rounded-xl px-4 py-3"
+        className="bg-surface flex flex-wrap items-center gap-2 rounded-xl px-4 py-3"
         role="group"
         aria-label="筛选条件"
       >
@@ -191,7 +191,7 @@ export function PlanningPanel({ onOpen, onDelete }: PanelEmit) {
             onClick={() => toggle('type', t)}
             className={`rounded-full border px-2.5 py-0.5 text-xs transition-colors ${
               filterType.has(t)
-                ? 'border-accent/40 bg-accent/10 text-accent'
+                ? 'border-accent/40 bg-accent/10 text-ink'
                 : 'border-border text-muted hover:text-ink'
             }`}
           >
@@ -211,7 +211,7 @@ export function PlanningPanel({ onOpen, onDelete }: PanelEmit) {
             onClick={() => toggle('priority', p)}
             className={`rounded-full border px-2.5 py-0.5 text-xs transition-colors ${
               filterPriority.has(p)
-                ? 'border-accent/40 bg-accent/10 text-accent'
+                ? 'border-accent/40 bg-accent/10 text-ink'
                 : 'border-border text-muted hover:text-ink'
             }`}
           >
@@ -226,7 +226,7 @@ export function PlanningPanel({ onOpen, onDelete }: PanelEmit) {
 
       {/* table */}
       <div className="border-border overflow-hidden rounded-xl border">
-        <div className="text-muted bg-muted border-border grid grid-cols-[1fr_80px_32px] gap-4 border-b px-4 py-2.5 text-[10px] font-medium tracking-widest uppercase sm:grid-cols-[2fr_1fr_1fr_1fr_100px_32px]">
+        <div className="text-muted bg-surface border-border grid grid-cols-[1fr_80px_32px] gap-4 border-b px-4 py-2.5 text-[10px] font-medium tracking-widest uppercase sm:grid-cols-[2fr_1fr_1fr_1fr_100px_32px]">
           <span>标题</span>
           <span className="max-sm:hidden">类型</span>
           <span className="max-sm:hidden">优先级</span>
@@ -244,7 +244,7 @@ export function PlanningPanel({ onOpen, onDelete }: PanelEmit) {
             onKeyDown={(e) => {
               if (e.key === 'Enter') onOpen(task.slug);
             }}
-            className="hover:bg-muted/40 border-border grid cursor-pointer grid-cols-[1fr_80px_32px] items-center gap-4 border-t px-4 py-2.5 transition-colors sm:grid-cols-[2fr_1fr_1fr_1fr_100px_32px]"
+            className="hover:bg-surface/40 border-border grid cursor-pointer grid-cols-[1fr_80px_32px] items-center gap-4 border-t px-4 py-2.5 transition-colors sm:grid-cols-[2fr_1fr_1fr_1fr_100px_32px]"
           >
             <span className="text-ink truncate text-sm font-medium">
               {task.title}
@@ -393,7 +393,7 @@ export function ReviewPanel({ onOpen }: Pick<PanelEmit, 'onOpen'>) {
           {distributionRows.map((row) => (
             <div key={row.type} className="flex items-center gap-3">
               <span className="text-ink w-16 shrink-0 text-sm">{row.type}</span>
-              <div className="bg-muted h-2 flex-1 overflow-hidden rounded-full">
+              <div className="bg-surface h-2 flex-1 overflow-hidden rounded-full">
                 <div
                   className="h-full rounded-full transition-transform duration-400"
                   style={{

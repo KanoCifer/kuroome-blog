@@ -69,7 +69,7 @@ const visible = computed(() => hasData.value);
       <p class="text-muted mb-4 text-sm">
         {{ readListenSubtitle }}
       </p>
-      <div class="bg-muted flex h-2 overflow-hidden rounded-full">
+      <div class="bg-surface flex h-2 overflow-hidden rounded-full">
         <div
           class="bg-accent h-full transition-all duration-700"
           :style="{ width: `${readPercent}%` }"

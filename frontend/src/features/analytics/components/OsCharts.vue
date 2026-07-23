@@ -6,7 +6,7 @@
     <p class="text-muted mb-3 text-xs">按操作系统分类的访问占比</p>
     <div
       v-if="loading && !hasOsData"
-      class="bg-muted h-56 animate-pulse rounded-xl"
+      class="bg-surface h-56 animate-pulse rounded-xl"
     ></div>
     <div
       v-else-if="!hasOsData"

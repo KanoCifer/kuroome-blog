@@ -31,7 +31,10 @@ const isDone = computed(() => clamped.value >= 100);
 <template>
   <div class="flex w-full flex-col gap-2">
     <!-- 头部：左侧标题，右侧百分比 -->
-    <div v-if="showLabel || $slots.label" class="flex items-center justify-between text-xs">
+    <div
+      v-if="showLabel || $slots.label"
+      class="flex items-center justify-between text-xs"
+    >
       <span class="text-muted font-medium">
         <slot name="label">上传进度</slot>
       </span>
@@ -41,7 +44,7 @@ const isDone = computed(() => clamped.value >= 100);
     <!-- 进度条轨道 -->
     <div
       :class="[
-        'bg-muted relative w-full overflow-hidden rounded-full',
+        'bg-surface relative w-full overflow-hidden rounded-full',
         height,
       ]"
       role="progressbar"

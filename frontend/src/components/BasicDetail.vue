@@ -103,7 +103,7 @@
         <button
           type="button"
           :aria-label="onBack ? '返回' : '返回上一页'"
-          class="bg-accent text-accent hover:bg-accent/90 focus-visible:ring-ring inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium shadow-sm transition-[background-color,transform,box-shadow] duration-300 hover:scale-[1.02] hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.96]"
+          class="bg-accent text-ink hover:bg-accent/90 focus-visible:ring-ring inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium shadow-sm transition-[background-color,transform,box-shadow] duration-300 hover:scale-[1.02] hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.96]"
           @click="onBack === undefined ? $router.back() : onBack()"
         >
           <svg

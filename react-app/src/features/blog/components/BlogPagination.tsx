@@ -41,7 +41,7 @@ export function BlogPagination({
             onClick={() => onPageChange(pagination.prev_num || 1)}
             className={`focus-visible:ring-ring inline-flex h-10 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${
               pagination.has_prev
-                ? 'text-muted hover:bg-muted hover:text-ink'
+                ? 'text-muted hover:bg-surface hover:text-ink'
                 : 'text-muted/50 cursor-not-allowed'
             }`}
           >
@@ -58,8 +58,8 @@ export function BlogPagination({
                 onClick={() => onPageChange(p)}
                 className={`focus-visible:ring-ring inline-flex h-10 min-w-10 items-center justify-center rounded-xl px-3 text-sm font-semibold transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${
                   p === currentPage
-                    ? 'bg-accent text-accent'
-                    : 'text-muted hover:bg-muted hover:text-ink'
+                    ? 'bg-accent text-ink'
+                    : 'text-muted hover:bg-surface hover:text-ink'
                 }`}
               >
                 {p}
@@ -81,7 +81,7 @@ export function BlogPagination({
             }
             className={`focus-visible:ring-ring inline-flex h-10 items-center gap-1.5 rounded-xl px-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none ${
               pagination.has_next
-                ? 'text-muted hover:bg-muted hover:text-ink'
+                ? 'text-muted hover:bg-surface hover:text-ink'
                 : 'text-muted/50 cursor-not-allowed'
             }`}
           >

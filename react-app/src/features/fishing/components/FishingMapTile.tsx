@@ -86,7 +86,7 @@ export function FishingMapTile({
         onClick={() => void retryLocate()}
       >
         {isLocating ? (
-          <Loader2 className="text-accent h-4 w-4 animate-spin" />
+          <Loader2 className="text-ink h-4 w-4 animate-spin" />
         ) : (
           <Locate className="h-4 w-4" />
         )}
