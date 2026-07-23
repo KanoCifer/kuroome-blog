@@ -89,14 +89,14 @@ func (h *FishHandler) DeleteFishingSpot(c *gin.Context) {
 }
 
 // RegisterRoutes 在 r 下挂载钓点路由。
-// GET 公开（列表 / 详情）加 1h 缓存；POST / PATCH / DELETE 需 admin 中间件保护。
-func (h *FishHandler) RegisterRoutes(r *gin.RouterGroup, adminMW gin.HandlerFunc) {
+// GET 公开（列表 / 详情）加 1h 缓存；POST / PATCH / DELETE 需 auth + admin 中间件保护。
+func (h *FishHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFunc, adminMW gin.HandlerFunc) {
 	cacheH1 := middleware.CacheController("public, max-age=3600")
 
 	f := r.Group("/fish")
 	f.GET("/spots", cacheH1, h.GetFishingSpotsList)
 	f.GET("/spots/:id", cacheH1, h.GetFishingSpot)
-	f.POST("/spots", adminMW, h.CreateFishingSpot)
-	f.PATCH("/spots/:id", adminMW, h.UpdateFishingSpot)
-	f.DELETE("/spots/:id", adminMW, h.DeleteFishingSpot)
+	f.POST("/spots", authMW, adminMW, h.CreateFishingSpot)
+	f.PATCH("/spots/:id", authMW, adminMW, h.UpdateFishingSpot)
+	f.DELETE("/spots/:id", authMW, adminMW, h.DeleteFishingSpot)
 }

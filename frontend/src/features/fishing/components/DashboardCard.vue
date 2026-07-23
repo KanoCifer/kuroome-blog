@@ -31,7 +31,7 @@ const motionMap = {
   <component
     :is="motionMap[as]"
     :transition="EASE"
-    class="group fishing-card bg-page relative flex h-full flex-col overflow-hidden rounded-3xl border shadow-sm"
+    class="group fishing-card bg-card relative flex h-full flex-col overflow-hidden rounded-3xl border shadow-sm"
     :class="[
       tone === 'hero' && 'shadow-md',
       interactive && 'fishing-card--interactive cursor-pointer',

@@ -58,6 +58,39 @@ const selectedHarborName = computed(() => {
   return opt?.name ?? '选择港口';
 });
 
+/**
+ * 当前潮向:拿逐时曲线里「现在」所处点与下一点比高度,得涨/落/平。
+ * 纯展示,失败时返回 null 不影响任何交互。
+ */
+const tideTrend = computed<'rising' | 'falling' | 'slack' | null>(() => {
+  const hourly = tideData.value?.tideHourly;
+  if (!hourly || hourly.length < 2) return null;
+  const now = dayjs();
+  let idx = -1;
+  hourly.forEach((point, i) => {
+    if (!dayjs(point.fxTime).isAfter(now)) idx = i;
+  });
+  if (idx < 0) idx = 0;
+  const next = hourly[Math.min(idx + 1, hourly.length - 1)];
+  const cur = hourly[idx];
+  const delta = Number(next.height) - Number(cur.height);
+  if (Math.abs(delta) < 0.03) return 'slack';
+  return delta > 0 ? 'rising' : 'falling';
+});
+
+const trendLabel = computed(() => {
+  switch (tideTrend.value) {
+    case 'rising':
+      return '涨潮';
+    case 'falling':
+      return '落潮';
+    case 'slack':
+      return '平潮';
+    default:
+      return '';
+  }
+});
+
 /** 选完之后立刻关闭 dropdown — slot 暴露的 close() 在两个 picker 都要 */
 function pickHarbor(code: string, close: () => void) {
   selectedHarbor.value = code;
@@ -288,11 +321,19 @@ onMounted(() => {
 <template>
   <DashboardCard>
     <!-- Header -->
-    <div class="mb-4 flex items-start justify-between gap-2">
+    <div class="mb-1 flex items-start justify-between gap-2">
       <div class="min-w-0">
-        <h3 class="text-ink text-lg font-semibold tracking-tight">潮汐预报</h3>
-        <p class="text-muted mt-0.5 truncate text-sm">
-          {{ tideSpotName }} · {{ todayStr }}
+        <h3 class="text-ink font-serif text-lg font-semibold tracking-tight">
+          潮汐预报
+        </h3>
+        <p class="text-muted mt-1 flex items-center gap-1.5 truncate text-sm">
+          <span class="truncate">{{ tideSpotName }} · {{ todayStr }}</span>
+          <span
+            v-if="trendLabel"
+            class="text-accent inline-flex shrink-0 items-center gap-0.5 text-xs font-medium"
+          >
+            <span aria-hidden="true">·</span>{{ trendLabel }}
+          </span>
         </p>
       </div>
       <div class="flex shrink-0 items-center gap-1.5">
@@ -383,38 +424,86 @@ onMounted(() => {
       <span class="text-muted mt-3 text-sm">获取潮汐数据...</span>
     </div>
 
-    <!-- Chart -->
-    <div v-else-if="tideData">
-      <v-chart
-        :option="tideOptions"
-        style="width: 100%; height: 240px"
-        autoresize
+    <!-- 数据 -->
+    <div v-else-if="tideData" class="mt-3 flex flex-1 flex-col">
+      <!-- 潮汐历读数:满潮 | 干潮,两列排印 + 印刷竖线,不套卡片 -->
+      <div
+        class="grid grid-cols-[1fr_auto_1fr] content-center items-center gap-x-5"
+      >
+        <!-- 满潮 -->
+        <div class="min-w-0">
+          <div class="flex items-baseline justify-between gap-2">
+            <span
+              class="text-muted inline-flex items-center gap-1.5 text-xs font-medium tracking-wide"
+            >
+              <span class="bg-warning h-1.5 w-1.5 rounded-full" aria-hidden />
+              满潮
+            </span>
+            <span class="text-muted text-xs tabular-nums">
+              {{ highTide?.time ?? '--:--' }}
+            </span>
+          </div>
+          <p
+            class="text-ink mt-1.5 text-xl leading-none font-semibold tabular-nums"
+          >
+            {{ highTide ? highTide.height.toFixed(2) : '--'
+            }}<span class="text-muted ml-1 font-sans text-base font-normal"
+              >m</span
+            >
+          </p>
+        </div>
+
+        <!-- 印刷竖线分隔:非卡片,纯排印分割 -->
+        <div
+          class="my-1 w-px self-stretch"
+          :style="{
+            backgroundImage:
+              'repeating-linear-gradient(to bottom, var(--color-border) 0 3px, transparent 3px 7px)',
+          }"
+          aria-hidden="true"
+        />
+
+        <!-- 干潮 -->
+        <div class="min-w-0">
+          <div class="flex items-baseline justify-between gap-2">
+            <span
+              class="text-muted inline-flex items-center gap-1.5 text-xs font-medium tracking-wide"
+            >
+              <span class="bg-accent h-1.5 w-1.5 rounded-full" aria-hidden />
+              干潮
+            </span>
+            <span class="text-muted text-xs tabular-nums">
+              {{ lowTide?.time ?? '--:--' }}
+            </span>
+          </div>
+          <p
+            class="text-ink mt-1.5 text-xl leading-none font-semibold tabular-nums"
+          >
+            {{ lowTide ? lowTide.height.toFixed(2) : '--'
+            }}<span class="text-muted ml-1 font-sans text-base font-normal"
+              >m</span
+            >
+          </p>
+        </div>
+      </div>
+
+      <!-- 印刷横线:把读数与水墨潮汐带分开 -->
+      <div
+        class="my-1 h-px w-full shrink-0"
+        :style="{
+          backgroundImage:
+            'repeating-linear-gradient(to right, var(--color-border) 0 4px, transparent 4px 8px)',
+        }"
+        aria-hidden="true"
       />
 
-      <div class="mt-3 grid grid-cols-2 gap-3">
-        <div class="bg-warning/10 border-warning/20 rounded-xl border p-3">
-          <div class="flex items-baseline justify-between gap-2">
-            <p class="text-warning text-xs font-medium">最高潮</p>
-            <p class="text-muted text-xs tabular-nums">
-              {{ highTide?.time ?? '--:--' }}
-            </p>
-          </div>
-          <p class="text-ink mt-1 text-base font-semibold tabular-nums">
-            {{ highTide ? highTide.height.toFixed(2) : '--' }} m
-          </p>
-        </div>
-
-        <div class="bg-accent/10 border-accent/20 rounded-xl border p-3">
-          <div class="flex items-baseline justify-between gap-2">
-            <p class="text-ink text-xs font-medium">最低潮</p>
-            <p class="text-muted text-xs tabular-nums">
-              {{ lowTide?.time ?? '--:--' }}
-            </p>
-          </div>
-          <p class="text-ink mt-1 text-base font-semibold tabular-nums">
-            {{ lowTide ? lowTide.height.toFixed(2) : '--' }} m
-          </p>
-        </div>
+      <!-- 水墨潮汐带:flex-1 与读数区平均分配剩余高度 -->
+      <div class="h-full min-h-[160px] flex-1">
+        <v-chart
+          :option="tideOptions"
+          style="width: 100%; height: 100%"
+          autoresize
+        />
       </div>
     </div>
 
