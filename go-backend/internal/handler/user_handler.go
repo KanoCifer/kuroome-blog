@@ -12,6 +12,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
+	"github.com/KanoCifer/kuroome-blog/internal/util"
 )
 
 type Userer interface {
@@ -64,7 +65,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 	slog.InfoContext(c.Request.Context(), "user login", "user_id", user.ID)
 
 	// 写入 refresh_token cookie（与 Python 端一致），供前端静默刷新。
-	setRefreshCookie(c, h.cfg, tokens.RefreshToken)
+	util.SetRefreshCookie(c, h.cfg, tokens.RefreshToken)
 
 	// 用户字段铺平到 data 顶层（与 Python 端 user_to_dict 形状一致）。
 	userData := h.userSvc.UserToDict(user, user.Profile)
@@ -136,7 +137,7 @@ func (h *UserHandler) Logout(c *gin.Context) {
 
 	h.userSvc.Logout(c.Request.Context(), uint(c.GetInt("user_id")))
 	// 清除 refresh_token cookie（与 Python 端一致）。
-	clearRefreshCookie(c, h.cfg)
+	util.ClearRefreshCookie(c, h.cfg)
 	response.Success(c, nil, "已退出登录")
 }
 
@@ -166,7 +167,7 @@ func (h *UserHandler) RefreshToken(c *gin.Context) {
 	}
 
 	// 轮换 refresh cookie（与 Python 端一致）。
-	setRefreshCookie(c, h.cfg, tokens.RefreshToken)
+	util.SetRefreshCookie(c, h.cfg, tokens.RefreshToken)
 
 	response.Success(c, gin.H{
 		"access_token":  tokens.AccessToken,

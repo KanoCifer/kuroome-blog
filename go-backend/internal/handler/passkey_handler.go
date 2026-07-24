@@ -12,6 +12,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
+	"github.com/KanoCifer/kuroome-blog/internal/util"
 )
 
 // PasskeyServiceer 定义 handler 依赖的 Passkey 业务接口。
@@ -124,7 +125,7 @@ func (h *PasskeyHandler) Authenticate(c *gin.Context) {
 	slog.InfoContext(c.Request.Context(), "passkey login", "user_id", user.ID)
 
 	// 写入 refresh_token cookie（与 Python 端一致）。
-	setRefreshCookie(c, h.cfg, tokens.RefreshToken)
+	util.SetRefreshCookie(c, h.cfg, tokens.RefreshToken)
 
 	// 用户字段铺平到 data 顶层（与 Python 端 user_to_dict 形状一致）。
 	userData := h.userSvc.UserToDict(user, user.Profile)

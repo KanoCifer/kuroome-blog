@@ -13,6 +13,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
+	"github.com/KanoCifer/kuroome-blog/internal/util"
 )
 
 // GitHubOAuthServiceer 定义 handler 依赖的 GitHub OAuth 业务接口。
@@ -95,7 +96,7 @@ func (h *GitHubHandler) Callback(c *gin.Context) {
 			tokens.RefreshToken,
 			7*24*3600,
 			"/",
-			cookieDomain(h.cfg),
+			util.CookieDomain(h.cfg),
 			true, // secure
 			true, // httponly
 		)
