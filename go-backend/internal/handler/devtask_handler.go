@@ -180,7 +180,7 @@ func (h *DevTaskHandler) BatchStatus(c *gin.Context) {
 		response.APIError(c, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	response.Success(c, dto.BatchStatusResult{
+	response.Success(c, dto.BatchStatusResponse{
 		Succeeded: result.Succeeded,
 		Failed:    result.Failed,
 	}, "Batch status update completed")

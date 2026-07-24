@@ -25,28 +25,28 @@ func init() {
 // ---------- mock DevTaskService ----------
 
 type mockDevTaskService struct {
-	createFn       func(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error)
-	getBySlugFn    func(ctx context.Context, slug string, withParent bool) (*dto.DevTaskOut, error)
-	listFn         func(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListOut, error)
+	createFn       func(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskResponse, error)
+	getBySlugFn    func(ctx context.Context, slug string, withParent bool) (*dto.DevTaskResponse, error)
+	listFn         func(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListResponse, error)
 	updateFn       func(ctx context.Context, slug string, req dto.DevTaskUpdate) error
 	softDelFn      func(ctx context.Context, slug string) error
 	hardDelFn      func(ctx context.Context, slug string) error
-	findFrontierFn func(ctx context.Context, limit int) ([]dto.DevTaskOut, error)
+	findFrontierFn func(ctx context.Context, limit int) ([]dto.DevTaskResponse, error)
 	batchStatusFn  func(ctx context.Context, slugs []string, status document.DevTaskStatus) (*service.BatchStatusResult, error)
 }
 
-func (m *mockDevTaskService) Create(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error) {
+func (m *mockDevTaskService) Create(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskResponse, error) {
 	return m.createFn(ctx, userID, req)
 }
 
-func (m *mockDevTaskService) GetBySlug(ctx context.Context, slug string, withParent bool) (*dto.DevTaskOut, error) {
+func (m *mockDevTaskService) GetBySlug(ctx context.Context, slug string, withParent bool) (*dto.DevTaskResponse, error) {
 	if m.getBySlugFn != nil {
 		return m.getBySlugFn(ctx, slug, withParent)
 	}
 	return nil, nil
 }
 
-func (m *mockDevTaskService) List(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListOut, error) {
+func (m *mockDevTaskService) List(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListResponse, error) {
 	return m.listFn(ctx, filter, page, perPage)
 }
 
@@ -62,7 +62,7 @@ func (m *mockDevTaskService) HardDelete(ctx context.Context, slug string) error 
 	return m.hardDelFn(ctx, slug)
 }
 
-func (m *mockDevTaskService) FindFrontier(ctx context.Context, limit int) ([]dto.DevTaskOut, error) {
+func (m *mockDevTaskService) FindFrontier(ctx context.Context, limit int) ([]dto.DevTaskResponse, error) {
 	if m.findFrontierFn != nil {
 		return m.findFrontierFn(ctx, limit)
 	}
@@ -112,8 +112,8 @@ func decodeResp(t *testing.T, body []byte) (data map[string]any, message string)
 
 func TestDevTask_CreateTask_Success(t *testing.T) {
 	svc := &mockDevTaskService{
-		createFn: func(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error) {
-			return &dto.DevTaskOut{Slug: "task-1", Title: req.Title}, nil
+		createFn: func(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskResponse, error) {
+			return &dto.DevTaskResponse{Slug: "task-1", Title: req.Title}, nil
 		},
 	}
 	r := newDevTaskHandler(svc)
@@ -137,7 +137,7 @@ func TestDevTask_CreateTask_Success(t *testing.T) {
 
 func TestDevTask_CreateTask_Error(t *testing.T) {
 	svc := &mockDevTaskService{
-		createFn: func(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error) {
+		createFn: func(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskResponse, error) {
 			return nil, errors.New("db error")
 		},
 	}
@@ -173,11 +173,11 @@ func TestDevTask_CreateTask_InvalidBody(t *testing.T) {
 
 func TestDevTask_ListTasks_DefaultPagination(t *testing.T) {
 	svc := &mockDevTaskService{
-		listFn: func(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListOut, error) {
+		listFn: func(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListResponse, error) {
 			if page != 1 || perPage != 10 {
 				t.Errorf("page=%d perPage=%d, want (1,10)", page, perPage)
 			}
-			return &dto.DevTaskListOut{Tasks: []dto.DevTaskOut{}, Pagination: dto.Pagination{Total: 0}}, nil
+			return &dto.DevTaskListResponse{Tasks: []dto.DevTaskResponse{}, Pagination: dto.Pagination{Total: 0}}, nil
 		},
 	}
 	r := newDevTaskHandler(svc)
@@ -192,11 +192,11 @@ func TestDevTask_ListTasks_DefaultPagination(t *testing.T) {
 
 func TestDevTask_ListTasks_CustomPagination(t *testing.T) {
 	svc := &mockDevTaskService{
-		listFn: func(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListOut, error) {
+		listFn: func(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListResponse, error) {
 			if page != 2 || perPage != 20 {
 				t.Errorf("page=%d perPage=%d, want (2,20)", page, perPage)
 			}
-			return &dto.DevTaskListOut{Tasks: []dto.DevTaskOut{}, Pagination: dto.Pagination{Total: 0}}, nil
+			return &dto.DevTaskListResponse{Tasks: []dto.DevTaskResponse{}, Pagination: dto.Pagination{Total: 0}}, nil
 		},
 	}
 	r := newDevTaskHandler(svc)
@@ -211,14 +211,14 @@ func TestDevTask_ListTasks_CustomPagination(t *testing.T) {
 
 func TestDevTask_ListTasks_Filter(t *testing.T) {
 	svc := &mockDevTaskService{
-		listFn: func(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListOut, error) {
+		listFn: func(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListResponse, error) {
 			if filter.Status != "已完成" {
 				t.Errorf("filter.Status = %q, want 已完成", filter.Status)
 			}
 			if filter.Priority != "P1 高" {
 				t.Errorf("filter.Priority = %q, want P1 高", filter.Priority)
 			}
-			return &dto.DevTaskListOut{Tasks: []dto.DevTaskOut{}, Pagination: dto.Pagination{Total: 0}}, nil
+			return &dto.DevTaskListResponse{Tasks: []dto.DevTaskResponse{}, Pagination: dto.Pagination{Total: 0}}, nil
 		},
 	}
 	r := newDevTaskHandler(svc)
@@ -233,7 +233,7 @@ func TestDevTask_ListTasks_Filter(t *testing.T) {
 
 func TestDevTask_ListTasks_ServerError(t *testing.T) {
 	svc := &mockDevTaskService{
-		listFn: func(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListOut, error) {
+		listFn: func(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListResponse, error) {
 			return nil, errors.New("boom")
 		},
 	}
@@ -251,8 +251,8 @@ func TestDevTask_ListTasks_ServerError(t *testing.T) {
 
 func TestDevTask_GetTaskBySlug_Success(t *testing.T) {
 	svc := &mockDevTaskService{
-		getBySlugFn: func(ctx context.Context, slug string, withParent bool) (*dto.DevTaskOut, error) {
-			return &dto.DevTaskOut{Slug: slug, Title: "test"}, nil
+		getBySlugFn: func(ctx context.Context, slug string, withParent bool) (*dto.DevTaskResponse, error) {
+			return &dto.DevTaskResponse{Slug: slug, Title: "test"}, nil
 		},
 	}
 	r := newDevTaskHandler(svc)
@@ -271,7 +271,7 @@ func TestDevTask_GetTaskBySlug_Success(t *testing.T) {
 
 func TestDevTask_GetTaskBySlug_NotFound(t *testing.T) {
 	svc := &mockDevTaskService{
-		getBySlugFn: func(ctx context.Context, slug string, withParent bool) (*dto.DevTaskOut, error) {
+		getBySlugFn: func(ctx context.Context, slug string, withParent bool) (*dto.DevTaskResponse, error) {
 			return nil, errs.ErrTaskNotFound
 		},
 	}
@@ -339,8 +339,8 @@ func TestDevTask_HardDelete_Success(t *testing.T) {
 
 func TestDevTask_FrontierTasks_Success(t *testing.T) {
 	svc := &mockDevTaskService{
-		findFrontierFn: func(ctx context.Context, limit int) ([]dto.DevTaskOut, error) {
-			return []dto.DevTaskOut{{Slug: "frontier-1"}}, nil
+		findFrontierFn: func(ctx context.Context, limit int) ([]dto.DevTaskResponse, error) {
+			return []dto.DevTaskResponse{{Slug: "frontier-1"}}, nil
 		},
 	}
 	r := newDevTaskHandler(svc)

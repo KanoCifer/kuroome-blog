@@ -56,8 +56,8 @@ type DevTaskUpdate struct {
 	ParentSlug *string `json:"parent_slug"`
 }
 
-// DevTaskOut 任务输出
-type DevTaskOut struct {
+// DevTaskResponse 任务输出
+type DevTaskResponse struct {
 	ID          string                   `json:"id"`
 	UserID      int                      `json:"user_id"`
 	Title       string                   `json:"title"`
@@ -87,7 +87,7 @@ type DevTaskOut struct {
 	ParentSlug *string `json:"parent_slug,omitempty"`
 	// Parent: 当 ParentSlug 存在时，附带父 spec 的数据。omitempty = 子任务/
 	//         无父任务时无该字段。自引用结构，便于前端一次拿到上下文。
-	Parent *DevTaskOut `json:"parent,omitempty"`
+	Parent *DevTaskResponse `json:"parent,omitempty"`
 }
 
 // BatchStatusRequest 批量修改任务状态请求
@@ -98,8 +98,8 @@ type BatchStatusRequest struct {
 	Status document.DevTaskStatus `json:"status" binding:"required"`
 }
 
-// BatchStatusResult 批量修改任务状态响应
-type BatchStatusResult struct {
+// BatchStatusResponse 批量修改任务状态响应
+type BatchStatusResponse struct {
 	// Succeeded 已更新状态的任务 slug 列表。
 	Succeeded []string `json:"succeeded"`
 	// Failed 失败的任务 slug → 原因。
@@ -116,15 +116,15 @@ type DevTaskFilter struct {
 	ForAgent       *bool  `json:"for_agent,omitempty"`
 }
 
-// DevTaskListOut 任务列表响应
-type DevTaskListOut struct {
-	Tasks      []DevTaskOut `json:"tasks"`
-	Pagination Pagination   `json:"pagination"`
+// DevTaskListResponse 任务列表响应
+type DevTaskListResponse struct {
+	Tasks      []DevTaskResponse `json:"tasks"`
+	Pagination Pagination        `json:"pagination"`
 }
 
-// ToDevTaskOut 从 document.DevTask 转换为 DTO
-func ToDevTaskOut(t document.DevTask) DevTaskOut {
-	return DevTaskOut{
+// ToDevTaskResponse 从 document.DevTask 转换为 DTO
+func ToDevTaskResponse(t document.DevTask) DevTaskResponse {
+	return DevTaskResponse{
 		ID:                 t.ID,
 		UserID:             t.UserID,
 		Title:              t.Title,
@@ -151,10 +151,10 @@ func ToDevTaskOut(t document.DevTask) DevTaskOut {
 }
 
 // ToDevTaskList 批量转换
-func ToDevTaskList(tasks []document.DevTask) []DevTaskOut {
-	out := make([]DevTaskOut, 0, len(tasks))
+func ToDevTaskList(tasks []document.DevTask) []DevTaskResponse {
+	out := make([]DevTaskResponse, 0, len(tasks))
 	for _, t := range tasks {
-		out = append(out, ToDevTaskOut(t))
+		out = append(out, ToDevTaskResponse(t))
 	}
 	return out
 }

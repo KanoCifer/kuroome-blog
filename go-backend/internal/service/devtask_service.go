@@ -19,14 +19,14 @@ import (
 // DevTaskServiceer devtask 读表面 —— handler 依赖接口，便于 mock 测试。
 // 所有接口一律使用 slug 作为任务标识，不暴露 ObjectID。
 type DevTasker interface {
-	Create(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error)
-	GetBySlug(ctx context.Context, slug string, withParent bool) (*dto.DevTaskOut, error)
-	List(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListOut, error)
+	Create(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskResponse, error)
+	GetBySlug(ctx context.Context, slug string, withParent bool) (*dto.DevTaskResponse, error)
+	List(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListResponse, error)
 	Update(ctx context.Context, slug string, req dto.DevTaskUpdate) error
 	BatchUpdateStatus(ctx context.Context, slugs []string, status document.DevTaskStatus) (*BatchStatusResult, error)
 	SoftDelete(ctx context.Context, slug string) error
 	HardDelete(ctx context.Context, slug string) error
-	FindFrontier(ctx context.Context, limit int) ([]dto.DevTaskOut, error)
+	FindFrontier(ctx context.Context, limit int) ([]dto.DevTaskResponse, error)
 }
 
 // DevTaskRepositoryer devtask 持久层接口 —— service 依赖接口，便于 mock 测试。
@@ -63,8 +63,8 @@ func blockedByOrEmpty(s []string) []string {
 }
 
 // serializeTask 将文档转为输出 DTO。
-func serializeTask(t document.DevTask) dto.DevTaskOut {
-	return dto.DevTaskOut{
+func serializeTask(t document.DevTask) dto.DevTaskResponse {
+	return dto.DevTaskResponse{
 		ID:                 t.ID,
 		UserID:             t.UserID,
 		Title:              t.Title,
@@ -91,11 +91,11 @@ func serializeTask(t document.DevTask) dto.DevTaskOut {
 }
 
 // serializeTasks 批量序列化，nil/空切片统一为空数组。
-func serializeTasks(tasks []document.DevTask) []dto.DevTaskOut {
+func serializeTasks(tasks []document.DevTask) []dto.DevTaskResponse {
 	if len(tasks) == 0 {
-		return []dto.DevTaskOut{}
+		return []dto.DevTaskResponse{}
 	}
-	out := make([]dto.DevTaskOut, 0, len(tasks))
+	out := make([]dto.DevTaskResponse, 0, len(tasks))
 	for _, t := range tasks {
 		out = append(out, serializeTask(t))
 	}
@@ -103,7 +103,7 @@ func serializeTasks(tasks []document.DevTask) []dto.DevTaskOut {
 }
 
 // Create 创建任务。
-func (s *DevTaskService) Create(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskOut, error) {
+func (s *DevTaskService) Create(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskResponse, error) {
 	// 自增生成 slug —— counters 集合单文档 $inc 保证原子性，并发安全。
 	seq, err := s.repo.NextSlugSeq(ctx)
 	if err != nil {
@@ -170,7 +170,7 @@ func (s *DevTaskService) List(
 	ctx context.Context,
 	filter dto.DevTaskFilter,
 	page, perPage int,
-) (*dto.DevTaskListOut, error) {
+) (*dto.DevTaskListResponse, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -184,7 +184,7 @@ func (s *DevTaskService) List(
 		return nil, err
 	}
 
-	return &dto.DevTaskListOut{
+	return &dto.DevTaskListResponse{
 		Tasks:      serializeTasks(tasks),
 		Pagination: pagination(page, perPage, int(total)),
 	}, nil
@@ -341,7 +341,7 @@ func (s *DevTaskService) ArchiveDoneTasks(ctx context.Context) (int64, error) {
 // withParent=true 且任务有 parent_slug 时，额外附带父 spec 的 DevTaskOut 到
 // Parent 字段，便于前端一次拿到子任务 + spec 上下文；父任务不存在仅 warn
 // 不阻塞返回。withParent=false 跳过第二次查询。
-func (s *DevTaskService) GetBySlug(ctx context.Context, slug string, withParent bool) (*dto.DevTaskOut, error) {
+func (s *DevTaskService) GetBySlug(ctx context.Context, slug string, withParent bool) (*dto.DevTaskResponse, error) {
 	if slug == "" {
 		return nil, errs.ErrTaskNotFound
 	}
@@ -370,7 +370,7 @@ func (s *DevTaskService) GetBySlug(ctx context.Context, slug string, withParent 
 
 // FindFrontier 返回 agent 当前可认领的任务列表 —— Pocock 的 frontier 概念。
 // = for_agent=true + status=待排期 + blocked_by=空 + is_deleted=false，按当前排序规则。
-func (s *DevTaskService) FindFrontier(ctx context.Context, limit int) ([]dto.DevTaskOut, error) {
+func (s *DevTaskService) FindFrontier(ctx context.Context, limit int) ([]dto.DevTaskResponse, error) {
 	if limit < 1 {
 		limit = 10
 	}
