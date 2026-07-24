@@ -27,7 +27,7 @@ type mockMonitorService struct {
 	visitorsFn        func(ctx context.Context, days, page, pageSize int) (dto.Visitors, error)
 	userLoginsFn      func(ctx context.Context, days, page, pageSize int) (dto.UserLogins, error)
 	serverStatusFn    func() (dto.ServerStatus, error)
-	trackVisitorFn    func(ctx context.Context, data dto.VisitorData) error
+	trackVisitorFn    func(ctx context.Context, data dto.VisitorResponse) error
 	getStatusDetailFn func(ctx context.Context) (dto.StatusDetail, error)
 }
 
@@ -57,7 +57,7 @@ func (m *mockMonitorService) GetStatusDetail(ctx context.Context) (dto.StatusDet
 	return dto.StatusDetail{}, nil
 }
 
-func (m *mockMonitorService) TrackVisitor(ctx context.Context, data dto.VisitorData) error {
+func (m *mockMonitorService) TrackVisitor(ctx context.Context, data dto.VisitorResponse) error {
 	if m.trackVisitorFn != nil {
 		return m.trackVisitorFn(ctx, data)
 	}
@@ -338,7 +338,7 @@ func TestTrackVisitor_Disabled(t *testing.T) {
 func TestTrackVisitor_Success(t *testing.T) {
 	config.Cfg = &config.Config{Admin: config.AdminConfig{EnableTracking: true}}
 	svc := &mockMonitorService{
-		trackVisitorFn: func(ctx context.Context, data dto.VisitorData) error { return nil },
+		trackVisitorFn: func(ctx context.Context, data dto.VisitorResponse) error { return nil },
 	}
 	r := setupMonitor(svc, func(c *gin.Context) { c.Next() })
 	w := httptest.NewRecorder()
@@ -355,7 +355,7 @@ func TestTrackVisitor_Success(t *testing.T) {
 func TestOldTrackRedirect(t *testing.T) {
 	config.Cfg = &config.Config{Admin: config.AdminConfig{EnableTracking: true}}
 	svc := &mockMonitorService{
-		trackVisitorFn: func(ctx context.Context, data dto.VisitorData) error { return nil },
+		trackVisitorFn: func(ctx context.Context, data dto.VisitorResponse) error { return nil },
 	}
 	h := NewMonitorHandler(svc, config.Cfg)
 	r := gin.New()

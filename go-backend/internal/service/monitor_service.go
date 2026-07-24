@@ -24,7 +24,7 @@ type Monitorer interface {
 	GetUserLogins(ctx context.Context, days, page, pageSize int) (dto.UserLogins, error)
 	GetServerStatus() (dto.ServerStatus, error)
 	StreamServerStatus(ctx context.Context) (<-chan dto.ServerStatus, error)
-	TrackVisitor(ctx context.Context, data dto.VisitorData) error
+	TrackVisitor(ctx context.Context, data dto.VisitorResponse) error
 	GetStatusDetail(ctx context.Context) (dto.StatusDetail, error)
 }
 
@@ -42,7 +42,7 @@ func NewMonitorService(visitor *postgres.VisitorRepo, user *postgres.UserRepo, v
 }
 
 // TrackVisitor 记录访客追踪数据（公开接口）。visit_time 由 PG default current_timestamp 填充。
-func (s *MonitorService) TrackVisitor(ctx context.Context, data dto.VisitorData) error {
+func (s *MonitorService) TrackVisitor(ctx context.Context, data dto.VisitorResponse) error {
 	track := &model.VisitorTrack{
 		VisitorID:        data.VisitorID,
 		PageURL:          data.PageURL,

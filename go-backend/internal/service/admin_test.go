@@ -122,7 +122,7 @@ func TestAdminService_AddPost_Success(t *testing.T) {
 	}
 	svc := &adminService{repo: repo, redis: nil}
 
-	id, err := svc.AddPost(context.Background(), dto.PostIn{
+	id, err := svc.AddPost(context.Background(), dto.PostRequest{
 		Title: "Hello", Body: "World", Tags: []string{"go"}, IsPinned: true,
 	})
 	if err != nil {
@@ -149,7 +149,7 @@ func TestAdminService_AddPost_WithOptionalFields(t *testing.T) {
 	}
 	svc := &adminService{repo: repo, redis: nil}
 
-	_, err := svc.AddPost(context.Background(), dto.PostIn{
+	_, err := svc.AddPost(context.Background(), dto.PostRequest{
 		Title: "T", Body: "B", Summary: "Summary", Cover: "cover.png",
 	})
 	if err != nil {
@@ -274,7 +274,7 @@ func TestAdminService_TrackVisitor_WritesToPostgres(t *testing.T) {
 	}
 
 	svc := NewAdminService(nil, postgres.NewVisitorRepo(db), nil)
-	data := dto.VisitorData{
+	data := dto.VisitorResponse{
 		VisitorID:   "v-1",
 		PageURL:     "https://example.com/posts/1",
 		PagePath:    "/posts/1",

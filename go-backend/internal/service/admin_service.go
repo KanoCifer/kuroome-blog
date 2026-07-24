@@ -31,11 +31,11 @@ type VisitorRepositoryer interface {
 
 // Adminer 定义 admin 后台的用例契约。
 type Adminer interface {
-	AddPost(ctx context.Context, post dto.PostIn) (id string, err error)
+	AddPost(ctx context.Context, post dto.PostRequest) (id string, err error)
 	UpdatePost(ctx context.Context, id string, post dto.PostUpdate) error
 	DeletePost(ctx context.Context, id string) error
-	TrackVisitor(ctx context.Context, data dto.VisitorData) error
-	ListPostViewsData(ctx context.Context) ([]dto.PostViewData, error)
+	TrackVisitor(ctx context.Context, data dto.VisitorResponse) error
+	ListPostViewsData(ctx context.Context) ([]dto.PostViewResponse, error)
 }
 
 type adminService struct {
@@ -66,7 +66,7 @@ func ptrIf(s string) *string {
 	return nil
 }
 
-func (s *adminService) AddPost(ctx context.Context, post dto.PostIn) (string, error) {
+func (s *adminService) AddPost(ctx context.Context, post dto.PostRequest) (string, error) {
 	doc := &document.Post{
 		Title:    post.Title,
 		Body:     post.Body,
@@ -152,14 +152,14 @@ func (s *adminService) DeletePost(ctx context.Context, id string) error {
 	return nil
 }
 
-func (s *adminService) ListPostViewsData(ctx context.Context) ([]dto.PostViewData, error) {
+func (s *adminService) ListPostViewsData(ctx context.Context) ([]dto.PostViewResponse, error) {
 	docs, err := s.repo.ListPostViewsData(ctx)
 	if err != nil {
 		return nil, err
 	}
-	data := make([]dto.PostViewData, 0, len(docs))
+	data := make([]dto.PostViewResponse, 0, len(docs))
 	for _, d := range docs {
-		data = append(data, dto.PostViewData{Title: d.Title, Views: d.Views})
+		data = append(data, dto.PostViewResponse{Title: d.Title, Views: d.Views})
 	}
 	return data, nil
 }
@@ -170,7 +170,7 @@ func (s *adminService) ListPostViewsData(ctx context.Context) ([]dto.PostViewDat
 // 定时任务消费落库——那条链路久经失败（缺显式 commit、browser 列约束、
 // DTO 与 schema 不对齐），所以此处改为 Go 端直写，不再依赖 Redis 跨语言消费。
 // visit_time 不使用前端传的值，由 PG default current_timestamp 填充。
-func (s *adminService) TrackVisitor(ctx context.Context, data dto.VisitorData) error {
+func (s *adminService) TrackVisitor(ctx context.Context, data dto.VisitorResponse) error {
 	track := &model.VisitorTrack{
 		VisitorID:        data.VisitorID,
 		PageURL:          data.PageURL,

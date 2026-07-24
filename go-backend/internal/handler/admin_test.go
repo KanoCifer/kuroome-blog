@@ -23,13 +23,13 @@ func init() {
 // ---------- mock AdminService ----------
 
 type mockAdminService struct {
-	addPostFn       func(ctx context.Context, post dto.PostIn) (string, error)
+	addPostFn       func(ctx context.Context, post dto.PostRequest) (string, error)
 	updatePostFn    func(ctx context.Context, id string, post dto.PostUpdate) error
 	deletePostFn    func(ctx context.Context, id string) error
-	listViewsDataFn func(ctx context.Context) ([]dto.PostViewData, error)
+	listViewsDataFn func(ctx context.Context) ([]dto.PostViewResponse, error)
 }
 
-func (m *mockAdminService) AddPost(ctx context.Context, post dto.PostIn) (string, error) {
+func (m *mockAdminService) AddPost(ctx context.Context, post dto.PostRequest) (string, error) {
 	return m.addPostFn(ctx, post)
 }
 
@@ -41,7 +41,7 @@ func (m *mockAdminService) DeletePost(ctx context.Context, id string) error {
 	return m.deletePostFn(ctx, id)
 }
 
-func (m *mockAdminService) ListPostViewsData(ctx context.Context) ([]dto.PostViewData, error) {
+func (m *mockAdminService) ListPostViewsData(ctx context.Context) ([]dto.PostViewResponse, error) {
 	return m.listViewsDataFn(ctx)
 }
 
@@ -92,12 +92,12 @@ func postUpdate(id, title, body string) dto.PostUpdate {
 
 func TestAdmin_AddPost_Success(t *testing.T) {
 	svc := &mockAdminService{
-		addPostFn: func(ctx context.Context, post dto.PostIn) (string, error) {
+		addPostFn: func(ctx context.Context, post dto.PostRequest) (string, error) {
 			return "507f1f77bcf86cd799439011", nil
 		},
 	}
 	_, r := newAdminHandler(svc)
-	w, req := postJSON(t, "/v3/post/add", dto.PostIn{Title: "t", Body: "b", Tags: []string{"go"}})
+	w, req := postJSON(t, "/v3/post/add", dto.PostRequest{Title: "t", Body: "b", Tags: []string{"go"}})
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
@@ -118,12 +118,12 @@ func TestAdmin_AddPost_Success(t *testing.T) {
 
 func TestAdmin_AddPost_Error(t *testing.T) {
 	svc := &mockAdminService{
-		addPostFn: func(ctx context.Context, post dto.PostIn) (string, error) {
+		addPostFn: func(ctx context.Context, post dto.PostRequest) (string, error) {
 			return "", errors.New("db down")
 		},
 	}
 	_, r := newAdminHandler(svc)
-	w, req := postJSON(t, "/v3/post/add", dto.PostIn{Title: "t", Body: "b"})
+	w, req := postJSON(t, "/v3/post/add", dto.PostRequest{Title: "t", Body: "b"})
 	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusInternalServerError {
@@ -132,7 +132,7 @@ func TestAdmin_AddPost_Error(t *testing.T) {
 }
 
 func TestAdmin_AddPost_InvalidBody(t *testing.T) {
-	svc := &mockAdminService{addPostFn: func(context.Context, dto.PostIn) (string, error) { return "", nil }}
+	svc := &mockAdminService{addPostFn: func(context.Context, dto.PostRequest) (string, error) { return "", nil }}
 	_, r := newAdminHandler(svc)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/v3/post/add", bytes.NewReader([]byte("not json")))

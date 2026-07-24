@@ -15,10 +15,10 @@ import (
 )
 
 type AdminServiceer interface {
-	AddPost(ctx context.Context, post dto.PostIn) (id string, err error)
+	AddPost(ctx context.Context, post dto.PostRequest) (id string, err error)
 	UpdatePost(ctx context.Context, id string, post dto.PostUpdate) error
 	DeletePost(ctx context.Context, id string) error
-	ListPostViewsData(ctx context.Context) ([]dto.PostViewData, error)
+	ListPostViewsData(ctx context.Context) ([]dto.PostViewResponse, error)
 }
 
 type AdminHandler struct {
@@ -31,7 +31,7 @@ func NewAdminHandler(adminSvc AdminServiceer, cfg *config.Config) *AdminHandler 
 }
 
 func (h *AdminHandler) AddPost(c *gin.Context) {
-	var req dto.PostIn
+	var req dto.PostRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.APIError(c, err.Error())
 		return
