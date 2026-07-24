@@ -17,12 +17,12 @@ import (
 
 // BlogServiceer 博客读表面 —— handler 依赖接口，便于 mock 测试。
 type BlogServiceer interface {
-	ListPosts(ctx context.Context, page int, search string) (*dto.BlogListOut, error)
-	GetPost(ctx context.Context, id string) (*dto.PostOut, error)
+	ListPosts(ctx context.Context, page int, search string) (*dto.BlogListResponse, error)
+	GetPost(ctx context.Context, id string) (*dto.PostResponse, error)
 	IncrementViews(ctx context.Context, id string) error
 	LikePost(ctx context.Context, id string) (int, error)
-	ListTags(ctx context.Context) ([]dto.TagOut, error)
-	ListPostsByTag(ctx context.Context, tag string, page, perPage int) (*dto.PostsByTagOut, error)
+	ListTags(ctx context.Context) ([]dto.TagResponse, error)
+	ListPostsByTag(ctx context.Context, tag string, page, perPage int) (*dto.PostsByTagResponse, error)
 }
 
 // BlogHandler 处理博客读请求（公开接口，无需鉴权）。
@@ -120,7 +120,7 @@ func (h *BlogHandler) LikePost(c *gin.Context) {
 		}
 		return
 	}
-	response.Success(c, dto.LikeOut{Likes: likes}, "Liked successfully")
+	response.Success(c, dto.LikeResponse{Likes: likes}, "Liked successfully")
 }
 
 // RegisterRoutes 挂载博客读路由到 v3 组。

@@ -1,7 +1,7 @@
 package dto
 
-// PostOut 单篇博客输出 —— 与 Python _serialize_post 形状一致。
-type PostOut struct {
+// PostResponse 单篇博客输出 —— 与 Python _serialize_post 形状一致。
+type PostResponse struct {
 	ID        string   `json:"_id"`
 	Title     string   `json:"title"`
 	Body      string   `json:"body"`
@@ -15,27 +15,27 @@ type PostOut struct {
 	UpdatedAt string   `json:"updated_at"`
 }
 
-// LikeOut 点赞响应 —— 返回递增后的最新喜欢数。
-type LikeOut struct {
+// LikeResponse 点赞响应 —— 返回递增后的最新喜欢数。
+type LikeResponse struct {
 	Likes int `json:"likes"`
 }
 
-// TagOut 标签聚合项 —— 与 Python aggregate_tag_counts 形状一致。
-type TagOut struct {
+// TagResponse 标签聚合项 —— 与 Python aggregate_tag_counts 形状一致。
+type TagResponse struct {
 	Name  string `json:"name"`
 	Count int    `json:"count"`
 }
 
-// BlogListOut 博客列表响应 —— 与 Python get_blogs 返回形状一致。
-type BlogListOut struct {
-	Posts      []PostOut  `json:"posts"`
-	Tags       []TagOut   `json:"tags"`
-	Pagination Pagination `json:"pagination"`
+// BlogListResponse 博客列表响应 —— 与 Python get_blogs 返回形状一致。
+type BlogListResponse struct {
+	Posts      []PostResponse `json:"posts"`
+	Tags       []TagResponse  `json:"tags"`
+	Pagination Pagination     `json:"pagination"`
 }
 
-// PostsByTagOut 标签筛选响应 —— 与 Python get_posts_by_tag 返回形状一致。
-type PostsByTagOut struct {
-	Posts []PostOut `json:"posts"`
-	Tag   string    `json:"tag"`
-	Total int       `json:"total"`
+// PostsByTagResponse 标签筛选响应 —— 与 Python get_posts_by_tag 返回形状一致。
+type PostsByTagResponse struct {
+	Posts []PostResponse `json:"posts"`
+	Tag   string         `json:"tag"`
+	Total int            `json:"total"`
 }

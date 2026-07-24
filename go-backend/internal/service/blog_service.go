@@ -27,12 +27,12 @@ type BlogRepositoryer interface {
 
 // Bloger 定义博客读表面的用例契约。
 type Bloger interface {
-	ListPosts(ctx context.Context, page int, search string) (*dto.BlogListOut, error)
-	GetPost(ctx context.Context, id string) (*dto.PostOut, error)
+	ListPosts(ctx context.Context, page int, search string) (*dto.BlogListResponse, error)
+	GetPost(ctx context.Context, id string) (*dto.PostResponse, error)
 	IncrementViews(ctx context.Context, id string) error
 	LikePost(ctx context.Context, id string) (int, error)
-	ListTags(ctx context.Context) ([]dto.TagOut, error)
-	ListPostsByTag(ctx context.Context, tag string, page, perPage int) (*dto.PostsByTagOut, error)
+	ListTags(ctx context.Context) ([]dto.TagResponse, error)
+	ListPostsByTag(ctx context.Context, tag string, page, perPage int) (*dto.PostsByTagResponse, error)
 }
 
 type blogService struct {
@@ -45,14 +45,14 @@ func NewBlogService(repo BlogRepositoryer) *blogService {
 
 // serializePost 将文档转为输出 DTO —— 与 Python _serialize_post 对齐。
 // mongo-driver 将 _id(ObjectID) 解码为 ID 字段的十六进制字符串。
-func serializePost(p document.Post) dto.PostOut {
+func serializePost(p document.Post) dto.PostResponse {
 	t := func(tm time.Time) string {
 		if tm.IsZero() {
 			return ""
 		}
 		return tm.UTC().Format(time.RFC3339)
 	}
-	return dto.PostOut{
+	return dto.PostResponse{
 		ID:        p.ID,
 		Title:     p.Title,
 		Body:      p.Body,
@@ -68,11 +68,11 @@ func serializePost(p document.Post) dto.PostOut {
 }
 
 // serializePosts 批量序列化，nil/空切片统一为空数组。
-func serializePosts(posts []document.Post) []dto.PostOut {
+func serializePosts(posts []document.Post) []dto.PostResponse {
 	if len(posts) == 0 {
-		return []dto.PostOut{}
+		return []dto.PostResponse{}
 	}
-	out := make([]dto.PostOut, 0, len(posts))
+	out := make([]dto.PostResponse, 0, len(posts))
 	for _, p := range posts {
 		out = append(out, serializePost(p))
 	}
@@ -106,7 +106,7 @@ func pagination(page, perPage, total int) dto.Pagination {
 }
 
 // ListPosts 分页列出博客（含标签聚合）—— 与 Python get_blogs 对齐。
-func (s *blogService) ListPosts(ctx context.Context, page int, search string) (*dto.BlogListOut, error) {
+func (s *blogService) ListPosts(ctx context.Context, page int, search string) (*dto.BlogListResponse, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -124,12 +124,12 @@ func (s *blogService) ListPosts(ctx context.Context, page int, search string) (*
 		return nil, err
 	}
 
-	tags := make([]dto.TagOut, 0, len(tagCounts))
+	tags := make([]dto.TagResponse, 0, len(tagCounts))
 	for _, tc := range tagCounts {
-		tags = append(tags, dto.TagOut{Name: tc.Name, Count: tc.Count})
+		tags = append(tags, dto.TagResponse{Name: tc.Name, Count: tc.Count})
 	}
 
-	return &dto.BlogListOut{
+	return &dto.BlogListResponse{
 		Posts:      serializePosts(posts),
 		Tags:       tags,
 		Pagination: pagination(page, perPage, int(total)),
@@ -137,7 +137,7 @@ func (s *blogService) ListPosts(ctx context.Context, page int, search string) (*
 }
 
 // GetPost 按 ID 获取单篇博客 —— 与 Python get_blog_post 对齐。
-func (s *blogService) GetPost(ctx context.Context, id string) (*dto.PostOut, error) {
+func (s *blogService) GetPost(ctx context.Context, id string) (*dto.PostResponse, error) {
 	if id == "" {
 		return nil, errs.ErrInvalidPostID
 	}
@@ -179,21 +179,21 @@ func (s *blogService) LikePost(ctx context.Context, id string) (int, error) {
 }
 
 // ListTags 列出所有标签及文章数 —— 与 Python list_tags 对齐。
-func (s *blogService) ListTags(ctx context.Context) ([]dto.TagOut, error) {
+func (s *blogService) ListTags(ctx context.Context) ([]dto.TagResponse, error) {
 	tagCounts, err := s.repo.AggregateTagCounts(ctx)
 	if err != nil {
 		slog.ErrorContext(ctx, "aggregate tag counts", "error", err)
 		return nil, err
 	}
-	tags := make([]dto.TagOut, 0, len(tagCounts))
+	tags := make([]dto.TagResponse, 0, len(tagCounts))
 	for _, tc := range tagCounts {
-		tags = append(tags, dto.TagOut{Name: tc.Name, Count: tc.Count})
+		tags = append(tags, dto.TagResponse{Name: tc.Name, Count: tc.Count})
 	}
 	return tags, nil
 }
 
 // ListPostsByTag 按标签分页列出博客 —— 与 Python get_posts_by_tag 对齐。
-func (s *blogService) ListPostsByTag(ctx context.Context, tag string, page, perPage int) (*dto.PostsByTagOut, error) {
+func (s *blogService) ListPostsByTag(ctx context.Context, tag string, page, perPage int) (*dto.PostsByTagResponse, error) {
 	tag = strings.TrimSpace(tag)
 	if tag == "" {
 		return nil, errs.ErrInvalidPostID
@@ -211,7 +211,7 @@ func (s *blogService) ListPostsByTag(ctx context.Context, tag string, page, perP
 		return nil, err
 	}
 
-	return &dto.PostsByTagOut{
+	return &dto.PostsByTagResponse{
 		Posts: serializePosts(posts),
 		Tag:   tag,
 		Total: int(total),
