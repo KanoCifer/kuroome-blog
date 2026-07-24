@@ -18,7 +18,7 @@ type Systemer interface {
 		page, perPage int,
 		eventType *string,
 		start, end *time.Time,
-	) (dto.Events, error)
+	) (dto.EventsResponse, error)
 }
 
 // EventRepositoryer 定义 SystemService 依赖的持久层能力集合。
@@ -46,7 +46,7 @@ func (s *SystemService) ListEvents(
 	page, perPage int,
 	eventType *string,
 	start, end *time.Time,
-) (dto.Events, error) {
+) (dto.EventsResponse, error) {
 	perPage = clamp(perPage, 1, 200)
 	if perPage == 0 {
 		perPage = 10 // 默认 10 条，对齐 Python
@@ -60,11 +60,11 @@ func (s *SystemService) ListEvents(
 
 	total, err := s.repo.Count(ctx, filter)
 	if err != nil {
-		return dto.Events{}, err
+		return dto.EventsResponse{}, err
 	}
 	events, err := s.repo.List(ctx, filter, offset, perPage)
 	if err != nil {
-		return dto.Events{}, err
+		return dto.EventsResponse{}, err
 	}
 
 	items := make([]dto.Event, 0, len(events))
@@ -93,7 +93,7 @@ func (s *SystemService) ListEvents(
 		pagination.NextNum = &v
 	}
 
-	return dto.Events{Items: items, Pagination: pagination}, nil
+	return dto.EventsResponse{Items: items, Pagination: pagination}, nil
 }
 
 // toEventDTO 把持久层 model.Event 转为对外 dto.Event。

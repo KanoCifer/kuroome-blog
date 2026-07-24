@@ -27,7 +27,7 @@ type mockSystemService struct {
 		page, perPage int,
 		eventType *string,
 		start, end *time.Time,
-	) (dto.Events, error)
+	) (dto.EventsResponse, error)
 }
 
 func (m *mockSystemService) ListEvents(
@@ -35,11 +35,11 @@ func (m *mockSystemService) ListEvents(
 	page, perPage int,
 	eventType *string,
 	start, end *time.Time,
-) (dto.Events, error) {
+) (dto.EventsResponse, error) {
 	if m.listEventsFn != nil {
 		return m.listEventsFn(ctx, page, perPage, eventType, start, end)
 	}
-	return dto.Events{}, nil
+	return dto.EventsResponse{}, nil
 }
 
 // ---------- helpers ----------
@@ -83,8 +83,8 @@ func TestEvents_DefaultParamsReturnsItemsAndPagination(t *testing.T) {
 	svc := &mockSystemService{
 		listEventsFn: func(
 			ctx context.Context, page, perPage int, eventType *string, start, end *time.Time,
-		) (dto.Events, error) {
-			return dto.Events{
+		) (dto.EventsResponse, error) {
+			return dto.EventsResponse{
 				Items: []dto.Event{
 					{ID: 1, Type: "startup", Message: "boot"},
 					{ID: 2, Type: "deploy", Message: "v1"},
@@ -121,12 +121,12 @@ func TestEvents_PassesPageAndTypeToService(t *testing.T) {
 	svc := &mockSystemService{
 		listEventsFn: func(
 			ctx context.Context, page, perPage int, eventType *string, start, end *time.Time,
-		) (dto.Events, error) {
+		) (dto.EventsResponse, error) {
 			capturedPage = page
 			if eventType != nil {
 				capturedType = *eventType
 			}
-			return dto.Events{
+			return dto.EventsResponse{
 				Items:      []dto.Event{},
 				Pagination: dto.Pagination{Page: page, PerPage: perPage, Total: 0, Pages: 0},
 			}, nil
@@ -191,8 +191,8 @@ func TestEvents_ServiceError(t *testing.T) {
 	svc := &mockSystemService{
 		listEventsFn: func(
 			ctx context.Context, page, perPage int, eventType *string, start, end *time.Time,
-		) (dto.Events, error) {
-			return dto.Events{}, errors.New("db boom")
+		) (dto.EventsResponse, error) {
+			return dto.EventsResponse{}, errors.New("db boom")
 		},
 	}
 	r := setupSystem(svc)

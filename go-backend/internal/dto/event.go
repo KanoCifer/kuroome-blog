@@ -25,8 +25,8 @@ type Pagination struct {
 	NextNum *int `json:"next_num"`
 }
 
-// Events /api/v3/system/events 的响应信封内层结构。
-type Events struct {
+// EventsResponse /api/v3/system/events 的响应信封内层结构。
+type EventsResponse struct {
 	Items      []Event    `json:"items"`
 	Pagination Pagination `json:"pagination"`
 }
