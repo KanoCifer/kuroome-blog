@@ -17,7 +17,7 @@
           class="text-warning inline-flex items-center gap-1 text-[10px] font-semibold tracking-[0.18em] uppercase"
         >
           <span aria-hidden="true">·</span>
-          <PinIcon class="h-3 w-3" />
+          <Star class="h-3 w-3" />
           <span>置顶</span>
         </span>
       </div>
@@ -28,54 +28,58 @@
           v-if="hasPrev || hasNext"
           class="text-muted flex items-center gap-1 text-[11px]"
         >
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="icon"
             :disabled="!hasPrev"
-            class="hover:text-ink /40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors disabled:cursor-not-allowed disabled:opacity-30"
+            class="!h-7 !w-7 border /40 disabled:!opacity-30"
             :aria-label="'上一条'"
             @click="emit('navigate', 'prev')"
           >
             <ChevronLeft class="h-3.5 w-3.5" />
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
             :disabled="!hasNext"
-            class="hover:text-ink /40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors disabled:cursor-not-allowed disabled:opacity-30"
+            class="!h-7 !w-7 border /40 disabled:!opacity-30"
             :aria-label="'下一条'"
             @click="emit('navigate', 'next')"
           >
             <ChevronRight class="h-3.5 w-3.5" />
-          </button>
+          </Button>
         </div>
 
         <!-- admin 操作 -->
         <template v-if="isAdmin">
-          <button
-            type="button"
-            class="bg-accent text-ink hover:bg-accent/90 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-medium shadow-sm transition-colors"
+          <Button
+            variant="default"
+            class="!h-7 !rounded-full gap-1 !px-3 !py-1.5 !text-[12px] shadow-sm"
             @click="emit('edit', moment)"
           >
-            <EditIcon class="h-3.5 w-3.5" />
+            <Pencil class="h-3.5 w-3.5" />
             编辑
-          </button>
-          <button
-            type="button"
-            class="text-muted hover:text-destructive /40 hover:border-destructive/40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            class="!h-7 !w-7 border /40 hover:!text-destructive hover:!border-destructive/40"
             aria-label="删除"
             @click="emit('delete', moment)"
           >
-            <IconDel class="h-3.5 w-3.5" />
-          </button>
+            <Trash2 class="h-3.5 w-3.5" />
+          </Button>
         </template>
 
-        <button
-          type="button"
-          class="text-muted hover:text-ink /40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
+        <Button
+          variant="ghost"
+          size="icon"
+          class="!h-7 !w-7 border /40"
           aria-label="关闭"
           @click="emit('update:open', false)"
         >
-          <IconClose class="h-3.5 w-3.5" />
-        </button>
+          <X class="h-3.5 w-3.5" />
+        </Button>
       </div>
     </header>
 
@@ -103,15 +107,12 @@
         ></div>
 
         <!-- 附件图片网格（点击放大查看） -->
-        <div
-          v-if="imageAttachments.length"
-          class="mt-6 grid grid-cols-3 gap-2"
-        >
-          <button
+        <div v-if="imageAttachments.length" class="mt-6 grid grid-cols-3 gap-2">
+          <Button
             v-for="(att, idx) in imageAttachments"
             :key="att.url"
-            type="button"
-            class="bg-surface group relative aspect-square overflow-hidden rounded-xl"
+            variant="ghost"
+            class="!bg-surface group relative !aspect-square !h-auto !w-full overflow-hidden !rounded-xl !p-0"
             :aria-label="`查看图片 ${idx + 1}`"
             @click="openLightbox(idx)"
           >
@@ -120,7 +121,7 @@
               alt=""
               class="h-full w-full object-cover transition-transform group-hover:scale-[1.02]"
             />
-          </button>
+          </Button>
         </div>
 
         <!-- 标签 -->
@@ -135,7 +136,10 @@
         <div
           class="text-muted /40 mt-10 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-dashed pt-4 font-mono text-[11px] tracking-wide"
         >
-          <span>发布于 {{ moment.published_at ?? moment.created_at }}</span>
+          <span
+            >发布于
+            {{ formatDate(moment.published_at ?? moment.created_at) }}</span
+          >
           <span v-if="moment.source" class="text-muted/60">·</span>
           <span v-if="moment.source">来源 {{ moment.source }}</span>
           <span class="text-muted/60">·</span>
@@ -202,26 +206,28 @@
           <span class="font-mono text-sm tabular-nums">
             {{ lightboxIndex + 1 }} / {{ imageAttachments.length }}
           </span>
-          <button
-            type="button"
-            class="hover:bg-page/20 inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
+          <Button
+            variant="ghost"
+            size="icon"
+            class="!h-9 !w-9 !text-page hover:!bg-page/20"
             aria-label="关闭"
             @click="closeLightbox"
           >
-            <IconClose class="h-5 w-5" />
-          </button>
+            <X class="h-5 w-5" />
+          </Button>
         </div>
 
         <!-- 左切换 -->
-        <button
+        <Button
           v-if="imageAttachments.length > 1"
-          type="button"
-          class="text-page hover:bg-page/20 absolute left-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
+          variant="ghost"
+          size="icon"
+          class="!h-11 !w-11 !text-page hover:!bg-page/20"
           aria-label="上一张"
           @click="lightboxPrev"
         >
           <ChevronLeft class="h-6 w-6" />
-        </button>
+        </Button>
 
         <!-- 主图 -->
         <img
@@ -231,26 +237,24 @@
         />
 
         <!-- 右切换 -->
-        <button
+        <Button
           v-if="imageAttachments.length > 1"
-          type="button"
-          class="text-page hover:bg-page/20 absolute right-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors"
+          variant="ghost"
+          size="icon"
+          class="!h-11 !w-11 !text-page hover:!bg-page/20"
           aria-label="下一张"
           @click="lightboxNext"
         >
           <ChevronRight class="h-6 w-6" />
-        </button>
+        </Button>
       </div>
     </Teleport>
   </Modal>
 </template>
 
 <script setup lang="ts">
-import { ChevronLeft, ChevronRight } from '@lucide/vue';
-import { EditIcon } from '@/components';
-import { IconClose } from '@/components';
-import { IconDel } from '@/components';
-import { PinIcon } from '@/components';
+import { Button } from '@/components';
+import { ChevronLeft, ChevronRight, Pencil, Star, Trash2, X } from '@lucide/vue';
 import { Modal } from '@/components';
 import { renderMarkdown } from '@/composables';
 import type {
@@ -259,9 +263,9 @@ import type {
   MomentStatus,
   MomentVisibility,
 } from '@/features/moments/types';
-import dayjs from 'dayjs';
 import { computed, defineComponent, h, onBeforeUnmount, ref, watch } from 'vue';
 import MomentTagChip from './MomentTagChip.vue';
+import { formatDate } from '@/lib';
 
 const props = defineProps<{
   open: boolean;
@@ -279,12 +283,6 @@ const emit = defineEmits<{
   (e: 'delete', moment: Moment | null): void;
   (e: 'navigate', direction: 'prev' | 'next'): void;
 }>();
-
-const formattedDateTime = computed(() => {
-  if (!props.moment) return '';
-  const raw = props.moment.published_at ?? props.moment.created_at;
-  return dayjs(raw).format('YYYY-MM-DD HH:mm');
-});
 
 const isPureEmoji = (s: string) => /\p{Extended_Pictographic}/u.test(s);
 const moodEmoji = computed(() => {

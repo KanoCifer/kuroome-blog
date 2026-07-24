@@ -17,58 +17,45 @@
           class="flex flex-wrap items-center gap-2 text-[12px]"
           aria-label="按标签过滤"
         >
-          <button
+          <Button
             type="button"
             :class="[
-              'rounded-full px-3 py-1 font-medium transition-colors',
+              '!h-auto !rounded-full !px-3 !py-1 !font-medium',
               activeTag === null
-                ? 'bg-accent text-ink shadow-sm'
-                : 'bg-page text-muted hover:bg-surface /60 border',
+                ? 'bg-accent !text-ink shadow-sm'
+                : '!bg-page text-muted hover:!bg-surface /60 !border',
             ]"
             @click="setTag(null)"
           >
             全部
-          </button>
-          <button
+          </Button>
+          <Button
             v-for="tag in allTags"
             :key="tag"
             type="button"
             :class="[
-              'rounded-full px-3 py-1 font-medium transition-colors',
+              '!h-auto !rounded-full !px-3 !py-1 !font-medium',
               activeTag === tag
-                ? 'bg-accent text-ink shadow-sm'
-                : 'bg-page text-muted hover:bg-surface /60 border',
+                ? 'bg-accent !text-ink shadow-sm'
+                : '!bg-page text-muted hover:!bg-surface /60 !border',
             ]"
             @click="setTag(tag)"
           >
             <span class="text-ink/70">#</span>{{ tag }}
-          </button>
+          </Button>
         </div>
 
-        <button
+        <Button
           v-if="isAdmin"
-          type="button"
-          class="ml-auto inline-flex items-center gap-1.5 rounded-md border bg-accent px-4 py-2 text-[13px] font-medium text-contrast transition-[color,transform,background-color] duration-280 hover:bg-accent/90 active:scale-[0.96] focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+          variant="default"
+          size="md"
+          class="ml-auto !h-auto !rounded-md gap-1.5 !border !px-4 !py-2 !text-[13px]"
           aria-label="新建碎碎念"
           @click="openEditor(null)"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 4.5v15m7.5-7.5h-15"
-            />
-          </svg>
+          <Plus class="h-4 w-4" />
           写一句
-        </button>
+        </Button>
       </div>
 
       <!-- 错误提示 -->
@@ -77,27 +64,15 @@
         class="border-destructive/30 bg-destructive/10 text-destructive mb-6 flex items-center gap-2 rounded-xl border p-4 text-sm"
         role="alert"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5 shrink-0"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          aria-hidden="true"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-            clip-rule="evenodd"
-          />
-        </svg>
+        <CircleAlert class="h-5 w-5 shrink-0" />
         <span class="flex-1">{{ errorMessage }}</span>
-        <button
-          type="button"
-          class="hover:text-destructive/80 text-xs underline underline-offset-2"
+        <Button
+          variant="ghost"
+          class="!h-auto !p-0 !text-xs !underline !underline-offset-2 hover:!text-destructive/80"
           @click="reload"
         >
           重试
-        </button>
+        </Button>
       </div>
 
       <!-- 加载骨架 -->
@@ -136,57 +111,29 @@
         class="text-muted mt-10 flex items-center justify-between text-xs"
         aria-label="碎碎念分页"
       >
-        <button
-          type="button"
+        <Button
+          variant="outline"
           :disabled="publicPage <= 1"
-          class="bg-card text-ink hover:bg-secondary /60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          class="!h-auto !rounded-full gap-1.5 !border /60 !bg-card !px-4 !py-2 !font-medium shadow-sm disabled:!opacity-40"
           @click="goPage(publicPage - 1)"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-3.5 w-3.5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M15.75 19.5L8.25 12l7.5-7.5"
-            />
-          </svg>
+          <ChevronLeft class="h-3.5 w-3.5" />
           上一页
-        </button>
+        </Button>
 
         <span class="font-serif tracking-wider tabular-nums">
           第 {{ publicPage }} / {{ totalPages }} 卷
         </span>
 
-        <button
-          type="button"
+        <Button
+          variant="outline"
           :disabled="publicPage >= totalPages"
-          class="bg-card text-ink hover:bg-secondary /60 inline-flex items-center gap-1.5 rounded-full border px-4 py-2 font-medium shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          class="!h-auto !rounded-full gap-1.5 !border /60 !bg-card !px-4 !py-2 !font-medium shadow-sm disabled:!opacity-40"
           @click="goPage(publicPage + 1)"
         >
           下一页
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-3.5 w-3.5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M8.25 4.5l7.5 7.5-7.5 7.5"
-            />
-          </svg>
-        </button>
+          <ChevronRight class="h-3.5 w-3.5" />
+        </Button>
       </nav>
     </div>
 
@@ -231,35 +178,40 @@
         </p>
       </div>
       <div class="/40 flex items-center justify-end gap-2 border-t px-6 py-4">
-        <button
-          type="button"
+        <Button
+          variant="outline"
           :disabled="deleting"
-          class="/60 text-ink hover:bg-surface inline-flex items-center justify-center rounded-lg border px-4 py-1.5 text-[13px] transition-colors disabled:opacity-50"
+          class="!h-auto !rounded-lg !border /60 !px-4 !py-1.5 !text-[13px] disabled:!opacity-50"
           @click="onDeleteCancel"
         >
           取消
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          variant="destructive"
           :disabled="deleting"
-          class="bg-destructive hover:bg-destructive/90 inline-flex items-center justify-center rounded-lg px-4 py-1.5 text-[13px] font-medium text-white shadow-sm transition-colors disabled:opacity-50"
+          class="!h-auto !rounded-lg !px-4 !py-1.5 !text-[13px] !text-white shadow-sm disabled:!opacity-50"
           @click="handleDelete"
         >
           {{ deleting ? '删除中…' : '删除' }}
-        </button>
+        </Button>
       </div>
     </Modal>
   </BasicDetail>
 </template>
 
 <script setup lang="ts">
-import { BasicDetail } from '@/components';
+import { BasicDetail, Button, Modal } from '@/components';
 import { useAuthStore } from '@/features/auth';
-import { Modal } from '@/components';
 import { MomentComposer } from '@/features/moments/composables';
 import { useMomentsStore } from '@/features/moments/stores/moments';
 import { useNotificationStore } from '@/stores';
 import type { Moment, MomentUpdatePayload } from '@/features/moments/types';
+import {
+  ChevronLeft,
+  ChevronRight,
+  CircleAlert,
+  Plus,
+} from '@lucide/vue';
 import dayjs from 'dayjs';
 import { storeToRefs } from 'pinia';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';

@@ -21,7 +21,7 @@
 
     <!-- 时间戳 -->
     <time class="tabular-nums" :datetime="moment.published_at ?? ''">
-      {{ formattedTime }}
+      {{ formatDate(moment.published_at ?? '') }}
     </time>
 
     <!-- 置顶标 -->
@@ -30,16 +30,16 @@
       class="text-warning inline-flex items-center gap-1 font-semibold tracking-[0.18em] uppercase"
     >
       <span aria-hidden="true">·</span>
-      <PinIcon class="h-3 w-3" />
+      <Star class="h-3 w-3" />
       <span>置顶</span>
     </span>
   </div>
 </template>
 
 <script setup lang="ts">
-import { PinIcon } from '@/components';
 import type { Moment } from '@/features/moments/types';
-import dayjs from 'dayjs';
+import { formatDate } from '@/lib';
+import { Star } from '@lucide/vue';
 import { computed } from 'vue';
 
 const props = defineProps<{
@@ -47,11 +47,6 @@ const props = defineProps<{
   /** 卷序号文本，例如 "卷十二"；不传则不展示 */
   volumeLabel?: string;
 }>();
-
-const formattedTime = computed(() => {
-  const raw = props.moment.published_at ?? props.moment.created_at;
-  return dayjs(raw).format('YYYY-MM-DD HH:mm');
-});
 
 // mood 字段允许直接写 emoji，也允许写"开心"等中文词——这里不做翻译，
 // 仅在用户写纯文本时套上一对括号以提示这是 mood。

@@ -14,14 +14,15 @@
           {{ isEdit ? '改一改' : '碎碎念' }}
         </h2>
       </div>
-      <button
-        type="button"
-        class="text-muted hover:text-ink /40 inline-flex h-7 w-7 items-center justify-center rounded-full border transition-colors"
+      <Button
+        variant="ghost"
+        size="icon"
+        class="!h-7 !w-7 border /40"
         aria-label="关闭"
         @click="emit('update:open', false)"
       >
-        <IconClose class="h-3.5 w-3.5" />
-      </button>
+        <X class="h-3.5 w-3.5" />
+      </Button>
     </header>
 
     <!-- 主体：左表单 + 右侧设置 -->
@@ -100,14 +101,15 @@
                 alt=""
                 class="h-full w-full object-cover"
               />
-              <button
-                type="button"
-                class="bg-page/80 text-ink hover:bg-page absolute top-1.5 right-1.5 inline-flex h-6 w-6 items-center justify-center rounded-full opacity-0 shadow-sm backdrop-blur-md transition-opacity group-hover:opacity-100"
+              <Button
+                variant="ghost"
+                size="icon"
+                class="!h-6 !w-6 !bg-page/80 !text-ink hover:!bg-page absolute top-1.5 right-1.5 opacity-0 shadow-sm backdrop-blur-md transition-opacity group-hover:opacity-100"
                 :aria-label="`删除图片 ${idx + 1}`"
                 @click="removeAttachment(idx)"
               >
                 <X class="h-3.5 w-3.5" />
-              </button>
+              </Button>
             </div>
 
             <!-- 上传中 / 失败瓦片 -->
@@ -150,30 +152,30 @@
                   {{ pendingError }}
                 </p>
                 <div class="flex gap-1.5">
-                  <button
-                    type="button"
-                    class="bg-accent text-ink hover:bg-accent/90 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium"
+                  <Button
+                    variant="default"
+                    class="!h-auto !rounded-md gap-1 !px-2 !py-1 !text-xs"
                     @click="retryUpload"
                   >
                     <RefreshCw class="h-3 w-3" />
                     重试
-                  </button>
-                  <button
-                    type="button"
-                    class="bg-surface text-ink hover:bg-surface/70 rounded-md px-2 py-1 text-xs font-medium"
+                  </Button>
+                  <Button
+                    variant="outline"
+                    class="!h-auto !rounded-md !bg-surface !px-2 !py-1 !text-xs hover:!bg-surface/70"
                     @click="removeFailed"
                   >
                     移除
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
 
             <!-- + 瓦片(沿用 SpotFormPanel 风格,不用第二个 UploadDropzone 以避免嵌套) -->
-            <button
+            <Button
               v-if="canAddMore"
-              type="button"
-              class="bg-surface hover:bg-surface/70 relative flex aspect-square flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed transition-colors"
+              variant="ghost"
+              class="!bg-surface hover:!bg-surface/70 relative !aspect-square !h-auto !w-full !flex-col !overflow-hidden !rounded-xl !border-2 !border-dashed !p-0"
               aria-label="添加图片"
               :title="`还可上传 ${MAX_ATTACHMENTS - attachments.length} 张`"
               @click="triggerAttachmentPicker"
@@ -183,7 +185,7 @@
                 :stroke-width="1.5"
               />
               <span class="text-muted mt-1 text-xs">添加</span>
-            </button>
+            </Button>
           </div>
 
           <!-- 隐藏 file input: + 瓦片 click 触发 -->
@@ -203,20 +205,20 @@
             <span class="text-muted text-[11px]">emoji 或一个词</span>
           </div>
           <div class="flex flex-wrap gap-1.5">
-            <button
+            <Button
               v-for="e in EMOJI_PRESETS"
               :key="e"
-              type="button"
+              variant="ghost"
               :class="[
-                'flex h-8 w-8 items-center justify-center rounded-lg border text-[16px] transition-colors',
+                '!h-8 !w-8 !rounded-lg !border !text-[16px] !p-0',
                 form.mood === e
-                  ? 'border-accent bg-accent/10'
-                  : '/40 bg-page hover:bg-surface',
+                  ? '!border-accent !bg-accent/10'
+                  : '!bg-page hover:!bg-surface',
               ]"
               @click="toggleMood(e)"
             >
               {{ e }}
-            </button>
+            </Button>
           </div>
           <input
             v-model="form.mood"
@@ -242,14 +244,15 @@
               class="bg-surface text-ink inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[12px]"
             >
               <span class="text-ink/70 font-serif">#</span>{{ tag }}
-              <button
-                type="button"
-                class="text-muted hover:text-ink"
+              <Button
+                variant="ghost"
+                size="icon"
+                class="!h-5 !w-5 !p-0"
                 :aria-label="`删除标签 ${tag}`"
                 @click="removeTag(i)"
               >
                 ×
-              </button>
+              </Button>
             </span>
             <input
               v-model="tagInput"
@@ -334,21 +337,21 @@
         </div>
 
         <div class="space-y-2 pt-2">
-          <button
-            type="button"
+          <Button
+            variant="default"
             :disabled="submitting"
-            class="bg-accent text-ink hover:bg-accent/90 inline-flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-[13px] font-medium shadow-sm transition-colors disabled:opacity-50"
+            class="!h-auto !w-full !rounded-lg gap-1.5 !px-3 !py-2 !text-[13px] shadow-sm disabled:!opacity-50"
             @click="handleSubmit"
           >
             {{ submitting ? '保存中…' : isEdit ? '保存修改' : '发布' }}
-          </button>
-          <button
-            type="button"
-            class="/60 text-ink hover:bg-surface inline-flex w-full items-center justify-center rounded-lg border px-3 py-1.5 text-[12px] transition-colors"
+          </Button>
+          <Button
+            variant="outline"
+            class="!h-auto !w-full !rounded-lg !px-3 !py-1.5 !text-[12px]"
             @click="emit('update:open', false)"
           >
             取消
-          </button>
+          </Button>
         </div>
         <div class="text-muted text-center font-mono text-[10px] tracking-wide">
           ⌘ + S 保存
@@ -359,8 +362,7 @@
 </template>
 
 <script setup lang="ts">
-import { IconClose } from '@/components';
-import { Modal } from '@/components';
+import { Button, Modal } from '@/components';
 import {
   ImageOff,
   ImagePlus,

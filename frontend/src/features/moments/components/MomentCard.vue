@@ -32,7 +32,7 @@
         v-if="moment.is_pinned"
         class="bg-warning/15 text-warning absolute -top-2 left-3 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-[0.18em] uppercase shadow-sm"
       >
-        <PinIcon class="h-3 w-3" />
+        <Star class="h-3 w-3" />
         <span>置顶</span>
       </span>
 
@@ -42,22 +42,24 @@
         class="absolute top-2 right-2 flex items-center gap-1 opacity-0 transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100"
         @click.stop
       >
-        <button
-          type="button"
-          class="text-muted hover:text-ink /40 bg-page/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
+        <Button
+          variant="ghost"
+          size="icon"
+          class="bg-page/95 /40 hover:!bg-page !h-7 !w-7 border"
           :aria-label="`编辑 ${moment.id}`"
           @click="emit('edit', moment)"
         >
-          <EditIcon class="h-3.5 w-3.5" />
-        </button>
-        <button
-          type="button"
-          class="text-muted hover:text-destructive /40 bg-page/95 inline-flex h-7 w-7 items-center justify-center rounded-full border shadow-sm transition-colors"
+          <Pencil class="h-3.5 w-3.5" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          class="bg-page/95 /40 hover:!text-destructive !h-7 !w-7 border"
           :aria-label="`删除 ${moment.id}`"
           @click="emit('delete', moment)"
         >
-          <IconDel class="h-3.5 w-3.5" />
-        </button>
+          <Trash2 class="h-3.5 w-3.5" />
+        </Button>
       </div>
 
       <!-- 元数据行 -->
@@ -69,9 +71,8 @@
 
       <!-- 内容预览（markdown 渲染，自带 prose 主题） -->
       <div
-        class="prose prose-sm text-ink relative mt-2 max-w-none line-clamp-3 pl-3"
-        style="text-wrap: pretty"
-        v-html="renderMarkdown(moment.content)"
+        class="prose prose-sm text-ink moment-clamp-3 relative mt-2 max-w-none pl-3 font-serif!"
+        v-html="withDropCap(renderMarkdown(moment.content))"
       />
 
       <!-- 标签 chip 行 -->
@@ -87,9 +88,8 @@
 </template>
 
 <script setup lang="ts">
-import { EditIcon } from '@/components';
-import { IconDel } from '@/components';
-import { PinIcon } from '@/components';
+import { Button } from '@/components';
+import { Pencil, Star, Trash2 } from '@lucide/vue';
 import { renderMarkdown } from '@/composables';
 import type { Moment } from '@/features/moments/types';
 import { motion } from 'motion-v';
@@ -109,5 +109,40 @@ const emit = defineEmits<{
   (e: 'edit', moment: Moment): void;
   (e: 'delete', moment: Moment): void;
 }>();
+
+/**
+ * 把首字包到 <span class="drop-cap">，让 CSS 可以用真实 DOM 元素放大首字。
+ * ::first-letter 在 display:-webkit-box（line-clamp 容器）内对 CJK 字符不稳定，
+ * 且 display:inline-block 在伪元素上被规范禁止，改用注入的 span 稳定可控。
+ */
+function withDropCap(html: string): string {
+  if (!html) return html;
+  return html.replace(
+    /^(<p[^>]*>)([^\s])/,
+    '$1<span class="drop-cap">$2</span>',
+  );
+}
 </script>
 
+<style lang="scss" scoped>
+// 不使用 Tailwind 的 .line-clamp-3：它会把容器变成 display:-webkit-box，
+// 首字样式（包括 ::first-letter 和 inline-block span）都会被 box layout 影响。
+// 改用现代 line-clamp 简写，容器保持普通 block，<p> 是 block container。
+.moment-clamp-3 {
+  line-clamp: 3;
+  overflow: hidden;
+  text-wrap: pretty;
+}
+
+// 真实 DOM 元素，::v-deep 跨过 v-html 边界命中由 withDropCap 注入的 span。
+// font / line-height / vertical-align 在 inline-block 上都稳定生效。
+:deep(.drop-cap) {
+  display: inline-block;
+  font-size: 3rem;
+  font-weight: bold;
+  line-height: 0.9;
+  margin-right: 0.12em;
+  vertical-align: top;
+  color: var(--accent);
+}
+</style>

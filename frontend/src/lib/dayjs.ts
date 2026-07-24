@@ -43,7 +43,7 @@ export function formatCurrentWeekRange(opts: WeekRangeOptions = {}): string {
 
 export const formatDate = (dateStr: string | null | undefined) => {
   if (!dateStr) return '未知时间';
-  return dayjs(dateStr).local().format('YYYY-MM-DD HH:mm:ss');
+  return dayjs.utc(dateStr).local().format('YYYY-MM-DD HH:mm:ss');
 };
 
 // ── duration.ts ─────────────────────────────────────────────────────
