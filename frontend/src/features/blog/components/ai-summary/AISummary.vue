@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from 'motion-v';
 import { FADE } from '@/constants';
 import { computed, onMounted, ref, watch } from 'vue';
 import { renderMarkdown } from '@/composables';
-import { ModalFadeTransition } from '@/components';
+import { HoverDropdown, ModalFadeTransition } from '@/components';
 
 const renderedSummary = computed(() =>
   summary.value ? renderMarkdown(summary.value) : '',
@@ -84,18 +84,29 @@ async function switchToChat() {
   cardMode.value = CardMode.CHAT;
   await enterChat();
 }
+
+// ── 模型选择（HoverDropdown 桥接） ──
+const selectedModelLabel = computed(
+  () =>
+    modelOptions.find((o) => o.value === selectedModel.value)?.label ??
+    selectedModel.value,
+);
+
+function pickModel(value: string, close?: () => void) {
+  selectedModel.value = value;
+  close?.();
+}
 </script>
 
 <template>
   <section
-    class="summary-card bg-page/60 /60 mb-6 overflow-hidden rounded-3xl border shadow-sm transition-all"
-    :class="{ 'is-loading': loading }"
+    class="mb-6 overflow-hidden rounded-xl border bg-surface/85"
   >
     <!-- Header -->
     <div class="flex items-center justify-between gap-3 px-5 pt-4 pb-3">
       <div class="flex items-center gap-2.5">
         <div
-          class="bg-accent/10 dark:bg-accent/15 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+          class="bg-page flex h-8 w-8 shrink-0 items-center justify-center rounded-md border"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -117,7 +128,7 @@ async function switchToChat() {
             <path d="M9 13v2" />
           </svg>
         </div>
-        <h3 class="text-ink text-base font-semibold tracking-tight">
+        <h3 class="text-ink text-sm font-semibold tracking-tight">
           <template v-if="cardMode === CardMode.SUMMARY"> AI 总结 </template>
           <template v-else> AI 对话 </template>
         </h3>
@@ -129,7 +140,7 @@ async function switchToChat() {
             :animate="{ opacity: 1, y: 0 }"
             :exit="{ opacity: 0, y: -6 }"
             :transition="FADE"
-            class="text-muted text-sm"
+            class="text-muted text-xs"
           >
             {{ textShimmer[0] }}
           </motion.span>
@@ -145,7 +156,7 @@ async function switchToChat() {
             class="relative cursor-pointer rounded-md px-3 py-1 text-sm font-medium transition-all"
             :class="
               cardMode === CardMode.SUMMARY
-                ? 'bg-page text-ink shadow-sm'
+                ? 'bg-page text-ink'
                 : 'text-muted hover:text-ink'
             "
             :disabled="loading"
@@ -157,7 +168,7 @@ async function switchToChat() {
             class="relative cursor-pointer rounded-md px-3 py-1 text-sm font-medium transition-all"
             :class="
               cardMode === CardMode.CHAT
-                ? 'bg-page text-ink shadow-sm'
+                ? 'bg-page text-ink'
                 : 'text-muted hover:text-ink'
             "
             :disabled="loading"
@@ -172,21 +183,63 @@ async function switchToChat() {
     <!-- Toolbar: model selector + action button -->
     <div class="flex items-center gap-2 px-5 pb-3">
       <template v-if="cardMode === CardMode.SUMMARY">
-        <select
-          v-model="selectedModel"
-          class="/70 bg-surface/40 text-ink dark:/70 dark:bg-surface/30 dark:text-ink focus:ring-ring cursor-pointer rounded-md border px-2.5 py-1.5 text-sm transition-colors focus:ring-1 focus:outline-none"
-          :disabled="loading"
+        <HoverDropdown
+          panel-class="absolute left-0 top-full z-10 mt-1 w-56 rounded-md border bg-card/95 p-1 shadow-lg"
         >
-          <option
-            v-for="opt in modelOptions"
-            :key="opt.value"
-            :value="opt.value"
-          >
-            {{ opt.label }}
-          </option>
-        </select>
+          <template #trigger="{ isOpen }">
+            <button
+              type="button"
+              class="border bg-surface/30 text-ink inline-flex max-w-[12rem] items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm transition-colors hover:bg-surface/60 focus-visible:ring-2 focus-visible:ring-ring/40 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              :aria-expanded="isOpen"
+              :disabled="loading"
+            >
+              <span class="truncate">{{ selectedModelLabel }}</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="text-muted h-3.5 w-3.5 shrink-0 transition-transform duration-200"
+                :class="isOpen && 'rotate-180'"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6 9l6 6 6-6"
+                />
+              </svg>
+            </button>
+          </template>
+
+          <template #default="{ close }">
+            <button
+              v-for="opt in modelOptions"
+              :key="opt.value"
+              type="button"
+              class="flex w-full items-center justify-between gap-2 rounded px-2.5 py-1.5 text-left text-sm transition-colors hover:bg-surface/60 disabled:cursor-not-allowed disabled:opacity-50"
+              :class="
+                opt.value === selectedModel
+                  ? 'bg-surface/40 text-ink'
+                  : 'text-muted'
+              "
+              :disabled="loading"
+              @click="pickModel(opt.value, close)"
+            >
+              <span class="truncate">{{ opt.label }}</span>
+              <span
+                v-if="opt.value === selectedModel"
+                class="text-accent text-xs leading-none"
+                aria-hidden="true"
+                >✓</span
+              >
+            </button>
+          </template>
+        </HoverDropdown>
+
         <button
-          class="bg-accent text-ink hover:bg-accent/90 disabled:bg-accent/30 dark:disabled:bg-accent/30 ml-auto inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed"
+          class="bg-accent text-ink hover:bg-accent/90 disabled:bg-accent/30 ml-auto inline-flex cursor-pointer items-center gap-1.5 rounded-md px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed"
           :disabled="!canSummarize"
           @click="onGenerate"
         >
@@ -212,7 +265,7 @@ async function switchToChat() {
           </svg>
           {{
             loading
-              ? '总结中...'
+              ? '生成中...'
               : summaryHasGenerated
                 ? '重新总结'
                 : '生成总结'
@@ -234,14 +287,14 @@ async function switchToChat() {
     <!-- Error message -->
     <p
       v-if="errorMessage"
-      class="text-destructive dark:text-destructive px-5 pb-3 text-sm"
+      class="text-destructive px-5 pb-3 text-sm"
     >
       {{ errorMessage }}
     </p>
 
     <!-- Summary content -->
     <template v-if="cardMode === CardMode.SUMMARY">
-      <div class="/40 border-t px-5 pt-4 pb-5">
+      <div class="border-t border-ink/10 px-5 pt-4 pb-5">
         <ModalFadeTransition mode="out-in">
           <div
             v-if="summary"
@@ -284,7 +337,7 @@ async function switchToChat() {
 
     <!-- Chat content -->
     <template v-else>
-      <div class="/40 border-t">
+      <div class="border-t border-ink/10">
         <template v-if="!hasGenerated">
           <div class="px-5 py-6 text-center">
             <p class="text-muted text-base">
@@ -307,8 +360,8 @@ async function switchToChat() {
                 class="max-w-[80%] rounded-2xl px-3.5 py-2.5 text-base leading-relaxed"
                 :class="
                   msg.role === 'user'
-                    ? 'bg-accent text-ink whitespace-pre-line'
-                    : 'bg-surface/50 text-ink dark:bg-surface/30 dark:text-ink prose max-w-none'
+                    ? 'bg-secondary text-ink whitespace-pre-line'
+                    : 'bg-surface/40 text-ink prose max-w-none'
                 "
               >
                 <template v-if="msg.role === 'user'">
@@ -334,17 +387,17 @@ async function switchToChat() {
             </div>
           </div>
 
-          <div class="/40 flex items-center gap-2 border-t px-4 py-3">
+          <div class="border-t border-ink/10 flex items-center gap-2 px-4 py-3">
             <input
               v-model="chatInput"
               type="text"
               placeholder="继续提问..."
-              class="/70 bg-surface/30 text-ink placeholder-muted focus:border-ring focus:ring-ring dark:/70 dark:bg-surface/20 dark:text-ink dark:placeholder-muted dark:focus:border-ring dark:focus:ring-ring flex-1 rounded-lg border px-3.5 py-2.5 text-base transition-colors focus:ring-1 focus:outline-none"
+              class="border bg-surface/30 text-ink placeholder-muted flex-1 rounded-md px-3.5 py-2.5 text-base transition-colors focus:ring-2 focus:ring-ring/40 focus:outline-none"
               :disabled="loading"
               @keydown="onChatKeydown"
             />
             <button
-              class="bg-accent text-ink hover:bg-accent/90 disabled:bg-accent/30 dark:disabled:bg-accent/30 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg transition disabled:cursor-not-allowed"
+              class="bg-secondary text-ink hover:bg-secondary/80 disabled:bg-secondary/30 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-md transition disabled:cursor-not-allowed"
               :disabled="!canChat"
               @click="onSendChat"
             >
@@ -390,44 +443,3 @@ async function switchToChat() {
   </section>
 </template>
 
-<style scoped>
-.summary-card {
-  transition:
-    transform 200ms ease,
-    box-shadow 200ms ease,
-    border-color 200ms ease;
-}
-
-.summary-card:hover {
-  transform: translateY(-1px);
-  box-shadow:
-    0 4px 16px -2px oklch(from var(--color-accent) l c h / 0.08),
-    0 1px 4px oklch(from var(--color-accent) l c h / 0.04);
-}
-
-.summary-card.is-loading {
-  animation: card-breathe 2s ease-in-out infinite;
-}
-
-.summary-fade-enter-active,
-.summary-fade-leave-active {
-  transition: all 200ms ease;
-}
-
-.summary-fade-enter-from,
-.summary-fade-leave-to {
-  opacity: 0;
-  transform: translateY(3px);
-}
-
-@keyframes card-breathe {
-  0%,
-  100% {
-    border-color: oklch(from var(--color-accent) l c h / 0.15);
-  }
-  50% {
-    border-color: oklch(from var(--color-accent) l c h / 0.35);
-    box-shadow: 0 4px 20px oklch(from var(--color-accent) l c h / 0.08);
-  }
-}
-</style>
