@@ -23,38 +23,38 @@ func init() {
 // ---------- mock MonitorService ----------
 
 type mockMonitorService struct {
-	overviewFn        func(ctx context.Context, days int) (dto.Overview, error)
-	visitorsFn        func(ctx context.Context, days, page, pageSize int) (dto.Visitors, error)
-	userLoginsFn      func(ctx context.Context, days, page, pageSize int) (dto.UserLogins, error)
-	serverStatusFn    func() (dto.ServerStatus, error)
+	overviewFn        func(ctx context.Context, days int) (dto.OverviewResponse, error)
+	visitorsFn        func(ctx context.Context, days, page, pageSize int) (dto.VisitorsResponse, error)
+	userLoginsFn      func(ctx context.Context, days, page, pageSize int) (dto.UserLoginsResponse, error)
+	serverStatusFn    func() (dto.ServerStatusResponse, error)
 	trackVisitorFn    func(ctx context.Context, data dto.VisitorResponse) error
-	getStatusDetailFn func(ctx context.Context) (dto.StatusDetail, error)
+	getStatusDetailFn func(ctx context.Context) (dto.StatusDetailResponse, error)
 }
 
-func (m *mockMonitorService) GetOverview(ctx context.Context, days int) (dto.Overview, error) {
+func (m *mockMonitorService) GetOverview(ctx context.Context, days int) (dto.OverviewResponse, error) {
 	return m.overviewFn(ctx, days)
 }
 
-func (m *mockMonitorService) GetVisitors(ctx context.Context, days, page, pageSize int) (dto.Visitors, error) {
+func (m *mockMonitorService) GetVisitors(ctx context.Context, days, page, pageSize int) (dto.VisitorsResponse, error) {
 	return m.visitorsFn(ctx, days, page, pageSize)
 }
 
-func (m *mockMonitorService) GetUserLogins(ctx context.Context, days, page, pageSize int) (dto.UserLogins, error) {
+func (m *mockMonitorService) GetUserLogins(ctx context.Context, days, page, pageSize int) (dto.UserLoginsResponse, error) {
 	return m.userLoginsFn(ctx, days, page, pageSize)
 }
 
-func (m *mockMonitorService) GetServerStatus() (dto.ServerStatus, error) {
+func (m *mockMonitorService) GetServerStatus() (dto.ServerStatusResponse, error) {
 	if m.serverStatusFn != nil {
 		return m.serverStatusFn()
 	}
-	return dto.ServerStatus{}, nil
+	return dto.ServerStatusResponse{}, nil
 }
 
-func (m *mockMonitorService) GetStatusDetail(ctx context.Context) (dto.StatusDetail, error) {
+func (m *mockMonitorService) GetStatusDetail(ctx context.Context) (dto.StatusDetailResponse, error) {
 	if m.getStatusDetailFn != nil {
 		return m.getStatusDetailFn(ctx)
 	}
-	return dto.StatusDetail{}, nil
+	return dto.StatusDetailResponse{}, nil
 }
 
 func (m *mockMonitorService) TrackVisitor(ctx context.Context, data dto.VisitorResponse) error {
@@ -64,8 +64,8 @@ func (m *mockMonitorService) TrackVisitor(ctx context.Context, data dto.VisitorR
 	return nil
 }
 
-func (m *mockMonitorService) StreamServerStatus(ctx context.Context) (<-chan dto.ServerStatus, error) {
-	ch := make(chan dto.ServerStatus, 1)
+func (m *mockMonitorService) StreamServerStatus(ctx context.Context) (<-chan dto.ServerStatusResponse, error) {
+	ch := make(chan dto.ServerStatusResponse, 1)
 	if m.serverStatusFn != nil {
 		if s, err := m.serverStatusFn(); err == nil {
 			ch <- s
@@ -98,8 +98,8 @@ func requestGet(t *testing.T, r *gin.Engine, path string) *httptest.ResponseReco
 
 func TestGetOverview_ReturnsData(t *testing.T) {
 	svc := &mockMonitorService{
-		overviewFn: func(ctx context.Context, days int) (dto.Overview, error) {
-			return dto.Overview{TotalVisits: 10, UniqueVisitors: 5, PeriodDays: days}, nil
+		overviewFn: func(ctx context.Context, days int) (dto.OverviewResponse, error) {
+			return dto.OverviewResponse{TotalVisits: 10, UniqueVisitors: 5, PeriodDays: days}, nil
 		},
 	}
 	adminAllow := func(c *gin.Context) { c.Next() }
@@ -119,8 +119,8 @@ func TestGetOverview_ReturnsData(t *testing.T) {
 
 func TestGetOverview_DefaultsDaysTo7(t *testing.T) {
 	svc := &mockMonitorService{
-		overviewFn: func(ctx context.Context, days int) (dto.Overview, error) {
-			return dto.Overview{PeriodDays: days}, nil
+		overviewFn: func(ctx context.Context, days int) (dto.OverviewResponse, error) {
+			return dto.OverviewResponse{PeriodDays: days}, nil
 		},
 	}
 	adminAllow := func(c *gin.Context) { c.Next() }
@@ -155,8 +155,8 @@ func TestGetOverview_InvalidDays(t *testing.T) {
 
 func TestGetVisitors_ReturnsPaginatedList(t *testing.T) {
 	svc := &mockMonitorService{
-		visitorsFn: func(ctx context.Context, days, page, pageSize int) (dto.Visitors, error) {
-			return dto.Visitors{Total: 50, Page: 1, PageSize: 20, TotalPages: 3}, nil
+		visitorsFn: func(ctx context.Context, days, page, pageSize int) (dto.VisitorsResponse, error) {
+			return dto.VisitorsResponse{Total: 50, Page: 1, PageSize: 20, TotalPages: 3}, nil
 		},
 	}
 	adminAllow := func(c *gin.Context) { c.Next() }
@@ -186,8 +186,8 @@ func TestGetVisitors_InvalidPageSize(t *testing.T) {
 
 func TestGetUserLogins_ReturnsList(t *testing.T) {
 	svc := &mockMonitorService{
-		userLoginsFn: func(ctx context.Context, days, page, pageSize int) (dto.UserLogins, error) {
-			return dto.UserLogins{Total: 2, Page: 1, PageSize: 20, TotalPages: 1}, nil
+		userLoginsFn: func(ctx context.Context, days, page, pageSize int) (dto.UserLoginsResponse, error) {
+			return dto.UserLoginsResponse{Total: 2, Page: 1, PageSize: 20, TotalPages: 1}, nil
 		},
 	}
 	adminAllow := func(c *gin.Context) { c.Next() }
@@ -227,8 +227,8 @@ func TestMonitorEndpoints_RequireAdmin(t *testing.T) {
 
 func TestGetOverview_ServiceError(t *testing.T) {
 	svc := &mockMonitorService{
-		overviewFn: func(ctx context.Context, days int) (dto.Overview, error) {
-			return dto.Overview{}, errors.New("db boom")
+		overviewFn: func(ctx context.Context, days int) (dto.OverviewResponse, error) {
+			return dto.OverviewResponse{}, errors.New("db boom")
 		},
 	}
 	adminAllow := func(c *gin.Context) { c.Next() }
@@ -244,8 +244,8 @@ func TestGetOverview_ServiceError(t *testing.T) {
 
 func TestGetServerStatus_ReturnsPayload(t *testing.T) {
 	svc := &mockMonitorService{
-		serverStatusFn: func() (dto.ServerStatus, error) {
-			return dto.ServerStatus{CPUPercent: 23.5, CPUCores: 8, MemTotal: 16384}, nil
+		serverStatusFn: func() (dto.ServerStatusResponse, error) {
+			return dto.ServerStatusResponse{CPUPercent: 23.5, CPUCores: 8, MemTotal: 16384}, nil
 		},
 	}
 	adminAllow := func(c *gin.Context) { c.Next() }
@@ -268,8 +268,8 @@ func TestGetServerStatus_ReturnsPayload(t *testing.T) {
 
 func TestServerStatusStream_ReturnsSSEFrames(t *testing.T) {
 	svc := &mockMonitorService{
-		serverStatusFn: func() (dto.ServerStatus, error) {
-			return dto.ServerStatus{CPUPercent: 12.3, CPUCores: 4}, nil
+		serverStatusFn: func() (dto.ServerStatusResponse, error) {
+			return dto.ServerStatusResponse{CPUPercent: 12.3, CPUCores: 4}, nil
 		},
 	}
 	adminAllow := func(c *gin.Context) { c.Next() }
@@ -379,8 +379,8 @@ func TestOldTrackRedirect(t *testing.T) {
 
 func TestGetStatusDetail_ReturnsPayload(t *testing.T) {
 	svc := &mockMonitorService{
-		getStatusDetailFn: func(ctx context.Context) (dto.StatusDetail, error) {
-			return dto.StatusDetail{
+		getStatusDetailFn: func(ctx context.Context) (dto.StatusDetailResponse, error) {
+			return dto.StatusDetailResponse{
 				Version: dto.VersionInfoOut{RepoURL: "https://github.com/KanoCifer/kuroome-blog", CurrentVersion: "4.0.0"},
 				Service: dto.ServiceInfoOut{Runtime: "go1.26", DbOk: true, ApiOk: true},
 				System:  dto.SystemInfoOut{OsName: "darwin", CpuCountLogical: 8},

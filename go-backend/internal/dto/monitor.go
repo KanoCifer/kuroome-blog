@@ -2,8 +2,8 @@ package dto
 
 import "time"
 
-// Overview 对齐 Python monitor_service.get_overview 的返回结构。
-type Overview struct {
+// OverviewResponse 对齐 Python monitor_service.get_overview 的返回结构。
+type OverviewResponse struct {
 	TotalVisits      int              `json:"total_visits"`
 	UniqueVisitors   int              `json:"unique_visitors"`
 	UniqueVisitorIDs int              `json:"unique_visitor_ids"`
@@ -28,8 +28,8 @@ type VisitorItem struct {
 	VisitTime        *time.Time `json:"visit_time"`
 }
 
-// Visitors 分页访客列表。
-type Visitors struct {
+// VisitorsResponse 分页访客列表。
+type VisitorsResponse struct {
 	List       []VisitorItem `json:"list"`
 	Total      int           `json:"total"`
 	Page       int           `json:"page"`
@@ -50,8 +50,8 @@ type UserLoginItem struct {
 	Active         bool    `json:"active"`
 }
 
-// UserLogins 分页用户登录记录。
-type UserLogins struct {
+// UserLoginsResponse 分页用户登录记录。
+type UserLoginsResponse struct {
 	List       []UserLoginItem `json:"list"`
 	Total      int             `json:"total"`
 	Page       int             `json:"page"`
@@ -59,8 +59,8 @@ type UserLogins struct {
 	TotalPages int             `json:"total_pages"`
 }
 
-// ServerStatus 对齐 Python _get_server_status_payload 字段名。
-type ServerStatus struct {
+// ServerStatusResponse 对齐 Python _get_server_status_payload 字段名。
+type ServerStatusResponse struct {
 	CPUPercent float64 `json:"cpu_percent"`
 	CPUCores   int     `json:"cpu_cores"`
 	MemTotal   int     `json:"mem_total"`
@@ -71,18 +71,18 @@ type ServerStatus struct {
 	DiskUsage  float64 `json:"disk_usage"`
 }
 
-type StatusDetail struct {
-	Version VersionInfoOut `json:"version"`
-	Service ServiceInfoOut `json:"service"`
-	System  SystemInfoOut  `json:"system"`
+type StatusDetailResponse struct {
+	Version VersionInfoResponse `json:"version"`
+	Service ServiceInfoResponse `json:"service"`
+	System  SystemInfoResponse  `json:"system"`
 }
 
-type VersionInfoOut struct {
+type VersionInfoResponse struct {
 	RepoURL        string `json:"repo_url"`
 	CurrentVersion string `json:"current_version"`
 }
 
-type ServiceInfoOut struct {
+type ServiceInfoResponse struct {
 	Runtime          string `json:"runtime"`
 	GoVersion        string `json:"go_version"`
 	Goroutines       int    `json:"goroutines"`
@@ -94,7 +94,7 @@ type ServiceInfoOut struct {
 	ApiOk            bool   `json:"api_ok"`
 }
 
-type SystemInfoOut struct {
+type SystemInfoResponse struct {
 	SystemTime         string             `json:"system_time"`
 	SystemTimezone     string             `json:"system_timezone"`
 	OsName             string             `json:"os_name"`

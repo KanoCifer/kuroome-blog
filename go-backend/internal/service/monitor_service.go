@@ -19,13 +19,13 @@ import (
 // Monitorer 定义 monitor handler 依赖的能力集合。
 // 由 service.Monitorer 实现；handler 仅依赖此接口，便于测试替换。
 type Monitorer interface {
-	GetOverview(ctx context.Context, days int) (dto.Overview, error)
-	GetVisitors(ctx context.Context, days, page, pageSize int) (dto.Visitors, error)
-	GetUserLogins(ctx context.Context, days, page, pageSize int) (dto.UserLogins, error)
-	GetServerStatus() (dto.ServerStatus, error)
-	StreamServerStatus(ctx context.Context) (<-chan dto.ServerStatus, error)
+	GetOverview(ctx context.Context, days int) (dto.OverviewResponse, error)
+	GetVisitors(ctx context.Context, days, page, pageSize int) (dto.VisitorsResponse, error)
+	GetUserLogins(ctx context.Context, days, page, pageSize int) (dto.UserLoginsResponse, error)
+	GetServerStatus() (dto.ServerStatusResponse, error)
+	StreamServerStatus(ctx context.Context) (<-chan dto.ServerStatusResponse, error)
 	TrackVisitor(ctx context.Context, data dto.VisitorResponse) error
-	GetStatusDetail(ctx context.Context) (dto.StatusDetail, error)
+	GetStatusDetail(ctx context.Context) (dto.StatusDetailResponse, error)
 }
 
 // MonitorService 实现 monitor 端点的业务逻辑（overview / visitors / user-logins
@@ -64,7 +64,7 @@ func (s *MonitorService) TrackVisitor(ctx context.Context, data dto.VisitorRespo
 
 // GetStatusDetail 返回服务器运行时状态概览，对齐 Python
 // PublicService.get_status_detail 的 {version, service, system} 三元组。
-func (s *MonitorService) GetStatusDetail(ctx context.Context) (dto.StatusDetail, error) {
+func (s *MonitorService) GetStatusDetail(ctx context.Context) (dto.StatusDetailResponse, error) {
 	// --- system info --------------------------------------------------- //
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
@@ -86,7 +86,7 @@ func (s *MonitorService) GetStatusDetail(ctx context.Context) (dto.StatusDetail,
 
 	vm, _ := mem.VirtualMemory()
 
-	sysInfo := dto.SystemInfoOut{
+	sysInfo := dto.SystemInfoResponse{
 		SystemTime:       time.Now().Format("2006/01/02 15:04:05"),
 		SystemTimezone:   "GMT+8",
 		OsName:           runtime.GOOS,
@@ -112,7 +112,7 @@ func (s *MonitorService) GetStatusDetail(ctx context.Context) (dto.StatusDetail,
 		dbOk = false
 	}
 
-	svcInfo := dto.ServiceInfoOut{
+	svcInfo := dto.ServiceInfoResponse{
 		Runtime:          runtime.Version() + " " + runtime.GOOS + "/" + runtime.GOARCH,
 		GoVersion:        runtime.Version(),
 		Goroutines:       runtime.NumGoroutine(),
@@ -125,12 +125,12 @@ func (s *MonitorService) GetStatusDetail(ctx context.Context) (dto.StatusDetail,
 	}
 
 	// --- version info -------------------------------------------------- //
-	verInfo := dto.VersionInfoOut{
+	verInfo := dto.VersionInfoResponse{
 		RepoURL:        "https://github.com/KanoCifer/kuroome-blog",
 		CurrentVersion: s.version,
 	}
 
-	return dto.StatusDetail{
+	return dto.StatusDetailResponse{
 		Version: verInfo,
 		Service: svcInfo,
 		System:  sysInfo,
@@ -138,40 +138,40 @@ func (s *MonitorService) GetStatusDetail(ctx context.Context) (dto.StatusDetail,
 }
 
 // GetOverview 返回 days 天内的访客总览统计，对齐 Python MonitorService.get_overview。
-func (s *MonitorService) GetOverview(ctx context.Context, days int) (dto.Overview, error) {
+func (s *MonitorService) GetOverview(ctx context.Context, days int) (dto.OverviewResponse, error) {
 	endTime := time.Now().UTC()
 	startTime := endTime.AddDate(0, 0, -days)
 
 	totalVisits, err := s.visitor.CountVisitsSince(ctx, startTime)
 	if err != nil {
-		return dto.Overview{}, err
+		return dto.OverviewResponse{}, err
 	}
 	uniqueVisitors, err := s.visitor.CountUniqueVisitorsSince(ctx, startTime)
 	if err != nil {
-		return dto.Overview{}, err
+		return dto.OverviewResponse{}, err
 	}
 	uniqueVisitorIDs, err := s.visitor.CountUniqueVisitorIDsSince(ctx, startTime)
 	if err != nil {
-		return dto.Overview{}, err
+		return dto.OverviewResponse{}, err
 	}
 	topPages, err := s.visitor.GetTopPagesSince(ctx, startTime, 10)
 	if err != nil {
-		return dto.Overview{}, err
+		return dto.OverviewResponse{}, err
 	}
 	browserStats, err := s.visitor.GetBrowserStatsSince(ctx, startTime)
 	if err != nil {
-		return dto.Overview{}, err
+		return dto.OverviewResponse{}, err
 	}
 	osStats, err := s.visitor.GetOSSStatsSince(ctx, startTime)
 	if err != nil {
-		return dto.Overview{}, err
+		return dto.OverviewResponse{}, err
 	}
 	dailyTrend, err := s.visitor.GetDailyTrendSince(ctx, startTime)
 	if err != nil {
-		return dto.Overview{}, err
+		return dto.OverviewResponse{}, err
 	}
 
-	return dto.Overview{
+	return dto.OverviewResponse{
 		TotalVisits:      totalVisits,
 		UniqueVisitors:   uniqueVisitors,
 		UniqueVisitorIDs: uniqueVisitorIDs,
@@ -184,19 +184,19 @@ func (s *MonitorService) GetOverview(ctx context.Context, days int) (dto.Overvie
 }
 
 // GetVisitors 返回 days 天内的访客分页列表，对齐 Python MonitorService.get_visitors。
-func (s *MonitorService) GetVisitors(ctx context.Context, days, page, pageSize int) (dto.Visitors, error) {
+func (s *MonitorService) GetVisitors(ctx context.Context, days, page, pageSize int) (dto.VisitorsResponse, error) {
 	endTime := time.Now().UTC()
 	startTime := endTime.AddDate(0, 0, -days)
 
 	total, err := s.visitor.CountVisitsSince(ctx, startTime)
 	if err != nil {
-		return dto.Visitors{}, err
+		return dto.VisitorsResponse{}, err
 	}
 
 	offset := (page - 1) * pageSize
 	tracks, err := s.visitor.ListVisitorsSince(ctx, startTime, offset, pageSize)
 	if err != nil {
-		return dto.Visitors{}, err
+		return dto.VisitorsResponse{}, err
 	}
 
 	list := make([]dto.VisitorItem, 0, len(tracks))
@@ -215,7 +215,7 @@ func (s *MonitorService) GetVisitors(ctx context.Context, days, page, pageSize i
 		})
 	}
 
-	return dto.Visitors{
+	return dto.VisitorsResponse{
 		List:       list,
 		Total:      total,
 		Page:       page,
@@ -225,13 +225,13 @@ func (s *MonitorService) GetVisitors(ctx context.Context, days, page, pageSize i
 }
 
 // GetUserLogins 返回 days 天内有登录记录的用户分页列表，对齐 Python MonitorService.get_user_logins。
-func (s *MonitorService) GetUserLogins(ctx context.Context, days, page, pageSize int) (dto.UserLogins, error) {
+func (s *MonitorService) GetUserLogins(ctx context.Context, days, page, pageSize int) (dto.UserLoginsResponse, error) {
 	endTime := time.Now().UTC()
 	startTime := endTime.AddDate(0, 0, -days)
 
 	users, err := s.user.ListUsersWithLoginRecords(ctx)
 	if err != nil {
-		return dto.UserLogins{}, err
+		return dto.UserLoginsResponse{}, err
 	}
 
 	logins := make([]dto.UserLoginItem, 0, len(users))
@@ -263,7 +263,7 @@ func (s *MonitorService) GetUserLogins(ctx context.Context, days, page, pageSize
 	}
 	paginated := logins[offset:end]
 
-	return dto.UserLogins{
+	return dto.UserLoginsResponse{
 		List:       paginated,
 		Total:      total,
 		Page:       page,
@@ -297,10 +297,10 @@ func isoPtr(t *time.Time) *string {
 //
 // cpu.Percent 用 1s 间隔（与 Python psutil.cpu_percent(interval=1) 一致），
 // 会阻塞约 1s 换取更准的 CPU 利用率。
-func (s *MonitorService) GetServerStatus() (dto.ServerStatus, error) {
+func (s *MonitorService) GetServerStatus() (dto.ServerStatusResponse, error) {
 	cpuPercents, err := cpu.Percent(time.Second, false)
 	if err != nil {
-		return dto.ServerStatus{}, err
+		return dto.ServerStatusResponse{}, err
 	}
 	var cpuPercent float64
 	if len(cpuPercents) > 0 {
@@ -309,20 +309,20 @@ func (s *MonitorService) GetServerStatus() (dto.ServerStatus, error) {
 
 	cpuCores, err := cpu.Counts(true)
 	if err != nil {
-		return dto.ServerStatus{}, err
+		return dto.ServerStatusResponse{}, err
 	}
 
 	vm, err := mem.VirtualMemory()
 	if err != nil {
-		return dto.ServerStatus{}, err
+		return dto.ServerStatusResponse{}, err
 	}
 
 	du, err := disk.Usage("/")
 	if err != nil {
-		return dto.ServerStatus{}, err
+		return dto.ServerStatusResponse{}, err
 	}
 
-	return dto.ServerStatus{
+	return dto.ServerStatusResponse{
 		CPUPercent: math.Round(cpuPercent),
 		CPUCores:   cpuCores,
 		MemTotal:   int(math.Round(float64(vm.Total) / 1024 / 1024)),
@@ -336,8 +336,8 @@ func (s *MonitorService) GetServerStatus() (dto.ServerStatus, error) {
 
 // StreamServerStatus 每 5s 推送一帧 server status，直到 ctx 取消。
 // 对齐 Python stream_server_status：一个无限循环，每 5s yield 一次 payload。
-func (s *MonitorService) StreamServerStatus(ctx context.Context) (<-chan dto.ServerStatus, error) {
-	ch := make(chan dto.ServerStatus)
+func (s *MonitorService) StreamServerStatus(ctx context.Context) (<-chan dto.ServerStatusResponse, error) {
+	ch := make(chan dto.ServerStatusResponse)
 	go func() {
 		defer close(ch)
 		ticker := time.NewTicker(5 * time.Second)
