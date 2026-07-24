@@ -75,7 +75,7 @@ func newFishHandler(svc *mockFishService) (*FishHandler, *gin.Engine) {
 	r := gin.New()
 	g := r.Group("/v3")
 	noopAdmin := func(c *gin.Context) { c.Next() }
-	h.RegisterRoutes(g, noopAdmin)
+	h.RegisterRoutes(g, noopAdmin, noopAdmin)
 	return h, r
 }
 

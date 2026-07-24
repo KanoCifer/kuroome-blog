@@ -122,6 +122,7 @@ import {
   ScrollText,
   Shield,
   Smartphone,
+  Palette,
   Wrench,
 } from '@lucide/vue';
 import { motion } from 'motion-v';
@@ -185,6 +186,7 @@ const othersItems: OthersItem[] = [
   { to: '/fishing-map', label: 'Fishing', icon: Map },
   { to: '/rss', label: 'RSS', icon: Rss },
   { to: '/subscription', label: 'Subscription', icon: CreditCard },
+  { to: '/color', label: 'Schemes', icon: Palette },
   { label: 'Mobile', icon: Smartphone, action: switchToMobile },
 ];
 
