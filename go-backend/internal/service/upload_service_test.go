@@ -106,7 +106,7 @@ func TestUploadAvatar_InvalidImageData(t *testing.T) {
 func TestUploadAvatar_TooLarge(t *testing.T) {
 	st := &mockProfileStorage{user: &model.User{}}
 	svc := newUploadSvc(t, st)
-	// 构造略大于 10MB 的数据（Content-Type 合法、数据超限，在 decodeImage 被截断检测）。
+	// 构造略大于 10MB 的数据（Content-Type 合法、数据超限，在 util.DecodeImage 被截断检测）。
 	big := make([]byte, svc.maxBytes()+1)
 	_, err := svc.UploadAvatar(context.Background(), 1, "a.png", "image/png", reader(big))
 	if !errEqual(err, errs.ErrImageTooLarge) {

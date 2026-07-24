@@ -1,4 +1,9 @@
-package service
+// Package util —— 跨层共享的纯函数工具集。
+//
+// 收纳不属于任何单一业务层、但被多个包复用的底层辅助函数
+// （图片处理、cookie 等）。所有函数均为无副作用的纯函数，
+// 不依赖全局状态。
+package util
 
 import (
 	"bytes"
@@ -12,14 +17,16 @@ import (
 	"path/filepath"
 
 	"golang.org/x/image/draw"
-	_ "golang.org/x/image/webp"
 
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
 )
 
-// decodeImage 解码上传流为 image.Image，同时执行大小限制与格式校验。
+// ThumbSize 缩略图目标边长（与 Python compress_avatar (256,256) 一致）。
+const ThumbSize = 256
+
+// DecodeImage 解码上传流为 image.Image，同时执行大小限制与格式校验。
 // format 返回 "jpeg"/"png"/"gif"/"webp"，作为落盘扩展名与编码依据。
-func decodeImage(src io.Reader, maxBytes int64) (image.Image, string, error) {
+func DecodeImage(src io.Reader, maxBytes int64) (image.Image, string, error) {
 	limited := io.LimitReader(src, maxBytes+1)
 	data, err := io.ReadAll(limited)
 	if err != nil {
@@ -36,28 +43,28 @@ func decodeImage(src io.Reader, maxBytes int64) (image.Image, string, error) {
 	return img, format, nil
 }
 
-// resizeThumb 按 thumbSize 等比缩放（保持宽高比），与 Python PIL thumbnail 行为一致。
-func resizeThumb(img image.Image) image.Image {
+// ResizeThumb 按 ThumbSize 等比缩放（保持宽高比），与 Python PIL thumbnail 行为一致。
+func ResizeThumb(img image.Image) image.Image {
 	w, h := img.Bounds().Dx(), img.Bounds().Dy()
-	if w <= thumbSize && h <= thumbSize {
+	if w <= ThumbSize && h <= ThumbSize {
 		return img
 	}
 	// 计算等比目标尺寸。
 	var tw, th int
 	if w >= h {
-		tw = thumbSize
-		th = h * thumbSize / w
+		tw = ThumbSize
+		th = h * ThumbSize / w
 	} else {
-		th = thumbSize
-		tw = w * thumbSize / h
+		th = ThumbSize
+		tw = w * ThumbSize / h
 	}
 	dst := image.NewRGBA(image.Rect(0, 0, tw, th))
 	draw.CatmullRom.Scale(dst, dst.Bounds(), img, img.Bounds(), draw.Over, nil)
 	return dst
 }
 
-// encodeImage 按 format 把 image 写入 path。
-func encodeImage(path string, img image.Image, format string) error {
+// EncodeImage 按 format 把 image 写入 path。
+func EncodeImage(path string, img image.Image, format string) error {
 	f, err := os.Create(path)
 	if err != nil {
 		return fmt.Errorf("创建文件失败: %w", err)
@@ -77,14 +84,14 @@ func encodeImage(path string, img image.Image, format string) error {
 	}
 }
 
-// ensureDir 确保 path 的父目录存在。
-func ensureDir(path string) error {
+// EnsureDir 确保 path 的父目录存在。
+func EnsureDir(path string) error {
 	return os.MkdirAll(filepath.Dir(path), 0o755)
 }
 
-// writeFile 把 src 写入 path（自动建父目录），带大小限制的拷贝。
-func writeFile(path string, src io.Reader, maxBytes int64) error {
-	if err := ensureDir(path); err != nil {
+// WriteFile 把 src 写入 path（自动建父目录），带大小限制的拷贝。
+func WriteFile(path string, src io.Reader, maxBytes int64) error {
+	if err := EnsureDir(path); err != nil {
 		return err
 	}
 	f, err := os.Create(path)

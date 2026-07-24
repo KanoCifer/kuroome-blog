@@ -23,12 +23,11 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
+	"github.com/KanoCifer/kuroome-blog/internal/util"
 )
 
-const (
-	// thumbSize 缩略图目标边长（与 Python compress_avartar (256,256) 一致）。
-	thumbSize = 256
-)
+// thumbSize 缩略图目标边长（与 Python compress_avatar (256,256) 一致）。
+const thumbSize = util.ThumbSize
 
 // 允许的图片 Content-Type（对齐 Python ALLOWED_IMAGE_TYPES）。
 var allowedImageTypes = []string{
@@ -92,7 +91,7 @@ func (s *uploadService) UploadFile(ctx context.Context, userID uint, filename st
 	rel := filepath.Join("uploads", fmt.Sprint(userID), name)
 
 	full := filepath.Join(s.cfg.UploadDir, rel)
-	if err := writeFile(full, src, s.maxBytes()); err != nil {
+	if err := util.WriteFile(full, src, s.maxBytes()); err != nil {
 		return "", err
 	}
 	return rel, nil
@@ -111,7 +110,7 @@ func (s *uploadService) UploadBlogImage(ctx context.Context, userID uint, filena
 	rel := filepath.Join("posts", fmt.Sprint(userID), name)
 
 	full := filepath.Join(s.cfg.UploadDir, rel)
-	if err := writeFile(full, src, s.maxBytes()); err != nil {
+	if err := util.WriteFile(full, src, s.maxBytes()); err != nil {
 		return "", err
 	}
 	return rel, nil
@@ -130,7 +129,7 @@ func (s *uploadService) UploadGalleryImage(ctx context.Context, userID uint, fil
 	rel := filepath.Join("gallery", fmt.Sprint(userID), name)
 
 	full := filepath.Join(s.cfg.UploadDir, rel)
-	if err := writeFile(full, src, s.maxBytes()); err != nil {
+	if err := util.WriteFile(full, src, s.maxBytes()); err != nil {
 		return "", err
 	}
 	return rel, nil
@@ -143,7 +142,7 @@ func (s *uploadService) UploadAvatar(ctx context.Context, userID uint, filename,
 		return "", errs.ErrUnsupportedImageType
 	}
 
-	img, format, err := decodeImage(src, s.maxBytes())
+	img, format, err := util.DecodeImage(src, s.maxBytes())
 	if err != nil {
 		return "", err
 	}
@@ -154,16 +153,16 @@ func (s *uploadService) UploadAvatar(ctx context.Context, userID uint, filename,
 	userDir := filepath.Join("pics", fmt.Sprint(userID))
 
 	origFull := filepath.Join(s.cfg.UploadDir, userDir, origName)
-	if err := ensureDir(origFull); err != nil {
+	if err := util.EnsureDir(origFull); err != nil {
 		return "", err
 	}
-	if err := encodeImage(origFull, img, format); err != nil {
+	if err := util.EncodeImage(origFull, img, format); err != nil {
 		return "", err
 	}
 
-	thumb := resizeThumb(img)
+	thumb := util.ResizeThumb(img)
 	thumbFull := filepath.Join(s.cfg.UploadDir, userDir, thumbName)
-	if err := encodeImage(thumbFull, thumb, "jpeg"); err != nil {
+	if err := util.EncodeImage(thumbFull, thumb, "jpeg"); err != nil {
 		return "", err
 	}
 
