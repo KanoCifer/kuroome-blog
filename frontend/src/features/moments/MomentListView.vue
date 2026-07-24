@@ -6,38 +6,68 @@
   >
     <div class="col-span-full container mx-auto min-h-dvh max-w-2xl px-4 py-8">
       <!-- ──────────────────────────────────────────────────────────── -->
-      <!--  顶部：tag 过滤                                              -->
+      <!--  顶部：tag 过滤 + 管理员「写一句」入口                         -->
       <!-- ──────────────────────────────────────────────────────────── -->
       <div
-        v-if="allTags.length"
-        class="mb-6 flex flex-wrap items-center gap-2 text-[12px]"
-        aria-label="按标签过滤"
+        v-if="allTags.length || isAdmin"
+        class="mb-6 flex flex-wrap items-center gap-3"
       >
-        <button
-          type="button"
-          :class="[
-            'rounded-full px-3 py-1 font-medium transition-colors',
-            activeTag === null
-              ? 'bg-accent text-ink shadow-sm'
-              : 'bg-page text-muted hover:bg-surface /60 border',
-          ]"
-          @click="setTag(null)"
+        <div
+          v-if="allTags.length"
+          class="flex flex-wrap items-center gap-2 text-[12px]"
+          aria-label="按标签过滤"
         >
-          全部
-        </button>
+          <button
+            type="button"
+            :class="[
+              'rounded-full px-3 py-1 font-medium transition-colors',
+              activeTag === null
+                ? 'bg-accent text-ink shadow-sm'
+                : 'bg-page text-muted hover:bg-surface /60 border',
+            ]"
+            @click="setTag(null)"
+          >
+            全部
+          </button>
+          <button
+            v-for="tag in allTags"
+            :key="tag"
+            type="button"
+            :class="[
+              'rounded-full px-3 py-1 font-medium transition-colors',
+              activeTag === tag
+                ? 'bg-accent text-ink shadow-sm'
+                : 'bg-page text-muted hover:bg-surface /60 border',
+            ]"
+            @click="setTag(tag)"
+          >
+            <span class="text-ink/70">#</span>{{ tag }}
+          </button>
+        </div>
+
         <button
-          v-for="tag in allTags"
-          :key="tag"
+          v-if="isAdmin"
           type="button"
-          :class="[
-            'rounded-full px-3 py-1 font-medium transition-colors',
-            activeTag === tag
-              ? 'bg-accent text-ink shadow-sm'
-              : 'bg-page text-muted hover:bg-surface /60 border',
-          ]"
-          @click="setTag(tag)"
+          class="ml-auto inline-flex items-center gap-1.5 rounded-md border bg-accent px-4 py-2 text-[13px] font-medium text-contrast transition-[color,transform,background-color] duration-280 hover:bg-accent/90 active:scale-[0.96] focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+          aria-label="新建碎碎念"
+          @click="openEditor(null)"
         >
-          <span class="text-ink/70">#</span>{{ tag }}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 4.5v15m7.5-7.5h-15"
+            />
+          </svg>
+          写一句
         </button>
       </div>
 
@@ -159,32 +189,6 @@
         </button>
       </nav>
     </div>
-
-    <!-- 浮动：管理员「写一句」按钮 -->
-    <button
-      v-if="isAdmin"
-      type="button"
-      class="bg-accent text-ink hover:bg-accent/90 fixed right-6 bottom-6 z-[60] inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-[13px] font-medium shadow-lg transition-all hover:shadow-xl"
-      aria-label="新建碎碎念"
-      @click="openEditor(null)"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="h-4 w-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="2"
-        stroke="currentColor"
-        aria-hidden="true"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M12 4.5v15m7.5-7.5h-15"
-        />
-      </svg>
-      写一句
-    </button>
 
     <!-- 详情 modal -->
     <MomentDetailModal

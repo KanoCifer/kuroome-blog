@@ -381,9 +381,9 @@ func TestGetStatusDetail_ReturnsPayload(t *testing.T) {
 	svc := &mockMonitorService{
 		getStatusDetailFn: func(ctx context.Context) (dto.StatusDetailResponse, error) {
 			return dto.StatusDetailResponse{
-				Version: dto.VersionInfoOut{RepoURL: "https://github.com/KanoCifer/kuroome-blog", CurrentVersion: "4.0.0"},
-				Service: dto.ServiceInfoOut{Runtime: "go1.26", DbOk: true, ApiOk: true},
-				System:  dto.SystemInfoOut{OsName: "darwin", CpuCountLogical: 8},
+				Version: dto.VersionInfoResponse{RepoURL: "https://github.com/KanoCifer/kuroome-blog", CurrentVersion: "4.0.0"},
+				Service: dto.ServiceInfoResponse{Runtime: "go1.26", DbOk: true, ApiOk: true},
+				System:  dto.SystemInfoResponse{OsName: "darwin", CpuCountLogical: 8},
 			}, nil
 		},
 	}

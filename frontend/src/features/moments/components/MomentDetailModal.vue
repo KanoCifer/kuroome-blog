@@ -95,13 +95,12 @@
           <span v-if="moodText" class="italic">{{ moodText }}</span>
         </div>
 
-        <!-- 内容（保留换行，后端已 escape） -->
+        <!-- 内容（markdown 渲染） -->
         <div
-          class="text-ink/90 font-serif text-[16px] leading-loose"
-          style="text-wrap: pretty; white-space: pre-wrap"
-        >
-          {{ moment.content }}
-        </div>
+          class="prose prose-lg text-ink max-w-none"
+          style="text-wrap: pretty"
+          v-html="renderMarkdown(moment.content)"
+        ></div>
 
         <!-- 附件图片网格（点击放大查看） -->
         <div
@@ -253,6 +252,7 @@ import { IconClose } from '@/components';
 import { IconDel } from '@/components';
 import { PinIcon } from '@/components';
 import { Modal } from '@/components';
+import { renderMarkdown } from '@/composables';
 import type {
   Moment,
   MomentAttachment,

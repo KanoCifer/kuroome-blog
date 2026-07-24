@@ -67,16 +67,12 @@
         class="relative pl-3"
       />
 
-      <!-- 内容预览（衬线 + 首字下沉） -->
-      <p
-        class="text-ink/85 relative mt-2 line-clamp-3 pl-3 font-serif text-[15px] leading-loose"
+      <!-- 内容预览（markdown 渲染，自带 prose 主题） -->
+      <div
+        class="prose prose-sm text-ink relative mt-2 max-w-none line-clamp-3 pl-3"
         style="text-wrap: pretty"
-      >
-        <span class="moment-drop-cap text-ink/95">
-          {{ moment.content.charAt(0) }}
-        </span>
-        <span>{{ moment.content.slice(1) }}</span>
-      </p>
+        v-html="renderMarkdown(moment.content)"
+      />
 
       <!-- 标签 chip 行 -->
       <div
@@ -94,6 +90,7 @@
 import { EditIcon } from '@/components';
 import { IconDel } from '@/components';
 import { PinIcon } from '@/components';
+import { renderMarkdown } from '@/composables';
 import type { Moment } from '@/features/moments/types';
 import { motion } from 'motion-v';
 import { WHILE_IN_VIEW_FADE_UP } from '@/constants';
@@ -114,14 +111,3 @@ const emit = defineEmits<{
 }>();
 </script>
 
-<style scoped>
-/* 首字下沉：碎碎念卡的核心视觉差异点 */
-.moment-drop-cap {
-  font-family: serif;
-  font-size: 2.4em;
-  float: left;
-  line-height: 0.9;
-  margin: 0.05em 0.12em -0.05em 0;
-  font-weight: 600;
-}
-</style>
