@@ -45,7 +45,7 @@ func (h *FishHandler) GetFishingSpot(c *gin.Context) {
 
 // CreateFishingSpot 创建钓点  POST /fish/spots
 func (h *FishHandler) CreateFishingSpot(c *gin.Context) {
-	var req dto.FishingSpotIn
+	var req dto.FishingSpotRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.APIError(c, err.Error())
 		return

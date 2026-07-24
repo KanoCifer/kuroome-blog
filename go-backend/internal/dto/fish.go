@@ -1,6 +1,6 @@
 package dto
 
-type FishingSpotOut struct {
+type FishingSpotResponse struct {
 	ID          string    `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
@@ -10,8 +10,8 @@ type FishingSpotOut struct {
 	Images      []string  `json:"images"`
 }
 
-// FishingSpotIn 创建钓点请求 —— 全字段非指针，Name / Location 必填。
-type FishingSpotIn struct {
+// FishingSpotRequest 创建钓点请求 —— 全字段非指针，Name / Location 必填。
+type FishingSpotRequest struct {
 	Name        string    `json:"name" binding:"required"`
 	Location    []float64 `json:"location" binding:"required"`
 	Description string    `json:"description"`

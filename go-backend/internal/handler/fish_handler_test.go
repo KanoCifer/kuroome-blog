@@ -24,30 +24,30 @@ func init() {
 // 不能用 interface{} 替代 context.Context。
 
 type mockFishService struct {
-	listFn    func(ctx context.Context) ([]*dto.FishingSpotOut, error)
-	getByIDFn func(ctx context.Context, id string) (*dto.FishingSpotOut, error)
-	createFn  func(ctx context.Context, spot *dto.FishingSpotIn) error
+	listFn    func(ctx context.Context) ([]*dto.FishingSpotResponse, error)
+	getByIDFn func(ctx context.Context, id string) (*dto.FishingSpotResponse, error)
+	createFn  func(ctx context.Context, spot *dto.FishingSpotRequest) error
 	updateFn  func(ctx context.Context, id string, spot *dto.FishingSpotUpdate) error
 	deleteFn  func(ctx context.Context, id string, hard ...bool) error
 }
 
 var _ service.Fisher = (*mockFishService)(nil)
 
-func (m *mockFishService) GetFishingSpots(ctx context.Context) ([]*dto.FishingSpotOut, error) {
+func (m *mockFishService) GetFishingSpots(ctx context.Context) ([]*dto.FishingSpotResponse, error) {
 	if m.listFn != nil {
 		return m.listFn(ctx)
 	}
 	return nil, nil
 }
 
-func (m *mockFishService) GetFishingSpotByID(ctx context.Context, id string) (*dto.FishingSpotOut, error) {
+func (m *mockFishService) GetFishingSpotByID(ctx context.Context, id string) (*dto.FishingSpotResponse, error) {
 	if m.getByIDFn != nil {
 		return m.getByIDFn(ctx, id)
 	}
 	return nil, nil
 }
 
-func (m *mockFishService) CreateFishingSpot(ctx context.Context, spot *dto.FishingSpotIn) error {
+func (m *mockFishService) CreateFishingSpot(ctx context.Context, spot *dto.FishingSpotRequest) error {
 	if m.createFn != nil {
 		return m.createFn(ctx, spot)
 	}
@@ -112,8 +112,8 @@ func fishDecode(t *testing.T, w *httptest.ResponseRecorder) fishResp {
 
 func TestFishHandler_GetFishingSpotsList_Success(t *testing.T) {
 	svc := &mockFishService{
-		listFn: func(ctx context.Context) ([]*dto.FishingSpotOut, error) {
-			return []*dto.FishingSpotOut{
+		listFn: func(ctx context.Context) ([]*dto.FishingSpotResponse, error) {
+			return []*dto.FishingSpotResponse{
 				{ID: "abc", Name: "钓点 A"},
 				{ID: "def", Name: "钓点 B"},
 			}, nil
@@ -137,7 +137,7 @@ func TestFishHandler_GetFishingSpotsList_Success(t *testing.T) {
 
 func TestFishHandler_GetFishingSpotsList_Error(t *testing.T) {
 	svc := &mockFishService{
-		listFn: func(ctx context.Context) ([]*dto.FishingSpotOut, error) {
+		listFn: func(ctx context.Context) ([]*dto.FishingSpotResponse, error) {
 			return nil, errors.New("mongo down")
 		},
 	}
@@ -151,7 +151,7 @@ func TestFishHandler_GetFishingSpotsList_Error(t *testing.T) {
 
 func TestFishHandler_GetFishingSpotsList_EmptyNoPanic(t *testing.T) {
 	svc := &mockFishService{
-		listFn: func(ctx context.Context) ([]*dto.FishingSpotOut, error) {
+		listFn: func(ctx context.Context) ([]*dto.FishingSpotResponse, error) {
 			return nil, nil
 		},
 	}
@@ -171,11 +171,11 @@ func TestFishHandler_GetFishingSpotsList_EmptyNoPanic(t *testing.T) {
 
 func TestFishHandler_GetFishingSpot_Success(t *testing.T) {
 	svc := &mockFishService{
-		getByIDFn: func(ctx context.Context, id string) (*dto.FishingSpotOut, error) {
+		getByIDFn: func(ctx context.Context, id string) (*dto.FishingSpotResponse, error) {
 			if id != "507f1f77bcf86cd799439011" {
 				t.Errorf("unexpected id: %s", id)
 			}
-			return &dto.FishingSpotOut{ID: id, Name: "钓点"}, nil
+			return &dto.FishingSpotResponse{ID: id, Name: "钓点"}, nil
 		},
 	}
 	_, r := newFishHandler(svc)
@@ -196,7 +196,7 @@ func TestFishHandler_GetFishingSpot_Success(t *testing.T) {
 
 func TestFishHandler_GetFishingSpot_Error(t *testing.T) {
 	svc := &mockFishService{
-		getByIDFn: func(ctx context.Context, id string) (*dto.FishingSpotOut, error) {
+		getByIDFn: func(ctx context.Context, id string) (*dto.FishingSpotResponse, error) {
 			return nil, errors.New("not found")
 		},
 	}
@@ -211,16 +211,16 @@ func TestFishHandler_GetFishingSpot_Error(t *testing.T) {
 // ---------- Create ----------
 
 func TestFishHandler_CreateFishingSpot_Success(t *testing.T) {
-	var captured *dto.FishingSpotIn
+	var captured *dto.FishingSpotRequest
 	svc := &mockFishService{
-		createFn: func(ctx context.Context, spot *dto.FishingSpotIn) error {
+		createFn: func(ctx context.Context, spot *dto.FishingSpotRequest) error {
 			captured = spot
 			return nil
 		},
 	}
 	_, r := newFishHandler(svc)
 
-	body := dto.FishingSpotIn{Name: "新钓点", Location: []float64{120.1, 30.2}}
+	body := dto.FishingSpotRequest{Name: "新钓点", Location: []float64{120.1, 30.2}}
 	w := fishDo(t, r, http.MethodPost, "/v3/fish/spots", body)
 	if w.Code != http.StatusOK {
 		t.Fatalf("status = %d, want 200; body=%s", w.Code, w.Body.String())
@@ -249,7 +249,7 @@ func TestFishHandler_CreateFishingSpot_MissingRequiredFields(t *testing.T) {
 	_, r := newFishHandler(svc)
 
 	// 缺 name / location → binding:"required" 失败。ptr 复用 admin_test.go 的通用 helper。
-	body := dto.FishingSpotIn{}
+	body := dto.FishingSpotRequest{}
 	w := fishDo(t, r, http.MethodPost, "/v3/fish/spots", body)
 	if w.Code != http.StatusBadRequest {
 		t.Errorf("status = %d, want 400 (missing required field)", w.Code)
@@ -258,13 +258,13 @@ func TestFishHandler_CreateFishingSpot_MissingRequiredFields(t *testing.T) {
 
 func TestFishHandler_CreateFishingSpot_ServiceError(t *testing.T) {
 	svc := &mockFishService{
-		createFn: func(ctx context.Context, spot *dto.FishingSpotIn) error {
+		createFn: func(ctx context.Context, spot *dto.FishingSpotRequest) error {
 			return errors.New("create failed")
 		},
 	}
 	_, r := newFishHandler(svc)
 
-	body := dto.FishingSpotIn{Name: "t", Location: []float64{1, 2}}
+	body := dto.FishingSpotRequest{Name: "t", Location: []float64{1, 2}}
 	w := fishDo(t, r, http.MethodPost, "/v3/fish/spots", body)
 	if w.Code != http.StatusBadRequest {
 		t.Errorf("status = %d, want 400", w.Code)

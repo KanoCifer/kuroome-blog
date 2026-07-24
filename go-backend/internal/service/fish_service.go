@@ -18,9 +18,9 @@ type FishRepoer interface {
 }
 
 type Fisher interface {
-	GetFishingSpots(ctx context.Context) ([]*dto.FishingSpotOut, error)
-	GetFishingSpotByID(ctx context.Context, id string) (*dto.FishingSpotOut, error)
-	CreateFishingSpot(ctx context.Context, spot *dto.FishingSpotIn) error
+	GetFishingSpots(ctx context.Context) ([]*dto.FishingSpotResponse, error)
+	GetFishingSpotByID(ctx context.Context, id string) (*dto.FishingSpotResponse, error)
+	CreateFishingSpot(ctx context.Context, spot *dto.FishingSpotRequest) error
 	UpdateFishingSpot(ctx context.Context, id string, spot *dto.FishingSpotUpdate) error
 	Delete(ctx context.Context, id string, hardDelete ...bool) error
 }
@@ -33,14 +33,14 @@ func NewFishService(repo FishRepoer) *FishService {
 	return &FishService{repo: repo}
 }
 
-func (s *FishService) GetFishingSpots(ctx context.Context) ([]*dto.FishingSpotOut, error) {
+func (s *FishService) GetFishingSpots(ctx context.Context) ([]*dto.FishingSpotResponse, error) {
 	docs, err := s.repo.List(ctx)
 	if err != nil {
 		return nil, err
 	}
-	var spots []*dto.FishingSpotOut
+	var spots []*dto.FishingSpotResponse
 	for _, doc := range docs {
-		spots = append(spots, &dto.FishingSpotOut{
+		spots = append(spots, &dto.FishingSpotResponse{
 			ID:          doc.ID,
 			Name:        doc.Name,
 			Description: doc.Description,
@@ -53,12 +53,12 @@ func (s *FishService) GetFishingSpots(ctx context.Context) ([]*dto.FishingSpotOu
 	return spots, nil
 }
 
-func (s *FishService) GetFishingSpotByID(ctx context.Context, id string) (*dto.FishingSpotOut, error) {
+func (s *FishService) GetFishingSpotByID(ctx context.Context, id string) (*dto.FishingSpotResponse, error) {
 	doc, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
-	var out = &dto.FishingSpotOut{
+	var out = &dto.FishingSpotResponse{
 		ID:          doc.ID,
 		Name:        doc.Name,
 		Description: doc.Description,
@@ -101,7 +101,7 @@ func (s *FishService) UpdateFishingSpot(ctx context.Context, id string, spot *dt
 	return s.repo.Update(ctx, id, data)
 }
 
-func (s *FishService) CreateFishingSpot(ctx context.Context, spot *dto.FishingSpotIn) error {
+func (s *FishService) CreateFishingSpot(ctx context.Context, spot *dto.FishingSpotRequest) error {
 	doc := &document.FishingSpot{
 		Name:        spot.Name,
 		Description: spot.Description,
