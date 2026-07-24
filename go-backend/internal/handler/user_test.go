@@ -26,12 +26,12 @@ func init() {
 
 type mockUserService struct {
 	authenticateFn  func(ctx context.Context, username, password string) (*model.User, error)
-	createTokensFn  func(ctx context.Context, u *model.User) (*dto.Tokens, error)
+	createTokensFn  func(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
 	createUserFn    func(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
 	getByIDFn       func(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
 	getByUsernameFn func(ctx context.Context, username string) (*model.User, *model.Profile, error)
 	logoutFn        func(ctx context.Context, userID uint)
-	refreshFn       func(ctx context.Context, refreshToken string) (*dto.Tokens, error)
+	refreshFn       func(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
 	sendEmailCodeFn func(ctx context.Context, email string) bool
 	userToDictFn    func(u *model.User, p *model.Profile) map[string]any
 }
@@ -40,11 +40,11 @@ func (m *mockUserService) Authenticate(ctx context.Context, username, password s
 	return m.authenticateFn(ctx, username, password)
 }
 
-func (m *mockUserService) CreateTokens(ctx context.Context, u *model.User) (*dto.Tokens, error) {
+func (m *mockUserService) CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error) {
 	if m.createTokensFn != nil {
 		return m.createTokensFn(ctx, u)
 	}
-	return &dto.Tokens{AccessToken: "access", RefreshToken: "refresh"}, nil
+	return &dto.TokensResponse{AccessToken: "access", RefreshToken: "refresh"}, nil
 }
 
 func (m *mockUserService) CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
@@ -68,7 +68,7 @@ func (m *mockUserService) Logout(ctx context.Context, userID uint) {
 	}
 }
 
-func (m *mockUserService) RefreshTokens(ctx context.Context, refreshToken string) (*dto.Tokens, error) {
+func (m *mockUserService) RefreshTokens(ctx context.Context, refreshToken string) (*dto.TokensResponse, error) {
 	return m.refreshFn(ctx, refreshToken)
 }
 
@@ -206,7 +206,7 @@ func TestLogin_TokenError(t *testing.T) {
 		authenticateFn: func(ctx context.Context, username, password string) (*model.User, error) {
 			return &model.User{Model: gormModel(1)}, nil
 		},
-		createTokensFn: func(ctx context.Context, u *model.User) (*dto.Tokens, error) {
+		createTokensFn: func(ctx context.Context, u *model.User) (*dto.TokensResponse, error) {
 			return nil, errors.New("jwt error")
 		},
 	}
@@ -390,8 +390,8 @@ func TestLogout_CallsService(t *testing.T) {
 
 func TestRefreshToken_Success(t *testing.T) {
 	svc := &mockUserService{
-		refreshFn: func(ctx context.Context, refreshToken string) (*dto.Tokens, error) {
-			return &dto.Tokens{AccessToken: "new-access", RefreshToken: "new-refresh"}, nil
+		refreshFn: func(ctx context.Context, refreshToken string) (*dto.TokensResponse, error) {
+			return &dto.TokensResponse{AccessToken: "new-access", RefreshToken: "new-refresh"}, nil
 		},
 	}
 	h := NewUserHandler(svc, config.Cfg)
@@ -410,7 +410,7 @@ func TestRefreshToken_Success(t *testing.T) {
 
 func TestRefreshToken_InvalidToken(t *testing.T) {
 	svc := &mockUserService{
-		refreshFn: func(ctx context.Context, refreshToken string) (*dto.Tokens, error) {
+		refreshFn: func(ctx context.Context, refreshToken string) (*dto.TokensResponse, error) {
 			return nil, errs.ErrInvalidToken
 		},
 	}
@@ -426,9 +426,9 @@ func TestRefreshToken_InvalidToken(t *testing.T) {
 
 func TestRefreshToken_MissingField(t *testing.T) {
 	svc := &mockUserService{
-		refreshFn: func(ctx context.Context, refreshToken string) (*dto.Tokens, error) {
+		refreshFn: func(ctx context.Context, refreshToken string) (*dto.TokensResponse, error) {
 			t.Errorf("refreshFn should not be called when no token present")
-			return &dto.Tokens{}, nil
+			return &dto.TokensResponse{}, nil
 		},
 	}
 	h := NewUserHandler(svc, config.Cfg)
@@ -444,11 +444,11 @@ func TestRefreshToken_MissingField(t *testing.T) {
 
 func TestRefreshToken_FromCookie(t *testing.T) {
 	svc := &mockUserService{
-		refreshFn: func(ctx context.Context, refreshToken string) (*dto.Tokens, error) {
+		refreshFn: func(ctx context.Context, refreshToken string) (*dto.TokensResponse, error) {
 			if refreshToken != "cookie-refresh" {
 				t.Errorf("refreshToken = %q, want cookie-refresh", refreshToken)
 			}
-			return &dto.Tokens{AccessToken: "new-access", RefreshToken: "new-refresh"}, nil
+			return &dto.TokensResponse{AccessToken: "new-access", RefreshToken: "new-refresh"}, nil
 		},
 	}
 	h := NewUserHandler(svc, config.Cfg)

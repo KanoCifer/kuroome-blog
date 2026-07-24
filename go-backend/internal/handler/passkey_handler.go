@@ -28,7 +28,7 @@ type PasskeyServiceer interface {
 // passkeyTokenCreator 是 PasskeyHandler 为签发 token 所需的窄接口。
 // handler 自定接口，不直接依赖 service.Userer，便于 mock 测试。
 type passkeyTokenCreator interface {
-	CreateTokens(ctx context.Context, u *model.User) (*dto.Tokens, error)
+	CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
 	UserToDict(u *model.User, p *model.Profile) map[string]any
 }
 

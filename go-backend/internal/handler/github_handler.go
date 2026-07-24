@@ -23,7 +23,7 @@ type GitHubOAuthServiceer interface {
 
 	// HandleCallback 处理 GitHub 回调。
 	// login 模式返回 (user, tokens, nil); bind 模式返回 (user, nil, nil)。
-	HandleCallback(ctx context.Context, state, code string) (*model.User, *dto.Tokens, error)
+	HandleCallback(ctx context.Context, state, code string) (*model.User, *dto.TokensResponse, error)
 
 	// UnbindGitHub 解除用户与 GitHub 的绑定。
 	UnbindGitHub(ctx context.Context, userID uint) error

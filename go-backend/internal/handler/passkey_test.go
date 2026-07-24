@@ -212,8 +212,8 @@ func TestAuthenticate_Success(t *testing.T) {
 		},
 	}
 	mockUserSvc := &mockUserService{
-		createTokensFn: func(ctx context.Context, u *model.User) (*dto.Tokens, error) {
-			return &dto.Tokens{AccessToken: "access", RefreshToken: "refresh"}, nil
+		createTokensFn: func(ctx context.Context, u *model.User) (*dto.TokensResponse, error) {
+			return &dto.TokensResponse{AccessToken: "access", RefreshToken: "refresh"}, nil
 		},
 	}
 	h := NewPasskeyHandler(svc, mockUserSvc, config.Cfg)

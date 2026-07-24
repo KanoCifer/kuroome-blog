@@ -17,11 +17,11 @@ import (
 
 type Userer interface {
 	Authenticate(ctx context.Context, username, password string) (*model.User, error)
-	CreateTokens(ctx context.Context, u *model.User) (*dto.Tokens, error)
+	CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
 	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
 	GetByID(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
 	Logout(ctx context.Context, userID uint)
-	RefreshTokens(ctx context.Context, refreshToken string) (*dto.Tokens, error)
+	RefreshTokens(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
 	UserToDict(u *model.User, p *model.Profile) map[string]any
 	SendEmailCode(ctx context.Context, email string) bool
 }

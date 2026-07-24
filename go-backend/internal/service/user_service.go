@@ -59,8 +59,8 @@ type Userer interface {
 	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
 	SendEmailCode(ctx context.Context, email string) bool
 	Authenticate(ctx context.Context, username, password string) (*model.User, error)
-	CreateTokens(ctx context.Context, u *model.User) (*dto.Tokens, error)
-	RefreshTokens(ctx context.Context, refreshToken string) (*dto.Tokens, error)
+	CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
+	RefreshTokens(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
 	Logout(ctx context.Context, userID uint)
 	UserToDict(u *model.User, p *model.Profile) map[string]any
 }
@@ -183,7 +183,7 @@ func (s *userService) Authenticate(ctx context.Context, username, password strin
 }
 
 // CreateTokens 生成 access + refresh token，refresh 入库 Redis
-func (s *userService) CreateTokens(ctx context.Context, u *model.User) (*dto.Tokens, error) {
+func (s *userService) CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error) {
 	refreshTTL := 7 * 24 * time.Hour
 	accessExpiry := time.Now().UTC().Add(24 * time.Hour)
 	refreshExpiry := time.Now().UTC().Add(refreshTTL)
@@ -202,14 +202,14 @@ func (s *userService) CreateTokens(ctx context.Context, u *model.User) (*dto.Tok
 		s.redis.Set(ctx, "refresh:"+itoa(int(u.ID)), refreshToken, refreshTTL)
 	}
 
-	return &dto.Tokens{
+	return &dto.TokensResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
 }
 
 // RefreshTokens 校验 refresh token 并轮换
-func (s *userService) RefreshTokens(ctx context.Context, refreshToken string) (*dto.Tokens, error) {
+func (s *userService) RefreshTokens(ctx context.Context, refreshToken string) (*dto.TokensResponse, error) {
 	claims, err := jwt.ParseToken(refreshToken)
 	if err != nil {
 		return nil, errs.ErrInvalidToken

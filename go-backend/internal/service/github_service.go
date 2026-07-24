@@ -28,14 +28,14 @@ import (
 
 // UserSvcer 定义 github 服务依赖的用户业务能力。
 type UserSvcer interface {
-	CreateTokens(ctx context.Context, u *model.User) (*dto.Tokens, error)
+	CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
 	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
 }
 
 // GitHubOAuther 定义 github handler 依赖的业务能力。
 type GitHubOAuther interface {
 	AuthURL(ctx context.Context, mode string, userID uint) (string, error)
-	HandleCallback(ctx context.Context, state, code string) (*model.User, *dto.Tokens, error)
+	HandleCallback(ctx context.Context, state, code string) (*model.User, *dto.TokensResponse, error)
 	UnbindGitHub(ctx context.Context, userID uint) error
 }
 
@@ -136,7 +136,7 @@ func (g *GitHubOAuth) AuthURL(ctx context.Context, mode string, userID uint) (st
 // bind 模式(userID>0): 把 github_id 绑到该用户, 返回 (user, nil, nil)。
 //
 // 出错时返回 (nil, nil, err)。
-func (g *GitHubOAuth) HandleCallback(ctx context.Context, state, code string) (*model.User, *dto.Tokens, error) {
+func (g *GitHubOAuth) HandleCallback(ctx context.Context, state, code string) (*model.User, *dto.TokensResponse, error) {
 	// 1. 校验 state
 	if state == "" || code == "" {
 		return nil, nil, errs.ErrInvalidOAuthState
@@ -167,7 +167,7 @@ func (g *GitHubOAuth) HandleCallback(ctx context.Context, state, code string) (*
 }
 
 // loginByGitHub 按 github_id 查找或自动创建用户, 并签发 token。
-func (g *GitHubOAuth) loginByGitHub(ctx context.Context, gh *ghUser) (*model.User, *dto.Tokens, error) {
+func (g *GitHubOAuth) loginByGitHub(ctx context.Context, gh *ghUser) (*model.User, *dto.TokensResponse, error) {
 	existing, err := g.userRepo.GetByGithubID(ctx, gh.ID)
 	if err != nil {
 		return nil, nil, err
@@ -202,7 +202,7 @@ func (g *GitHubOAuth) loginByGitHub(ctx context.Context, gh *ghUser) (*model.Use
 }
 
 // bindGitHub 把 github_id 绑到指定用户。
-func (g *GitHubOAuth) bindGitHub(ctx context.Context, userID uint, gh *ghUser) (*model.User, *dto.Tokens, error) {
+func (g *GitHubOAuth) bindGitHub(ctx context.Context, userID uint, gh *ghUser) (*model.User, *dto.TokensResponse, error) {
 	existing, err := g.userRepo.GetByGithubID(ctx, gh.ID)
 	if err != nil {
 		return nil, nil, err
