@@ -11,7 +11,7 @@ export default {
       headline: '一款易用的',
       headlineTail: 'Noon Chrome 插件',
       subheadline:
-        '还是熟悉的 1688 页面，还是你自己的 Noon 店铺。Nomu 把采集、翻译、图片处理和逐件发布收进同一条流水线：从源页到已上架，一条黄色确认走完。',
+        '还是熟悉的 1688 页面，还是你自己的 Noon 店铺。Nomu 把采集、翻译、图片处理和逐件发布收进同一条流水线：从源页到已上架，黄色高亮逐条确认。',
       ctaPrimary: '添加到 Chrome',
       ctaPrimaryHint: '跳转到 Chrome 网上应用商店，一键安装 Nomu',
       ctaSecondary: '看看它做什么',
@@ -26,7 +26,7 @@ export default {
         publish: '发布',
       },
       screenshotAlt: 'Nomu 主界面截图',
-      screenshotCaption: '右侧抽屉，一条黄色确认到底',
+      screenshotCaption: '右侧抽屉，黄色高亮逐条确认',
     },
     positioning: {
       claim1: '数据留在本地',
@@ -36,12 +36,12 @@ export default {
     features: {
       eyebrow: '功能',
       sectionTitle: '采集商品，剩下的交给插件。',
-      sectionSubtitle: '每一步都替你想好了默认值：翻译自动出、图片自动合规、AI 类目推荐。你只需要在黄色高亮处点头。',
+      sectionSubtitle: '每一步都有默认值：翻译自动出、图片自动合规、AI 类目推荐。你只需要在黄色高亮处点一下确认。',
       items: {
         pipeline: {
           title: '把 1688 商品发到 Noon',
           imageAlt: '采集到发布全流程的截图',
-          body: '采集源页、加入待发布列表、提交上架、激活并登记质保，一气呵成。',
+          body: '采集源页、加入待发布列表、提交上架、激活并登记质保，一次走完。',
         },
         multiAccount: {
           title: '店铺集中管理',
@@ -56,12 +56,12 @@ export default {
         image: {
           title: '图片自动处理成可上架',
           imageAlt: '商品图按 660×900 规格处理的截图',
-          body: '商品图自动调整为 Noon 要求的尺寸和白底（660×900），不合格的图片不会导致上架被拒。',
+          body: '商品图自动调整为 Noon 要求的尺寸和白底（660×900），规格不对的图片会被处理到位，不会让上架被卡。',
         },
         serial: {
           title: '逐件发布，出错即停',
           imageAlt: '逐件独立发布的商品截图',
-          body: '每件商品独立发布。第一件失败就停止整个批次，不会出现一半上架、一半漏掉的情况。',
+          body: '每件商品独立发布。第一件失败就停止整个批次，不会留下一半上架、一半漏发的乱摊子。',
         },
         ai: {
           title: '自动推荐 Noon 类目',
@@ -90,12 +90,12 @@ export default {
       },
     },
     audience: {
-      motto: '为从 1688 采购、在 Noon 阿联酋与沙特站上架的中文卖家而做',
+      motto: '为从 1688 采购、在 Noon 阿联酋和沙特站上架的中文卖家而做',
     },
     roadmap: {
       eyebrow: '未来计划',
       sectionTitle: '正在规划中的功能',
-      sectionSubtitle: '这些是已经在路线图上的近邻能力，不承诺时间表，按真实需求推进。',
+      sectionSubtitle: '这些是已经在路线图上的下一批能力，不承诺时间表，按真实需求推进。',
       status: '计划中',
       items: {
         sources: {
@@ -103,8 +103,8 @@ export default {
           body: '在 1688 之外接入更常用的采购平台，让一批多源同时导入。',
         },
         egypt: {
-          title: 'AI 自动化填写所有内容',
-          body: '接入 AI 能力，自动填写所有信息',
+          title: 'AI 填写所有信息',
+          body: '接上 AI，自动填写标题、描述、属性等所有字段。',
         },
         templates: {
           title: '上架模板',
@@ -112,14 +112,14 @@ export default {
         },
         batchEdit: {
           title: 'AI 生图',
-          body: '接入 AI 生图，自动生成电商高质量宣传图。',
+          body: '接上 AI 生图，自动生成电商高质量宣传图。',
         },
       },
     },
     privacy: {
       eyebrow: '隐私',
       sectionTitle: '替你干活的工具，不该让你盲目信任。',
-      sectionSubtitle: '扩展能接触你的店铺配置和每一次提交，它最不该是个黑盒，你的数据由你掌握。',
+      sectionSubtitle: '扩展能接触你的店铺配置和每一次提交——这些数据该让你看清楚流向。',
       colLocal: '留在本地',
       colEgress: '只发给 Noon',
       colNever: '永远不会看到',
@@ -215,7 +215,7 @@ export default {
         },
         regions: {
           q: '支持哪些 Noon 站点？',
-          a: '目前支持 Noon 阿联酋站与沙特站。其他站点未在范围内验证，暂不承诺。',
+          a: '目前支持 Noon 阿联酋站和沙特站。其他站点没测过，暂不承诺。',
         },
         sources: {
           q: '除了 1688 还支持其它源吗？',
@@ -227,7 +227,7 @@ export default {
         },
         translation: {
           q: '翻译质量如何？是否需要二次校对？',
-          a: '翻译自动完成（中译英 / 阿）。高客单价或品牌商品建议发布前人工抽检，自动翻译不保证等同于母语水平。',
+          a: '翻译自动完成（中译英 / 阿）。贵重或品牌商品建议发布前抽检一下，自动翻译不保证母语水平。',
         },
         failure: {
           q: '上架失败的商品会怎样？',
@@ -238,7 +238,7 @@ export default {
     support: {
       eyebrow: '支持',
       sectionTitle: '遇到问题？',
-      sectionSubtitle: '安装、采集、发布任何一步遇到了问题了，或者想提功能建议，都可以直接联系。',
+      sectionSubtitle: '安装、采集、发布任何一步遇到问题，或者想提功能建议，都可以联系。',
       viewQr: '查看微信二维码',
       channels: {
         wechat: {
@@ -256,7 +256,7 @@ export default {
       },
     },
     finalCta: {
-      title: '把上架这件事，交还给流程',
+      title: '把上架交给流程',
       body: '1688 页面照开，Noon 店铺照用，只是复制粘贴的部分没有了。',
       button: '添加到 Chrome',
       hint: '在 Chrome 网上应用商店一键安装 Nomu',

@@ -57,7 +57,7 @@ export default {
         image: {
           title: 'Product images ready to publish',
           imageAlt: 'Screenshot of images being prepared to the 660×900 spec',
-          body: "Images are resized onto white backgrounds at Noon's 660×900 spec automatically, so a non-compliant picture never blocks a listing.",
+          body: "Images are resized onto white backgrounds at Noon's 660×900 spec automatically, so a bad image never blocks a listing.",
         },
         serial: {
           title: 'Publish one by one, stop on the first problem',
@@ -97,7 +97,7 @@ export default {
       eyebrow: 'Roadmap',
       sectionTitle: 'What is on the roadmap next',
       sectionSubtitle:
-        'These are the nearest capabilities already on the list. No timelines promised; we move when real demand arrives.',
+        'These are the next capabilities already on the list. No timelines promised; we move when real demand arrives.',
       status: 'Planned',
       items: {
         sources: {
@@ -106,7 +106,7 @@ export default {
         },
         egypt: {
           title: 'AI fills in everything',
-          body: 'Plug in AI to fill out titles, descriptions, attributes and other fields automatically.',
+          body: 'Use AI to fill out titles, descriptions, attributes and other fields automatically.',
         },
         templates: {
           title: 'Listing templates',
@@ -114,7 +114,7 @@ export default {
         },
         batchEdit: {
           title: 'AI image generation',
-          body: 'Plug in AI image generation to create high-quality ecommerce promo images automatically.',
+          body: 'Use AI to generate high-quality ecommerce promo images automatically.',
         },
       },
     },
@@ -244,7 +244,7 @@ export default {
     },
     support: {
       eyebrow: 'Support',
-      sectionTitle: 'Stuck? Reach the developer directly.',
+      sectionTitle: 'Stuck? Get in touch directly.',
       sectionSubtitle:
         'No forum digging. If install, capture or publishing gets stuck, or you have a feature idea, get in touch.',
       viewQr: 'View WeChat QR code',
@@ -264,7 +264,7 @@ export default {
       },
     },
     finalCta: {
-      title: 'Hand listing back to a workflow',
+      title: 'Put listing on a workflow',
       body: 'You keep browsing 1688 and running your Noon stores as before. What goes away is the copy-paste part.',
       button: 'Add to Chrome',
       hint: 'One-click install from the Chrome Web Store',
