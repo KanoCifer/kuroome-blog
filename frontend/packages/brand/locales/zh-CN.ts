@@ -138,7 +138,7 @@ export default {
     },
     permissions: {
       sectionTitle: '权限说明',
-      sectionSubtitle: '三项核心权限；用到的网站列在下面',
+      sectionSubtitle: '几项核心权限；用到的网站列在下面',
       top: {
         tabs: {
           name: 'Tabs',
@@ -151,10 +151,6 @@ export default {
         sidePanel: {
           name: 'Side Panel',
           reason: '在 Chrome 侧边栏里显示 Nomu 的店铺管理面板。',
-        },
-        cookies: {
-          name: 'Cookies',
-          reason: '读取并使用你的 Cookie 来与 Noon 通信',
         },
       },
       fullTitle: '展开完整权限列表',
@@ -172,10 +168,6 @@ export default {
           sidePanel: {
             name: '侧边栏',
             reason: '显示侧边栏店铺管理面板。',
-          },
-          cookies: {
-            name: 'Cookies',
-            reason: '读取并使用你的 Cookie 来与 Noon 通信',
           },
         },
         hosts: {

@@ -145,7 +145,7 @@ export default {
     },
     permissions: {
       sectionTitle: 'Permissions, explained',
-      sectionSubtitle: 'Four core permissions; the sites the tool uses are listed below',
+      sectionSubtitle: 'A few core permissions; the sites the tool uses are listed below',
       top: {
         tabs: {
           name: 'Tabs',
@@ -158,10 +158,6 @@ export default {
         sidePanel: {
           name: 'Side panel',
           reason: "Show the store-management panel in Chrome's side panel.",
-        },
-        cookies: {
-          name: 'Cookies',
-          reason: 'Read and use your cookies to talk to Noon',
         },
       },
       fullTitle: 'Show the full permission list',
@@ -179,10 +175,6 @@ export default {
           sidePanel: {
             name: 'Side panel',
             reason: 'Show the store-management panel in the side panel.',
-          },
-          cookies: {
-            name: 'Cookies',
-            reason: 'Read and use your cookies to talk to Noon',
           },
         },
         hosts: {
