@@ -8,7 +8,7 @@ const { t } = useI18n();
 // 文档站（VitePress），base 为 /docs/
 const DOCS_URL = 'https://kanocifer.chat/docs/';
 
-const channelKeys = ['wechat', 'docs', 'github'] as const;
+const channelKeys = ['wechat', 'docs'] as const;
 </script>
 
 <template>
@@ -33,7 +33,7 @@ const channelKeys = ['wechat', 'docs', 'github'] as const;
     </header>
 
     <ul
-      class="divide-border/60 border-border/60 grid grid-cols-1 divide-y border-y md:grid-cols-3"
+      class="divide-border/60 border-border/60 grid grid-cols-1 divide-y border-y md:grid-cols-2"
     >
       <li
         v-for="(key, idx) in channelKeys"
@@ -44,7 +44,11 @@ const channelKeys = ['wechat', 'docs', 'github'] as const;
         <span
           class="text-accent bg-accent/10 inline-flex size-7 shrink-0 items-center justify-center rounded-md"
         >
-          <component :is="(LucideIcons as any)[icons[key]]" :size="14" :stroke-width="1.75" />
+          <component
+            :is="(LucideIcons as any)[icons[key]]"
+            :size="14"
+            :stroke-width="1.75"
+          />
         </span>
         <h3 class="text-ink text-base font-semibold">
           {{ t(`noonTool.support.channels.${key}.title`) }}

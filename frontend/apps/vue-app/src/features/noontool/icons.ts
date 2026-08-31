@@ -11,7 +11,6 @@ export const icons = {
   support: 'LifeBuoy',
   wechat: 'MessageCircle',
   docs: 'BookOpen',
-  github: 'Code',
   footerLink: 'ArrowUpRight',
   roadmapSources: 'PackageSearch',
   roadmapEgypt: 'Sparkles',
