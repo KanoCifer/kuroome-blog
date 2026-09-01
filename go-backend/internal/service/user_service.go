@@ -62,7 +62,7 @@ type Userer interface {
 	GetByUsername(ctx context.Context, username string) (*model.User, *model.Profile, error)
 	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
 	SendEmailCode(ctx context.Context, email string) bool
-	SendMagicLoginEmail(ctx context.Context, email string) bool
+	SendMagicLoginEmail(ctx context.Context, email, mode string) bool
 	Authenticate(ctx context.Context, username, password string) (*model.User, error)
 	AuthenticateMagicLogin(ctx context.Context, token string) (*model.User, *model.Profile, error)
 	CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
@@ -73,21 +73,25 @@ type Userer interface {
 
 // userService 持有 repo 和 redis，负责编排业务逻辑。
 //
-// adminUserIDs / frontendURL 由调用方从 config 注入，避免本包直接读取全局 config.Cfg。
-// frontendURL 用于构造魔法登录邮件的链接 host（接法 A：链接 → 前端 /auth/magic 路由）。
+// adminUserIDs / frontendURLs 由调用方从 config 注入，避免本包直接读取全局 config.Cfg。
+// frontendURLs 按 mode 索引（blog / nomu），用于魔法登录邮件链接选 host + 路径。
 type userService struct {
 	repo         UserRepositoryer
 	redis        *redis.Client
 	adminUserIDs []int
-	frontendURL  string
+	frontendURLs map[string]string
 }
 
-func NewUserService(repo UserRepositoryer, redis *redis.Client, adminUserIDs []int, frontendURL string) *userService {
+func NewUserService(repo UserRepositoryer, redis *redis.Client, adminUserIDs []int, frontendURLs map[string]string) *userService {
+	trimmed := make(map[string]string, len(frontendURLs))
+	for k, v := range frontendURLs {
+		trimmed[k] = strings.TrimRight(v, "/")
+	}
 	return &userService{
 		repo:         repo,
 		redis:        redis,
 		adminUserIDs: adminUserIDs,
-		frontendURL:  strings.TrimRight(frontendURL, "/"),
+		frontendURLs: trimmed,
 	}
 }
 
@@ -294,20 +298,45 @@ func (s *userService) UserToDict(u *model.User, p *model.Profile) map[string]any
 // ----- Email 魔法登录 ----
 //
 // 邮箱未注册时静默返回 true，由 handler 一律 200 OK 兜底，避免枚举。
+//
+// mode 决定两件事：
+//  1. 邮件里链接的 host + 路径（blog → kanocifer.chat SPA；nomu → 扩展 options.html）；
+//  2. Redis 缓存 key 的命名空间（<token>:<mode>）。
+//     跨 mode 即便 hex 撞上也不会互相消费——blog token 写到 magiclogintoken:<h>:blog，
+//     nomu token 写到 magiclogintoken:<h>:nomu，两个独立 key。
 const (
 	magicLoginTokenBytes = 32
 	magicLoginTokenHex   = magicLoginTokenBytes * 2
 	magicLoginTokenTTL   = time.Minute * 10
-	magicLoginCacheKey   = "magiclogintoken:%s"
-	// magicLoginLinkPath 是相对前端路由的格式串（含 query）；
-	// SendMagicLoginEmail 用 frontendURL + 该路径拼接出完整链接。
-	// 接法 A：链接打到前端 SPA（kanocifer.chat/auth/magic?token=…），
-	//        前端拿到 token 再 POST /v3/magic-login 完成登录。
-	magicLoginLinkPath = "/auth/magic?token=%s"
+	magicLoginCacheKey   = "magiclogintoken:%s:%s"
+
+	// magicLoginModeBlog / magicLoginModeNomu 是 mode 字段的合法取值。
+	// 非法 mode 走 blog 兜底 + slog.Warn，handler 层 DTO 用 oneof 拦截。
+	magicLoginModeBlog = "blog"
+	magicLoginModeNomu = "nomu"
 )
 
+// magicLoginLinkPathFor 给出 mode 对应的"路径?token=%s"模板。
+// nomu 走 hash 路由（#/login/magic），所以 path 里必须含 "#"。
+func magicLoginLinkPathFor(mode string) string {
+	if mode == magicLoginModeNomu {
+		return "/options.html#/login/magic?token=%s"
+	}
+	return "/auth/magic?token=%s"
+}
+
+// normalizeMagicLoginMode 兜底非法 mode 为 blog，warn 一行便于发现配置漂移。
+func normalizeMagicLoginMode(mode string) string {
+	if mode == magicLoginModeBlog || mode == magicLoginModeNomu {
+		return mode
+	}
+	return magicLoginModeBlog
+}
+
 // SendMagicLoginEmail 向已注册邮箱发送一次性登录链接；邮箱不存在时静默返回 true。
-func (s *userService) SendMagicLoginEmail(ctx context.Context, email string) bool {
+//
+// mode 决定链接 host + 路径以及 Redis key 命名空间。未知 mode 兜底为 blog 并 warn。
+func (s *userService) SendMagicLoginEmail(ctx context.Context, email, mode string) bool {
 	// 一次查询同时承担"邮箱是否存在"判断和后续 user 解析，
 	// 避免 EmailExists + GetByEmail 之间被并发注册/删除留下不一致窗口。
 	u, _, err := s.repo.GetByEmail(ctx, email)
@@ -319,46 +348,77 @@ func (s *userService) SendMagicLoginEmail(ctx context.Context, email string) boo
 		return false
 	}
 
-	token := generateRandomToken(magicLoginTokenBytes)
-	cacheKey := fmt.Sprintf(magicLoginCacheKey, token)
+	normalized := normalizeMagicLoginMode(mode)
+	if normalized != mode {
+		slog.WarnContext(ctx, "magic login unknown mode, fallback to blog",
+			"requested_mode", mode, "effective_mode", normalized)
+		mode = normalized
+	} else {
+		mode = normalized
+	}
+
+	hex := generateRandomToken(magicLoginTokenBytes)
+	cacheKey := fmt.Sprintf(magicLoginCacheKey, hex, mode)
 	if err := s.redis.Set(ctx, cacheKey, email, magicLoginTokenTTL).Err(); err != nil {
 		slog.ErrorContext(ctx, "magic login redis set failed", "err", err)
 		return false
 	}
 
-	link := s.magicLoginLink(token)
+	// 邮件里给出的 token 包含 mode 段，consume 端据此反查正确的 redis key。
+	token := hex + ":" + mode
+	link := s.magicLoginLink(token, mode)
 	msg := buildMagicLoginEmail(link)
 	ok := (&notification.EmailChannel{}).Send(ctx, msg, notification.NotificationContext{Email: email})
 	if !ok {
 		s.redis.Del(ctx, cacheKey)
 		return false
 	}
-	slog.InfoContext(ctx, "magic login email sent", "email", email)
+	slog.InfoContext(ctx, "magic login email sent", "email", email, "mode", mode)
 	return true
 }
 
 // magicLoginLink 拼出邮件里用的完整登录链接。
 //
-// 缺省回退到 "/auth/magic?token=<token>"（相对路径）：未注入 frontendURL 的旧部署
-// 仍能工作，但跨 host 场景必须注入。
-func (s *userService) magicLoginLink(token string) string {
-	rel := fmt.Sprintf(magicLoginLinkPath, token)
-	if s.frontendURL == "" {
+// 缺省回退到纯相对路径（<path>?token=<token>）：对应 mode 的 host 未注入时
+// 仍能给出可用的相对链接，便于 dev / 配置漂移时排查。
+func (s *userService) magicLoginLink(token, mode string) string {
+	rel := fmt.Sprintf(magicLoginLinkPathFor(mode), token)
+	host := s.frontendURLs[mode]
+	if host == "" {
 		return rel
 	}
-	return s.frontendURL + rel
+	return host + rel
+}
+
+// splitMagicLoginToken 把 "<64-hex>:<mode>" 拆成 (hex, mode)。
+// 任何一段不合法都返回 ok=false，调用方应回 ErrInvalidMagicToken。
+func splitMagicLoginToken(token string) (hex, mode string, ok bool) {
+	idx := strings.LastIndex(token, ":")
+	if idx < 0 {
+		return "", "", false
+	}
+	hex, mode = token[:idx], token[idx+1:]
+	if len(hex) != magicLoginTokenHex {
+		return "", "", false
+	}
+	if mode != magicLoginModeBlog && mode != magicLoginModeNomu {
+		return "", "", false
+	}
+	return hex, mode, true
 }
 
 // AuthenticateMagicLogin 用一次性 token 换取登录态；token 校验后立即消费。
+//
+// token 形态: "<64-hex>:<mode>"，hex 段进 redis key，mode 段决定走哪个命名空间。
 func (s *userService) AuthenticateMagicLogin(ctx context.Context, token string) (*model.User, *model.Profile, error) {
 	if s.redis == nil || token == "" {
 		return nil, nil, usererrs.ErrInvalidMagicToken
 	}
-	// 仅放行 64 位 hex，避免恶意 token 污染 Redis key。
-	if len(token) != magicLoginTokenHex {
+	hex, mode, ok := splitMagicLoginToken(token)
+	if !ok {
 		return nil, nil, usererrs.ErrInvalidMagicToken
 	}
-	cacheKey := fmt.Sprintf(magicLoginCacheKey, token)
+	cacheKey := fmt.Sprintf(magicLoginCacheKey, hex, mode)
 	email, err := s.redis.GetDel(ctx, cacheKey).Result()
 	if errors.Is(err, redis.Nil) || err != nil || email == "" {
 		return nil, nil, usererrs.ErrInvalidMagicToken
@@ -371,7 +431,7 @@ func (s *userService) AuthenticateMagicLogin(ctx context.Context, token string) 
 	if u == nil {
 		return nil, nil, usererrs.ErrUserNotFound
 	}
-	slog.InfoContext(ctx, "magic login consumed", "user_id", u.ID)
+	slog.InfoContext(ctx, "magic login consumed", "user_id", u.ID, "mode", mode)
 	return u, p, nil
 }
 

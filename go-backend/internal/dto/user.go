@@ -56,8 +56,15 @@ type PasskeyAuthRequest struct {
 }
 
 // MagicLoginEmailRequest 申请邮件魔法登录链接的请求。
+//
+// Mode 决定邮件里链接落到哪个前端 + Redis 缓存命名空间：
+//   - "blog" → kanocifer.chat SPA（落地页魔法登录）
+//   - "nomu" → Chrome 扩展（NoonToolv1）的 options.html#/login/magic
+//
+// 非法 mode 走 binding oneof 拒绝；handler 解析后透传给 service。
 type MagicLoginEmailRequest struct {
 	Email string `json:"email" binding:"required,email"`
+	Mode  string `json:"mode"  binding:"required,oneof=blog nomu"`
 }
 
 // MagicLoginAuthRequest 使用 token 完成魔法登录的请求。

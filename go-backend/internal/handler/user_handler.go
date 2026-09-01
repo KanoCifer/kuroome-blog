@@ -25,7 +25,7 @@ type Userer interface {
 	RefreshTokens(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
 	UserToDict(u *model.User, p *model.Profile) map[string]any
 	SendEmailCode(ctx context.Context, email string) bool
-	SendMagicLoginEmail(ctx context.Context, email string) bool
+	SendMagicLoginEmail(ctx context.Context, email, mode string) bool
 }
 
 // UserHandler 持有业务服务，gin 路由方法挂在其上。
@@ -191,13 +191,16 @@ func (h *UserHandler) EmailCode(c *gin.Context) {
 }
 
 // MagicLoginEmail 申请魔法登录邮件。
+//
+// req.Mode 决定链接 host + Redis key 命名空间（blog / nomu），
+// DTO 用 binding:"required,oneof=blog nomu" 拦截非法值。
 func (h *UserHandler) MagicLoginEmail(c *gin.Context) {
 	var req dto.MagicLoginEmailRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.APIError(c, err.Error(), 400)
 		return
 	}
-	go h.userSvc.SendMagicLoginEmail(c.Request.Context(), req.Email)
+	go h.userSvc.SendMagicLoginEmail(c.Request.Context(), req.Email, req.Mode)
 	response.Success(c, nil, "若该邮箱已注册，登录链接已发送")
 }
 

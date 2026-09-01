@@ -79,9 +79,22 @@ type WebAuthnConfig struct {
 }
 
 // FrontendConfig 前端相关。
+//
+// URLs 按 mode（blog / nomu 等）持有不同前端入口：
+//   - Blog 走 kanocifer.chat 落地页（web 端魔法登录）
+//   - Nomu 走 chrome-extension://<id>（Chrome 扩展魔法登录）
+//
+// 兼容旧部署：env FRONTEND_URL 在 Load() 阶段回退到 URLs.Blog。
 type FrontendConfig struct {
-	URL            string `mapstructure:"FRONTEND_URL"`
-	ViteJSAPIToken string `mapstructure:"VITE_JS_API_TOKEN"`
+	URLs           FrontendURLs `mapstructure:",squash"`
+	ViteJSAPIToken string       `mapstructure:"VITE_JS_API_TOKEN"`
+}
+
+// FrontendURLs 前端入口按 mode 索引。key 集合稳定（blog / nomu），
+// 未来加新前端在此追加字段并扩 magicLoginLinkPathFor 的 switch。
+type FrontendURLs struct {
+	Blog string `mapstructure:"BLOG"`
+	Nomu string `mapstructure:"NOMU"`
 }
 
 // AdminConfig 管理员与运维。
@@ -160,7 +173,11 @@ func defaultConfig() Config {
 			Origin: "https://kanocifer.chat",
 		},
 		Frontend: FrontendConfig{
-			URL: "https://kanocifer.chat",
+			URLs: FrontendURLs{
+				Blog: "https://kanocifer.chat",
+				// Nomu 默认空——chrome-extension://<id> 没有通用默认，
+				// 必须由部署通过 FRONTEND_NOMU 显式注入。
+			},
 		},
 		Admin: AdminConfig{
 			UserIDs:        []int{1, 2},
@@ -228,6 +245,14 @@ func Load(cfgFile ...string) (*Config, error) {
 	}
 	if proxies := viper.GetString("TRUSTED_PROXIES"); proxies != "" {
 		cfg.Server.TrustedProxies = splitAndTrim(proxies)
+	}
+
+	// 兼容旧部署：env FRONTEND_URL 回退为 blog URL（多 mode 拆分前的形态）。
+	// 仅在 BLOG 未显式配置时生效，已配置则不覆盖。
+	if cfg.Frontend.URLs.Blog == "" {
+		if v := viper.GetString("FRONTEND_URL"); v != "" {
+			cfg.Frontend.URLs.Blog = v
+		}
 	}
 
 	Cfg = &cfg

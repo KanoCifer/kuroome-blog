@@ -6,8 +6,10 @@ import (
 	"encoding/json"
 	"errors"
 	"log/slog"
+	"strings"
 	"testing"
 
+	"github.com/alicebob/miniredis/v2"
 	"github.com/redis/go-redis/v9"
 	"golang.org/x/crypto/bcrypt"
 
@@ -256,7 +258,7 @@ func TestGetByID_NotFound(t *testing.T) {
 	repo := &mockUserRepo{
 		getByIDFn: func(ctx context.Context, id uint) (*model.User, error) { return nil, nil },
 	}
-	svc := NewUserService(repo, nil, nil, "")
+	svc := NewUserService(repo, nil, nil, nil)
 
 	_, _, err := svc.GetByID(context.Background(), 999)
 	if !errors.Is(err, usererrs.ErrUserNotFound) {
@@ -270,7 +272,7 @@ func TestGetByID_RepoError(t *testing.T) {
 			return nil, errors.New("db error")
 		},
 	}
-	svc := NewUserService(repo, nil, nil, "")
+	svc := NewUserService(repo, nil, nil, nil)
 
 	_, _, err := svc.GetByID(context.Background(), 1)
 	if err == nil {
@@ -284,7 +286,7 @@ func TestGetByID_Success(t *testing.T) {
 			return &model.User{Model: gormModel(id), Username: "alice"}, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil, "")
+	svc := NewUserService(repo, nil, nil, nil)
 
 	u, p, err := svc.GetByID(context.Background(), uint(1))
 	if err != nil {
@@ -306,7 +308,7 @@ func TestAuthenticate_UserNotFound(t *testing.T) {
 			return nil, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil, "")
+	svc := NewUserService(repo, nil, nil, nil)
 
 	_, err := svc.Authenticate(context.Background(), "ghost", "pass")
 	if !errors.Is(err, usererrs.ErrInvalidCredentials) {
@@ -321,7 +323,7 @@ func TestAuthenticate_WrongPassword(t *testing.T) {
 			return &model.User{Model: gormModel(1), PasswordHash: string(hash)}, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil, "")
+	svc := NewUserService(repo, nil, nil, nil)
 
 	_, err := svc.Authenticate(context.Background(), "alice", "wrong")
 	if !errors.Is(err, usererrs.ErrInvalidCredentials) {
@@ -336,7 +338,7 @@ func TestAuthenticate_Success(t *testing.T) {
 			return &model.User{Model: gormModel(1), Username: "alice", PasswordHash: string(hash)}, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil, "")
+	svc := NewUserService(repo, nil, nil, nil)
 
 	u, err := svc.Authenticate(context.Background(), "alice", "secret")
 	if err != nil {
@@ -363,7 +365,7 @@ func TestAuthenticate_LogPropagatesTraceID(t *testing.T) {
 			return &model.User{Model: gormModel(1), Username: "alice", PasswordHash: string(hash)}, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil, "")
+	svc := NewUserService(repo, nil, nil, nil)
 
 	ctx := logger.WithTraceID(context.Background(), "trace-xyz")
 	if _, err := svc.Authenticate(ctx, "alice", "secret"); err != nil {
@@ -424,36 +426,199 @@ func TestVerifyEmailCode_EmptyEmail(t *testing.T) {
 // 防止枚举；不调用 redis。
 func TestSendMagicLoginEmail_EmailNotRegistered(t *testing.T) {
 	repo := &mockUserRepo{emailExists: false}
-	svc := NewUserService(repo, nil, nil, "")
+	svc := NewUserService(repo, nil, nil, nil)
 
-	if !svc.SendMagicLoginEmail(context.Background(), "ghost@example.com") {
+	if !svc.SendMagicLoginEmail(context.Background(), "ghost@example.com", "blog") {
 		t.Error("SendMagicLoginEmail should return true (silent success) for unregistered email")
 	}
 }
 
 // TestAuthenticateMagicLogin_NilRedis 无 redis 直接 401 等价。
 func TestAuthenticateMagicLogin_NilRedis(t *testing.T) {
-	svc := NewUserService(&mockUserRepo{}, nil, nil, "")
-	_, _, err := svc.AuthenticateMagicLogin(context.Background(), "any-token")
+	svc := NewUserService(&mockUserRepo{}, nil, nil, nil)
+	_, _, err := svc.AuthenticateMagicLogin(context.Background(), "any-token:blog")
 	if !errors.Is(err, usererrs.ErrInvalidMagicToken) {
 		t.Errorf("err = %v, want ErrInvalidMagicToken", err)
 	}
 }
 
 // TestAuthenticateMagicLogin_BadLengthToken 长度不符直接拒绝，避免污染 key。
+// 缺冒号、缺 mode 段、hex 长度不对都视为非法 token。
 func TestAuthenticateMagicLogin_BadLengthToken(t *testing.T) {
-	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil, "")
-	_, _, err := svc.AuthenticateMagicLogin(context.Background(), "short")
-	if !errors.Is(err, usererrs.ErrInvalidMagicToken) {
-		t.Errorf("err = %v, want ErrInvalidMagicToken", err)
+	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil, nil)
+	bad := []string{
+		"short",                  // 无冒号、无 mode
+		"short:blog",             // hex 段太短
+		strings.Repeat("a", 64),  // 缺冒号、缺 mode
+		strings.Repeat("a", 64) + ":",        // mode 为空
+		strings.Repeat("a", 64) + ":h5",      // mode 非法
+		strings.Repeat("a", 63) + ":blog",    // hex 长度 63
+		strings.Repeat("a", 65) + ":blog",    // hex 长度 65
+	}
+	for _, tok := range bad {
+		_, _, err := svc.AuthenticateMagicLogin(context.Background(), tok)
+		if !errors.Is(err, usererrs.ErrInvalidMagicToken) {
+			t.Errorf("token %q: err = %v, want ErrInvalidMagicToken", tok, err)
+		}
 	}
 }
 
 // TestAuthenticateMagicLogin_EmptyToken 空 token 立即拒绝。
 func TestAuthenticateMagicLogin_EmptyToken(t *testing.T) {
-	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil, "")
+	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil, nil)
 	_, _, err := svc.AuthenticateMagicLogin(context.Background(), "")
 	if !errors.Is(err, usererrs.ErrInvalidMagicToken) {
 		t.Errorf("err = %v, want ErrInvalidMagicToken", err)
+	}
+}
+
+// ---------- mode 路由（blog / nomu）----------
+
+// TestMagicLoginLinkPathFor 锁定两个 mode 对应的路径模板。
+// nomu 走 hash 路由，所以 path 必须含 "#"；blog 走普通 SPA 路由。
+func TestMagicLoginLinkPathFor(t *testing.T) {
+	cases := []struct {
+		mode     string
+		wantPath string
+	}{
+		{"blog", "/auth/magic?token=%s"},
+		{"nomu", "/options.html#/login/magic?token=%s"},
+	}
+	for _, c := range cases {
+		got := magicLoginLinkPathFor(c.mode)
+		if got != c.wantPath {
+			t.Errorf("magicLoginLinkPathFor(%q) = %q, want %q", c.mode, got, c.wantPath)
+		}
+	}
+}
+
+// TestSplitMagicLoginToken 锁定 token 解析的合法 / 非法边界。
+func TestSplitMagicLoginToken(t *testing.T) {
+	hex := strings.Repeat("a", 64)
+	cases := []struct {
+		tok     string
+		wantOk  bool
+		wantHex string
+		wantMod string
+	}{
+		{hex + ":blog", true, hex, "blog"},
+		{hex + ":nomu", true, hex, "nomu"},
+		{"short", false, "", ""},
+		{hex, false, "", ""},
+		{hex + ":", false, "", ""},
+		{hex + ":h5", false, "", ""},
+		{strings.Repeat("a", 63) + ":blog", false, "", ""},
+		{strings.Repeat("a", 65) + ":blog", false, "", ""},
+	}
+	for _, c := range cases {
+		gotHex, gotMod, gotOk := splitMagicLoginToken(c.tok)
+		if gotOk != c.wantOk {
+			t.Errorf("splitMagicLoginToken(%q) ok = %v, want %v", c.tok, gotOk, c.wantOk)
+			continue
+		}
+		if gotOk && (gotHex != c.wantHex || gotMod != c.wantMod) {
+			t.Errorf("splitMagicLoginToken(%q) = (%q,%q), want (%q,%q)",
+				c.tok, gotHex, gotMod, c.wantHex, c.wantMod)
+		}
+	}
+}
+
+// TestMagicLoginLink_BlogHost 校验 blog mode 拼出的链接：
+// <blogHost>/auth/magic?token=<token>。
+func TestMagicLoginLink_BlogHost(t *testing.T) {
+	svc := &userService{frontendURLs: map[string]string{
+		"blog": "https://kanocifer.chat",
+		"nomu": "chrome-extension://abcdef",
+	}}
+	link := svc.magicLoginLink("deadbeef:blog", "blog")
+	want := "https://kanocifer.chat/auth/magic?token=deadbeef:blog"
+	if link != want {
+		t.Errorf("blog link = %q, want %q", link, want)
+	}
+}
+
+// TestMagicLoginLink_NomuHost 校验 nomu mode 拼出的链接：
+// <nomuHost>/options.html#/login/magic?token=<token>。# 必须保留。
+func TestMagicLoginLink_NomuHost(t *testing.T) {
+	svc := &userService{frontendURLs: map[string]string{
+		"blog": "https://kanocifer.chat",
+		"nomu": "chrome-extension://abcdef",
+	}}
+	link := svc.magicLoginLink("deadbeef:nomu", "nomu")
+	want := "chrome-extension://abcdef/options.html#/login/magic?token=deadbeef:nomu"
+	if link != want {
+		t.Errorf("nomu link = %q, want %q", link, want)
+	}
+}
+
+// TestMagicLoginLink_HostMissing 未注入对应 mode 的 host 时回退为相对路径，
+// 方便 dev / 配置漂移时排查。
+func TestMagicLoginLink_HostMissing(t *testing.T) {
+	svc := &userService{frontendURLs: map[string]string{}}
+	if got := svc.magicLoginLink("h:blog", "blog"); got != "/auth/magic?token=h:blog" {
+		t.Errorf("missing host blog = %q", got)
+	}
+	if got := svc.magicLoginLink("h:nomu", "nomu"); got != "/options.html#/login/magic?token=h:nomu" {
+		t.Errorf("missing host nomu = %q", got)
+	}
+}
+
+// TestMagicLoginLink_HostTrailingSlash host 末尾的 "/" 应被 TrimRight 掉，
+// 避免 chrome-extension://id//options.html 这种双斜杠。
+func TestMagicLoginLink_HostTrailingSlash(t *testing.T) {
+	svc := NewUserService(&mockUserRepo{}, nil, nil, map[string]string{
+		"nomu": "chrome-extension://abcdef/",
+	})
+	link := svc.magicLoginLink("h:nomu", "nomu")
+	if strings.Contains(link, "//options.html") {
+		t.Errorf("double slash detected: %q", link)
+	}
+}
+
+// TestAuthenticateMagicLogin_CrossModeIsolation 跨 mode 隔离是 handoff §4.3
+// 的核心契约：blog 写入 magiclogintoken:<hex>:blog，nomu 拿同样 hex 消费
+// 必须 401；反过来也成立。这是 redis key 按 mode 分段的目的。
+func TestAuthenticateMagicLogin_CrossModeIsolation(t *testing.T) {
+	mr, err := miniredis.Run()
+	if err != nil {
+		t.Fatalf("miniredis: %v", err)
+	}
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+
+	repo := &mockUserRepo{
+		getByEmailFn: func(ctx context.Context, email string) (*model.User, *model.Profile, error) {
+			return &model.User{Model: gormModel(1), Username: "alice"}, nil, nil
+		},
+	}
+	svc := NewUserService(repo, rdb, nil, nil)
+
+	const hex = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+	emailKey := "magiclogintoken:" + hex + ":blog"
+	if err := rdb.Set(context.Background(), emailKey, "alice@example.com", 0).Err(); err != nil {
+		t.Fatalf("seed: %v", err)
+	}
+
+	// 1) nomu 模式拿这个 hex 来消费 —— 应当 401（不是 ErrInvalidMagicToken 就是 redis.Nil 链回 401）。
+	if _, _, err := svc.AuthenticateMagicLogin(context.Background(), hex+":nomu"); !errors.Is(err, usererrs.ErrInvalidMagicToken) {
+		t.Errorf("nomu consuming blog key: err = %v, want ErrInvalidMagicToken", err)
+	}
+	// 验证 blog 那份还在（没被 nomu 误删）。
+	if mr.Exists(emailKey) == false {
+		t.Error("blog key was wrongly consumed by nomu request")
+	}
+
+	// 2) blog 模式拿自己的 hex 来消费 —— 必须成功。
+	u, _, err := svc.AuthenticateMagicLogin(context.Background(), hex+":blog")
+	if err != nil {
+		t.Fatalf("blog consuming blog key: %v", err)
+	}
+	if u == nil || u.Username != "alice" {
+		t.Errorf("user = %v, want alice", u)
+	}
+	// blog 那份已被 GETDEL 删掉。
+	if mr.Exists(emailKey) {
+		t.Error("blog key should be deleted after successful consumption")
 	}
 }

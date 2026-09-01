@@ -76,7 +76,11 @@ func NewAppState(
 	}
 
 	// -- services ---------------------------------------------------- //
-	userSvc := service.NewUserService(userRepo, redis, cfg.Admin.UserIDs, cfg.Frontend.URL)
+	// frontendURLs 按 mode 索引：blog = kanocifer.chat，nomu = chrome-extension://<id>。
+	userSvc := service.NewUserService(userRepo, redis, cfg.Admin.UserIDs, map[string]string{
+		"blog": cfg.Frontend.URLs.Blog,
+		"nomu": cfg.Frontend.URLs.Nomu,
+	})
 	return &AppState{
 		config:     cfg,
 		userSvc:    userSvc,

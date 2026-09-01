@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -43,7 +44,7 @@ type mockUserService struct {
 	logoutFn              func(ctx context.Context, userID uint)
 	refreshFn             func(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
 	sendEmailCodeFn       func(ctx context.Context, email string) bool
-	sendMagicLoginEmailFn func(ctx context.Context, email string) bool
+	sendMagicLoginEmailFn func(ctx context.Context, email, mode string) bool
 	userToDictFn          func(u *model.User, p *model.Profile) map[string]any
 }
 
@@ -90,9 +91,9 @@ func (m *mockUserService) SendEmailCode(ctx context.Context, email string) bool 
 	return true
 }
 
-func (m *mockUserService) SendMagicLoginEmail(ctx context.Context, email string) bool {
+func (m *mockUserService) SendMagicLoginEmail(ctx context.Context, email, mode string) bool {
 	if m.sendMagicLoginEmailFn != nil {
-		return m.sendMagicLoginEmailFn(ctx, email)
+		return m.sendMagicLoginEmailFn(ctx, email, mode)
 	}
 	return true
 }
@@ -501,25 +502,84 @@ func TestMagicLoginEmail_InvalidEmail(t *testing.T) {
 	h := NewUserHandler(svc, config.Cfg)
 
 	w := doRequest(h.MagicLoginEmail, http.MethodPost, "/email/magic-login",
-		jsonBody(t, dto.MagicLoginEmailRequest{Email: "not-an-email"}))
+		jsonBody(t, dto.MagicLoginEmailRequest{Email: "not-an-email", Mode: "blog"}))
 
 	if w.Code != http.StatusBadRequest {
 		t.Errorf("status = %d, want 400", w.Code)
 	}
 }
 
+func TestMagicLoginEmail_MissingMode(t *testing.T) {
+	// mode 字段为 DTO binding required，缺省直接 400。
+	svc := &mockUserService{}
+	h := NewUserHandler(svc, config.Cfg)
+
+	w := doRequest(h.MagicLoginEmail, http.MethodPost, "/email/magic-login",
+		jsonBody(t, map[string]string{"email": "alice@example.com"}))
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("status = %d, want 400 (missing mode)", w.Code)
+	}
+}
+
+func TestMagicLoginEmail_BadMode(t *testing.T) {
+	// oneof 拦截非法 mode。
+	svc := &mockUserService{}
+	h := NewUserHandler(svc, config.Cfg)
+
+	w := doRequest(h.MagicLoginEmail, http.MethodPost, "/email/magic-login",
+		jsonBody(t, dto.MagicLoginEmailRequest{Email: "alice@example.com", Mode: "h5"}))
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("status = %d, want 400 (invalid mode)", w.Code)
+	}
+}
+
 func TestMagicLoginEmail_AlwaysReturns200(t *testing.T) {
 	// 邮箱不存在时 service 静默 true，handler 仍 200，避免枚举。
 	svc := &mockUserService{
-		sendMagicLoginEmailFn: func(_ context.Context, _ string) bool { return true },
+		sendMagicLoginEmailFn: func(_ context.Context, _ string, _ string) bool { return true },
 	}
 	h := NewUserHandler(svc, config.Cfg)
 
 	w := doRequest(h.MagicLoginEmail, http.MethodPost, "/email/magic-login",
-		jsonBody(t, dto.MagicLoginEmailRequest{Email: "nobody@example.com"}))
+		jsonBody(t, dto.MagicLoginEmailRequest{Email: "nobody@example.com", Mode: "blog"}))
 
 	if w.Code != http.StatusOK {
 		t.Errorf("status = %d, want 200", w.Code)
+	}
+}
+
+func TestMagicLoginEmail_PassesModeToService(t *testing.T) {
+	// handler 应把 req.Mode 透传给 service（blog / nomu）。
+	// handler 用 go 调 service，所以通过 channel 等异步落点。
+	cases := []string{"blog", "nomu"}
+	for _, mode := range cases {
+		t.Run(mode, func(t *testing.T) {
+			done := make(chan string, 1)
+			svc := &mockUserService{
+				sendMagicLoginEmailFn: func(_ context.Context, _ string, m string) bool {
+					done <- m
+					return true
+				},
+			}
+			h := NewUserHandler(svc, config.Cfg)
+
+			w := doRequest(h.MagicLoginEmail, http.MethodPost, "/email/magic-login",
+				jsonBody(t, dto.MagicLoginEmailRequest{Email: "alice@example.com", Mode: mode}))
+
+			if w.Code != http.StatusOK {
+				t.Fatalf("status = %d, want 200", w.Code)
+			}
+			select {
+			case gotMode := <-done:
+				if gotMode != mode {
+					t.Errorf("service mode = %q, want %q", gotMode, mode)
+				}
+			case <-time.After(2 * time.Second):
+				t.Fatal("timed out waiting for service call")
+			}
+		})
 	}
 }
 

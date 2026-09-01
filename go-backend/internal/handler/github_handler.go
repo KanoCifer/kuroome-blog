@@ -102,13 +102,13 @@ func (h *GitHubHandler) Callback(c *gin.Context) {
 			true, // httponly
 		)
 		// 把 access_token 作为 query param 传给前端, 前端存入 localStorage
-		target := h.cfg.Frontend.URL + "/login/github?access_token=" + tokens.AccessToken
+		target := h.cfg.Frontend.URLs.Blog + "/login/github?access_token=" + tokens.AccessToken
 		c.Redirect(http.StatusFound, target)
 		return
 	}
 
 	// bind 模式: user != nil, tokens == nil → 重定向回设置页
-	c.Redirect(http.StatusFound, h.cfg.Frontend.URL+"/settings?success=github_bound")
+	c.Redirect(http.StatusFound, h.cfg.Frontend.URLs.Blog+"/settings?success=github_bound")
 }
 
 // Unbind POST /github/unbind — 解除绑定(需 Auth)。
@@ -135,7 +135,7 @@ func (h *GitHubHandler) RegisterRoutes(r *gin.RouterGroup, authMW gin.HandlerFun
 
 // redirectWithError 带 error 参数重定向到前端登录/设置页。
 func redirectWithError(c *gin.Context, cfg *config.Config, errorCode string) {
-	base := cfg.Frontend.URL
+	base := cfg.Frontend.URLs.Blog
 	target := base + "/login?error=" + errorCode
 	c.Redirect(http.StatusFound, target)
 }
