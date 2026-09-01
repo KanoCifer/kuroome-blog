@@ -73,15 +73,22 @@ type Userer interface {
 
 // userService 持有 repo 和 redis，负责编排业务逻辑。
 //
-// adminUserIDs 由调用方从 config 注入，避免本包直接读取全局 config.Cfg。
+// adminUserIDs / frontendURL 由调用方从 config 注入，避免本包直接读取全局 config.Cfg。
+// frontendURL 用于构造魔法登录邮件的链接 host（接法 A：链接 → 前端 /auth/magic 路由）。
 type userService struct {
 	repo         UserRepositoryer
 	redis        *redis.Client
 	adminUserIDs []int
+	frontendURL  string
 }
 
-func NewUserService(repo UserRepositoryer, redis *redis.Client, adminUserIDs []int) *userService {
-	return &userService{repo: repo, redis: redis, adminUserIDs: adminUserIDs}
+func NewUserService(repo UserRepositoryer, redis *redis.Client, adminUserIDs []int, frontendURL string) *userService {
+	return &userService{
+		repo:         repo,
+		redis:        redis,
+		adminUserIDs: adminUserIDs,
+		frontendURL:  strings.TrimRight(frontendURL, "/"),
+	}
 }
 
 // ---------- 查询 ----------
@@ -292,7 +299,11 @@ const (
 	magicLoginTokenHex   = magicLoginTokenBytes * 2
 	magicLoginTokenTTL   = time.Minute * 10
 	magicLoginCacheKey   = "magiclogintoken:%s"
-	magicLoginLinkPath   = "/v3/magic-login?token=%s"
+	// magicLoginLinkPath 是相对前端路由的格式串（含 query）；
+	// SendMagicLoginEmail 用 frontendURL + 该路径拼接出完整链接。
+	// 接法 A：链接打到前端 SPA（kanocifer.chat/auth/magic?token=…），
+	//        前端拿到 token 再 POST /v3/magic-login 完成登录。
+	magicLoginLinkPath = "/auth/magic?token=%s"
 )
 
 // SendMagicLoginEmail 向已注册邮箱发送一次性登录链接；邮箱不存在时静默返回 true。
@@ -315,7 +326,7 @@ func (s *userService) SendMagicLoginEmail(ctx context.Context, email string) boo
 		return false
 	}
 
-	link := fmt.Sprintf(magicLoginLinkPath, token)
+	link := s.magicLoginLink(token)
 	msg := buildMagicLoginEmail(link)
 	ok := (&notification.EmailChannel{}).Send(ctx, msg, notification.NotificationContext{Email: email})
 	if !ok {
@@ -324,6 +335,18 @@ func (s *userService) SendMagicLoginEmail(ctx context.Context, email string) boo
 	}
 	slog.InfoContext(ctx, "magic login email sent", "email", email)
 	return true
+}
+
+// magicLoginLink 拼出邮件里用的完整登录链接。
+//
+// 缺省回退到 "/auth/magic?token=<token>"（相对路径）：未注入 frontendURL 的旧部署
+// 仍能工作，但跨 host 场景必须注入。
+func (s *userService) magicLoginLink(token string) string {
+	rel := fmt.Sprintf(magicLoginLinkPath, token)
+	if s.frontendURL == "" {
+		return rel
+	}
+	return s.frontendURL + rel
 }
 
 // AuthenticateMagicLogin 用一次性 token 换取登录态；token 校验后立即消费。

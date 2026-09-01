@@ -76,7 +76,7 @@ func NewAppState(
 	}
 
 	// -- services ---------------------------------------------------- //
-	userSvc := service.NewUserService(userRepo, redis, cfg.Admin.UserIDs)
+	userSvc := service.NewUserService(userRepo, redis, cfg.Admin.UserIDs, cfg.Frontend.URL)
 	return &AppState{
 		config:     cfg,
 		userSvc:    userSvc,

@@ -256,7 +256,7 @@ func TestGetByID_NotFound(t *testing.T) {
 	repo := &mockUserRepo{
 		getByIDFn: func(ctx context.Context, id uint) (*model.User, error) { return nil, nil },
 	}
-	svc := NewUserService(repo, nil, nil)
+	svc := NewUserService(repo, nil, nil, "")
 
 	_, _, err := svc.GetByID(context.Background(), 999)
 	if !errors.Is(err, usererrs.ErrUserNotFound) {
@@ -270,7 +270,7 @@ func TestGetByID_RepoError(t *testing.T) {
 			return nil, errors.New("db error")
 		},
 	}
-	svc := NewUserService(repo, nil, nil)
+	svc := NewUserService(repo, nil, nil, "")
 
 	_, _, err := svc.GetByID(context.Background(), 1)
 	if err == nil {
@@ -284,7 +284,7 @@ func TestGetByID_Success(t *testing.T) {
 			return &model.User{Model: gormModel(id), Username: "alice"}, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil)
+	svc := NewUserService(repo, nil, nil, "")
 
 	u, p, err := svc.GetByID(context.Background(), uint(1))
 	if err != nil {
@@ -306,7 +306,7 @@ func TestAuthenticate_UserNotFound(t *testing.T) {
 			return nil, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil)
+	svc := NewUserService(repo, nil, nil, "")
 
 	_, err := svc.Authenticate(context.Background(), "ghost", "pass")
 	if !errors.Is(err, usererrs.ErrInvalidCredentials) {
@@ -321,7 +321,7 @@ func TestAuthenticate_WrongPassword(t *testing.T) {
 			return &model.User{Model: gormModel(1), PasswordHash: string(hash)}, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil)
+	svc := NewUserService(repo, nil, nil, "")
 
 	_, err := svc.Authenticate(context.Background(), "alice", "wrong")
 	if !errors.Is(err, usererrs.ErrInvalidCredentials) {
@@ -336,7 +336,7 @@ func TestAuthenticate_Success(t *testing.T) {
 			return &model.User{Model: gormModel(1), Username: "alice", PasswordHash: string(hash)}, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil)
+	svc := NewUserService(repo, nil, nil, "")
 
 	u, err := svc.Authenticate(context.Background(), "alice", "secret")
 	if err != nil {
@@ -363,7 +363,7 @@ func TestAuthenticate_LogPropagatesTraceID(t *testing.T) {
 			return &model.User{Model: gormModel(1), Username: "alice", PasswordHash: string(hash)}, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil)
+	svc := NewUserService(repo, nil, nil, "")
 
 	ctx := logger.WithTraceID(context.Background(), "trace-xyz")
 	if _, err := svc.Authenticate(ctx, "alice", "secret"); err != nil {
@@ -424,7 +424,7 @@ func TestVerifyEmailCode_EmptyEmail(t *testing.T) {
 // 防止枚举；不调用 redis。
 func TestSendMagicLoginEmail_EmailNotRegistered(t *testing.T) {
 	repo := &mockUserRepo{emailExists: false}
-	svc := NewUserService(repo, nil, nil)
+	svc := NewUserService(repo, nil, nil, "")
 
 	if !svc.SendMagicLoginEmail(context.Background(), "ghost@example.com") {
 		t.Error("SendMagicLoginEmail should return true (silent success) for unregistered email")
@@ -433,7 +433,7 @@ func TestSendMagicLoginEmail_EmailNotRegistered(t *testing.T) {
 
 // TestAuthenticateMagicLogin_NilRedis 无 redis 直接 401 等价。
 func TestAuthenticateMagicLogin_NilRedis(t *testing.T) {
-	svc := NewUserService(&mockUserRepo{}, nil, nil)
+	svc := NewUserService(&mockUserRepo{}, nil, nil, "")
 	_, _, err := svc.AuthenticateMagicLogin(context.Background(), "any-token")
 	if !errors.Is(err, usererrs.ErrInvalidMagicToken) {
 		t.Errorf("err = %v, want ErrInvalidMagicToken", err)
@@ -442,7 +442,7 @@ func TestAuthenticateMagicLogin_NilRedis(t *testing.T) {
 
 // TestAuthenticateMagicLogin_BadLengthToken 长度不符直接拒绝，避免污染 key。
 func TestAuthenticateMagicLogin_BadLengthToken(t *testing.T) {
-	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil)
+	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil, "")
 	_, _, err := svc.AuthenticateMagicLogin(context.Background(), "short")
 	if !errors.Is(err, usererrs.ErrInvalidMagicToken) {
 		t.Errorf("err = %v, want ErrInvalidMagicToken", err)
@@ -451,7 +451,7 @@ func TestAuthenticateMagicLogin_BadLengthToken(t *testing.T) {
 
 // TestAuthenticateMagicLogin_EmptyToken 空 token 立即拒绝。
 func TestAuthenticateMagicLogin_EmptyToken(t *testing.T) {
-	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil)
+	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil, "")
 	_, _, err := svc.AuthenticateMagicLogin(context.Background(), "")
 	if !errors.Is(err, usererrs.ErrInvalidMagicToken) {
 		t.Errorf("err = %v, want ErrInvalidMagicToken", err)
