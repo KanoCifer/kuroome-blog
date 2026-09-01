@@ -114,7 +114,15 @@ export const authGateway = {
       .then(extractData);
   },
 
-  sendRegisterEmailCode(payload: { email: string }): Promise<AxiosResponse<unknown>> {
+  /**
+   * 申请注册验证码邮件。mode 决定 HTML 模板 + redis 命名空间：
+   *   - 'blog'（默认，省略即走 blog）：kanocifer.chat 落地页注册
+   *   - 'nomu'：NoonToolv1 Chrome 扩展注册，邮件带 logo + 副标
+   * 缺省 / 非法值后端走 blog 兜底。
+   */
+  sendRegisterEmailCode(
+    payload: { email: string; mode?: 'blog' | 'nomu' },
+  ): Promise<AxiosResponse<unknown>> {
     return apiClient.post('v1/auth/email/code', payload);
   },
 
@@ -124,6 +132,7 @@ export const authGateway = {
     password: string;
     confirm_password: string;
     email_code: string;
+    mode?: 'blog' | 'nomu';
   }): Promise<AxiosResponse<unknown>> {
     return apiClient.post('v1/auth/register', payload);
   },
