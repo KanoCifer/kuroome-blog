@@ -189,7 +189,8 @@ func (h *UserHandler) EmailCode(c *gin.Context) {
 		response.APIError(c, "邮箱不能为空", 400)
 		return
 	}
-	go h.userSvc.SendEmailCode(c.Request.Context(), req.Email, req.Mode)
+	// fire-and-forget；WithoutCancel 避免 handler 返回后 ctx 取消导致发送中断
+	go h.userSvc.SendEmailCode(context.WithoutCancel(c.Request.Context()), req.Email, req.Mode)
 	response.Success(c, nil, "验证码已发送")
 }
 
@@ -203,7 +204,8 @@ func (h *UserHandler) MagicLoginEmail(c *gin.Context) {
 		response.APIError(c, err.Error(), 400)
 		return
 	}
-	go h.userSvc.SendMagicLoginEmail(c.Request.Context(), req.Email, req.Mode)
+	// fire-and-forget；WithoutCancel 避免 handler 返回后 ctx 取消导致发送中断
+	go h.userSvc.SendMagicLoginEmail(context.WithoutCancel(c.Request.Context()), req.Email, req.Mode)
 	response.Success(c, nil, "若该邮箱已注册，登录链接已发送")
 }
 
