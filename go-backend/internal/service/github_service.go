@@ -30,7 +30,7 @@ import (
 // UserSvcer 定义 github 服务依赖的用户业务能力。
 type UserSvcer interface {
 	CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
-	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
+	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error)
 }
 
 // GitHubOAuther 定义 github handler 依赖的业务能力。
@@ -188,7 +188,7 @@ func (g *GitHubOAuth) loginByGitHub(ctx context.Context, gh *ghUser) (*model.Use
 		email = gh.Login + "@github.com"
 	}
 	avatarURL := gh.AvatarURL
-	u, _, err := g.userSvc.CreateUser(ctx, username, randomPassword(), email, "", avatarURL)
+	u, _, err := g.userSvc.CreateUser(ctx, username, randomPassword(), email, "", avatarURL, "")
 	if err != nil {
 		return nil, nil, err
 	}

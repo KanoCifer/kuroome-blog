@@ -38,12 +38,12 @@ type mockUserService struct {
 	authenticateFn        func(ctx context.Context, username, password string) (*model.User, error)
 	authenticateMagicFn   func(ctx context.Context, token string) (*model.User, *model.Profile, error)
 	createTokensFn        func(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
-	createUserFn          func(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
+	createUserFn          func(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error)
 	getByIDFn             func(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
 	getByUsernameFn       func(ctx context.Context, username string) (*model.User, *model.Profile, error)
 	logoutFn              func(ctx context.Context, userID uint)
 	refreshFn             func(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
-	sendEmailCodeFn       func(ctx context.Context, email string) bool
+	sendEmailCodeFn       func(ctx context.Context, email, mode string) bool
 	sendMagicLoginEmailFn func(ctx context.Context, email, mode string) bool
 	userToDictFn          func(u *model.User, p *model.Profile) map[string]any
 }
@@ -59,8 +59,8 @@ func (m *mockUserService) CreateTokens(ctx context.Context, u *model.User) (*dto
 	return &dto.TokensResponse{AccessToken: "access", RefreshToken: "refresh"}, nil
 }
 
-func (m *mockUserService) CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
-	return m.createUserFn(ctx, username, password, email, emailCode, avatarURL)
+func (m *mockUserService) CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error) {
+	return m.createUserFn(ctx, username, password, email, emailCode, avatarURL, mode)
 }
 
 func (m *mockUserService) GetByID(ctx context.Context, userID uint) (*model.User, *model.Profile, error) {
@@ -84,9 +84,9 @@ func (m *mockUserService) RefreshTokens(ctx context.Context, refreshToken string
 	return m.refreshFn(ctx, refreshToken)
 }
 
-func (m *mockUserService) SendEmailCode(ctx context.Context, email string) bool {
+func (m *mockUserService) SendEmailCode(ctx context.Context, email, mode string) bool {
 	if m.sendEmailCodeFn != nil {
-		return m.sendEmailCodeFn(ctx, email)
+		return m.sendEmailCodeFn(ctx, email, mode)
 	}
 	return true
 }
@@ -252,7 +252,7 @@ func TestLogin_TokenError(t *testing.T) {
 
 func TestRegister_Success(t *testing.T) {
 	svc := &mockUserService{
-		createUserFn: func(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
+		createUserFn: func(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error) {
 			return &model.User{Model: gormModel(5), Username: username}, nil, nil
 		},
 	}
@@ -276,7 +276,7 @@ func TestRegister_Success(t *testing.T) {
 
 func TestRegister_UserExists(t *testing.T) {
 	svc := &mockUserService{
-		createUserFn: func(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
+		createUserFn: func(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error) {
 			return nil, nil, usererrs.ErrUserExists
 		},
 	}
@@ -296,7 +296,7 @@ func TestRegister_UserExists(t *testing.T) {
 
 func TestRegister_EmailExists(t *testing.T) {
 	svc := &mockUserService{
-		createUserFn: func(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
+		createUserFn: func(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error) {
 			return nil, nil, usererrs.ErrEmailExists
 		},
 	}
@@ -316,7 +316,7 @@ func TestRegister_EmailExists(t *testing.T) {
 
 func TestRegister_InvalidEmailCode(t *testing.T) {
 	svc := &mockUserService{
-		createUserFn: func(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
+		createUserFn: func(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error) {
 			return nil, nil, usererrs.ErrInvalidEmailCode
 		},
 	}
@@ -336,7 +336,7 @@ func TestRegister_InvalidEmailCode(t *testing.T) {
 
 func TestRegister_InvalidBody(t *testing.T) {
 	svc := &mockUserService{
-		createUserFn: func(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
+		createUserFn: func(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error) {
 			return &model.User{}, nil, nil
 		},
 	}
@@ -346,6 +346,145 @@ func TestRegister_InvalidBody(t *testing.T) {
 
 	if w.Code != http.StatusBadRequest {
 		t.Errorf("status = %d, want %d", w.Code, http.StatusBadRequest)
+	}
+}
+
+// ---------- EmailCode ----------
+
+func TestEmailCode_Success(t *testing.T) {
+	svc := &mockUserService{}
+	h := NewUserHandler(svc, config.Cfg)
+
+	w := doRequest(h.EmailCode, http.MethodPost, "/email/code",
+		jsonBody(t, dto.EmailCodeRequest{Email: "alice@example.com"}))
+
+	if w.Code != http.StatusOK {
+		t.Errorf("status = %d, want 200", w.Code)
+	}
+}
+
+func TestEmailCode_InvalidEmail(t *testing.T) {
+	svc := &mockUserService{}
+	h := NewUserHandler(svc, config.Cfg)
+
+	w := doRequest(h.EmailCode, http.MethodPost, "/email/code",
+		jsonBody(t, dto.EmailCodeRequest{Email: "not-an-email"}))
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("status = %d, want 400", w.Code)
+	}
+}
+
+func TestEmailCode_BadMode(t *testing.T) {
+	// oneof 拦截非法 mode（h5 不是 blog / nomu）。
+	svc := &mockUserService{}
+	h := NewUserHandler(svc, config.Cfg)
+
+	w := doRequest(h.EmailCode, http.MethodPost, "/email/code",
+		jsonBody(t, dto.EmailCodeRequest{Email: "alice@example.com", Mode: "h5"}))
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("status = %d, want 400 (invalid mode)", w.Code)
+	}
+}
+
+func TestEmailCode_PassesModeToService(t *testing.T) {
+	// handler 应把 req.Mode 透传给 service（空 → ""，blog / nomu 原样）。
+	cases := []struct {
+		name      string
+		mode      string
+		wantMode  string
+	}{
+		{"missing defaults empty", "", ""},
+		{"blog", "blog", "blog"},
+		{"nomu", "nomu", "nomu"},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			done := make(chan string, 1)
+			svc := &mockUserService{
+				sendEmailCodeFn: func(_ context.Context, _ string, m string) bool {
+					done <- m
+					return true
+				},
+			}
+			h := NewUserHandler(svc, config.Cfg)
+
+			w := doRequest(h.EmailCode, http.MethodPost, "/email/code",
+				jsonBody(t, dto.EmailCodeRequest{Email: "alice@example.com", Mode: c.mode}))
+
+			if w.Code != http.StatusOK {
+				t.Fatalf("status = %d, want 200", w.Code)
+			}
+			select {
+			case gotMode := <-done:
+				if gotMode != c.wantMode {
+					t.Errorf("service mode = %q, want %q", gotMode, c.wantMode)
+				}
+			case <-time.After(2 * time.Second):
+				t.Fatal("timed out waiting for service call")
+			}
+		})
+	}
+}
+
+// ---------- Register mode passthrough ----------
+
+func TestRegister_PassesModeToService(t *testing.T) {
+	// handler 应把 req.Mode 透传给 service.CreateUser，方便 register
+	// 时按 mode 验证 email_code。
+	cases := []string{"", "blog", "nomu"}
+	for _, mode := range cases {
+		t.Run(mode, func(t *testing.T) {
+			done := make(chan string, 1)
+			svc := &mockUserService{
+				createUserFn: func(_ context.Context, _ string, _ string, _ string, _ string, _ string, m string) (*model.User, *model.Profile, error) {
+					done <- m
+					return &model.User{Model: gormModel(1), Username: "alice"}, nil, nil
+				},
+			}
+			h := NewUserHandler(svc, config.Cfg)
+
+			w := doRequest(h.Register, http.MethodPost, "/register",
+				jsonBody(t, dto.RegisterRequest{
+					Username:  "alice",
+					Password:  "secret123",
+					Email:     "alice@example.com",
+					EmailCode: "123456",
+					Mode:      mode,
+				}))
+
+			if w.Code != http.StatusOK {
+				t.Fatalf("status = %d, want 200", w.Code)
+			}
+			select {
+			case gotMode := <-done:
+				if gotMode != mode {
+					t.Errorf("service mode = %q, want %q", gotMode, mode)
+				}
+			case <-time.After(2 * time.Second):
+				t.Fatal("timed out waiting for service call")
+			}
+		})
+	}
+}
+
+func TestRegister_BadMode(t *testing.T) {
+	// oneof 拦截非法 mode。
+	svc := &mockUserService{}
+	h := NewUserHandler(svc, config.Cfg)
+
+	w := doRequest(h.Register, http.MethodPost, "/register",
+		jsonBody(t, dto.RegisterRequest{
+			Username:  "alice",
+			Password:  "secret123",
+			Email:     "alice@example.com",
+			EmailCode: "123456",
+			Mode:      "h5",
+		}))
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("status = %d, want 400 (invalid mode)", w.Code)
 	}
 }
 

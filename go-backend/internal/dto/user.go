@@ -3,11 +3,25 @@ package dto
 import "github.com/KanoCifer/kuroome-blog/internal/model"
 
 // RegisterRequest 注册请求
+//
+// Mode 决定 email_code 的 Redis 命名空间（email_code:<email>:<mode>），
+// 区分 blog（kanocifer.chat 落地页）和 nomu（NoonToolv1 Chrome 扩展），
+// 同邮箱同时申请两个 mode 的验证码互不覆盖。缺省 / 非法值走 blog 兜底。
 type RegisterRequest struct {
 	Username  string `json:"username" binding:"required,min=3,max=50"`
 	Password  string `json:"password" binding:"required,min=6"`
 	Email     string `json:"email" binding:"required,email"`
 	EmailCode string `json:"email_code" binding:"required"`
+	Mode      string `json:"mode,omitempty" binding:"omitempty,oneof=blog nomu"`
+}
+
+// EmailCodeRequest 申请注册验证码邮件的请求。
+//
+// Mode 决定 HTML 模板 + Redis 命名空间（与 RegisterRequest.Mode 同语义）。
+// 缺省 / 非法值走 blog 兜底，handler 不强制 client 传 mode 以保留向后兼容。
+type EmailCodeRequest struct {
+	Email string `json:"email" binding:"required,email"`
+	Mode  string `json:"mode,omitempty" binding:"omitempty,oneof=blog nomu"`
 }
 
 // LoginRequest 登录请求

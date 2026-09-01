@@ -13,7 +13,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
+	usererrs "github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/logger"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 )
@@ -407,18 +407,89 @@ func TestLogout_WithRedis(t *testing.T) {
 
 func TestVerifyEmailCode_NilRedis(t *testing.T) {
 	svc := &userService{redis: nil}
-	if svc.verifyEmailCode(context.Background(), "a@b.com", "123456") {
+	if svc.verifyEmailCode(context.Background(), "a@b.com", "123456", modeBlog) {
 		t.Error("verifyEmailCode should return false when redis is nil")
 	}
 }
 
 func TestVerifyEmailCode_EmptyEmail(t *testing.T) {
 	svc := &userService{redis: nil}
-	if svc.verifyEmailCode(context.Background(), "", "123456") {
+	if svc.verifyEmailCode(context.Background(), "", "123456", modeBlog) {
 		t.Error("verifyEmailCode should return false when email is empty")
 	}
 }
 
+func TestEmailCode_SendAndVerifyShareKeyNamespace(t *testing.T) {
+	mr, err := miniredis.Run()
+	if err != nil {
+		t.Fatalf("miniredis: %v", err)
+	}
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+
+	svc := &userService{redis: rdb}
+	const email = "alice@example.com"
+	const code = "654321"
+
+	// 模拟 SendEmailCode 写 key 的形态（blog 模式）
+	key := emailCodeKey(email, modeBlog)
+	if err := rdb.Set(context.Background(), key, code, emailCodeExpire).Err(); err != nil {
+		t.Fatalf("seed: %v", err)
+	}
+
+	if !svc.verifyEmailCode(context.Background(), email, code, modeBlog) {
+		t.Fatal("verifyEmailCode should accept the code written under the same mode namespace")
+	}
+	// 消费后 key 被删除
+	if mr.Exists(key) {
+		t.Error("email code key should be deleted after successful verify")
+	}
+}
+
+// TestEmailCode_CrossModeIsolation 同邮箱下 blog 验证码不应被 nomu 消费。
+//
+// 锁住 handoff §4.3 同款契约：redis key 按 mode 分段，跨 mode 互不串。
+// 这条契约之前只在 magic login 上验证过；email code 加 mode 后必须延续。
+func TestEmailCode_CrossModeIsolation(t *testing.T) {
+	mr, err := miniredis.Run()
+	if err != nil {
+		t.Fatalf("miniredis: %v", err)
+	}
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+
+	svc := &userService{redis: rdb}
+	const email = "alice@example.com"
+	const code = "111222"
+
+	blogKey := emailCodeKey(email, modeBlog)
+	nomuKey := emailCodeKey(email, modeNomu)
+
+	// 只写 blog 模式
+	if err := rdb.Set(context.Background(), blogKey, code, emailCodeExpire).Err(); err != nil {
+		t.Fatalf("seed blog: %v", err)
+	}
+
+	// 拿 nomu 模式来消费 blog 验证码 → 应当被拒
+	if svc.verifyEmailCode(context.Background(), email, code, modeNomu) {
+		t.Error("nomu mode consumed blog key — cross-mode isolation broken")
+	}
+	// blog 那份还在（没被 nomu 误删）
+	if !mr.Exists(blogKey) {
+		t.Error("blog key was wrongly consumed by nomu verify")
+	}
+
+	// blog 模式消费自己的 key → 应当成功
+	if !svc.verifyEmailCode(context.Background(), email, code, modeBlog) {
+		t.Error("blog mode should consume its own key")
+	}
+	if mr.Exists(blogKey) {
+		t.Error("blog key should be deleted after successful verify")
+	}
+	_ = nomuKey // nomu 这条 key 本测试不写，仅作占位以防后续加断言
+}
 
 // ---------- MagicLogin ----------
 
@@ -447,13 +518,13 @@ func TestAuthenticateMagicLogin_NilRedis(t *testing.T) {
 func TestAuthenticateMagicLogin_BadLengthToken(t *testing.T) {
 	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil, nil)
 	bad := []string{
-		"short",                  // 无冒号、无 mode
-		"short:blog",             // hex 段太短
-		strings.Repeat("a", 64),  // 缺冒号、缺 mode
-		strings.Repeat("a", 64) + ":",        // mode 为空
-		strings.Repeat("a", 64) + ":h5",      // mode 非法
-		strings.Repeat("a", 63) + ":blog",    // hex 长度 63
-		strings.Repeat("a", 65) + ":blog",    // hex 长度 65
+		"short",                           // 无冒号、无 mode
+		"short:blog",                      // hex 段太短
+		strings.Repeat("a", 64),           // 缺冒号、缺 mode
+		strings.Repeat("a", 64) + ":",     // mode 为空
+		strings.Repeat("a", 64) + ":h5",   // mode 非法
+		strings.Repeat("a", 63) + ":blog", // hex 长度 63
+		strings.Repeat("a", 65) + ":blog", // hex 长度 65
 	}
 	for _, tok := range bad {
 		_, _, err := svc.AuthenticateMagicLogin(context.Background(), tok)
@@ -620,5 +691,120 @@ func TestAuthenticateMagicLogin_CrossModeIsolation(t *testing.T) {
 	// blog 那份已被 GETDEL 删掉。
 	if mr.Exists(emailKey) {
 		t.Error("blog key should be deleted after successful consumption")
+	}
+}
+
+// ---------- HTML 模板：mode 路由 ----------
+
+// TestRenderVerificationHTML_BlogVsNomu 锁住两套 HTML 的关键差异：
+// nomu 必须带 logo URL + "NoonToolv1" 副标 + "代发" 页脚；blog 都不带。
+// 这是品牌认知 + 防回归的最小断言，足够发现未来改坏一边的设计。
+func TestRenderVerificationHTML_BlogVsNomu(t *testing.T) {
+	code := "123456"
+
+	blog := renderVerificationHTML(code, modeBlog)
+	nomu := renderVerificationHTML(code, modeNomu)
+
+	// blog 特征：含 "kanocifer.chat" wordmark + "注册验证码" 副标；
+	// 不应含 logo URL 也不应含 "NoonToolv1" 品牌。
+	if !strings.Contains(blog, "kanocifer.chat") {
+		t.Error("blog html should mention kanocifer.chat wordmark")
+	}
+	if strings.Contains(blog, nomuLogoURL) {
+		t.Error("blog html should NOT embed nomu logo")
+	}
+	if strings.Contains(blog, "NoonToolv1") {
+		t.Error("blog html should NOT mention NoonToolv1")
+	}
+	if !strings.Contains(blog, htmlEscape(code)) {
+		t.Error("blog html should embed the code")
+	}
+
+	// nomu 特征：含 logo URL + "NoonToolv1" 副标 + "代发" 页脚。
+	if !strings.Contains(nomu, nomuLogoURL) {
+		t.Error("nomu html should embed nomu logo")
+	}
+	if !strings.Contains(nomu, "NoonToolv1") {
+		t.Error("nomu html should mention NoonToolv1")
+	}
+	if !strings.Contains(nomu, "代 NoonToolv1 发送") {
+		t.Error("nomu html should have '代 NoonToolv1 发送' footer")
+	}
+	if !strings.Contains(nomu, htmlEscape(code)) {
+		t.Error("nomu html should embed the code")
+	}
+}
+
+func TestRenderMagicLoginHTML_BlogVsNomu(t *testing.T) {
+	link := "https://example.com/auth/magic?token=deadbeef"
+
+	blog := renderMagicLoginHTML(link, modeBlog)
+	nomu := renderMagicLoginHTML(link, modeNomu)
+
+	// blog 不带 logo / NoonToolv1
+	if strings.Contains(blog, nomuLogoURL) {
+		t.Error("blog magic-login html should NOT embed nomu logo")
+	}
+	if strings.Contains(blog, "NoonToolv1") {
+		t.Error("blog magic-login html should NOT mention NoonToolv1")
+	}
+	// CTA 文案
+	if !strings.Contains(blog, "登录 kanocifer.chat") {
+		t.Error("blog magic-login button should say 登录 kanocifer.chat")
+	}
+	if !strings.Contains(blog, htmlEscape(link)) {
+		t.Error("blog magic-login should embed the link")
+	}
+
+	// nomu 带 logo + NoonToolv1 + "完成 NoonToolv1 登录" CTA
+	if !strings.Contains(nomu, nomuLogoURL) {
+		t.Error("nomu magic-login html should embed nomu logo")
+	}
+	if !strings.Contains(nomu, "完成 NoonToolv1 登录") {
+		t.Error("nomu magic-login button should say 完成 NoonToolv1 登录")
+	}
+	if !strings.Contains(nomu, htmlEscape(link)) {
+		t.Error("nomu magic-login should embed the link")
+	}
+}
+
+// TestNormalizeMode 兜底非法 mode 为 blog。空 / 未知值都走 blog。
+func TestNormalizeMode(t *testing.T) {
+	cases := []struct {
+		in, want string
+	}{
+		{"", modeBlog},
+		{"blog", modeBlog},
+		{"nomu", modeNomu},
+		{"h5", modeBlog},
+		{"BLOG", modeBlog}, // 大小写敏感：BLOG 不算合法，走 blog 兜底
+	}
+	for _, c := range cases {
+		if got := normalizeMode(c.in); got != c.want {
+			t.Errorf("normalizeMode(%q) = %q, want %q", c.in, got, c.want)
+		}
+	}
+}
+
+// TestBuildVerificationEmail_Title 锁住 mode 决定邮件标题。
+func TestBuildVerificationEmail_Title(t *testing.T) {
+	blog := buildVerificationEmail("123456", modeBlog)
+	nomu := buildVerificationEmail("123456", modeNomu)
+	if blog.Title != "kanocifer.chat 注册验证码" {
+		t.Errorf("blog title = %q", blog.Title)
+	}
+	if nomu.Title != "NoonToolv1 注册验证码" {
+		t.Errorf("nomu title = %q", nomu.Title)
+	}
+}
+
+func TestBuildMagicLoginEmail_Title(t *testing.T) {
+	blog := buildMagicLoginEmail("https://x", modeBlog)
+	nomu := buildMagicLoginEmail("https://x", modeNomu)
+	if blog.Title != "kanocifer.chat 登录链接" {
+		t.Errorf("blog title = %q", blog.Title)
+	}
+	if nomu.Title != "NoonToolv1 登录链接" {
+		t.Errorf("nomu title = %q", nomu.Title)
 	}
 }

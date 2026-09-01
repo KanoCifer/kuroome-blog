@@ -19,12 +19,12 @@ type Userer interface {
 	Authenticate(ctx context.Context, username, password string) (*model.User, error)
 	AuthenticateMagicLogin(ctx context.Context, token string) (*model.User, *model.Profile, error)
 	CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
-	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
+	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error)
 	GetByID(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
 	Logout(ctx context.Context, userID uint)
 	RefreshTokens(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
 	UserToDict(u *model.User, p *model.Profile) map[string]any
-	SendEmailCode(ctx context.Context, email string) bool
+	SendEmailCode(ctx context.Context, email, mode string) bool
 	SendMagicLoginEmail(ctx context.Context, email, mode string) bool
 }
 
@@ -82,7 +82,7 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
-	u, _, err := h.userSvc.CreateUser(c.Request.Context(), req.Username, req.Password, req.Email, req.EmailCode, "")
+	u, _, err := h.userSvc.CreateUser(c.Request.Context(), req.Username, req.Password, req.Email, req.EmailCode, "", req.Mode)
 	if err != nil {
 		switch {
 		case errors.Is(err, usererrs.ErrUserExists):
@@ -174,10 +174,13 @@ func (h *UserHandler) RefreshToken(c *gin.Context) {
 	}, "访问令牌已刷新")
 }
 
+// EmailCode 申请注册验证码邮件。
+//
+// req.Mode 决定 HTML 模板（blog 编辑式 / nomu logo + 副标）和 Redis key
+// 命名空间（email_code:<email>:<mode>）。mode 缺省 / 非法值走 blog 兜底，
+// DTO 用 binding:"omitempty,oneof=blog nomu" 拦截非法值。
 func (h *UserHandler) EmailCode(c *gin.Context) {
-	var req struct {
-		Email string `json:"email"`
-	}
+	var req dto.EmailCodeRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.APIError(c, err.Error(), 400)
 		return
@@ -186,7 +189,7 @@ func (h *UserHandler) EmailCode(c *gin.Context) {
 		response.APIError(c, "邮箱不能为空", 400)
 		return
 	}
-	go h.userSvc.SendEmailCode(c.Request.Context(), req.Email)
+	go h.userSvc.SendEmailCode(c.Request.Context(), req.Email, req.Mode)
 	response.Success(c, nil, "验证码已发送")
 }
 

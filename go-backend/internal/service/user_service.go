@@ -17,7 +17,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
-	"github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
+	usererrs "github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/pkg/jwt"
@@ -25,8 +25,9 @@ import (
 )
 
 const (
-	emailCodeExpire = time.Minute * 5
-	emailCodePrefix = "email_code:"
+	emailCodeExpire   = time.Minute * 5
+	emailCodeCacheKey = "email_code:%s:%s" // 命名空间 by mode，跨 mode 互不串
+	nomuLogoURL       = "https://kanocifer.chat/logo/logo.png"
 )
 
 type LoginResponse struct {
@@ -60,8 +61,8 @@ type UserRepositoryer interface {
 type Userer interface {
 	GetByID(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
 	GetByUsername(ctx context.Context, username string) (*model.User, *model.Profile, error)
-	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
-	SendEmailCode(ctx context.Context, email string) bool
+	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error)
+	SendEmailCode(ctx context.Context, email, mode string) bool
 	SendMagicLoginEmail(ctx context.Context, email, mode string) bool
 	Authenticate(ctx context.Context, username, password string) (*model.User, error)
 	AuthenticateMagicLogin(ctx context.Context, token string) (*model.User, *model.Profile, error)
@@ -121,7 +122,7 @@ func (s *userService) GetByUsername(ctx context.Context, username string) (*mode
 
 // ---------- 注册 ----------
 
-func (s *userService) CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error) {
+func (s *userService) CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error) {
 	if s.repo.UsernameExists(ctx, username) {
 		return nil, nil, usererrs.ErrUserExists
 	}
@@ -130,7 +131,7 @@ func (s *userService) CreateUser(ctx context.Context, username, password, email,
 	}
 
 	if emailCode != "" {
-		if !s.verifyEmailCode(ctx, email, emailCode) {
+		if !s.verifyEmailCode(ctx, email, emailCode, mode) {
 			return nil, nil, usererrs.ErrInvalidEmailCode
 		}
 	}
@@ -158,24 +159,36 @@ func (s *userService) CreateUser(ctx context.Context, username, password, email,
 	return u, p, nil
 }
 
-func (s *userService) SendEmailCode(ctx context.Context, email string) bool {
+func (s *userService) SendEmailCode(ctx context.Context, email, mode string) bool {
+	mode = normalizeMode(mode)
 	var ch notification.Channel = &notification.EmailChannel{}
 	code := generateCode()
 
-	key := emailCodePrefix + email
-	s.redis.Set(ctx, key, code, emailCodeExpire)
+	key := emailCodeKey(email, mode)
+	if err := s.redis.Set(ctx, key, code, emailCodeExpire).Err(); err != nil {
+		slog.ErrorContext(ctx, "email code redis set failed", "err", err, "email", email, "mode", mode)
+	}
 
-	msg := buildVerificationEmail(code)
+	msg := buildVerificationEmail(code, mode)
 	return ch.Send(ctx, msg, notification.NotificationContext{Email: email})
 }
 
 // buildVerificationEmail 构造注册验证码邮件内容与纯文本 fallback。
-func buildVerificationEmail(code string) notification.Message {
+//
+// mode 决定：
+//  1. 邮件标题 + HTML 模板（blog 走编辑式极简，nomu 走 logo + 品牌副标）
+//  2. Redis 缓存 key 命名空间（email_code:<email>:<mode>）——
+//     同邮箱同时申请 blog 和 nomu 验证码互不覆盖，注册时按 mode 取回。
+func buildVerificationEmail(code, mode string) notification.Message {
+	title := "kanocifer.chat 注册验证码"
+	if mode == modeNomu {
+		title = "Nomu 注册验证码"
+	}
 	plain := fmt.Sprintf("您的验证码：%s\n请在5分钟内使用。", code)
 	return notification.Message{
-		Title: "kanocifer.chat 注册验证码",
+		Title: title,
 		Body:  plain,
-		HTML:  renderVerificationHTML(code),
+		HTML:  renderVerificationHTML(code, mode),
 	}
 }
 
@@ -295,6 +308,32 @@ func (s *userService) UserToDict(u *model.User, p *model.Profile) map[string]any
 	return d
 }
 
+// ----- 通用 mode 常量 -----
+//
+// mode 区分同一后端服务下的不同前端：blog = kanocifer.chat 落地页 SPA，
+// nomu = Nomu Chrome 扩展。email code 和 magic login 都按 mode
+// 路由：HTML 模板选型 + Redis 缓存 key 命名空间。
+//
+// 非法 mode 走 blog 兜底（normalizeMode），handler 层 DTO 用 oneof 拦截。
+const (
+	modeBlog = "blog"
+	modeNomu = "nomu"
+)
+
+// emailCodeKey 拼出 email 验证码的 redis key；mode 段隔离 blog / nomu，
+// 同邮箱同时申两个 mode 的验证码互不覆盖。
+func emailCodeKey(email, mode string) string {
+	return fmt.Sprintf(emailCodeCacheKey, email, normalizeMode(mode))
+}
+
+// normalizeMode 兜底非法 mode 为 blog。email code 和 magic login 共用。
+func normalizeMode(mode string) string {
+	if mode == modeBlog || mode == modeNomu {
+		return mode
+	}
+	return modeBlog
+}
+
 // ----- Email 魔法登录 ----
 //
 // 邮箱未注册时静默返回 true，由 handler 一律 200 OK 兜底，避免枚举。
@@ -309,28 +348,15 @@ const (
 	magicLoginTokenHex   = magicLoginTokenBytes * 2
 	magicLoginTokenTTL   = time.Minute * 10
 	magicLoginCacheKey   = "magiclogintoken:%s:%s"
-
-	// magicLoginModeBlog / magicLoginModeNomu 是 mode 字段的合法取值。
-	// 非法 mode 走 blog 兜底 + slog.Warn，handler 层 DTO 用 oneof 拦截。
-	magicLoginModeBlog = "blog"
-	magicLoginModeNomu = "nomu"
 )
 
 // magicLoginLinkPathFor 给出 mode 对应的"路径?token=%s"模板。
 // nomu 走 hash 路由（#/login/magic），所以 path 里必须含 "#"。
 func magicLoginLinkPathFor(mode string) string {
-	if mode == magicLoginModeNomu {
+	if mode == modeNomu {
 		return "/options.html#/login/magic?token=%s"
 	}
 	return "/auth/magic?token=%s"
-}
-
-// normalizeMagicLoginMode 兜底非法 mode 为 blog，warn 一行便于发现配置漂移。
-func normalizeMagicLoginMode(mode string) string {
-	if mode == magicLoginModeBlog || mode == magicLoginModeNomu {
-		return mode
-	}
-	return magicLoginModeBlog
 }
 
 // SendMagicLoginEmail 向已注册邮箱发送一次性登录链接；邮箱不存在时静默返回 true。
@@ -348,7 +374,7 @@ func (s *userService) SendMagicLoginEmail(ctx context.Context, email, mode strin
 		return false
 	}
 
-	normalized := normalizeMagicLoginMode(mode)
+	normalized := normalizeMode(mode)
 	if normalized != mode {
 		slog.WarnContext(ctx, "magic login unknown mode, fallback to blog",
 			"requested_mode", mode, "effective_mode", normalized)
@@ -367,7 +393,7 @@ func (s *userService) SendMagicLoginEmail(ctx context.Context, email, mode strin
 	// 邮件里给出的 token 包含 mode 段，consume 端据此反查正确的 redis key。
 	token := hex + ":" + mode
 	link := s.magicLoginLink(token, mode)
-	msg := buildMagicLoginEmail(link)
+	msg := buildMagicLoginEmail(link, mode)
 	ok := (&notification.EmailChannel{}).Send(ctx, msg, notification.NotificationContext{Email: email})
 	if !ok {
 		s.redis.Del(ctx, cacheKey)
@@ -401,7 +427,7 @@ func splitMagicLoginToken(token string) (hex, mode string, ok bool) {
 	if len(hex) != magicLoginTokenHex {
 		return "", "", false
 	}
-	if mode != magicLoginModeBlog && mode != magicLoginModeNomu {
+	if mode != modeBlog && mode != modeNomu {
 		return "", "", false
 	}
 	return hex, mode, true
@@ -436,38 +462,112 @@ func (s *userService) AuthenticateMagicLogin(ctx context.Context, token string) 
 }
 
 // buildMagicLoginEmail 构造魔法登录邮件内容与纯文本 fallback。
-func buildMagicLoginEmail(link string) notification.Message {
+//
+// mode 决定标题 + HTML 模板（blog 编辑式极简，nomu logo + 品牌副标）。
+func buildMagicLoginEmail(link, mode string) notification.Message {
+	title := "kanocifer.chat 登录链接"
+	if mode == modeNomu {
+		title = "Nomu 登录链接"
+	}
 	plain := fmt.Sprintf("点击下方链接登录（10 分钟内有效）：\n%s\n若非本人操作，请忽略此邮件。", link)
 	return notification.Message{
-		Title: "kanocifer.chat 登录链接",
+		Title: title,
 		Body:  plain,
-		HTML:  renderMagicLoginHTML(link),
+		HTML:  renderMagicLoginHTML(link, mode),
 	}
 }
 
-// renderMagicLoginHTML 渲染魔法登录邮件 HTML —— 与验证码同调性：
-// 深色大字号 CTA 按钮 + 末尾明文链接 fallback，兼容屏蔽按钮的客户端。
-func renderMagicLoginHTML(link string) string {
+// renderMagicLoginHTML 渲染魔法登录邮件 HTML。
+//
+// 两种 mode 共用同一调性（克制编辑式），但通过品牌头部差异化：
+//   - blog：纯文字 wordmark，无 logo，编辑式极简；
+//   - nomu：logo + "Nomu" 副标，CTA 文案改成"完成 Nomu 登录"，
+//     页脚多一行"由 kanocifer.chat 代 Nomu 发送"。
+//
+// 末尾明文链接 fallback 保留，兼容屏蔽按钮/图片的客户端。
+func renderMagicLoginHTML(link, mode string) string {
+	if mode == modeNomu {
+		return renderMagicLoginHTMLNomu(link)
+	}
+	return renderMagicLoginHTMLBlog(link)
+}
+
+func renderMagicLoginHTMLBlog(link string) string {
 	return fmt.Sprintf(`<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>kanocifer.chat 登录链接</title>
 </head>
-<body style="margin:0;padding:24px;background:#fafafa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-<table width="100%%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:0 auto;background:#ffffff;border-radius:8px;overflow:hidden;">
-<tr><td style="padding:32px 24px 24px;">
-<p style="margin:0 0 16px;font-size:14px;color:#333333;">点击下方按钮登录您的账号：</p>
-<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 24px;"><tr><td style="background:#1a1a1a;border-radius:6px;">
-<a href="%s" style="display:inline-block;padding:14px 28px;font-size:16px;font-weight:600;color:#ffffff;text-decoration:none;letter-spacing:1px;">登录 kanocifer.chat</a>
-</td></tr></table>
-<p style="margin:0 0 8px;font-size:13px;color:#888888;">按钮无法使用？复制以下链接到浏览器打开：</p>
-<p style="margin:0;font-size:12px;line-height:1.6;word-break:break-all;color:#555555;font-family:'SF Mono',Consolas,monospace;">%s</p>
-<p style="margin:16px 0 0;font-size:13px;color:#888888;">链接 10 分钟内有效。若非本人操作，请忽略此邮件。</p>
+<body style="margin:0;padding:32px 16px;background:#fafafa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#1a1a1a;">
+<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:0 auto;">
+<tr><td style="padding:0 0 24px;text-align:left;">
+  <span style="font-size:14px;font-weight:600;letter-spacing:-0.2px;color:#1a1a1a;">kanocifer.chat</span>
+</td></tr>
+<tr><td style="background:#ffffff;border:1px solid #ececec;border-radius:14px;padding:36px 32px;">
+  <p style="margin:0 0 6px;font-size:13px;color:#888888;letter-spacing:0.2px;">魔法登录</p>
+  <h1 style="margin:0 0 12px;font-size:20px;font-weight:600;line-height:1.4;color:#1a1a1a;letter-spacing:-0.2px;">点击下方按钮登录</h1>
+  <p style="margin:0 0 28px;font-size:14px;line-height:1.6;color:#6b6b6b;">无需输入密码，单击按钮即可登录您的账号。</p>
+  <table role="presentation" width="100%%" cellpadding="0" cellspacing="0">
+  <tr><td align="center" style="padding:4px 0 8px;">
+    <table role="presentation" cellpadding="0" cellspacing="0">
+    <tr><td align="center" style="background:#1a1a1a;border-radius:10px;">
+      <a href="%[1]s" target="_blank" style="display:inline-block;padding:16px 40px;font-size:15px;font-weight:600;letter-spacing:0.2px;color:#ffffff;text-decoration:none;">登录 kanocifer.chat</a>
+    </td></tr>
+    </table>
+  </td></tr>
+  </table>
+  <p style="margin:28px 0 8px;font-size:13px;color:#888888;">按钮无法使用？复制以下链接到浏览器打开：</p>
+  <p style="margin:0;padding:12px 14px;background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;font-size:12px;line-height:1.6;word-break:break-all;color:#555555;font-family:'SF Mono','JetBrains Mono',Consolas,Menlo,monospace;">%[1]s</p>
+  <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#999999;">链接 10 分钟内有效，仅可使用一次。若非本人操作，请忽略此邮件。</p>
+</td></tr>
+<tr><td style="padding:20px 4px 0;text-align:left;">
+  <p style="margin:0;font-size:12px;line-height:1.6;color:#aaaaaa;">kanocifer.chat · 魔法登录</p>
 </td></tr>
 </table>
 </body>
-</html>`, htmlEscape(link), htmlEscape(link))
+</html>`, htmlEscape(link))
+}
+
+func renderMagicLoginHTMLNomu(link string) string {
+	return fmt.Sprintf(`<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nomu 登录链接</title>
+</head>
+<body style="margin:0;padding:32px 16px;background:#fafafa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#1a1a1a;">
+<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:0 auto;">
+<tr><td style="padding:0 0 28px;text-align:center;">
+  <img src="%[1]s" alt="Nomu" width="64" height="64" style="display:inline-block;width:64px;height:64px;border:0;outline:none;text-decoration:none;" />
+  <p style="margin:14px 0 0;font-size:13px;font-weight:600;letter-spacing:0.4px;color:#1a1a1a;">Nomu</p>
+  <p style="margin:4px 0 0;font-size:12px;color:#888888;letter-spacing:0.2px;">Chrome 扩展 · 一键登录</p>
+</td></tr>
+<tr><td style="background:#ffffff;border:1px solid #ececec;border-radius:14px;padding:32px 28px;">
+  <h1 style="margin:0 0 6px;font-size:20px;font-weight:600;line-height:1.3;color:#1a1a1a;letter-spacing:-0.2px;">点击下方按钮完成登录</h1>
+  <p style="margin:0 0 28px;font-size:14px;line-height:1.6;color:#6b6b6b;">点击后会自动打开 Nomu 并完成登录。</p>
+  <table role="presentation" width="100%%" cellpadding="0" cellspacing="0">
+  <tr><td align="center" style="padding:4px 0 8px;">
+    <table role="presentation" cellpadding="0" cellspacing="0">
+    <tr><td align="center" style="background:#1a1a1a;border-radius:10px;">
+      <a href="%[2]s" target="_blank" style="display:inline-block;padding:16px 40px;font-size:15px;font-weight:600;letter-spacing:0.2px;color:#ffffff;text-decoration:none;">完成 Nomu 登录</a>
+    </td></tr>
+    </table>
+  </td></tr>
+  </table>
+  <p style="margin:28px 0 8px;font-size:13px;color:#888888;">按钮无法使用？复制以下链接到浏览器打开：</p>
+  <p style="margin:0;padding:12px 14px;background:#fafafa;border:1px solid #f0f0f0;border-radius:8px;font-size:12px;line-height:1.6;word-break:break-all;color:#555555;font-family:'SF Mono','JetBrains Mono',Consolas,Menlo,monospace;">%[2]s</p>
+  <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:#999999;">链接 10 分钟内有效，仅可使用一次。若非本人操作，请忽略此邮件。</p>
+</td></tr>
+<tr><td style="padding:20px 4px 0;text-align:center;">
+  <p style="margin:0 0 4px;font-size:12px;line-height:1.6;color:#aaaaaa;">这封邮件由 <span style="color:#888888;">kanocifer.chat</span> 代 Nomu 发送</p>
+  <p style="margin:0;font-size:12px;line-height:1.6;color:#cccccc;">Nomu · 魔法登录</p>
+</td></tr>
+</table>
+</body>
+</html>`, nomuLogoURL, htmlEscape(link))
 }
 
 // ---------- 辅助 ----------
@@ -476,25 +576,86 @@ func generateCode() string {
 	return itoa(rand.Intn(999999))
 }
 
-// renderVerificationEmail 渲染验证码邮件 HTML —— 克制样式，与 design-system
-// "适" 调性对齐：深色大字号 + 等宽字体突出验证码，不用花哨色彩。
-func renderVerificationHTML(code string) string {
+// renderVerificationHTML 渲染注册验证码邮件 HTML。
+//
+// 两种 mode 共用同一调性（克制编辑式），但通过品牌头部差异化：
+//   - blog：纯文字 wordmark，无 logo，编辑式极简；
+//   - nomu：logo + "Nomu · 邮箱验证" 副标，验证码说明改成
+//     "用于完成 Nomu 账号注册"，页脚多一行"由 kanocifer.chat 代发"。
+//
+// 验证码本身仍用 36px monospace + 8px letter-spacing，跨 mode 一致。
+func renderVerificationHTML(code, mode string) string {
+	if mode == modeNomu {
+		return renderVerificationHTMLNomu(code)
+	}
+	return renderVerificationHTMLBlog(code)
+}
+
+func renderVerificationHTMLBlog(code string) string {
 	return fmt.Sprintf(`<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>kanocifer.chat 注册验证码</title>
 </head>
-<body style="margin:0;padding:24px;background:#fafafa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
-<table width="100%%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:0 auto;background:#ffffff;border-radius:8px;overflow:hidden;">
-<tr><td style="padding:32px 24px 16px;">
-<p style="margin:0 0 16px;font-size:14px;color:#333333;">这是您的验证码：</p>
-<p style="margin:0 0 24px;font-size:32px;font-weight:700;letter-spacing:4px;color:#1a1a1a;font-family:'SF Mono',Consolas,monospace;">%s</p>
-<p style="margin:0;font-size:13px;color:#888888;">请在5分钟内使用。若非本人操作，请忽略此邮件。</p>
+<body style="margin:0;padding:32px 16px;background:#fafafa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#1a1a1a;">
+<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:0 auto;">
+<tr><td style="padding:0 0 24px;text-align:left;">
+  <span style="font-size:14px;font-weight:600;letter-spacing:-0.2px;color:#1a1a1a;">kanocifer.chat</span>
+</td></tr>
+<tr><td style="background:#ffffff;border:1px solid #ececec;border-radius:14px;padding:36px 32px;">
+  <p style="margin:0 0 6px;font-size:13px;color:#888888;letter-spacing:0.2px;">注册验证码</p>
+  <h1 style="margin:0 0 28px;font-size:18px;font-weight:600;line-height:1.4;color:#1a1a1a;letter-spacing:-0.2px;">这是您的验证码</h1>
+  <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="background:#fafafa;border:1px solid #f0f0f0;border-radius:10px;">
+  <tr><td style="padding:24px 16px;text-align:center;">
+    <span style="font-family:'SF Mono','JetBrains Mono',Consolas,Menlo,monospace;font-size:36px;font-weight:600;letter-spacing:8px;color:#1a1a1a;">%s</span>
+  </td></tr>
+  </table>
+  <p style="margin:24px 0 0;font-size:14px;line-height:1.6;color:#6b6b6b;">请在 5 分钟内使用。验证码仅用于本次注册，不会以任何形式再次索取。</p>
+  <p style="margin:12px 0 0;font-size:13px;line-height:1.6;color:#999999;">若非本人操作，请忽略此邮件。</p>
+</td></tr>
+<tr><td style="padding:20px 4px 0;text-align:left;">
+  <p style="margin:0;font-size:12px;line-height:1.6;color:#aaaaaa;">kanocifer.chat · 注册验证码</p>
 </td></tr>
 </table>
 </body>
 </html>`, htmlEscape(code))
+}
+
+func renderVerificationHTMLNomu(code string) string {
+	return fmt.Sprintf(`<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nomu 注册验证码</title>
+</head>
+<body style="margin:0;padding:32px 16px;background:#fafafa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#1a1a1a;">
+<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:0 auto;">
+<tr><td style="padding:0 0 28px;text-align:center;">
+  <img src="%s" alt="Nomu" width="64" height="64" style="display:inline-block;width:64px;height:64px;border:0;outline:none;text-decoration:none;" />
+  <p style="margin:14px 0 0;font-size:13px;font-weight:600;letter-spacing:0.4px;color:#1a1a1a;">Nomu</p>
+  <p style="margin:4px 0 0;font-size:12px;color:#888888;letter-spacing:0.2px;">Chrome 扩展 · 邮箱验证</p>
+</td></tr>
+<tr><td style="background:#ffffff;border:1px solid #ececec;border-radius:14px;padding:32px 28px;">
+  <h1 style="margin:0 0 6px;font-size:20px;font-weight:600;line-height:1.3;color:#1a1a1a;letter-spacing:-0.2px;">这是您的验证码</h1>
+  <p style="margin:0 0 24px;font-size:14px;line-height:1.6;color:#6b6b6b;">用于完成 Nomu 账号注册，请妥善保管。</p>
+  <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="background:#fafafa;border:1px solid #f0f0f0;border-radius:10px;">
+  <tr><td style="padding:24px 16px;text-align:center;">
+    <span style="font-family:'SF Mono','JetBrains Mono',Consolas,Menlo,monospace;font-size:36px;font-weight:700;letter-spacing:8px;color:#1a1a1a;">%s</span>
+  </td></tr>
+  </table>
+  <p style="margin:24px 0 0;font-size:14px;line-height:1.6;color:#6b6b6b;">请在 5 分钟内使用。验证码仅用于本次注册，不会以任何形式再次索取。</p>
+  <p style="margin:12px 0 0;font-size:13px;line-height:1.6;color:#999999;">若非本人操作，请忽略此邮件。</p>
+</td></tr>
+<tr><td style="padding:20px 4px 0;text-align:center;">
+  <p style="margin:0 0 4px;font-size:12px;line-height:1.6;color:#aaaaaa;">这封邮件由 <span style="color:#888888;">kanocifer.chat</span> 代 Nomu 发送</p>
+  <p style="margin:0;font-size:12px;line-height:1.6;color:#cccccc;">Nomu · 注册验证码</p>
+</td></tr>
+</table>
+</body>
+</html>`, nomuLogoURL, htmlEscape(code))
 }
 
 // htmlEscape 转义 HTML 特殊字符，防止验证码中含 < > & 等破坏模板。
@@ -539,12 +700,11 @@ func generateRandomToken(n int) string {
 	return hex.EncodeToString(raw)
 }
 
-// verifyEmailCode 校验 Redis 中的注册验证码（signup_code:{email}）。
-func (s *userService) verifyEmailCode(ctx context.Context, email, code string) bool {
+func (s *userService) verifyEmailCode(ctx context.Context, email, code, mode string) bool {
 	if s.redis == nil || email == "" {
 		return false
 	}
-	key := "signup_code:" + email
+	key := emailCodeKey(email, mode)
 	stored, err := s.redis.Get(ctx, key).Result()
 	if err != nil || stored != code {
 		return false
