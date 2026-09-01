@@ -40,9 +40,18 @@ export interface PasskeyLoginResult {
   raw: LoginResponseData | undefined;
 }
 
-/** 邮箱魔法登录 — POST /v3/email/magic-login 的请求体 */
+/** 邮箱魔法登录 — POST /v3/email/magic-login 的请求体
+ *
+ * mode 决定邮件里链接落到哪个前端 + 后端 Redis 命名空间：
+ *   - "blog" → kanocifer.chat 落地页（web 端魔法登录）
+ *   - "nomu" → Chrome 扩展（NoonToolv1）的 options.html#/login/magic
+ *
+ * 落地页这一侧调用方不感知 mode，gateway 默认填 "blog"；扩展自己在 client.ts
+ * 里固定传 "nomu"。后端 DTO 用 binding:"required,oneof=blog nomu" 拦截非法值。
+ */
 export interface MagicLinkRequestPayload {
   email: string;
+  mode: 'blog' | 'nomu';
 }
 
 function buildLoginResult(data: LoginResponseData): LoginResult {
@@ -121,7 +130,7 @@ export const authGateway = {
 
   /**
    * 申请魔法登录邮件。永远返回 200（防 enumeration）；前端不要根据响应判断邮箱是否注册。
-   * 仅当邮箱格式非法时返回 400。
+   * 仅当邮箱格式非法、mode 字段缺失或非 blog/nomu 时返回 400。
    */
   requestMagicLink(payload: MagicLinkRequestPayload): Promise<ApiResponse<null>> {
     return apiClient

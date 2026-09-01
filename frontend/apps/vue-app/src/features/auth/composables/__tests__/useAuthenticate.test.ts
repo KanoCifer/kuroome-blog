@@ -70,7 +70,12 @@ describe('useAuthenticate — magic-link', () => {
       requestMagicLink.mockResolvedValue({ code: 0, data: null });
       const { handleRequestMagicLink, magicLinkSentTo, errors } = useAuthenticate();
       await handleRequestMagicLink('alice@example.com');
-      expect(requestMagicLink).toHaveBeenCalledWith({ email: 'alice@example.com' });
+      // 落地页固定 mode='blog'，让后端拼 kanocifer.chat SPA 链接。
+      // 扩展（NoonToolv1）在自己 client.ts 里固定传 mode='nomu'。
+      expect(requestMagicLink).toHaveBeenCalledWith({
+        email: 'alice@example.com',
+        mode: 'blog',
+      });
       expect(magicLinkSentTo.value).toBe('a****@example.com');
       expect(errors.value.email).toBeUndefined();
     });

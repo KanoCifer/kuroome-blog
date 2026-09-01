@@ -103,7 +103,9 @@ export function useAuthenticate() {
     }
     isMagicLinkRequesting.value = true;
     try {
-      await authGateway.requestMagicLink({ email });
+      // 落地页固定 mode='blog'：让后端拼 kanocifer.chat SPA 链接。
+      // 扩展（NoonToolv1）在自己 client.ts 里固定传 mode='nomu'，互不干扰。
+      await authGateway.requestMagicLink({ email, mode: 'blog' });
       // enumeration-safe：永远"成功"，不管邮箱是否注册
       magicLinkSentTo.value = maskEmail(email);
     } catch (err) {
