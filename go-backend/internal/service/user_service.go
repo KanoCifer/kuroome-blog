@@ -2,6 +2,9 @@ package service
 
 import (
 	"context"
+	crand "crypto/rand"
+	"encoding/hex"
+	"errors"
 	"fmt"
 	"log/slog"
 	"math/rand"
@@ -59,7 +62,9 @@ type Userer interface {
 	GetByUsername(ctx context.Context, username string) (*model.User, *model.Profile, error)
 	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
 	SendEmailCode(ctx context.Context, email string) bool
+	SendMagicLoginEmail(ctx context.Context, email string) bool
 	Authenticate(ctx context.Context, username, password string) (*model.User, error)
+	AuthenticateMagicLogin(ctx context.Context, token string) (*model.User, *model.Profile, error)
 	CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
 	RefreshTokens(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
 	Logout(ctx context.Context, userID uint)
@@ -279,6 +284,109 @@ func (s *userService) UserToDict(u *model.User, p *model.Profile) map[string]any
 	return d
 }
 
+// ----- Email 魔法登录 ----
+//
+// 邮箱未注册时静默返回 true，由 handler 一律 200 OK 兜底，避免枚举。
+const (
+	magicLoginTokenBytes = 32
+	magicLoginTokenHex   = magicLoginTokenBytes * 2
+	magicLoginTokenTTL   = time.Minute * 10
+	magicLoginCacheKey   = "magiclogintoken:%s"
+	magicLoginLinkPath   = "/v3/magic-login?token=%s"
+)
+
+// SendMagicLoginEmail 向已注册邮箱发送一次性登录链接；邮箱不存在时静默返回 true。
+func (s *userService) SendMagicLoginEmail(ctx context.Context, email string) bool {
+	// 一次查询同时承担"邮箱是否存在"判断和后续 user 解析，
+	// 避免 EmailExists + GetByEmail 之间被并发注册/删除留下不一致窗口。
+	u, _, err := s.repo.GetByEmail(ctx, email)
+	if err != nil || u == nil {
+		return true
+	}
+	if s.redis == nil {
+		slog.WarnContext(ctx, "magic login aborted: redis not configured")
+		return false
+	}
+
+	token := generateRandomToken(magicLoginTokenBytes)
+	cacheKey := fmt.Sprintf(magicLoginCacheKey, token)
+	if err := s.redis.Set(ctx, cacheKey, email, magicLoginTokenTTL).Err(); err != nil {
+		slog.ErrorContext(ctx, "magic login redis set failed", "err", err)
+		return false
+	}
+
+	link := fmt.Sprintf(magicLoginLinkPath, token)
+	msg := buildMagicLoginEmail(link)
+	ok := (&notification.EmailChannel{}).Send(ctx, msg, notification.NotificationContext{Email: email})
+	if !ok {
+		s.redis.Del(ctx, cacheKey)
+		return false
+	}
+	slog.InfoContext(ctx, "magic login email sent", "email", email)
+	return true
+}
+
+// AuthenticateMagicLogin 用一次性 token 换取登录态；token 校验后立即消费。
+func (s *userService) AuthenticateMagicLogin(ctx context.Context, token string) (*model.User, *model.Profile, error) {
+	if s.redis == nil || token == "" {
+		return nil, nil, usererrs.ErrInvalidMagicToken
+	}
+	// 仅放行 64 位 hex，避免恶意 token 污染 Redis key。
+	if len(token) != magicLoginTokenHex {
+		return nil, nil, usererrs.ErrInvalidMagicToken
+	}
+	cacheKey := fmt.Sprintf(magicLoginCacheKey, token)
+	email, err := s.redis.GetDel(ctx, cacheKey).Result()
+	if errors.Is(err, redis.Nil) || err != nil || email == "" {
+		return nil, nil, usererrs.ErrInvalidMagicToken
+	}
+
+	u, p, err := s.repo.GetByEmail(ctx, email)
+	if err != nil {
+		return nil, nil, err
+	}
+	if u == nil {
+		return nil, nil, usererrs.ErrUserNotFound
+	}
+	slog.InfoContext(ctx, "magic login consumed", "user_id", u.ID)
+	return u, p, nil
+}
+
+// buildMagicLoginEmail 构造魔法登录邮件内容与纯文本 fallback。
+func buildMagicLoginEmail(link string) notification.Message {
+	plain := fmt.Sprintf("点击下方链接登录（10 分钟内有效）：\n%s\n若非本人操作，请忽略此邮件。", link)
+	return notification.Message{
+		Title: "kanocifer.chat 登录链接",
+		Body:  plain,
+		HTML:  renderMagicLoginHTML(link),
+	}
+}
+
+// renderMagicLoginHTML 渲染魔法登录邮件 HTML —— 与验证码同调性：
+// 深色大字号 CTA 按钮 + 末尾明文链接 fallback，兼容屏蔽按钮的客户端。
+func renderMagicLoginHTML(link string) string {
+	return fmt.Sprintf(`<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:24px;background:#fafafa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+<table width="100%%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:0 auto;background:#ffffff;border-radius:8px;overflow:hidden;">
+<tr><td style="padding:32px 24px 24px;">
+<p style="margin:0 0 16px;font-size:14px;color:#333333;">点击下方按钮登录您的账号：</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 24px;"><tr><td style="background:#1a1a1a;border-radius:6px;">
+<a href="%s" style="display:inline-block;padding:14px 28px;font-size:16px;font-weight:600;color:#ffffff;text-decoration:none;letter-spacing:1px;">登录 kanocifer.chat</a>
+</td></tr></table>
+<p style="margin:0 0 8px;font-size:13px;color:#888888;">按钮无法使用？复制以下链接到浏览器打开：</p>
+<p style="margin:0;font-size:12px;line-height:1.6;word-break:break-all;color:#555555;font-family:'SF Mono',Consolas,monospace;">%s</p>
+<p style="margin:16px 0 0;font-size:13px;color:#888888;">链接 10 分钟内有效。若非本人操作，请忽略此邮件。</p>
+</td></tr>
+</table>
+</body>
+</html>`, htmlEscape(link), htmlEscape(link))
+}
+
 // ---------- 辅助 ----------
 
 func generateCode() string {
@@ -338,6 +446,14 @@ func parseUint(s string) (uint, error) {
 // gormModel 快速构造仅带 ID 的 model.User
 func gormModel(id uint) gorm.Model {
 	return gorm.Model{ID: id}
+}
+
+func generateRandomToken(n int) string {
+	raw := make([]byte, n)
+	if _, err := crand.Read(raw); err != nil {
+		return ""
+	}
+	return hex.EncodeToString(raw)
 }
 
 // verifyEmailCode 校验 Redis 中的注册验证码（signup_code:{email}）。

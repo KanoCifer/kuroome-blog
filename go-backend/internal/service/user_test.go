@@ -178,6 +178,7 @@ func TestUserToDict_ProfileWithZeroID(t *testing.T) {
 type mockUserRepo struct {
 	getByIDFn       func(ctx context.Context, id uint) (*model.User, error)
 	getByUsernameFn func(ctx context.Context, username string) (*model.User, error)
+	getByEmailFn    func(ctx context.Context, email string) (*model.User, *model.Profile, error)
 	usernameExists  bool
 	emailExists     bool
 }
@@ -201,6 +202,9 @@ func (m *mockUserRepo) GetByUsername(ctx context.Context, username string) (*mod
 }
 
 func (m *mockUserRepo) GetByEmail(ctx context.Context, email string) (*model.User, *model.Profile, error) {
+	if m.getByEmailFn != nil {
+		return m.getByEmailFn(ctx, email)
+	}
 	return nil, nil, nil
 }
 
@@ -410,5 +414,46 @@ func TestVerifyEmailCode_EmptyEmail(t *testing.T) {
 	svc := &userService{redis: nil}
 	if svc.verifyEmailCode(context.Background(), "", "123456") {
 		t.Error("verifyEmailCode should return false when email is empty")
+	}
+}
+
+
+// ---------- MagicLogin ----------
+
+// TestSendMagicLoginEmail_EmailNotRegistered 邮箱未注册时静默 true，
+// 防止枚举；不调用 redis。
+func TestSendMagicLoginEmail_EmailNotRegistered(t *testing.T) {
+	repo := &mockUserRepo{emailExists: false}
+	svc := NewUserService(repo, nil, nil)
+
+	if !svc.SendMagicLoginEmail(context.Background(), "ghost@example.com") {
+		t.Error("SendMagicLoginEmail should return true (silent success) for unregistered email")
+	}
+}
+
+// TestAuthenticateMagicLogin_NilRedis 无 redis 直接 401 等价。
+func TestAuthenticateMagicLogin_NilRedis(t *testing.T) {
+	svc := NewUserService(&mockUserRepo{}, nil, nil)
+	_, _, err := svc.AuthenticateMagicLogin(context.Background(), "any-token")
+	if !errors.Is(err, usererrs.ErrInvalidMagicToken) {
+		t.Errorf("err = %v, want ErrInvalidMagicToken", err)
+	}
+}
+
+// TestAuthenticateMagicLogin_BadLengthToken 长度不符直接拒绝，避免污染 key。
+func TestAuthenticateMagicLogin_BadLengthToken(t *testing.T) {
+	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil)
+	_, _, err := svc.AuthenticateMagicLogin(context.Background(), "short")
+	if !errors.Is(err, usererrs.ErrInvalidMagicToken) {
+		t.Errorf("err = %v, want ErrInvalidMagicToken", err)
+	}
+}
+
+// TestAuthenticateMagicLogin_EmptyToken 空 token 立即拒绝。
+func TestAuthenticateMagicLogin_EmptyToken(t *testing.T) {
+	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil)
+	_, _, err := svc.AuthenticateMagicLogin(context.Background(), "")
+	if !errors.Is(err, usererrs.ErrInvalidMagicToken) {
+		t.Errorf("err = %v, want ErrInvalidMagicToken", err)
 	}
 }

@@ -23,20 +23,28 @@ import (
 
 func init() {
 	gin.SetMode(gin.TestMode)
+	// user_test.go 大量用例直接用全局 config.Cfg，而 SetRefreshCookie
+	// 会读 cfg.Security.CookieDomain —— 一旦 cfg 为 nil 整个测试套 panic。
+	// 在测试 init 阶段注入最小占位 cfg，仅供 cookies util 不 panic。
+	if config.Cfg == nil {
+		config.Cfg = &config.Config{}
+	}
 }
 
 // ---------- mock UserService ----------
 
 type mockUserService struct {
-	authenticateFn  func(ctx context.Context, username, password string) (*model.User, error)
-	createTokensFn  func(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
-	createUserFn    func(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
-	getByIDFn       func(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
-	getByUsernameFn func(ctx context.Context, username string) (*model.User, *model.Profile, error)
-	logoutFn        func(ctx context.Context, userID uint)
-	refreshFn       func(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
-	sendEmailCodeFn func(ctx context.Context, email string) bool
-	userToDictFn    func(u *model.User, p *model.Profile) map[string]any
+	authenticateFn        func(ctx context.Context, username, password string) (*model.User, error)
+	authenticateMagicFn   func(ctx context.Context, token string) (*model.User, *model.Profile, error)
+	createTokensFn        func(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
+	createUserFn          func(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
+	getByIDFn             func(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
+	getByUsernameFn       func(ctx context.Context, username string) (*model.User, *model.Profile, error)
+	logoutFn              func(ctx context.Context, userID uint)
+	refreshFn             func(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
+	sendEmailCodeFn       func(ctx context.Context, email string) bool
+	sendMagicLoginEmailFn func(ctx context.Context, email string) bool
+	userToDictFn          func(u *model.User, p *model.Profile) map[string]any
 }
 
 func (m *mockUserService) Authenticate(ctx context.Context, username, password string) (*model.User, error) {
@@ -80,6 +88,20 @@ func (m *mockUserService) SendEmailCode(ctx context.Context, email string) bool 
 		return m.sendEmailCodeFn(ctx, email)
 	}
 	return true
+}
+
+func (m *mockUserService) SendMagicLoginEmail(ctx context.Context, email string) bool {
+	if m.sendMagicLoginEmailFn != nil {
+		return m.sendMagicLoginEmailFn(ctx, email)
+	}
+	return true
+}
+
+func (m *mockUserService) AuthenticateMagicLogin(ctx context.Context, token string) (*model.User, *model.Profile, error) {
+	if m.authenticateMagicFn != nil {
+		return m.authenticateMagicFn(ctx, token)
+	}
+	return nil, nil, usererrs.ErrInvalidMagicToken
 }
 
 func (m *mockUserService) UserToDict(u *model.User, p *model.Profile) map[string]any {
@@ -469,6 +491,133 @@ func TestRefreshToken_FromCookie(t *testing.T) {
 	data, _ := parseResp(t, w.Body.Bytes())
 	if data["access_token"] != "new-access" {
 		t.Errorf("access_token = %v, want new-access", data["access_token"])
+	}
+}
+
+// ---------- MagicLoginEmail ----------
+
+func TestMagicLoginEmail_InvalidEmail(t *testing.T) {
+	svc := &mockUserService{}
+	h := NewUserHandler(svc, config.Cfg)
+
+	w := doRequest(h.MagicLoginEmail, http.MethodPost, "/email/magic-login",
+		jsonBody(t, dto.MagicLoginEmailRequest{Email: "not-an-email"}))
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("status = %d, want 400", w.Code)
+	}
+}
+
+func TestMagicLoginEmail_AlwaysReturns200(t *testing.T) {
+	// 邮箱不存在时 service 静默 true，handler 仍 200，避免枚举。
+	svc := &mockUserService{
+		sendMagicLoginEmailFn: func(_ context.Context, _ string) bool { return true },
+	}
+	h := NewUserHandler(svc, config.Cfg)
+
+	w := doRequest(h.MagicLoginEmail, http.MethodPost, "/email/magic-login",
+		jsonBody(t, dto.MagicLoginEmailRequest{Email: "nobody@example.com"}))
+
+	if w.Code != http.StatusOK {
+		t.Errorf("status = %d, want 200", w.Code)
+	}
+}
+
+// ---------- MagicLogin ----------
+
+func TestMagicLogin_Success_FromQuery(t *testing.T) {
+	svc := &mockUserService{
+		authenticateMagicFn: func(_ context.Context, token string) (*model.User, *model.Profile, error) {
+			return &model.User{Model: gormModel(8), Username: "alice"}, nil, nil
+		},
+	}
+	h := NewUserHandler(svc, config.Cfg)
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request, _ = http.NewRequest(http.MethodGet, "/magic-login?token=abc-token", nil)
+	h.MagicLogin(c)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("status = %d, want 200", w.Code)
+	}
+	data, _ := parseResp(t, w.Body.Bytes())
+	if data["access_token"] == nil {
+		t.Error("expected access_token in response")
+	}
+	if cookie := findCookie(w, "refresh_token"); cookie == nil {
+		t.Error("expected refresh_token cookie set on magic login")
+	}
+}
+
+func TestMagicLogin_Success_FromBody(t *testing.T) {
+	svc := &mockUserService{
+		authenticateMagicFn: func(_ context.Context, token string) (*model.User, *model.Profile, error) {
+			return &model.User{Model: gormModel(9), Username: "bob"}, nil, nil
+		},
+	}
+	h := NewUserHandler(svc, config.Cfg)
+
+	w := doRequest(h.MagicLogin, http.MethodPost, "/magic-login",
+		jsonBody(t, dto.MagicLoginAuthRequest{Token: "any-token"}))
+
+	if w.Code != http.StatusOK {
+		t.Errorf("status = %d, want 200", w.Code)
+	}
+}
+
+func TestMagicLogin_MissingToken(t *testing.T) {
+	svc := &mockUserService{
+		authenticateMagicFn: func(_ context.Context, _ string) (*model.User, *model.Profile, error) {
+			t.Error("service should not be called when token is empty")
+			return nil, nil, nil
+		},
+	}
+	h := NewUserHandler(svc, config.Cfg)
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request, _ = http.NewRequest(http.MethodGet, "/magic-login", nil)
+	h.MagicLogin(c)
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("status = %d, want 400", w.Code)
+	}
+}
+
+func TestMagicLogin_InvalidToken(t *testing.T) {
+	svc := &mockUserService{
+		authenticateMagicFn: func(_ context.Context, _ string) (*model.User, *model.Profile, error) {
+			return nil, nil, usererrs.ErrInvalidMagicToken
+		},
+	}
+	h := NewUserHandler(svc, config.Cfg)
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request, _ = http.NewRequest(http.MethodGet, "/magic-login?token=bad", nil)
+	h.MagicLogin(c)
+
+	if w.Code != http.StatusUnauthorized {
+		t.Errorf("status = %d, want 401", w.Code)
+	}
+}
+
+func TestMagicLogin_UserNotFound(t *testing.T) {
+	svc := &mockUserService{
+		authenticateMagicFn: func(_ context.Context, _ string) (*model.User, *model.Profile, error) {
+			return nil, nil, usererrs.ErrUserNotFound
+		},
+	}
+	h := NewUserHandler(svc, config.Cfg)
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request, _ = http.NewRequest(http.MethodGet, "/magic-login?token=expired", nil)
+	h.MagicLogin(c)
+
+	if w.Code != http.StatusNotFound {
+		t.Errorf("status = %d, want 404", w.Code)
 	}
 }
 

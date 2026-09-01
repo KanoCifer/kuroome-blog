@@ -54,3 +54,13 @@ type PasskeyRegistrationRequest struct {
 type PasskeyAuthRequest struct {
 	Assertion map[string]any `json:"assertion"`
 }
+
+// MagicLoginEmailRequest 申请邮件魔法登录链接的请求。
+type MagicLoginEmailRequest struct {
+	Email string `json:"email" binding:"required,email"`
+}
+
+// MagicLoginAuthRequest 使用 token 完成魔法登录的请求。
+type MagicLoginAuthRequest struct {
+	Token string `json:"token" binding:"required"`
+}

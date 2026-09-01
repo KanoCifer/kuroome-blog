@@ -11,4 +11,5 @@ var (
 	ErrInvalidEmailCode   = errors.New("验证码无效")
 	ErrUserNotFound       = errors.New("用户不存在")
 	ErrInvalidToken       = errors.New("无效的令牌")
+	ErrInvalidMagicToken  = errors.New("魔法链接无效或已过期")
 )

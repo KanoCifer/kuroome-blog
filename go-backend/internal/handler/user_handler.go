@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/KanoCifer/kuroome-blog/internal/config"
-	"github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
+	usererrs "github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
@@ -17,6 +17,7 @@ import (
 
 type Userer interface {
 	Authenticate(ctx context.Context, username, password string) (*model.User, error)
+	AuthenticateMagicLogin(ctx context.Context, token string) (*model.User, *model.Profile, error)
 	CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
 	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL string) (*model.User, *model.Profile, error)
 	GetByID(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
@@ -24,6 +25,7 @@ type Userer interface {
 	RefreshTokens(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
 	UserToDict(u *model.User, p *model.Profile) map[string]any
 	SendEmailCode(ctx context.Context, email string) bool
+	SendMagicLoginEmail(ctx context.Context, email string) bool
 }
 
 // UserHandler 持有业务服务，gin 路由方法挂在其上。
@@ -188,9 +190,67 @@ func (h *UserHandler) EmailCode(c *gin.Context) {
 	response.Success(c, nil, "验证码已发送")
 }
 
-// RegisterRoutes 把 handler 方法挂到路由组。
-// publicMWs 是应用于 login/register 等公开接口的限流中间件(可变参数)。
-// authMiddleware 是认证中间件, 用于 logout/me 等需登录接口。
+// MagicLoginEmail 申请魔法登录邮件。
+func (h *UserHandler) MagicLoginEmail(c *gin.Context) {
+	var req dto.MagicLoginEmailRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.APIError(c, err.Error(), 400)
+		return
+	}
+	go h.userSvc.SendMagicLoginEmail(c.Request.Context(), req.Email)
+	response.Success(c, nil, "若该邮箱已注册，登录链接已发送")
+}
+
+// MagicLogin 用一次性 token 完成登录。
+func (h *UserHandler) MagicLogin(c *gin.Context) {
+	token := tokenFromRequest(c)
+	if token == "" {
+		response.APIError(c, "登录令牌不能为空", 400)
+		return
+	}
+
+	u, p, err := h.userSvc.AuthenticateMagicLogin(c.Request.Context(), token)
+	if err != nil {
+		switch {
+		case errors.Is(err, usererrs.ErrInvalidMagicToken):
+			slog.WarnContext(c.Request.Context(), "magic login failed", "reason", "invalid_token")
+			response.APIError(c, err.Error(), 401)
+		case errors.Is(err, usererrs.ErrUserNotFound):
+			slog.WarnContext(c.Request.Context(), "magic login failed", "reason", "user_not_found")
+			response.APIError(c, "用户不存在", 404)
+		default:
+			slog.ErrorContext(c.Request.Context(), "magic login error", "error", err)
+			response.APIError(c, "server error", 500)
+		}
+		return
+	}
+
+	tokens, err := h.userSvc.CreateTokens(c.Request.Context(), u)
+	if err != nil {
+		slog.ErrorContext(c.Request.Context(), "magic login create tokens error", "error", err, "user_id", u.ID)
+		response.APIError(c, "server error", 500)
+		return
+	}
+
+	util.SetRefreshCookie(c, h.cfg, tokens.RefreshToken)
+	userData := h.userSvc.UserToDict(u, p)
+	userData["access_token"] = tokens.AccessToken
+	userData["refresh_token"] = tokens.RefreshToken
+	response.Success(c, userData, "登录成功")
+}
+
+// tokenFromRequest GET 走 query、其它走 JSON body，统一 magic-login 的双入口。
+func tokenFromRequest(c *gin.Context) string {
+	if t := c.Query("token"); t != "" {
+		return t
+	}
+	var req dto.MagicLoginAuthRequest
+	if err := c.ShouldBindJSON(&req); err == nil {
+		return req.Token
+	}
+	return ""
+}
+
 func (h *UserHandler) RegisterRoutes(r *gin.RouterGroup, authMiddleware gin.HandlerFunc, publicMWs ...gin.HandlerFunc) {
 	r.POST("/login", append(publicMWs, h.Login)...)
 	r.POST("/register", append(publicMWs, h.Register)...)
@@ -198,4 +258,7 @@ func (h *UserHandler) RegisterRoutes(r *gin.RouterGroup, authMiddleware gin.Hand
 	r.POST("/logout", authMiddleware, h.Logout)
 	r.GET("/me", authMiddleware, h.Me)
 	r.POST("/email/code", h.EmailCode)
+	r.GET("/magic-login", append(publicMWs, h.MagicLogin)...)
+	r.POST("/magic-login", append(publicMWs, h.MagicLogin)...)
+	r.POST("/email/magic-login", append(publicMWs, h.MagicLoginEmail)...)
 }
