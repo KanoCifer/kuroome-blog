@@ -40,6 +40,11 @@ export interface PasskeyLoginResult {
   raw: LoginResponseData | undefined;
 }
 
+/** 邮箱魔法登录 — POST /v3/email/magic-login 的请求体 */
+export interface MagicLinkRequestPayload {
+  email: string;
+}
+
 function buildLoginResult(data: LoginResponseData): LoginResult {
   const { access_token, refresh_token, ...userFields } = data;
   return {
@@ -113,6 +118,30 @@ export const authGateway = {
   }): Promise<AxiosResponse<unknown>> {
     return apiClient.post('v1/auth/register', payload);
   },
+
+  /**
+   * 申请魔法登录邮件。永远返回 200（防 enumeration）；前端不要根据响应判断邮箱是否注册。
+   * 仅当邮箱格式非法时返回 400。
+   */
+  requestMagicLink(payload: MagicLinkRequestPayload): Promise<ApiResponse<null>> {
+    return apiClient
+      .post<ApiResponse<null>>('v3/email/magic-login', payload)
+      .then((res) => res.data);
+  },
+
+  /**
+   * 用邮件里的 token 完成登录。
+   * 成功返回登录用户字典 + access_token；refresh_token 由后端通过 HttpOnly cookie 写入。
+   * （动态网关同名方法见 createAuthGateway）
+   */
+  consumeMagicLink(payload: { token: string }): Promise<LoginResult> {
+    return apiClient
+      .post<ApiResponse<LoginResponseData>>('v3/magic-login', payload)
+      .then((res) => {
+        const data = extractData(res);
+        return data ? buildLoginResult(data as LoginResponseData) : emptyLoginResult();
+      });
+  },
 };
 
 // ------------------------------------------------------------------ //
@@ -124,6 +153,7 @@ export interface AuthGateway {
   getPasskeyAuthenticationOptions: () => Promise<PublicKeyCredentialRequestOptionsJSON>;
   login: (username: string, password: string) => Promise<LoginResult>;
   loginWithPasskey: (assertion: unknown) => Promise<PasskeyLoginResult>;
+  consumeMagicLink: (payload: { token: string }) => Promise<LoginResult>;
   logout: () => Promise<void>;
   loginWithGitHub: () => void;
 }
@@ -155,6 +185,15 @@ export function createAuthGateway(): AuthGateway {
       const res = await apiClient.post<ApiResponse<LoginResponseData>>(
         'v3/passkey/authenticate',
         { assertion },
+      );
+      const data = extractData(res);
+      return data ? buildLoginResult(data as LoginResponseData) : emptyLoginResult();
+    },
+
+    async consumeMagicLink(payload: { token: string }): Promise<LoginResult> {
+      const res = await apiClient.post<ApiResponse<LoginResponseData>>(
+        'v3/magic-login',
+        payload,
       );
       const data = extractData(res);
       return data ? buildLoginResult(data as LoginResponseData) : emptyLoginResult();

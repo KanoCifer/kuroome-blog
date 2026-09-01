@@ -29,7 +29,12 @@ export type { DevTaskService } from './gateways/devtaskService';
 
 // ── auth ──────────────────────────────────────────────────────────────
 export { authGateway, createAuthGateway } from './gateways/auth';
-export type { AuthGateway, LoginResult, PasskeyLoginResult } from './gateways/auth';
+export type {
+  AuthGateway,
+  LoginResult,
+  PasskeyLoginResult,
+  MagicLinkRequestPayload,
+} from './gateways/auth';
 
 // ── blog ──────────────────────────────────────────────────────────────
 export { blogGateway } from './gateways/blog';

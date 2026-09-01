@@ -138,6 +138,33 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  /**
+   * 用邮件魔法链接 token 完成登录。
+   * 复用 login() 的 token / user / cache / notifier 流程；refresh_token 由后端 cookie 写入。
+   */
+  async function loginWithMagicLink(token: string) {
+    loading.value = true;
+    try {
+      const res = await authGateway.consumeMagicLink({ token });
+
+      const userData = res.user;
+      user.value = userData;
+      accessToken.value = res.accessToken;
+      tokenService.save(res.accessToken);
+      userCache.set(userData);
+
+      reconnectWs();
+
+      notifier.success('魔法链接登录成功！欢迎回来！');
+      return res.raw;
+    } catch (error) {
+      notifier.error('魔法链接登录失败');
+      throw error;
+    } finally {
+      loading.value = false;
+    }
+  }
+
   const loginWithGitHub = () => {
     authGateway.loginWithGitHub();
   };
@@ -184,6 +211,7 @@ export const useAuthStore = defineStore('auth', () => {
     getPasskeyAuthenticationOptions,
     login,
     loginWithPasskey,
+    loginWithMagicLink,
     loginWithGitHub,
     logout,
     refreshUser,

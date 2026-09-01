@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { AuthLayout } from './components';
+import { AuthLayout, EmailLoginPane } from './components';
 import { Button, FieldError, IconKey, IconLock } from '@/components';
 import type { LoginForm } from '@readinglist/types';
-import { Check, Loader2, LogIn, ShieldUser } from '@lucide/vue';
+import { Check, Loader2, LogIn, Mail, ShieldUser } from '@lucide/vue';
 import { AnimatePresence, motion } from 'motion-v';
 import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
@@ -12,9 +12,13 @@ const {
   errors,
   isSubmitting,
   isPasskeySubmitting,
+  isMagicLinkRequesting,
+  magicLinkSentTo,
   handleSubmit,
   handlePasskeyLogin,
   handleGitHubLogin,
+  handleRequestMagicLink,
+  resetMagicLinkSent,
 } = useAuthenticate();
 
 const form = ref<LoginForm>({
@@ -24,6 +28,10 @@ const form = ref<LoginForm>({
 
 const showPassword = ref<boolean>(false);
 const isLoginHovered = ref<boolean>(false);
+
+// Tab 状态：'password' | 'email'（Passkey / GitHub 仍在各自按钮里）
+type LoginTab = 'password' | 'email';
+const tab = ref<LoginTab>('password');
 </script>
 
 <template>
@@ -76,8 +84,46 @@ const isLoginHovered = ref<boolean>(false);
       </div>
     </template>
 
+    <!-- Tab 切换：Password / Email -->
+    <div
+      role="tablist"
+      aria-label="登录方式"
+      class="bg-surface mb-4 flex gap-1 rounded-xl border p-1"
+    >
+      <button
+        role="tab"
+        type="button"
+        :aria-selected="tab === 'password' ? 'true' : 'false'"
+        @click="tab = 'password'"
+        class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors"
+        :class="
+          tab === 'password'
+            ? 'bg-page text-ink shadow-sm'
+            : 'text-muted hover:text-ink'
+        "
+      >
+        <ShieldUser class="size-4" />
+        密码登录
+      </button>
+      <button
+        role="tab"
+        type="button"
+        :aria-selected="tab === 'email' ? 'true' : 'false'"
+        @click="tab = 'email'; resetMagicLinkSent()"
+        class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors"
+        :class="
+          tab === 'email'
+            ? 'bg-page text-ink shadow-sm'
+            : 'text-muted hover:text-ink'
+        "
+      >
+        <Mail class="size-4" />
+        邮箱登录
+      </button>
+    </div>
+
     <!-- 登录表单 -->
-    <form @submit.prevent="handleSubmit(form)" class="w-full">
+    <form v-if="tab === 'password'" @submit.prevent="handleSubmit(form)" class="w-full">
       <!-- 用户名 -->
       <div>
         <div class="relative my-4">
@@ -250,6 +296,17 @@ const isLoginHovered = ref<boolean>(false);
         </button>
       </div>
     </form>
+
+    <!-- Email 登录 tab（接 /v3/email/magic-login） -->
+    <EmailLoginPane
+      v-else
+      :email-error="errors.email || null"
+      :is-requesting="isMagicLinkRequesting"
+      :sent-to="magicLinkSentTo"
+      @submit="(email: string) => handleRequestMagicLink(email)"
+      @resend="(email: string) => handleRequestMagicLink(email)"
+      @reset="resetMagicLinkSent"
+    />
 
     <template #footer>
       <!-- 注册链接 -->

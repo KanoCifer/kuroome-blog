@@ -248,6 +248,18 @@ const router = createRouter({
       },
     },
     {
+      // 邮箱魔法链接消费页：用户点邮件里的链接落到这里
+      path: '/auth/magic',
+      name: 'magic-link',
+      component: () => import('@/features/auth/MagicLinkView.vue'),
+      meta: {
+        title: "登录 - Kuroome's Blog",
+        description: "通过邮件魔法链接登录 Kuroome's Blog",
+        keywords: '登录,魔法链接,magic link',
+        transition: 'fade',
+      },
+    },
+    {
       path: '/register',
       name: 'register',
       component: () => import('@/features/auth/RegisterView.vue'),
