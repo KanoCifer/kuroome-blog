@@ -14,8 +14,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	usererrs "github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
+	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/logger"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
+	"github.com/KanoCifer/kuroome-blog/pkg/emailtemplates"
 )
 
 func TestCheckPassword_Correct(t *testing.T) {
@@ -499,7 +501,7 @@ func TestSendMagicLoginEmail_EmailNotRegistered(t *testing.T) {
 	repo := &mockUserRepo{emailExists: false}
 	svc := NewUserService(repo, nil, nil, nil)
 
-	if !svc.SendMagicLoginEmail(context.Background(), "ghost@example.com", "blog") {
+	if !svc.SendMagicLoginEmail(context.Background(), "ghost@example.com", "blog", "") {
 		t.Error("SendMagicLoginEmail should return true (silent success) for unregistered email")
 	}
 }
@@ -694,43 +696,137 @@ func TestAuthenticateMagicLogin_CrossModeIsolation(t *testing.T) {
 	}
 }
 
+// TestPollNomuLogin_DoneAfterConfirm 验证 nomu 接法 B 的核心契约：
+// AuthenticateMagicLogin 消费 nomu token 后，把登录结果写回 device_id 槽位，
+// PollNomuLogin 轮询该 device_id 应取到 done + 一对 token + 用户信息。
+func TestPollNomuLogin_DoneAfterConfirm(t *testing.T) {
+	// finishNomuLogin 内部 CreateTokens 需要 config.Cfg.Security.SecretKey。
+	// 仅在此用例注入最小占位 cfg，避免全局 config.Cfg 为 nil 时 jwt 签名 panic。
+	prevCfg := config.Cfg
+	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
+	t.Cleanup(func() { config.Cfg = prevCfg })
+
+	mr, err := miniredis.Run()
+	if err != nil {
+		t.Fatalf("miniredis: %v", err)
+	}
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+
+	repo := &mockUserRepo{
+		getByEmailFn: func(ctx context.Context, email string) (*model.User, *model.Profile, error) {
+			return &model.User{Model: gormModel(1), Username: "alice"}, nil, nil
+		},
+	}
+	svc := NewUserService(repo, rdb, nil, nil)
+
+	const hex = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+	const deviceID = "nomu-device-abc"
+	// 模拟 SendMagicLoginEmail 落下的 redis：token 段 + hex→device 反向映射。
+	emailKey := "magiclogintoken:" + hex + ":nomu"
+	if err := rdb.Set(context.Background(), emailKey, "alice@example.com", 0).Err(); err != nil {
+		t.Fatalf("seed email key: %v", err)
+	}
+	if err := rdb.Set(context.Background(), "nomulogin:hex:"+hex, deviceID, 0).Err(); err != nil {
+		t.Fatalf("seed hex→device: %v", err)
+	}
+
+	// 消费 token → 写槽位
+	if _, _, err := svc.AuthenticateMagicLogin(context.Background(), hex+":nomu"); err != nil {
+		t.Fatalf("AuthenticateMagicLogin(nomu): %v", err)
+	}
+
+	// 轮询 device_id → done
+	st, err := svc.PollNomuLogin(context.Background(), deviceID)
+	if err != nil {
+		t.Fatalf("PollNomuLogin: %v", err)
+	}
+	if st.Status != "done" {
+		t.Errorf("status = %q, want done", st.Status)
+	}
+	if st.AccessToken == "" || st.RefreshToken == "" {
+		t.Errorf("expected tokens in done state, got %+v", st)
+	}
+	if st.User == nil {
+		t.Error("expected user in done state")
+	}
+	// 反向映射用完即删
+	if mr.Exists("nomulogin:hex:" + hex) {
+		t.Error("hex→device mapping should be deleted after confirm")
+	}
+}
+
+// TestPollNomuLogin_PendingWhenMissing 槽位不存在 / 未确认应返回 pending 而非错误，
+// 让扩展可放心持续轮询而不会因抢跑收到 4xx。
+func TestPollNomuLogin_PendingWhenMissing(t *testing.T) {
+	mr, err := miniredis.Run()
+	if err != nil {
+		t.Fatalf("miniredis: %v", err)
+	}
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+
+	svc := NewUserService(&mockUserRepo{}, rdb, nil, nil)
+	st, err := svc.PollNomuLogin(context.Background(), "no-such-device")
+	if err != nil {
+		t.Fatalf("PollNomuLogin: %v", err)
+	}
+	if st.Status != "pending" {
+		t.Errorf("status = %q, want pending for missing slot", st.Status)
+	}
+}
+
+// TestPollNomuLogin_PendingWhenNilRedis redis 未配置同样回 pending，禁止 500。
+func TestPollNomuLogin_PendingWhenNilRedis(t *testing.T) {
+	svc := NewUserService(&mockUserRepo{}, nil, nil, nil)
+	st, err := svc.PollNomuLogin(context.Background(), "dev")
+	if err != nil {
+		t.Fatalf("PollNomuLogin: %v", err)
+	}
+	if st.Status != "pending" {
+		t.Errorf("status = %q, want pending", st.Status)
+	}
+}
+
 // ---------- HTML 模板：mode 路由 ----------
 
 // TestRenderVerificationHTML_BlogVsNomu 锁住两套 HTML 的关键差异：
-// nomu 必须带 logo URL + "NoonToolv1" 副标 + "代发" 页脚；blog 都不带。
+// nomu 必须带 logo URL + "Nomu" 副标 + "代发" 页脚；blog 都不带。
 // 这是品牌认知 + 防回归的最小断言，足够发现未来改坏一边的设计。
 func TestRenderVerificationHTML_BlogVsNomu(t *testing.T) {
 	code := "123456"
 
-	blog := renderVerificationHTML(code, modeBlog)
-	nomu := renderVerificationHTML(code, modeNomu)
+	blog := emailtemplates.RenderVerificationHTML(code, modeBlog)
+	nomu := emailtemplates.RenderVerificationHTML(code, modeNomu)
 
 	// blog 特征：含 "kanocifer.chat" wordmark + "注册验证码" 副标；
-	// 不应含 logo URL 也不应含 "NoonToolv1" 品牌。
+	// 不应含 logo URL 也不应含 "Nomu" 品牌。
 	if !strings.Contains(blog, "kanocifer.chat") {
 		t.Error("blog html should mention kanocifer.chat wordmark")
 	}
-	if strings.Contains(blog, nomuLogoURL) {
+	if strings.Contains(blog, emailtemplates.NomuLogoURL) {
 		t.Error("blog html should NOT embed nomu logo")
 	}
-	if strings.Contains(blog, "NoonToolv1") {
-		t.Error("blog html should NOT mention NoonToolv1")
+	if strings.Contains(blog, "Nomu") {
+		t.Error("blog html should NOT mention Nomu")
 	}
-	if !strings.Contains(blog, htmlEscape(code)) {
+	if !strings.Contains(blog, code) {
 		t.Error("blog html should embed the code")
 	}
 
-	// nomu 特征：含 logo URL + "NoonToolv1" 副标 + "代发" 页脚。
-	if !strings.Contains(nomu, nomuLogoURL) {
+	// nomu 特征：含 logo URL + "Nomu" 副标 + "代发" 页脚。
+	if !strings.Contains(nomu, emailtemplates.NomuLogoURL) {
 		t.Error("nomu html should embed nomu logo")
 	}
-	if !strings.Contains(nomu, "NoonToolv1") {
-		t.Error("nomu html should mention NoonToolv1")
+	if !strings.Contains(nomu, "Nomu") {
+		t.Error("nomu html should mention Nomu")
 	}
-	if !strings.Contains(nomu, "代 NoonToolv1 发送") {
-		t.Error("nomu html should have '代 NoonToolv1 发送' footer")
+	if !strings.Contains(nomu, "代 Nomu 发送") {
+		t.Error("nomu html should have '代 Nomu 发送' footer")
 	}
-	if !strings.Contains(nomu, htmlEscape(code)) {
+	if !strings.Contains(nomu, code) {
 		t.Error("nomu html should embed the code")
 	}
 }
@@ -738,32 +834,32 @@ func TestRenderVerificationHTML_BlogVsNomu(t *testing.T) {
 func TestRenderMagicLoginHTML_BlogVsNomu(t *testing.T) {
 	link := "https://example.com/auth/magic?token=deadbeef"
 
-	blog := renderMagicLoginHTML(link, modeBlog)
-	nomu := renderMagicLoginHTML(link, modeNomu)
+	blog := emailtemplates.RenderMagicLoginHTML(link, modeBlog)
+	nomu := emailtemplates.RenderMagicLoginHTML(link, modeNomu)
 
-	// blog 不带 logo / NoonToolv1
-	if strings.Contains(blog, nomuLogoURL) {
+	// blog 不带 logo / Nomu
+	if strings.Contains(blog, emailtemplates.NomuLogoURL) {
 		t.Error("blog magic-login html should NOT embed nomu logo")
 	}
-	if strings.Contains(blog, "NoonToolv1") {
-		t.Error("blog magic-login html should NOT mention NoonToolv1")
+	if strings.Contains(blog, "Nomu") {
+		t.Error("blog magic-login html should NOT mention Nomu")
 	}
 	// CTA 文案
 	if !strings.Contains(blog, "登录 kanocifer.chat") {
 		t.Error("blog magic-login button should say 登录 kanocifer.chat")
 	}
-	if !strings.Contains(blog, htmlEscape(link)) {
+	if !strings.Contains(blog, link) {
 		t.Error("blog magic-login should embed the link")
 	}
 
-	// nomu 带 logo + NoonToolv1 + "完成 NoonToolv1 登录" CTA
-	if !strings.Contains(nomu, nomuLogoURL) {
+	// nomu 带 logo + Nomu + "完成 Nomu 登录" CTA
+	if !strings.Contains(nomu, emailtemplates.NomuLogoURL) {
 		t.Error("nomu magic-login html should embed nomu logo")
 	}
-	if !strings.Contains(nomu, "完成 NoonToolv1 登录") {
-		t.Error("nomu magic-login button should say 完成 NoonToolv1 登录")
+	if !strings.Contains(nomu, "完成 Nomu 登录") {
+		t.Error("nomu magic-login button should say 完成 Nomu 登录")
 	}
-	if !strings.Contains(nomu, htmlEscape(link)) {
+	if !strings.Contains(nomu, link) {
 		t.Error("nomu magic-login should embed the link")
 	}
 }
@@ -788,23 +884,23 @@ func TestNormalizeMode(t *testing.T) {
 
 // TestBuildVerificationEmail_Title 锁住 mode 决定邮件标题。
 func TestBuildVerificationEmail_Title(t *testing.T) {
-	blog := buildVerificationEmail("123456", modeBlog)
-	nomu := buildVerificationEmail("123456", modeNomu)
+	blog := emailtemplates.VerificationEmail("123456", modeBlog)
+	nomu := emailtemplates.VerificationEmail("123456", modeNomu)
 	if blog.Title != "kanocifer.chat 注册验证码" {
 		t.Errorf("blog title = %q", blog.Title)
 	}
-	if nomu.Title != "NoonToolv1 注册验证码" {
+	if nomu.Title != "Nomu 注册验证码" {
 		t.Errorf("nomu title = %q", nomu.Title)
 	}
 }
 
 func TestBuildMagicLoginEmail_Title(t *testing.T) {
-	blog := buildMagicLoginEmail("https://x", modeBlog)
-	nomu := buildMagicLoginEmail("https://x", modeNomu)
+	blog := emailtemplates.MagicLoginEmail("https://x", modeBlog)
+	nomu := emailtemplates.MagicLoginEmail("https://x", modeNomu)
 	if blog.Title != "kanocifer.chat 登录链接" {
 		t.Errorf("blog title = %q", blog.Title)
 	}
-	if nomu.Title != "NoonToolv1 登录链接" {
+	if nomu.Title != "Nomu 登录链接" {
 		t.Errorf("nomu title = %q", nomu.Title)
 	}
 }
