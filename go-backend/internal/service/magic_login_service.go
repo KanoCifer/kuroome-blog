@@ -25,7 +25,6 @@ const (
 	magicLoginTokenTTL   = time.Minute * 10
 	magicLoginCacheKey   = "magiclogintoken:%s:%s"
 
-	// nomu 接法 B 轮询契约：
 	//   nomulogin:hex:<hex>           → device_id（回调端按 hex 反查槽位）
 	//   nomulogin:device:<device_id>  → 轮询槽位（pending / done / error）
 	nomuLoginHexKey       = "nomulogin:hex:%s"
@@ -35,21 +34,13 @@ const (
 	nomuLoginDoneState    = "done"
 )
 
-// magicLoginLinkPathFor 给出 mode 对应的"路径?token=%s"模板。
-// nomu 走 hash 路由（#/login/magic），所以 path 里必须含 "#"。
 func magicLoginLinkPathFor(mode string) string {
 	if mode == modeNomu {
-		return "/options.html#/login/magic?token=%s"
+		return "/nomu/login?token=%s"
 	}
 	return "/auth/magic?token=%s"
 }
 
-// SendMagicLoginEmail 向已注册邮箱发送一次性登录链接；邮箱不存在时静默返回 true。
-//
-// mode 决定链接 host + 路径以及 Redis key 命名空间。未知 mode 兜底为 blog 并 warn。
-//
-// deviceID 仅 nomu 接法 B 用：Nomu 扩展申请魔法登录邮件时生成，后端据此建立
-// 轮询槽位（nomulogin:<device_id>）与 hex→device 反向映射，回调端据此定位槽位。
 func (s *userService) SendMagicLoginEmail(ctx context.Context, email, mode, deviceID string) bool {
 	// 一次查询同时承担"邮箱是否存在"判断和后续 user 解析，
 	// 避免 EmailExists + GetByEmail 之间被并发注册/删除留下不一致窗口。

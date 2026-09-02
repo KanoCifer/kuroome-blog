@@ -548,14 +548,14 @@ func TestAuthenticateMagicLogin_EmptyToken(t *testing.T) {
 // ---------- mode 路由（blog / nomu）----------
 
 // TestMagicLoginLinkPathFor 锁定两个 mode 对应的路径模板。
-// nomu 走 hash 路由，所以 path 必须含 "#"；blog 走普通 SPA 路由。
+// 两者都是 web SPA 路由（blog → /auth/magic，nomu → /nomu/login）。
 func TestMagicLoginLinkPathFor(t *testing.T) {
 	cases := []struct {
 		mode     string
 		wantPath string
 	}{
 		{"blog", "/auth/magic?token=%s"},
-		{"nomu", "/options.html#/login/magic?token=%s"},
+		{"nomu", "/nomu/login?token=%s"},
 	}
 	for _, c := range cases {
 		got := magicLoginLinkPathFor(c.mode)
@@ -601,7 +601,7 @@ func TestSplitMagicLoginToken(t *testing.T) {
 func TestMagicLoginLink_BlogHost(t *testing.T) {
 	svc := &userService{frontendURLs: map[string]string{
 		"blog": "https://kanocifer.chat",
-		"nomu": "chrome-extension://abcdef",
+		"nomu": "https://kanocifer.chat",
 	}}
 	link := svc.magicLoginLink("deadbeef:blog", "blog")
 	want := "https://kanocifer.chat/auth/magic?token=deadbeef:blog"
@@ -611,14 +611,14 @@ func TestMagicLoginLink_BlogHost(t *testing.T) {
 }
 
 // TestMagicLoginLink_NomuHost 校验 nomu mode 拼出的链接：
-// <nomuHost>/options.html#/login/magic?token=<token>。# 必须保留。
+// <nomuHost>/nomu/login?token=<token>。nomu 回调页与 blog 同源（web SPA）。
 func TestMagicLoginLink_NomuHost(t *testing.T) {
 	svc := &userService{frontendURLs: map[string]string{
 		"blog": "https://kanocifer.chat",
-		"nomu": "chrome-extension://abcdef",
+		"nomu": "https://kanocifer.chat",
 	}}
 	link := svc.magicLoginLink("deadbeef:nomu", "nomu")
-	want := "chrome-extension://abcdef/options.html#/login/magic?token=deadbeef:nomu"
+	want := "https://kanocifer.chat/nomu/login?token=deadbeef:nomu"
 	if link != want {
 		t.Errorf("nomu link = %q, want %q", link, want)
 	}
@@ -631,19 +631,19 @@ func TestMagicLoginLink_HostMissing(t *testing.T) {
 	if got := svc.magicLoginLink("h:blog", "blog"); got != "/auth/magic?token=h:blog" {
 		t.Errorf("missing host blog = %q", got)
 	}
-	if got := svc.magicLoginLink("h:nomu", "nomu"); got != "/options.html#/login/magic?token=h:nomu" {
+	if got := svc.magicLoginLink("h:nomu", "nomu"); got != "/nomu/login?token=h:nomu" {
 		t.Errorf("missing host nomu = %q", got)
 	}
 }
 
 // TestMagicLoginLink_HostTrailingSlash host 末尾的 "/" 应被 TrimRight 掉，
-// 避免 chrome-extension://id//options.html 这种双斜杠。
+// 避免 https://kanocifer.chat//nomu/login 这种双斜杠。
 func TestMagicLoginLink_HostTrailingSlash(t *testing.T) {
 	svc := NewUserService(&mockUserRepo{}, nil, nil, map[string]string{
-		"nomu": "chrome-extension://abcdef/",
+		"nomu": "https://kanocifer.chat/",
 	})
 	link := svc.magicLoginLink("h:nomu", "nomu")
-	if strings.Contains(link, "//options.html") {
+	if strings.Contains(link, "//nomu/login") {
 		t.Errorf("double slash detected: %q", link)
 	}
 }

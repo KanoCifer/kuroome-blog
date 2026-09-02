@@ -80,9 +80,10 @@ type WebAuthnConfig struct {
 
 // FrontendConfig 前端相关。
 //
-// URLs 按 mode（blog / nomu 等）持有不同前端入口：
-//   - Blog 走 kanocifer.chat 落地页（web 端魔法登录）
-//   - Nomu 走 chrome-extension://<id>（Chrome 扩展魔法登录）
+// URLs 按 mode（blog / nomu 等）持有不同前端入口。blog 与 nomu 的魔法登录
+// 都落在同一个 web 前端（kanocifer.chat），仅路径不同（/auth/magic vs
+// /nomu/login），因此不再单列 nomu host。
+// 邮件链接必须是 http(s)，chrome-extension:// 会被多数邮件客户端拦截。
 //
 // 兼容旧部署：env FRONTEND_URL 在 Load() 阶段回退到 URLs.Blog。
 type FrontendConfig struct {
@@ -90,11 +91,10 @@ type FrontendConfig struct {
 	ViteJSAPIToken string       `mapstructure:"VITE_JS_API_TOKEN"`
 }
 
-// FrontendURLs 前端入口按 mode 索引。key 集合稳定（blog / nomu），
-// 未来加新前端在此追加字段并扩 magicLoginLinkPathFor 的 switch。
+// FrontendURLs 前端入口。blog / nomu 同源共用 Blog host，
+// 未来若有真正独立部署的新前端，在此追加字段并扩 magicLoginLinkPathFor 的 switch。
 type FrontendURLs struct {
 	Blog string `mapstructure:"BLOG"`
-	Nomu string `mapstructure:"NOMU"`
 }
 
 // AdminConfig 管理员与运维。
@@ -175,8 +175,6 @@ func defaultConfig() Config {
 		Frontend: FrontendConfig{
 			URLs: FrontendURLs{
 				Blog: "https://kanocifer.chat",
-				// Nomu 默认空——chrome-extension://<id> 没有通用默认，
-				// 必须由部署通过 FRONTEND_NOMU 显式注入。
 			},
 		},
 		Admin: AdminConfig{

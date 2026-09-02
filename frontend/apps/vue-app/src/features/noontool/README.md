@@ -27,15 +27,15 @@
        │                                                        │   nomulogin:hex:<hex>         → device_id
        │                                                        │   nomulogin:device:<device>   → {status:"pending"}
        │                                                        │ 发送邮件,链接:
-       │                                                        │   <host>/options.html#/login/magic?token=<hex>:nomu
+       │                                                        │   <host>/nomu/login?token=<hex>:nomu
        │                                                        │
        │ 200 { code:0, msg:"若该邮箱已注册,登录链接已发送" }      │
        │ ◄─────────────────────────────────────────────────────│
        │                                                        │
        │                                            用户在邮箱点链接
        │                                            ↓
-       │                                  浏览器落到 options 页
-       │                                  hash 路由 /login/magic?token=...
+       │                                  浏览器落到 web 前端确认页
+       │                                  路由 /nomu/login?token=...
        │                                                        │
        │ (SPA 回调页内部)                                        │
        │ ② POST /v3/nomu/magic-login                            │
@@ -62,9 +62,10 @@
 
 关键约束:
 
-- **回调请求只在 options 页发起**,不能放 content script。邮件链接
-  `chrome-extension://<id>/options.html#...` 由浏览器内核直接打开 options 页,
-  SPA 在 `#/login/magic` 路由里发起 POST。
+- **邮件链接是普通 https 链接**,指向 web 前端确认页 `https://kanocifer.chat/nomu/login`,
+  由该页的 SPA(`NomuLoginView.vue`)发起 §2.2 的转发 POST。**不要**把链接指向
+  `chrome-extension://<id>/...` —— 多数邮件客户端会拦截非 http(s) 协议。
+  扩展侧不需要自建回调页,只负责 §2.1 申请邮件 + §2.3 轮询。
 - **扩展域没有浏览器域 cookie**。不要依赖 `Set-Cookie: refresh_token`,
   只从 JSON body 的 `access_token` / `refresh_token` 取。
 - **device_id 由扩展侧生成**(`crypto.randomUUID()` 或 16+ 字节随机串),
@@ -89,7 +90,7 @@ Content-Type: application/json
   `"若该邮箱已注册,登录链接已发送"`,不要用响应判断邮箱是否存在。
 - 失败:邮箱格式非法 → 400;`mode` 缺失或非 `blog|nomu` → 400。
 
-### 2.2 回调转发(由 SPA 在 options 页里发起,扩展本身不直接调用)
+### 2.2 回调转发（由 web SPA 确认页发起，扩展本身不直接调用）
 
 ```
 POST /v3/nomu/magic-login
@@ -100,7 +101,7 @@ Content-Type: application/json
 
 - `token` 形如 `<64-hex>:nomu`,hex 段是 64 位十六进制(32 字节),`mode` 段固定 `nomu`。
 - `mode` 必须为 `"nomu"`,后端用 `oneof=blog nomu` 拦截。
-- 该端点由前端 SPA(`NomuLoginView.vue`)在 hash 路由里调用,**扩展侧无需自己
+- 该端点由 web 前端 SPA(`NomuLoginView.vue`,路由 `/nomu/login`)调用,**扩展侧无需自己
   实现这个请求**。扩展只负责 ① 申请邮件、③ 轮询槽位。
 - 失败:token 格式非法 / 已过期 / 已消费 → 401 `invalid magic token`;
   用户被删除 → 404。
@@ -157,7 +158,7 @@ GET /v3/nomu/login/<device_id>
 
 ---
 
-## 4. 扩展侧 manifest 与 options 路由
+## 4. 扩展侧 manifest 与回调链接
 
 `manifest.json` 关键片段:
 
@@ -176,19 +177,25 @@ GET /v3/nomu/login/<device_id>
 }
 ```
 
-`options.html` 用 hash 路由,`#/login/magic` 由前端 SPA(`NomuLoginView.vue`)渲染:
+回调链接是**普通 https 链接**,指向 web 前端的确认页(与 blog 主站同源),扩展的
+options 页不再承担回调:
 
 ```
-GET chrome-extension://<extension-id>/options.html#/login/magic?token=<hex>:nomu
+https://kanocifer.chat/nomu/login?token=<hex>:nomu
 ```
 
-邮件里给出的链接是 `<host>/options.html#/login/magic?token=<hex>:nomu`,其中 `<host>`
-是后端配置的 nomu frontend host(生产为 `https://kanocifer.chat`)。邮件客户端点开时
-Chrome 把 host 替换为 `chrome-extension://<id>`,落进 options 页。
+其中 host 由后端配置的 nomu frontend host 决定(生产为 `https://kanocifer.chat`)。
+用户从邮件点开该链接,浏览器打开 web 页面,`NomuLoginView.vue` 自动读取
+`query.token` 并调 `forwardNomuMagicLink` 完成转发。
 
-扩展侧唯一需要的额外文件:在 options 页 hash 路由里挂一个 `/login/magic` 的简单容器,
-把 `location.hash` 的 `?token=...` 转给前端 SPA(`NomuLoginView.vue` 已自动读 query
-+ 调 `forwardNomuMagicLink`)。
+> 后端配置:早期版本把 nomu host 配成 `chrome-extension://<id>` 并指向
+> `options.html#/login/magic`,该方案依赖「Chrome 把 host 替换为扩展 ID」的
+> 未定义行为,且多数邮件客户端会拦截非 http(s) 协议,已废弃。现在 nomu 与
+> blog 共用 kanocifer.chat host,仅路径不同(`/nomu/login` vs `/auth/magic`)。
+
+扩展侧唯一要做的事:在 options 页触发「申请魔法登录邮件」(§2.1,带上本地生成的
+`device_id`),然后进入轮询(§2.3)直到 `status=="done"` 拿到 token。回调转发由
+web SPA 代发,扩展不要重复实现。
 
 ---
 

@@ -286,8 +286,9 @@ func (h *UserHandler) RegisterRoutes(r *gin.RouterGroup, authMiddleware gin.Hand
 	r.POST("/email/code", h.EmailCode)
 	r.POST("/magic-login/consume", append(publicMWs, h.MagicLoginConsume)...)
 	r.POST("/email/magic-login", append(publicMWs, h.MagicLoginEmail)...)
-	// Nomu 接法 B：回调页转发 token（公开） + 扩展轮询 device_id（公开）。
-	// /nomu/magic-login 与 /magic-login/consume 同 handler、DTO 同形态，按 mode 字段分支。
+	// Nomu 接法 B：回调页转发 token（公开 + 限流） + 扩展轮询 device_id（公开，
+	// 不挂限流：扩展以 300ms~3s 间隔持续轮询，login/register 的 5 次/分钟窗口
+	// 会直接 429 掉；device_id 是高熵随机串，轮询响应也不泄露用户数据）。
 	r.POST("/nomu/magic-login", append(publicMWs, h.MagicLoginConsume)...)
-	r.GET("/nomu/login/:device_id", append(publicMWs, h.PollNomuLogin)...)
+	r.GET("/nomu/login/:device_id", h.PollNomuLogin)
 }

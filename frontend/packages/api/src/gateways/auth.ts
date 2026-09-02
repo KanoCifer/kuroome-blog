@@ -43,8 +43,9 @@ export interface PasskeyLoginResult {
 /** 邮箱魔法登录 — POST /v3/email/magic-login 的请求体
  *
  * mode 决定邮件里链接落到哪个前端 + 后端 Redis 命名空间：
- *   - "blog" → kanocifer.chat 落地页（web 端魔法登录）
- *   - "nomu" → Chrome 扩展（NoonToolv1）的 options.html#/login/magic
+ *   - "blog" → kanocifer.chat 落地页（web 端魔法登录 /auth/magic）
+ *   - "nomu" → kanocifer.chat 上的 Nomu 确认页（web SPA 路由 /nomu/login），
+ *              扩展侧只轮询结果，邮件链接不再指向 chrome-extension://
  *
  * 落地页这一侧调用方不感知 mode，gateway 默认填 "blog"；扩展自己在 client.ts
  * 里固定传 "nomu"。后端 DTO 用 binding:"required,oneof=blog nomu" 拦截非法值。
@@ -214,7 +215,8 @@ export const authGateway = {
 
   /**
    * Nomu 扩展侧轮询 device_id 取最终登录结果。
-   * 槽位缺失 / 尚未确认时后端返回 401（等价 pending），扩展侧应继续轮询。
+   * 后端统一返 200，读 data.status 判断："pending"（槽位缺失/未确认，继续轮询）、
+   * "done"（取 access_token）、"error"（提示重试）。仅空 device_id 才 400。
    */
   pollNomuLogin(device_id: string): Promise<ApiResponse<NomuLoginState>> {
     return apiClient

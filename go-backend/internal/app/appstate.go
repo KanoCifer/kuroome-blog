@@ -76,10 +76,11 @@ func NewAppState(
 	}
 
 	// -- services ---------------------------------------------------- //
-	// frontendURLs 按 mode 索引：blog = kanocifer.chat，nomu = chrome-extension://<id>。
+	// frontendURLs 按 mode 索引：blog / nomu 都指向同一 web 前端（kanocifer.chat），
+	// 区别只在落地路径（/auth/magic vs /nomu/login）。
 	userSvc := service.NewUserService(userRepo, redis, cfg.Admin.UserIDs, map[string]string{
 		"blog": cfg.Frontend.URLs.Blog,
-		"nomu": cfg.Frontend.URLs.Nomu,
+		"nomu": cfg.Frontend.URLs.Blog,
 	})
 	return &AppState{
 		config:     cfg,
