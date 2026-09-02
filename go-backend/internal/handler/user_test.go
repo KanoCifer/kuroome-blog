@@ -20,6 +20,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/logger"
 	"github.com/KanoCifer/kuroome-blog/internal/middleware"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
+	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
 func init() {
@@ -44,7 +45,8 @@ type mockUserService struct {
 	logoutFn              func(ctx context.Context, userID uint)
 	refreshFn             func(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
 	sendEmailCodeFn       func(ctx context.Context, email, mode string) bool
-	sendMagicLoginEmailFn func(ctx context.Context, email, mode string) bool
+	sendMagicLoginEmailFn func(ctx context.Context, email, mode, deviceID string) bool
+	pollNomuLoginFn       func(ctx context.Context, deviceID string) (*service.NomuLoginState, error)
 	userToDictFn          func(u *model.User, p *model.Profile) map[string]any
 }
 
@@ -91,11 +93,18 @@ func (m *mockUserService) SendEmailCode(ctx context.Context, email, mode string)
 	return true
 }
 
-func (m *mockUserService) SendMagicLoginEmail(ctx context.Context, email, mode string) bool {
+func (m *mockUserService) SendMagicLoginEmail(ctx context.Context, email, mode, deviceID string) bool {
 	if m.sendMagicLoginEmailFn != nil {
-		return m.sendMagicLoginEmailFn(ctx, email, mode)
+		return m.sendMagicLoginEmailFn(ctx, email, mode, deviceID)
 	}
 	return true
+}
+
+func (m *mockUserService) PollNomuLogin(ctx context.Context, deviceID string) (*service.NomuLoginState, error) {
+	if m.pollNomuLoginFn != nil {
+		return m.pollNomuLoginFn(ctx, deviceID)
+	}
+	return nil, usererrs.ErrInvalidMagicToken
 }
 
 func (m *mockUserService) AuthenticateMagicLogin(ctx context.Context, token string) (*model.User, *model.Profile, error) {
@@ -677,7 +686,7 @@ func TestMagicLoginEmail_BadMode(t *testing.T) {
 func TestMagicLoginEmail_AlwaysReturns200(t *testing.T) {
 	// 邮箱不存在时 service 静默 true，handler 仍 200，避免枚举。
 	svc := &mockUserService{
-		sendMagicLoginEmailFn: func(_ context.Context, _ string, _ string) bool { return true },
+		sendMagicLoginEmailFn: func(_ context.Context, _ string, _ string, _ string) bool { return true },
 	}
 	h := NewUserHandler(svc, config.Cfg)
 
@@ -697,7 +706,7 @@ func TestMagicLoginEmail_PassesModeToService(t *testing.T) {
 		t.Run(mode, func(t *testing.T) {
 			done := make(chan string, 1)
 			svc := &mockUserService{
-				sendMagicLoginEmailFn: func(_ context.Context, _ string, m string) bool {
+				sendMagicLoginEmailFn: func(_ context.Context, _ string, m string, _ string) bool {
 					done <- m
 					return true
 				},
@@ -722,9 +731,10 @@ func TestMagicLoginEmail_PassesModeToService(t *testing.T) {
 	}
 }
 
-// ---------- MagicLogin ----------
+// ---------- MagicLoginConsume ----------
 
-func TestMagicLogin_Success_FromQuery(t *testing.T) {
+// TestMagicLoginConsume_BlogSuccess  blog 模式回调页 → 200 + access/refresh/user + cookie。
+func TestMagicLoginConsume_BlogSuccess(t *testing.T) {
 	svc := &mockUserService{
 		authenticateMagicFn: func(_ context.Context, token string) (*model.User, *model.Profile, error) {
 			return &model.User{Model: gormModel(8), Username: "alice"}, nil, nil
@@ -732,59 +742,65 @@ func TestMagicLogin_Success_FromQuery(t *testing.T) {
 	}
 	h := NewUserHandler(svc, config.Cfg)
 
-	w := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(w)
-	c.Request, _ = http.NewRequest(http.MethodGet, "/magic-login?token=abc-token", nil)
-	h.MagicLogin(c)
+	w := doRequest(h.MagicLoginConsume, http.MethodPost, "/magic-login/consume",
+		jsonBody(t, dto.MagicLoginConsumeRequest{Token: "abc-token:blog", Mode: "blog"}))
 
 	if w.Code != http.StatusOK {
 		t.Errorf("status = %d, want 200", w.Code)
 	}
 	data, _ := parseResp(t, w.Body.Bytes())
 	if data["access_token"] == nil {
-		t.Error("expected access_token in response")
+		t.Error("expected access_token in response (blog mode)")
 	}
 	if cookie := findCookie(w, "refresh_token"); cookie == nil {
-		t.Error("expected refresh_token cookie set on magic login")
+		t.Error("expected refresh_token cookie set on blog magic login")
 	}
 }
 
-func TestMagicLogin_Success_FromBody(t *testing.T) {
+// TestMagicLoginConsume_NomuSuccess  nomu 模式回调页 → 200 + "登录已确认"，不返 token、不写 cookie。
+func TestMagicLoginConsume_NomuSuccess(t *testing.T) {
 	svc := &mockUserService{
 		authenticateMagicFn: func(_ context.Context, token string) (*model.User, *model.Profile, error) {
-			return &model.User{Model: gormModel(9), Username: "bob"}, nil, nil
+			return &model.User{Model: gormModel(8), Username: "alice"}, nil, nil
 		},
 	}
 	h := NewUserHandler(svc, config.Cfg)
 
-	w := doRequest(h.MagicLogin, http.MethodPost, "/magic-login",
-		jsonBody(t, dto.MagicLoginAuthRequest{Token: "any-token"}))
+	w := doRequest(h.MagicLoginConsume, http.MethodPost, "/nomu/magic-login",
+		jsonBody(t, dto.MagicLoginConsumeRequest{Token: "abc-token:nomu", Mode: "nomu"}))
 
 	if w.Code != http.StatusOK {
 		t.Errorf("status = %d, want 200", w.Code)
 	}
+	data, msg := parseResp(t, w.Body.Bytes())
+	if msg != "登录已确认" {
+		t.Errorf("message = %q, want 登录已确认", msg)
+	}
+	if data != nil {
+		if _, ok := data["access_token"]; ok {
+			t.Error("nomu mode should NOT expose access_token in response")
+		}
+	}
+	if cookie := findCookie(w, "refresh_token"); cookie != nil {
+		t.Error("nomu mode should NOT set refresh_token cookie")
+	}
 }
 
-func TestMagicLogin_MissingToken(t *testing.T) {
-	svc := &mockUserService{
-		authenticateMagicFn: func(_ context.Context, _ string) (*model.User, *model.Profile, error) {
-			t.Error("service should not be called when token is empty")
-			return nil, nil, nil
-		},
-	}
+// TestMagicLoginConsume_MissingToken 空 token 直接 400（binding required）。
+func TestMagicLoginConsume_MissingToken(t *testing.T) {
+	svc := &mockUserService{}
 	h := NewUserHandler(svc, config.Cfg)
 
-	w := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(w)
-	c.Request, _ = http.NewRequest(http.MethodGet, "/magic-login", nil)
-	h.MagicLogin(c)
+	w := doRequest(h.MagicLoginConsume, http.MethodPost, "/magic-login/consume",
+		jsonBody(t, dto.MagicLoginConsumeRequest{Token: ""}))
 
 	if w.Code != http.StatusBadRequest {
 		t.Errorf("status = %d, want 400", w.Code)
 	}
 }
 
-func TestMagicLogin_InvalidToken(t *testing.T) {
+// TestMagicLoginConsume_InvalidToken  无效 token → 401。
+func TestMagicLoginConsume_InvalidToken(t *testing.T) {
 	svc := &mockUserService{
 		authenticateMagicFn: func(_ context.Context, _ string) (*model.User, *model.Profile, error) {
 			return nil, nil, usererrs.ErrInvalidMagicToken
@@ -792,17 +808,16 @@ func TestMagicLogin_InvalidToken(t *testing.T) {
 	}
 	h := NewUserHandler(svc, config.Cfg)
 
-	w := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(w)
-	c.Request, _ = http.NewRequest(http.MethodGet, "/magic-login?token=bad", nil)
-	h.MagicLogin(c)
+	w := doRequest(h.MagicLoginConsume, http.MethodPost, "/magic-login/consume",
+		jsonBody(t, dto.MagicLoginConsumeRequest{Token: "bad", Mode: "blog"}))
 
 	if w.Code != http.StatusUnauthorized {
 		t.Errorf("status = %d, want 401", w.Code)
 	}
 }
 
-func TestMagicLogin_UserNotFound(t *testing.T) {
+// TestMagicLoginConsume_UserNotFound  用户不存在 → 404。
+func TestMagicLoginConsume_UserNotFound(t *testing.T) {
 	svc := &mockUserService{
 		authenticateMagicFn: func(_ context.Context, _ string) (*model.User, *model.Profile, error) {
 			return nil, nil, usererrs.ErrUserNotFound
@@ -810,13 +825,72 @@ func TestMagicLogin_UserNotFound(t *testing.T) {
 	}
 	h := NewUserHandler(svc, config.Cfg)
 
-	w := httptest.NewRecorder()
-	c, _ := gin.CreateTestContext(w)
-	c.Request, _ = http.NewRequest(http.MethodGet, "/magic-login?token=expired", nil)
-	h.MagicLogin(c)
+	w := doRequest(h.MagicLoginConsume, http.MethodPost, "/magic-login/consume",
+		jsonBody(t, dto.MagicLoginConsumeRequest{Token: "expired", Mode: "blog"}))
 
 	if w.Code != http.StatusNotFound {
 		t.Errorf("status = %d, want 404", w.Code)
+	}
+}
+
+// TestMagicLoginConsume_DefaultMode  缺省 mode → 走 blog 分支（cookie + token）。
+func TestMagicLoginConsume_DefaultMode(t *testing.T) {
+	svc := &mockUserService{
+		authenticateMagicFn: func(_ context.Context, _ string) (*model.User, *model.Profile, error) {
+			return &model.User{Model: gormModel(1), Username: "alice"}, nil, nil
+		},
+	}
+	h := NewUserHandler(svc, config.Cfg)
+
+	w := doRequest(h.MagicLoginConsume, http.MethodPost, "/magic-login/consume",
+		jsonBody(t, dto.MagicLoginConsumeRequest{Token: "abc-token"}))
+
+	if w.Code != http.StatusOK {
+		t.Errorf("status = %d, want 200", w.Code)
+	}
+	if cookie := findCookie(w, "refresh_token"); cookie == nil {
+		t.Error("default mode should fall back to blog → cookie expected")
+	}
+}
+
+// ---------- PollNomuLogin ----------
+
+// TestPollNomuLogin_Done 轮询到 done 槽位 → 200 + 状态 + token。
+func TestPollNomuLogin_Done(t *testing.T) {
+	svc := &mockUserService{
+		pollNomuLoginFn: func(_ context.Context, deviceID string) (*service.NomuLoginState, error) {
+			return &service.NomuLoginState{Status: "done", AccessToken: "acc", RefreshToken: "ref"}, nil
+		},
+	}
+	h := NewUserHandler(svc, config.Cfg)
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request, _ = http.NewRequest(http.MethodGet, "/nomu/login/dev-1", nil)
+	c.Params = []gin.Param{{Key: "device_id", Value: "dev-1"}}
+	h.PollNomuLogin(c)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200", w.Code)
+	}
+	data, _ := parseResp(t, w.Body.Bytes())
+	if data["status"] != "done" {
+		t.Errorf("data = %v, want status done", data)
+	}
+}
+
+// TestPollNomuLogin_MissingDeviceID 缺 device_id → 400。
+func TestPollNomuLogin_MissingDeviceID(t *testing.T) {
+	svc := &mockUserService{}
+	h := NewUserHandler(svc, config.Cfg)
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request, _ = http.NewRequest(http.MethodGet, "/nomu/login/", nil)
+	h.PollNomuLogin(c)
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("status = %d, want 400", w.Code)
 	}
 }
 

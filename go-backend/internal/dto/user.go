@@ -79,9 +79,21 @@ type PasskeyAuthRequest struct {
 type MagicLoginEmailRequest struct {
 	Email string `json:"email" binding:"required,email"`
 	Mode  string `json:"mode"  binding:"required,oneof=blog nomu"`
+	// DeviceID 仅 nomu 模式用：Nomu 扩展申请魔法登录邮件时生成，用于
+	// 后续轮询同一 device_id 取最终登录结果。缺省不落轮询槽位。
+	DeviceID string `json:"device_id,omitempty"`
 }
 
-// MagicLoginAuthRequest 使用 token 完成魔法登录的请求。
-type MagicLoginAuthRequest struct {
+// MagicLoginConsumeRequest 回调页转发的一次性登录 token。
+//
+// Mode 决定 handler 的返回形态，与 service 内部的 Redis 命名空间无关
+// （token 自带 mode 段，service 按它查 redis key）。
+//
+//   - "blog" → kanocifer.chat SPA 回调：handler 写 refresh cookie + 返 access/refresh/user dict；
+//   - "nomu" → Nomu 扩展回调：service 内部把结果写到 device 槽位，handler 返 200 即可。
+//
+// 缺省 / 非法值走 blog 兜底，与 email-code / magic-login email 端点保持一致。
+type MagicLoginConsumeRequest struct {
 	Token string `json:"token" binding:"required"`
+	Mode  string `json:"mode,omitempty" binding:"omitempty,oneof=blog nomu"`
 }

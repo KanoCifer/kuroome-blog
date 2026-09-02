@@ -12,6 +12,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
+	"github.com/KanoCifer/kuroome-blog/internal/service"
 	"github.com/KanoCifer/kuroome-blog/internal/util"
 )
 
@@ -25,7 +26,8 @@ type Userer interface {
 	RefreshTokens(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
 	UserToDict(u *model.User, p *model.Profile) map[string]any
 	SendEmailCode(ctx context.Context, email, mode string) bool
-	SendMagicLoginEmail(ctx context.Context, email, mode string) bool
+	SendMagicLoginEmail(ctx context.Context, email, mode, deviceID string) bool
+	PollNomuLogin(ctx context.Context, deviceID string) (*service.NomuLoginState, error)
 }
 
 // UserHandler 持有业务服务，gin 路由方法挂在其上。
@@ -204,20 +206,42 @@ func (h *UserHandler) MagicLoginEmail(c *gin.Context) {
 		response.APIError(c, err.Error(), 400)
 		return
 	}
-	// fire-and-forget；WithoutCancel 避免 handler 返回后 ctx 取消导致发送中断
-	go h.userSvc.SendMagicLoginEmail(context.WithoutCancel(c.Request.Context()), req.Email, req.Mode)
+
+	go h.userSvc.SendMagicLoginEmail(context.WithoutCancel(c.Request.Context()), req.Email, req.Mode, req.DeviceID)
 	response.Success(c, nil, "若该邮箱已注册，登录链接已发送")
 }
 
-// MagicLogin 用一次性 token 完成登录。
-func (h *UserHandler) MagicLogin(c *gin.Context) {
-	token := tokenFromRequest(c)
-	if token == "" {
-		response.APIError(c, "登录令牌不能为空", 400)
+// PollNomuLogin 扩展侧轮询 device_id 取最终登录结果。
+func (h *UserHandler) PollNomuLogin(c *gin.Context) {
+	deviceID := c.Param("device_id")
+	if deviceID == "" {
+		response.APIError(c, "device_id 不能为空", 400)
+		return
+	}
+	state, err := h.userSvc.PollNomuLogin(c.Request.Context(), deviceID)
+	if err != nil {
+		slog.ErrorContext(c.Request.Context(), "nomu poll error", "error", err)
+		response.APIError(c, "server error", 500)
+		return
+	}
+	response.Success(c, state, "ok")
+}
+
+// MagicLoginConsume 回调页转发一次性 token 完成登录，按 mode 决定返回形态：
+//   - "nomu"：service 内部已把结果写到 device 槽位，handler 只返 200；
+//   - "blog"：handler 写 refresh cookie + 返 access/refresh/user dict。
+//
+// 缺省 / 非法 mode 走 blog 兜底。
+//
+// 回调页职责单一：发请求 + 不跳转；登录态由响应体或扩展轮询各自消费。
+func (h *UserHandler) MagicLoginConsume(c *gin.Context) {
+	var req dto.MagicLoginConsumeRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.APIError(c, err.Error(), 400)
 		return
 	}
 
-	u, p, err := h.userSvc.AuthenticateMagicLogin(c.Request.Context(), token)
+	u, p, err := h.userSvc.AuthenticateMagicLogin(c.Request.Context(), req.Token)
 	if err != nil {
 		switch {
 		case errors.Is(err, usererrs.ErrInvalidMagicToken):
@@ -233,30 +257,24 @@ func (h *UserHandler) MagicLogin(c *gin.Context) {
 		return
 	}
 
+	if req.Mode == "nomu" {
+		// Nomu 接法 B：service 内部已把登录结果写回 device 槽位，回调页无需关心结果。
+		response.Success(c, nil, "登录已确认")
+		return
+	}
+
+	// blog：浏览器域下，写 refresh cookie + 返完整登录数据。
 	tokens, err := h.userSvc.CreateTokens(c.Request.Context(), u)
 	if err != nil {
 		slog.ErrorContext(c.Request.Context(), "magic login create tokens error", "error", err, "user_id", u.ID)
 		response.APIError(c, "server error", 500)
 		return
 	}
-
 	util.SetRefreshCookie(c, h.cfg, tokens.RefreshToken)
 	userData := h.userSvc.UserToDict(u, p)
 	userData["access_token"] = tokens.AccessToken
 	userData["refresh_token"] = tokens.RefreshToken
 	response.Success(c, userData, "登录成功")
-}
-
-// tokenFromRequest GET 走 query、其它走 JSON body，统一 magic-login 的双入口。
-func tokenFromRequest(c *gin.Context) string {
-	if t := c.Query("token"); t != "" {
-		return t
-	}
-	var req dto.MagicLoginAuthRequest
-	if err := c.ShouldBindJSON(&req); err == nil {
-		return req.Token
-	}
-	return ""
 }
 
 func (h *UserHandler) RegisterRoutes(r *gin.RouterGroup, authMiddleware gin.HandlerFunc, publicMWs ...gin.HandlerFunc) {
@@ -266,7 +284,10 @@ func (h *UserHandler) RegisterRoutes(r *gin.RouterGroup, authMiddleware gin.Hand
 	r.POST("/logout", authMiddleware, h.Logout)
 	r.GET("/me", authMiddleware, h.Me)
 	r.POST("/email/code", h.EmailCode)
-	r.GET("/magic-login", append(publicMWs, h.MagicLogin)...)
-	r.POST("/magic-login", append(publicMWs, h.MagicLogin)...)
+	r.POST("/magic-login/consume", append(publicMWs, h.MagicLoginConsume)...)
 	r.POST("/email/magic-login", append(publicMWs, h.MagicLoginEmail)...)
+	// Nomu 接法 B：回调页转发 token（公开） + 扩展轮询 device_id（公开）。
+	// /nomu/magic-login 与 /magic-login/consume 同 handler、DTO 同形态，按 mode 字段分支。
+	r.POST("/nomu/magic-login", append(publicMWs, h.MagicLoginConsume)...)
+	r.GET("/nomu/login/:device_id", append(publicMWs, h.PollNomuLogin)...)
 }
