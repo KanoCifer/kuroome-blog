@@ -52,6 +52,34 @@ export interface PasskeyLoginResult {
 export interface MagicLinkRequestPayload {
   email: string;
   mode: 'blog' | 'nomu';
+  /**
+   * 仅 nomu 接法 B 用：Nomu 扩展申请魔法登录邮件时生成，后端据此建立
+   * 轮询槽位（nomulogin:device:<device_id>），回调确认后扩展侧轮询取登录结果。
+   */
+  device_id?: string;
+}
+
+export interface NomuMagicLinkForwardPayload {
+  token: string;
+  /**
+   * 后端按 mode 决定 consume 端点的返回形态：
+   *   - "nomu"：Nomu 接法 B，service 内部把登录结果写到 device 槽位，
+   *     handler 返 200；扩展侧轮询 pollNomuLogin 取结果。
+   *   - "blog"（兜底）：handler 写 refresh cookie + 返 LoginResult。
+   *
+   * 必传且必须为 "nomu" — 路由 /nomu/magic-login 只为 nomu 用，
+   * 后端会用 oneof=blog|nomu 拦截。
+   */
+  mode: 'nomu';
+}
+
+/** Nomu 轮询槽位内容（与后端 service.NomuLoginState 的 JSON 字段对齐）。 */
+export interface NomuLoginState {
+  status: 'pending' | 'done' | 'error';
+  access_token?: string;
+  refresh_token?: string;
+  user?: UserInfo | null;
+  error?: string;
 }
 
 function buildLoginResult(data: LoginResponseData): LoginResult {
@@ -150,15 +178,48 @@ export const authGateway = {
   /**
    * 用邮件里的 token 完成登录。
    * 成功返回登录用户字典 + access_token；refresh_token 由后端通过 HttpOnly cookie 写入。
-   * （动态网关同名方法见 createAuthGateway）
+   *
+   * mode 决定后端返回形态（路由统一为 POST /v3/magic-login/consume）：
+   *   - "blog"（默认）：handler 写 refresh cookie + 返 LoginResult；
+   *   - "nomu"：service 内部把结果写到 device 槽位，handler 返 null。
+   *
+   * 缺省走 blog 兜底；dynamic gateway 同名方法保持同样形态。
    */
-  consumeMagicLink(payload: { token: string }): Promise<LoginResult> {
+  consumeMagicLink(payload: {
+    token: string;
+    mode?: 'blog' | 'nomu';
+  }): Promise<LoginResult | null> {
     return apiClient
-      .post<ApiResponse<LoginResponseData>>('v3/magic-login', payload)
+      .post<ApiResponse<LoginResponseData | null>>('v3/magic-login/consume', payload)
       .then((res) => {
         const data = extractData(res);
-        return data ? buildLoginResult(data as LoginResponseData) : emptyLoginResult();
+        if (!data) return null;
+        return buildLoginResult(data as LoginResponseData);
       });
+  },
+
+  /**
+   * Nomu 无密码登录回调 — 把邮件回调收到的 token 转发给后端。
+   * 后端确认后把登录结果写回 device_id 槽位（nomulogin:device:<device_id>），
+   * Nomu 扩展侧轮询 pollNomuLogin 取最终登录结果。
+   *
+   * 路由 POST /v3/nomu/magic-login（与 /magic-login/consume 同 handler，
+   * 按 mode 字段分支）；payload.mode 必须为 "nomu"。
+   */
+  forwardNomuMagicLink(payload: NomuMagicLinkForwardPayload): Promise<ApiResponse<null>> {
+    return apiClient
+      .post<ApiResponse<null>>('v3/nomu/magic-login', payload)
+      .then((res) => res.data);
+  },
+
+  /**
+   * Nomu 扩展侧轮询 device_id 取最终登录结果。
+   * 槽位缺失 / 尚未确认时后端返回 401（等价 pending），扩展侧应继续轮询。
+   */
+  pollNomuLogin(device_id: string): Promise<ApiResponse<NomuLoginState>> {
+    return apiClient
+      .get<ApiResponse<NomuLoginState>>(`v3/nomu/login/${device_id}`)
+      .then((res) => res.data);
   },
 };
 
@@ -171,7 +232,10 @@ export interface AuthGateway {
   getPasskeyAuthenticationOptions: () => Promise<PublicKeyCredentialRequestOptionsJSON>;
   login: (username: string, password: string) => Promise<LoginResult>;
   loginWithPasskey: (assertion: unknown) => Promise<PasskeyLoginResult>;
-  consumeMagicLink: (payload: { token: string }) => Promise<LoginResult>;
+  consumeMagicLink: (payload: {
+    token: string;
+    mode?: 'blog' | 'nomu';
+  }) => Promise<LoginResult | null>;
   logout: () => Promise<void>;
   loginWithGitHub: () => void;
 }
@@ -208,13 +272,17 @@ export function createAuthGateway(): AuthGateway {
       return data ? buildLoginResult(data as LoginResponseData) : emptyLoginResult();
     },
 
-    async consumeMagicLink(payload: { token: string }): Promise<LoginResult> {
-      const res = await apiClient.post<ApiResponse<LoginResponseData>>(
-        'v3/magic-login',
+    async consumeMagicLink(payload: {
+      token: string;
+      mode?: 'blog' | 'nomu';
+    }): Promise<LoginResult | null> {
+      const res = await apiClient.post<ApiResponse<LoginResponseData | null>>(
+        'v3/magic-login/consume',
         payload,
       );
       const data = extractData(res);
-      return data ? buildLoginResult(data as LoginResponseData) : emptyLoginResult();
+      if (!data) return null;
+      return buildLoginResult(data as LoginResponseData);
     },
 
     async logout(): Promise<void> {

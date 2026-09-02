@@ -5,7 +5,7 @@
  * 流程：
  *  1. 用户在邮件里点 https://blog.kanocifer.chat/auth/magic?token=<64-hex>
  *  2. 浏览器落到这个路由，从 query.token 读出 token
- *  3. 调 POST /v3/magic-login 把 token 换成登录态
+ *  3. 调 POST /v3/magic-login/consume 把 token 换成登录态（mode=blog，写 refresh cookie + 返 LoginResult）
  *  4. 成功 → router.push 到 ?redirect= 或 '/'
  *  5. 失败 → 渲染对应错误页（401 过期 / 401 已用 / 404 用户注销 / 500 服务异常）
  */

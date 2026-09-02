@@ -139,13 +139,22 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   /**
-   * 用邮件魔法链接 token 完成登录。
+   * 用邮件魔法链接 token 完成登录（blog 落地页魔法登录）。
    * 复用 login() 的 token / user / cache / notifier 流程；refresh_token 由后端 cookie 写入。
+   *
+   * 固定传 mode="blog"：让后端走 SetRefreshCookie + 返 LoginResult 分支；
+   * 扩展（NoonToolv1）在自己 client.ts 里固定传 mode="nomu"，互不干扰。
    */
   async function loginWithMagicLink(token: string) {
     loading.value = true;
     try {
-      const res = await authGateway.consumeMagicLink({ token });
+      const res = await authGateway.consumeMagicLink({ token, mode: "blog" });
+      if (!res) {
+        // consume 端点已合并到 /magic-login/consume；nomu 分支返 null，
+        // blog 分支应当总返 LoginResult。走到这里说明响应被拦截器判为空，
+        // 当作登录失败处理。
+        throw new Error('魔法链接登录响应为空');
+      }
 
       const userData = res.user;
       user.value = userData;

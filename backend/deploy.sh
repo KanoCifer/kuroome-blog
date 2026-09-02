@@ -10,7 +10,7 @@ NO_COLOR='\033[0m'
 FEISHU_WEBHOOK="https://open.feishu.cn/open-apis/bot/v2/hook/1c9dcf4b-98d6-4b35-8eb6-0c9630b80268"
 
 notify_feishu() {
-  local status="$1"  # SUCCESS or FAILED
+  local status="$1"
   local template="$2"
   local summary="$3"
   local host
@@ -41,8 +41,6 @@ EOF
 
 FAILED_STEP=""
 
-# 任意命令失败时记录当前步骤并推送 webhook；由调用方在关键步骤前设置
-# FAILED_STEP，这样 webhook 能区分是哪一步挂掉。
 fail() {
   local reason="${1:-$FAILED_STEP}"
   notify_feishu "❌ FAILED" "red" "${reason:-Deploy failed}"
@@ -97,28 +95,15 @@ if [ "$BACKEND_CHANGED" = true ]; then
   ok "Dependencies synced"
 
   step "Running database migrations"
-  # schema 已统一由 Go 端 GORM AutoMigrate 管理（部署时 go-backend 启动即迁移），
-  # Python 侧不再跑 Alembic；此处仅执行数据脚本。
   FAILED_STEP="insert_changelog.py 执行失败" && /home/kano/.local/bin/uv run python scripts/insert_changelog.py
   ok "Migrations applied"
 else
   warn "No backend changes detected — skipping deps sync and migrations"
 fi
 
-if [ "$GO_BACKEND_CHANGED" = true ]; then
-  step "Building Go backend"
-  cd /home/kano/blog/go-backend || exit 1
-  FAILED_STEP="Go mod tidy 失败 (模块下载/网络)" && /usr/bin/go mod tidy
-  FAILED_STEP="Go 编译失败 (语法错误/依赖缺失)" && /usr/bin/go build -o /home/kano/blog/go-backend/server ./cmd/server
-  ok "Go binary built at /home/kano/blog/go-backend/server"
-else
-  warn "No Go backend changes detected — skipping build"
-fi
-
 step "Restarting services"
 if [ "$BACKEND_CHANGED" = true ] || [ "$GO_BACKEND_CHANGED" = true ]; then
   FAILED_STEP="supervisorctl reload 失败 (进程配置/权限)" && sudo supervisorctl reload || true
-  FAILED_STEP="gobackend 服务重启失败 (systemctl: 单元/启动错误)" && /usr/bin/systemctl --user restart gobackend
   ok "Backend restarted"
 else
   warn "No backend changes — skipping service restart"

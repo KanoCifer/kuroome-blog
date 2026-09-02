@@ -220,7 +220,7 @@ func TestMagicLogin_RealSend_BlogMode(t *testing.T) {
 	})
 
 	t.Logf(">>> 真发魔法登录邮件（blog 模式）到 %s，请查收", target)
-	if !svc.SendMagicLoginEmail(context.Background(), target, "blog") {
+	if !svc.SendMagicLoginEmail(context.Background(), target, "blog", "") {
 		t.Fatal("SendMagicLoginEmail returned false：QQ SMTP 发送失败")
 	}
 

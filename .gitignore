@@ -62,3 +62,4 @@ frontend/apps/vue-app/.env.production
 frontend/deploy.sh
 go-backend/logs/
 .agents/
+backend/deploy-go.sh

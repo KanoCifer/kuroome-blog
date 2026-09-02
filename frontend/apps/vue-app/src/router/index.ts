@@ -248,6 +248,19 @@ const router = createRouter({
       },
     },
     {
+      // Nomu 无密码登录回调页：邮件里点的回调地址落到这里，
+      // 读取 token/site 后转发给后端，扩展侧轮询获取最终登录结果。
+      path: '/nomu/login',
+      name: 'nomu-login',
+      component: () => import('@/features/noontool/NomuLoginView.vue'),
+      meta: {
+        title: 'Nomu 登录 - Nomu',
+        description: 'Nomu 无密码登录确认页',
+        keywords: '登录,无密码登录,Nomu',
+        transition: 'fade',
+      },
+    },
+    {
       // 邮箱魔法链接消费页：用户点邮件里的链接落到这里
       path: '/auth/magic',
       name: 'magic-link',
