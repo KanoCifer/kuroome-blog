@@ -64,6 +64,10 @@ type Uploader interface {
 
 	// UploadAvatar 保存头像图片，回写 profile.photo 后返回相对路径。
 	UploadAvatar(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
+
+	// UploadDesignImage 保存 AI 出图结果（上游固定 output_format=jpeg），
+	// 保存到 design/{userID}/ 并返回相对路径。
+	UploadDesignImage(ctx context.Context, userID uint, src io.Reader) (string, error)
 }
 
 // profileStorage 是 UploadAvatar 需要的持久层能力。
@@ -178,6 +182,21 @@ func (s *uploadService) UploadAvatar(ctx context.Context, userID uint, filename,
 	}
 	slog.InfoContext(ctx, "avatar uploaded", "user_id", userID, "rel", photoRel)
 	return photoRel, nil
+}
+
+// UploadDesignImage 把 AI 出图结果保存到 {UploadDir}/design/{userID}/{uuid}.jpg。
+// 上游 output_format 固定 jpeg，无需类型校验；单图上限放宽到 64MB
+// （大尺寸输出可超过常规上传的 MaxUploadMB）。
+func (s *uploadService) UploadDesignImage(ctx context.Context, userID uint, src io.Reader) (string, error) {
+	name := uuid.New().String() + ".jpg"
+	rel := filepath.Join("design", fmt.Sprint(userID), name)
+
+	full := filepath.Join(s.cfg.UploadDir, rel)
+	if err := util.WriteFile(full, src, 64<<20); err != nil {
+		return "", err
+	}
+	slog.InfoContext(ctx, "design image saved", "user_id", userID, "rel", rel)
+	return rel, nil
 }
 
 // updatePhoto 把 profile.photo 设为 photoRel，不存在则先建 profile。

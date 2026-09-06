@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -24,7 +25,7 @@ func newTestService(t *testing.T, generate func(w http.ResponseWriter, r *http.R
 	srvURL = srv.URL
 	t.Cleanup(srv.Close)
 
-	svc := NewDesignService(httpclient.New(), "test-key", WithBaseURL(srv.URL+"/api/v3/images/generations"))
+	svc := NewDesignService(httpclient.New(), "test-key", nil, WithBaseURL(srv.URL+"/api/v3/images/generations"))
 	return svc, srv
 }
 
@@ -46,12 +47,15 @@ func TestGenerateText2Image(t *testing.T) {
 		})
 	})
 
-	res, err := svc.Generate(context.Background(), GenerateRequest{Prompt: "一只猫"})
+	res, err := svc.Generate(context.Background(), GenerateRequest{Prompt: "一只猫", Size: "2K"})
 	if err != nil {
 		t.Fatalf("Generate: %v", err)
 	}
 	if gotAuth != "Bearer test-key" {
 		t.Errorf("Authorization = %q, want Bearer test-key", gotAuth)
+	}
+	if gotPayload["size"] != "2K" {
+		t.Errorf("size = %v, want tier string passthrough", gotPayload["size"])
 	}
 	if _, ok := gotPayload["image"]; ok {
 		t.Errorf("text2image payload should not contain image: %v", gotPayload)
@@ -115,8 +119,79 @@ func TestGenerateValidation(t *testing.T) {
 	if _, err := svc.Generate(context.Background(), GenerateRequest{Prompt: "x", Model: "gpt-image"}); !errors.Is(err, ErrUnknownModel) {
 		t.Errorf("unknown model: err = %v, want ErrUnknownModel", err)
 	}
-	if _, err := svc.Generate(context.Background(), GenerateRequest{Prompt: "x", Size: "1024*1024"}); !errors.Is(err, ErrInvalidSize) {
-		t.Errorf("bad size: err = %v, want ErrInvalidSize", err)
+}
+
+func TestGenerateSizePassthrough(t *testing.T) {
+	var gotPayload map[string]any
+	svc, _ := newTestService(t, func(w http.ResponseWriter, r *http.Request, _ string) {
+		json.NewDecoder(r.Body).Decode(&gotPayload)
+		json.NewEncoder(w).Encode(map[string]any{
+			"model": "doubao-seedream-5-0-260128",
+			"data":  []map[string]any{{"url": "https://ark.example/1.jpeg", "size": "2048x2048"}},
+		})
+	})
+
+	// 档位字符串原样透传，不做本地校验
+	if _, err := svc.Generate(context.Background(), GenerateRequest{Prompt: "x", Size: "1K"}); err != nil {
+		t.Fatalf("Generate: %v", err)
+	}
+	if gotPayload["size"] != "1K" {
+		t.Errorf("size = %v, want passthrough %q", gotPayload["size"], "1K")
+	}
+
+	// 空 size：字段整体省略，用上游默认
+	gotPayload = nil
+	if _, err := svc.Generate(context.Background(), GenerateRequest{Prompt: "x"}); err != nil {
+		t.Fatalf("Generate: %v", err)
+	}
+	if _, ok := gotPayload["size"]; ok {
+		t.Errorf("empty size should be omitted, got %v", gotPayload["size"])
+	}
+}
+
+// fakeStore 记录落盘调用，返回固定相对路径。
+type fakeStore struct {
+	userID uint
+	data   []byte
+}
+
+func (f *fakeStore) UploadDesignImage(ctx context.Context, userID uint, src io.Reader) (string, error) {
+	b, err := io.ReadAll(src)
+	if err != nil {
+		return "", err
+	}
+	f.userID, f.data = userID, b
+	return "design/1/abc.jpg", nil
+}
+
+func TestGeneratePersistsWithStore(t *testing.T) {
+	var srvURL string
+	mux := http.NewServeMux()
+	mux.HandleFunc("/api/v3/images/generations", func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(map[string]any{
+			"model": "doubao-seedream-5-0-260128",
+			"data":  []map[string]any{{"url": srvURL + "/blob/1", "size": "2048x2048"}},
+		})
+	})
+	mux.HandleFunc("/blob/1", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("fake-jpeg-bytes"))
+	})
+	srv := httptest.NewServer(mux)
+	srvURL = srv.URL
+	defer srv.Close()
+
+	store := &fakeStore{}
+	svc := NewDesignService(httpclient.New(), "test-key", store, WithBaseURL(srv.URL+"/api/v3/images/generations"))
+
+	res, err := svc.Generate(context.Background(), GenerateRequest{Prompt: "x", UserID: 1})
+	if err != nil {
+		t.Fatalf("Generate: %v", err)
+	}
+	if res.Images[0].URL != "/v3/media/design/1/abc.jpg" {
+		t.Errorf("url = %q, want local media path", res.Images[0].URL)
+	}
+	if store.userID != 1 || string(store.data) != "fake-jpeg-bytes" {
+		t.Errorf("store got user=%d data=%q", store.userID, store.data)
 	}
 }
 

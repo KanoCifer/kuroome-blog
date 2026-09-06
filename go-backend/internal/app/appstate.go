@@ -87,6 +87,7 @@ func NewAppState(
 		"blog": cfg.Frontend.URLs.Blog,
 		"nomu": cfg.Frontend.URLs.Blog,
 	})
+	uploadSvc := service.NewUploadService(userRepo, cfg)
 	return &AppState{
 		config:     cfg,
 		userSvc:    userSvc,
@@ -102,12 +103,12 @@ func NewAppState(
 			cfg.GitHub.ClientID, cfg.GitHub.ClientSecret, cfg.GitHub.RedirectURI,
 		),
 		fishSvc:     service.NewFishService(fishRepo),
-		uploadSvc:   service.NewUploadService(userRepo, cfg),
+		uploadSvc:   uploadSvc,
 		momentSvc:   service.NewMomentService(momentRepo),
 		weatherSvc:  service.NewWeatherService(httpCli, redis, cfg.Weather, signer),
 		wereadSvc:   wereadSvc.New(httpCli, redis, wereadRepo),
 		currencySvc: service.NewCurrencyService(httpCli, redis),
-		designSvc:   nomuSvc.NewDesignService(designHttp, cfg.Design.APIKey),
+		designSvc:   nomuSvc.NewDesignService(designHttp, cfg.Design.APIKey, uploadSvc),
 	}
 }
 

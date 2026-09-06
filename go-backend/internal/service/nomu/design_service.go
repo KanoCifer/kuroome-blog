@@ -4,20 +4,22 @@
 //   - 文生图：只传 Prompt；
 //   - 图生图：Images 传 1 张（单参考图，payload 用 image）或多张（多参考图，payload 用 images）。
 //
-// 编排流程：校验入参 → 解析模型别名 → DesignClient 组包发送 → 解析方舟响应。
-// 结果只携带上游返回的临时 URL（会过期），图片字节由前端自行拉取；
-// 服务端需要落盘时可直接使用 DesignClient.FetchBlob。
+// 编排流程：校验入参 → 解析模型别名 → DesignClient 组包发送 → 解析方舟响应
+// → FetchBlob 拉取结果图 → ImageStore 落盘 → 返回本站 /v3/media 同源地址。
+// 上游 TOS 临时 URL 无 CORS 头且会过期，不对前端暴露。
 package nomu
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"maps"
+	"path/filepath"
 	"slices"
-	"strconv"
 	"strings"
 
 	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
@@ -29,9 +31,6 @@ const (
 
 	// defaultModelKey 未指定模型时的兜底（成本低档）。
 	defaultModelKey = "Doubao-Seedream-5.0-lite"
-
-	// defaultSize 未指定尺寸时的兜底。
-	defaultSize = "1024x1024"
 )
 
 // models 面向用户的展示名 → 方舟模型 ID。直接传 ID 也接受。
@@ -45,26 +44,27 @@ var (
 	ErrEmptyPrompt = errors.New("design: prompt is required")
 	// ErrUnknownModel 模型别名/ID 不在 models 支持范围内。
 	ErrUnknownModel = errors.New("design: unknown model")
-	// ErrInvalidSize 尺寸既不是 WxH 整数格式也不是 adaptive。
-	ErrInvalidSize = errors.New("design: invalid size")
 	// ErrUpstream 上游（方舟）请求失败、响应异常或图片拉取失败。
 	ErrUpstream = errors.New("design: upstream generate failed")
 )
 
 // GenerateRequest 一次出图请求。
 type GenerateRequest struct {
+	// UserID 发起用户，用于结果图落盘目录归属；0 表示不落盘。
+	UserID uint
 	// Prompt 画面描述，必填。
 	Prompt string
 	// Model models 的展示名或方舟模型 ID，空则取默认模型。
 	Model string
-	// Size "WxH" 或 "adaptive"，空则 1024x1024。
+	// Size 上游 size 字符串（如 '1K' / '1.5K' / '2K' 档位或 'WxH'）。
+	// 原样透传给方舟，不做本地推导；空则省略字段、用上游默认。
 	Size string
-	// Images 参考图（URL 或 base64）。0 张 = 文生图；1 张走 image；多张走 images。
+	// Images 参考图（URL 或 base64 data URL）。0 张 = 文生图；1 张走 image；多张走 image 数组。
 	Images []string
 }
 
-// GeneratedImage 单张结果图。URL 是方舟返回的临时地址（会过期），
-// 由前端直接拉取展示；需要长期保存时由服务端后续落盘。
+// GeneratedImage 单张结果图。URL 已落盘为本站同源媒体地址
+// （store 为 nil 时退化为上游临时地址，会过期且无 CORS 头）。
 type GeneratedImage struct {
 	Index int    `json:"index"`
 	Size  string `json:"size,omitempty"`
@@ -108,18 +108,27 @@ type arkResponse struct {
 	} `json:"error"`
 }
 
+// mediaPrefix 落盘图片的对外服务前缀，与 router 的 Static 挂载点一致。
+const mediaPrefix = "/v3/media/"
+
+// ImageStore 出图结果落盘能力（*service.uploadService 提供）。
+type ImageStore interface {
+	UploadDesignImage(ctx context.Context, userID uint, src io.Reader) (string, error)
+}
+
 // DesignService 编排校验、请求发送与结果解析。
 type DesignService struct {
 	client *DesignClient
+	store  ImageStore
 }
 
 // NewDesignService 构造 DesignService。默认指向方舟正式端点，
-// apiKey 来自 config.Design.APIKey；opts 里显式传 WithBaseURL/WithAPIKey
-// 可覆盖默认值（测试注入用）。
-func NewDesignService(http *httpclient.Client, apiKey string, opts ...DesignClientOption) *DesignService {
+// apiKey 来自 config.Design.APIKey；store 为结果图落盘实现（可 nil，
+// nil 时结果只携带上游临时 URL）；opts 可覆盖默认端点（测试注入用）。
+func NewDesignService(http *httpclient.Client, apiKey string, store ImageStore, opts ...DesignClientOption) *DesignService {
 	opts = append(opts, WithAPIKey(apiKey))
 	client := NewDesignClient(http, append([]DesignClientOption{WithBaseURL(baseURL)}, opts...)...)
-	return &DesignService{client: client}
+	return &DesignService{client: client, store: store}
 }
 
 // Generate 校验入参并完成一次文生图/图生图，结果图字节随 GenerateResult 返回。
@@ -133,10 +142,7 @@ func (s *DesignService) Generate(ctx context.Context, req GenerateRequest) (*Gen
 	if err != nil {
 		return nil, err
 	}
-	size, err := normalizeSize(req.Size)
-	if err != nil {
-		return nil, err
-	}
+	size := strings.TrimSpace(req.Size)
 
 	raw, err := s.client.SendRequest(ctx, s.client.BuildPayload(prompt, model, req.Images, size))
 	if err != nil {
@@ -156,7 +162,19 @@ func (s *DesignService) Generate(ctx context.Context, req GenerateRequest) (*Gen
 
 	images := make([]GeneratedImage, 0, len(resp.Data))
 	for i, d := range resp.Data {
-		images = append(images, GeneratedImage{Index: i, Size: d.Size, URL: d.URL})
+		img := GeneratedImage{Index: i, Size: d.Size, URL: d.URL}
+		if s.store != nil && d.URL != "" {
+			data, err := s.client.FetchBlob(ctx, d.URL)
+			if err != nil {
+				return nil, fmt.Errorf("%w: fetch image %d: %v", ErrUpstream, i, err)
+			}
+			rel, err := s.store.UploadDesignImage(ctx, req.UserID, bytes.NewReader(data))
+			if err != nil {
+				return nil, err
+			}
+			img.URL = mediaPrefix + filepath.ToSlash(rel)
+		}
+		images = append(images, img)
 	}
 
 	slog.InfoContext(ctx, "design generated",
@@ -184,27 +202,4 @@ func resolveModel(name string) (string, error) {
 	}
 	return "", fmt.Errorf("%w: %q (supported: %s)", ErrUnknownModel,
 		name, strings.Join(slices.Sorted(maps.Keys(models)), ", "))
-}
-
-// normalizeSize 校验尺寸：空取默认；adaptive 放行；否则必须为 WxH 整数。
-// 不做范围限制，交给上游校验，避免硬编码尺寸集合把合法请求挡掉。
-func normalizeSize(size string) (string, error) {
-	size = strings.TrimSpace(size)
-	if size == "" {
-		return defaultSize, nil
-	}
-	if size == "adaptive" {
-		return size, nil
-	}
-	w, h, ok := strings.Cut(size, "x")
-	if !ok {
-		return "", fmt.Errorf("%w: %q", ErrInvalidSize, size)
-	}
-	if _, err := strconv.Atoi(w); err != nil {
-		return "", fmt.Errorf("%w: %q", ErrInvalidSize, size)
-	}
-	if _, err := strconv.Atoi(h); err != nil {
-		return "", fmt.Errorf("%w: %q", ErrInvalidSize, size)
-	}
-	return size, nil
 }

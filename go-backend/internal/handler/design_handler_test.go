@@ -147,7 +147,6 @@ func TestDesignGenerateServiceErrors(t *testing.T) {
 	}{
 		{"empty prompt", nomu.ErrEmptyPrompt, 400},
 		{"unknown model", nomu.ErrUnknownModel, 400},
-		{"invalid size", nomu.ErrInvalidSize, 400},
 		{"upstream", nomu.ErrUpstream, 502},
 		{"unexpected", errors.New("boom"), 500},
 	}

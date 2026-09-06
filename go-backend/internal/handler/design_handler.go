@@ -44,6 +44,7 @@ func (h *DesignHandler) Generate(c *gin.Context) {
 
 	userID := c.GetInt("user_id")
 	res, err := h.svc.Generate(c.Request.Context(), nomu.GenerateRequest{
+		UserID: uint(userID),
 		Prompt: req.Prompt,
 		Model:  req.Model,
 		Size:   req.Size,
@@ -63,8 +64,7 @@ func (h *DesignHandler) Generate(c *gin.Context) {
 func (h *DesignHandler) respondError(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, nomu.ErrEmptyPrompt),
-		errors.Is(err, nomu.ErrUnknownModel),
-		errors.Is(err, nomu.ErrInvalidSize):
+		errors.Is(err, nomu.ErrUnknownModel):
 		response.APIError(c, err.Error(), 400)
 	case errors.Is(err, nomu.ErrUpstream):
 		// 上游真实错误（状态码/body 片段）只在日志里，响应保持笼统文案。

@@ -43,13 +43,16 @@ func NewDesignClient(http *httpclient.Client, opts ...DesignClientOption) *Desig
 // BuildPayload 组装方舟 images/generations 请求体。
 // images 为空 → 文生图；参考图字段官方名为 image：
 // 1 张传字符串，多张传数组（不存在 images 字段）。
+// size 为上游语义（档位枚举 / WxH），原样透传；空则省略、用上游默认。
 func (c *DesignClient) BuildPayload(prompt string, model string, images []string, size string) map[string]any {
 	payload := map[string]any{
 		"prompt":        prompt,
 		"model":         model,
-		"size":          size,
 		"watermark":     false,
 		"output_format": "jpeg",
+	}
+	if size != "" {
+		payload["size"] = size
 	}
 	if len(images) == 1 {
 		payload["image"] = images[0]

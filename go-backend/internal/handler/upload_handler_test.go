@@ -45,6 +45,13 @@ type mockUpload struct {
 	avatarFn  func(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
 }
 
+func (m *mockUpload) UploadDesignImage(ctx context.Context, userID uint, src io.Reader) (string, error) {
+	if m.fileFn != nil {
+		return m.fileFn(ctx, userID, "design.jpg", src)
+	}
+	return "design/1/abc.jpg", nil
+}
+
 func (m *mockUpload) UploadFile(ctx context.Context, userID uint, filename string, src io.Reader) (string, error) {
 	return m.fileFn(ctx, userID, filename, src)
 }
