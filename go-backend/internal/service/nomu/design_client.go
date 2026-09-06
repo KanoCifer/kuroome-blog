@@ -41,7 +41,8 @@ func NewDesignClient(http *httpclient.Client, opts ...DesignClientOption) *Desig
 }
 
 // BuildPayload 组装方舟 images/generations 请求体。
-// images 为空 → 文生图；1 张 → image（单参考图）；多张 → images（多参考图）。
+// images 为空 → 文生图；参考图字段官方名为 image：
+// 1 张传字符串，多张传数组（不存在 images 字段）。
 func (c *DesignClient) BuildPayload(prompt string, model string, images []string, size string) map[string]any {
 	payload := map[string]any{
 		"prompt":        prompt,
@@ -53,13 +54,16 @@ func (c *DesignClient) BuildPayload(prompt string, model string, images []string
 	if len(images) == 1 {
 		payload["image"] = images[0]
 	} else if len(images) > 1 {
-		payload["images"] = images
+		payload["image"] = images
 	}
 	return payload
 }
 
 func (c *DesignClient) BuildHeaders() map[string]string {
-	return map[string]string{"Authorization": "Bearer " + c.apiKey}
+	return map[string]string{
+		"Authorization": "Bearer " + c.apiKey,
+		"Content-Type":  "application/json",
+	}
 }
 
 func (c *DesignClient) SendRequest(ctx context.Context, payload map[string]any) (json.RawMessage, error) {

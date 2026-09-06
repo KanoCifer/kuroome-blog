@@ -95,9 +95,9 @@ func TestGenerateImage2Image(t *testing.T) {
 		t.Fatalf("Generate: %v", err)
 	}
 
-	images, ok := gotPayload["images"].([]any)
+	images, ok := gotPayload["image"].([]any)
 	if !ok || len(images) != 2 {
-		t.Fatalf("payload images = %v, want 2 refs", gotPayload["images"])
+		t.Fatalf("payload image = %v, want array of 2 refs", gotPayload["image"])
 	}
 	if gotPayload["model"] != "doubao-seedream-5-0-pro-260628" {
 		t.Errorf("model = %v, want resolved id", gotPayload["model"])
