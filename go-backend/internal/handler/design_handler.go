@@ -67,6 +67,9 @@ func (h *DesignHandler) respondError(c *gin.Context, err error) {
 		errors.Is(err, nomu.ErrInvalidSize):
 		response.APIError(c, err.Error(), 400)
 	case errors.Is(err, nomu.ErrUpstream):
+		// 上游真实错误（状态码/body 片段）只在日志里，响应保持笼统文案。
+		slog.WarnContext(c.Request.Context(), "design upstream error",
+			"user_id", c.GetInt("user_id"), "error", err.Error())
 		response.APIError(c, "design upstream error", 502)
 	default:
 		slog.ErrorContext(c.Request.Context(), "design handler unexpected error",

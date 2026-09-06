@@ -2,6 +2,7 @@ package app
 
 import (
 	"log/slog"
+	"time"
 
 	"github.com/go-webauthn/webauthn/webauthn"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -68,6 +69,8 @@ func NewAppState(
 	// weather / 未来其它出站调用都复用这一份，不另起 *http.Client。
 	httpCli := httpclient.New()
 
+	designHttp := httpclient.New(httpclient.WithTimeout(120 * time.Second))
+
 	// QWeather EdDSA 签名器。私钥未配置时不阻断启动；weather 接口会
 	// 在首次请求时 fail-fast（service 层 nil signer 会 panic，可观测）。
 	signer, err := qweather.NewSigner(cfg.Weather.JWTPrivateKey)
@@ -104,7 +107,7 @@ func NewAppState(
 		weatherSvc:  service.NewWeatherService(httpCli, redis, cfg.Weather, signer),
 		wereadSvc:   wereadSvc.New(httpCli, redis, wereadRepo),
 		currencySvc: service.NewCurrencyService(httpCli, redis),
-		designSvc:   nomuSvc.NewDesignService(httpCli, cfg.Design.APIKey),
+		designSvc:   nomuSvc.NewDesignService(designHttp, cfg.Design.APIKey),
 	}
 }
 

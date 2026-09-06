@@ -63,3 +63,4 @@ frontend/deploy.sh
 go-backend/logs/
 .agents/
 backend/deploy-go.sh
+go-backend/.zcode/plans/
