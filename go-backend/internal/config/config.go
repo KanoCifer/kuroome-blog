@@ -253,6 +253,12 @@ func Load(cfgFile ...string) (*Config, error) {
 		cfg.Server.TrustedProxies = splitAndTrim(proxies)
 	}
 
+	// design 是嵌套 section，viper AutomaticEnv 对嵌套 key 不生效
+	// （容器内 config.yaml 不打进镜像），只能从平铺 env 回填。
+	if v := viper.GetString("DESIGN_API_KEY"); v != "" {
+		cfg.Design.APIKey = v
+	}
+
 	// 兼容旧部署：env FRONTEND_URL 回退为 blog URL（多 mode 拆分前的形态）。
 	// 仅在 BLOG 未显式配置时生效，已配置则不覆盖。
 	if cfg.Frontend.URLs.Blog == "" {
