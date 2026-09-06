@@ -32,11 +32,11 @@ import (
 //     真要发到真实地址必须显式 env 注入，避免地址写进仓库）
 //
 // 走查链路（任意一环挂都 fail）：
-//   1) SendEmailCode(email, "blog") 写 redis（key = email_code:<email>:blog，TTL 5min）
-//   2) 通过 QQ SMTP 真发邮件到 REAL_SEND_TO
-//   3) 从 redis 取出验证码
-//   4) verifyEmailCode(email, code, "blog") 接受它
-//   5) 重复 verifyEmailCode 同一验证码被拒（一次性消费）
+//  1. SendEmailCode(email, "blog") 写 redis（key = email_code:<email>:blog，TTL 5min）
+//  2. 通过 QQ SMTP 真发邮件到 REAL_SEND_TO
+//  3. 从 redis 取出验证码
+//  4. verifyEmailCode(email, code, "blog") 接受它
+//  5. 重复 verifyEmailCode 同一验证码被拒（一次性消费）
 //
 // 主要防回归场景：send / verify 用错 redis key 命名空间（之前 send 写
 // email_code:、verify 读 signup_code:，register 永远 ErrInvalidEmailCode
@@ -169,12 +169,12 @@ func isAllDigits(s string) bool {
 // 通过 QQ SMTP 真发魔法登录邮件到 REAL_SEND_TO；落 redis 后用同一次发送
 // 写下的 hex 调 AuthenticateMagicLogin 验整条 round-trip：
 //
-//   1) SendMagicLoginEmail(email, "blog") 写 redis key
-//      magiclogintoken:<64-hex>:blog → email
-//   2) 邮件走 QQ SMTP 真发出去（plain body 含完整链接，HTML 里在 CTA 按钮）
-//   3) 从 redis 拿到 hex，按 "<hex>:blog" 拼回 token 形态
-//   4) AuthenticateMagicLogin 接受、消费、删除 key
-//   5) 重复 AuthenticateMagicLogin 同一 token 被拒
+//  1. SendMagicLoginEmail(email, "blog") 写 redis key
+//     magiclogintoken:<64-hex>:blog → email
+//  2. 邮件走 QQ SMTP 真发出去（plain body 含完整链接，HTML 里在 CTA 按钮）
+//  3. 从 redis 拿到 hex，按 "<hex>:blog" 拼回 token 形态
+//  4. AuthenticateMagicLogin 接受、消费、删除 key
+//  5. 重复 AuthenticateMagicLogin 同一 token 被拒
 //
 // 主要防回归：之前 cache key 只有 <hex> 没分段，blog/nomu 撞同 hex
 // 互相串；本次加 mode 段后，链接里 mode 必须和 redis key 里 mode 一致。

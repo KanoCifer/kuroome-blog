@@ -28,8 +28,9 @@ const (
 )
 
 // mode 常量：区分同一后端服务下的不同前端
-//   blog = kanocifer.chat 落地页 SPA
-//   nomu = Nomu Chrome 扩展
+//
+//	blog = kanocifer.chat 落地页 SPA
+//	nomu = Nomu Chrome 扩展
 //
 // 非法 mode 走 blog 兜底（normalizeMode），handler 层 DTO 用 oneof 拦截。
 const (

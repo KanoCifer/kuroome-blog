@@ -12,6 +12,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/repository/mongodb"
 	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
+	nomuSvc "github.com/KanoCifer/kuroome-blog/internal/service/nomu"
 	wereadSvc "github.com/KanoCifer/kuroome-blog/internal/service/weread"
 	"github.com/KanoCifer/kuroome-blog/pkg/qweather"
 	"github.com/redis/go-redis/v9"
@@ -34,6 +35,7 @@ type AppState struct {
 	weatherSvc  service.Weatherer
 	wereadSvc   wereadSvc.Reader
 	currencySvc service.Currencyer
+	designSvc   *nomuSvc.DesignService
 }
 
 // NewAppState 组装所有 service，作为唯一的组合根入口。
@@ -102,6 +104,7 @@ func NewAppState(
 		weatherSvc:  service.NewWeatherService(httpCli, redis, cfg.Weather, signer),
 		wereadSvc:   wereadSvc.New(httpCli, redis, wereadRepo),
 		currencySvc: service.NewCurrencyService(httpCli, redis),
+		designSvc:   nomuSvc.NewDesignService(httpCli, cfg.Design.APIKey),
 	}
 }
 
@@ -121,5 +124,6 @@ func (a *AppState) MomentSvc() service.Momenter        { return a.momentSvc }
 func (a *AppState) WeatherSvc() service.Weatherer      { return a.weatherSvc }
 func (a *AppState) WereadSvc() wereadSvc.Reader        { return a.wereadSvc }
 func (a *AppState) CurrencySvc() service.Currencyer    { return a.currencySvc }
+func (a *AppState) DesignSvc() *nomuSvc.DesignService  { return a.designSvc }
 
 func (a *AppState) Cfg() *config.Config { return a.config }

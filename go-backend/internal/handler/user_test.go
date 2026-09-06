@@ -400,9 +400,9 @@ func TestEmailCode_BadMode(t *testing.T) {
 func TestEmailCode_PassesModeToService(t *testing.T) {
 	// handler 应把 req.Mode 透传给 service（空 → ""，blog / nomu 原样）。
 	cases := []struct {
-		name      string
-		mode      string
-		wantMode  string
+		name     string
+		mode     string
+		wantMode string
 	}{
 		{"missing defaults empty", "", ""},
 		{"blog", "blog", "blog"},

@@ -13,10 +13,10 @@ import (
 // 字段与索引对齐 Python backend/app/models/llm_usage.py 的 SQLAlchemy 定义，
 // 确保 GORM AutoMigrate 生成的约束/索引名与已有命名一致。
 type LlmUsage struct {
-	ID           uint           `gorm:"primaryKey;autoIncrement"`
-	Source       string         `gorm:"size:50;index"`
-	UserID       *uint          `gorm:"index"` // 匿名 = NULL
-	Model        string         `gorm:"size:100"`
+	ID           uint   `gorm:"primaryKey;autoIncrement"`
+	Source       string `gorm:"size:50;index"`
+	UserID       *uint  `gorm:"index"` // 匿名 = NULL
+	Model        string `gorm:"size:100"`
 	InputTokens  int
 	OutputTokens int
 	TotalTokens  int

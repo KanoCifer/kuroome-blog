@@ -22,9 +22,7 @@ func init() {
 
 func sendBootNotification() {
 	if !config.Cfg.Admin.SendBootEmail || config.Cfg.Feishu.WebhookURL == "" {
-		// 启动期 happy path 默认 INFO 噪音过大；降为 Debug，需要时再
-		// 通过 LOG_LEVEL=DEBUG 打开排查。记录 reason 便于确认是哪条分支
-		// 关掉了通知（admin 标志 vs feishu webhook 未配）。
+
 		reason := "send_boot_email_disabled"
 		if config.Cfg.Feishu.WebhookURL == "" {
 			reason = "feishu_webhook_unset"
@@ -39,9 +37,7 @@ func sendBootNotification() {
 		Color: "green",
 	}
 	if !nc.Send(context.Background(), msg, notification.NotificationContext{}) {
-		// notification.Channel.Send 仅返回 bool，底层 err 已被 channel 吞掉；
-		// 至少把"为什么算失败"留痕：send_returned_false，便于排查时区分
-		// webhook 不可达 vs 序列化错误。
+
 		slog.Error("send boot notification", "reason", "send_returned_false")
 	}
 }

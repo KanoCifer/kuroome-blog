@@ -24,16 +24,21 @@ type Config struct {
 	API      APIConfig
 	Weather  WeatherConfig
 	Upload   UploadConfig
+	Design   DesignConfig
+}
+
+type DesignConfig struct {
+	APIKey string `mapstructure:"API_KEY"`
 }
 
 // ServerConfig 服务运行与日志。
 type ServerConfig struct {
-	Port       int    `mapstructure:"PORT"`
-	LogLevel   string `mapstructure:"LOG_LEVEL"`
-	DbLogLevel string `mapstructure:"DB_LOG_LEVEL"`
-	SaveLogs   bool   `mapstructure:"SAVE_LOGS"`
-	ENV        string `mapstructure:"ENV"`
-	LogDir string `mapstructure:"LOG_DIR"`
+	Port           int      `mapstructure:"PORT"`
+	LogLevel       string   `mapstructure:"LOG_LEVEL"`
+	DbLogLevel     string   `mapstructure:"DB_LOG_LEVEL"`
+	SaveLogs       bool     `mapstructure:"SAVE_LOGS"`
+	ENV            string   `mapstructure:"ENV"`
+	LogDir         string   `mapstructure:"LOG_DIR"`
 	TrustedProxies []string `mapstructure:"TRUSTED_PROXIES"`
 }
 
@@ -200,6 +205,9 @@ func defaultConfig() Config {
 		Upload: UploadConfig{
 			UploadDir:   "./media",
 			MaxUploadMB: 10,
+		},
+		Design: DesignConfig{
+			APIKey: "",
 		},
 	}
 }
