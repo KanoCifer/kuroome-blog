@@ -8,6 +8,7 @@ from app.api.v2 import (
     friendlinks,
     learning,
     llm,
+    nomu,
     rss,
     subscriptions,
     translate,
@@ -30,3 +31,4 @@ def register_router(app: FastAPI):
     app.include_router(router=rss.router, prefix="/v2")
     app.include_router(router=learning.router, prefix="/v2")
     app.include_router(router=translate.router, prefix="/v2")
+    app.include_router(router=nomu.router, prefix="/v2")

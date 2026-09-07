@@ -13,6 +13,7 @@ from redis.asyncio import Redis as AsyncRedis
 
 from app.core.agent import AiAgent
 from app.core.llm_factory import create_llm_model
+from app.core.nomu_llm_factory import create_nomu_model
 from app.plugins.notification import NotificationPlugin
 from app.repositories import (
     DeviceRepo,
@@ -32,6 +33,7 @@ from app.services.fishing.fishing_service import FishingService
 from app.services.friendlink_service import FriendLinkService
 from app.services.gallery_service import GalleryService
 from app.services.learning_progress_service import LearningProgressService
+from app.services.nomu_service import NomuService
 from app.services.notification_service import NotificationService
 from app.services.public_service import PublicService
 from app.services.rss_service import RssService
@@ -67,6 +69,7 @@ class AppState:
     translate_svc: TranslateService
     progress_svc: LearningProgressService
     course_gen_svc: CourseGeneratorService
+    nomu_svc: NomuService
 
 
 def new_app_state(redis: AsyncRedis) -> AppState:
@@ -121,6 +124,7 @@ def new_app_state(redis: AsyncRedis) -> AppState:
     # （生成成功 mark_ready、混合读 get_progress），构造顺序不能反。
     progress_svc = LearningProgressService()
     course_gen_svc = CourseGeneratorService(progress_svc=progress_svc)
+    nomu_svc = NomuService(model=create_nomu_model())
 
     return AppState(
         user_svc=user_svc,
@@ -140,6 +144,7 @@ def new_app_state(redis: AsyncRedis) -> AppState:
         translate_svc=translate_svc,
         progress_svc=progress_svc,
         course_gen_svc=course_gen_svc,
+        nomu_svc=nomu_svc,
     )
 
 
