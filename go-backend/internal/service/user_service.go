@@ -81,7 +81,12 @@ type userService struct {
 	frontendURLs map[string]string
 }
 
-func NewUserService(repo UserRepositoryer, redis *redis.Client, adminUserIDs []int, frontendURLs map[string]string) *userService {
+func NewUserService(
+	repo UserRepositoryer,
+	redis *redis.Client,
+	adminUserIDs []int,
+	frontendURLs map[string]string,
+) *userService {
 	trimmed := make(map[string]string, len(frontendURLs))
 	for k, v := range frontendURLs {
 		trimmed[k] = strings.TrimRight(v, "/")
@@ -153,6 +158,7 @@ func (s *userService) CreateUser(ctx context.Context, username, password, email,
 	if err := s.repo.Create(ctx, u, p); err != nil {
 		return nil, nil, err
 	}
+
 	slog.InfoContext(ctx, "user register", "user_id", u.ID, "username", u.Username)
 	return u, p, nil
 }

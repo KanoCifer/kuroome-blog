@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"strconv"
 	"strings"
 
 	"github.com/google/uuid"
@@ -39,6 +40,9 @@ type Creditser interface {
 	Refund(ctx context.Context, userID uint, source, bizID string, amount int64, meta map[string]any) (*model.CreditTransaction, error)
 	Settle(ctx context.Context, userID uint, source, bizID string, actualQty int) (*model.CreditTransaction, error)
 	Grant(ctx context.Context, userID uint, amountLi int64, bizID string, meta map[string]any) (*model.CreditTransaction, error)
+	// GrantRegisterBonus 注册赠送渠道（source=register_bonus），bizID 由 userID
+	// 推导，与 admin_grant 各自走 (user_id, source, biz_id) 唯一键、互不干扰。
+	GrantRegisterBonus(ctx context.Context, userID uint, meta map[string]any) (*model.CreditTransaction, error)
 	GetBalance(ctx context.Context, userID uint) (int64, int64, error)
 	ListTransactions(ctx context.Context, userID uint, page, pageSize int) ([]model.CreditTransaction, int64, error)
 }
@@ -71,6 +75,13 @@ const creditRefundPrefix = "refund:"
 const creditSettlePrefix = "settle:"
 
 const creditGrantSource = "admin_grant"
+
+// creditRegisterBonusSource 注册赠送渠道（GrantRegisterBonus 专用）。
+const creditRegisterBonusSource = "register_bonus"
+
+// creditRegisterBonusPrefix 注册赠送 bizID 前缀："register:" + userID 推导
+// 确定性键，命中 (user_id, source, biz_id) 唯一索引天然幂等。
+const creditRegisterBonusPrefix = "register:"
 
 // MaxBizIDLen 客户端幂等键长度上限。推导：biz_id 列宽 64，Settle 补扣与 Refund
 // 冲正都以确定性键 "<前缀>+原键" 复用同一列（"refund:"/"settle:" 前缀同为 7 字符），
@@ -415,7 +426,37 @@ func (s *CreditService) Grant(
 		return nil, err
 	}
 
-	if existing, err := s.findTx(ctx, userID, creditGrantSource, bizID); err != nil {
+	return s.runGrant(ctx, creditGrantSource, userID, amountLi, bizID, meta)
+}
+
+// creditRegisterBonusLi 注册赠送积分（厘）= 100 分 = 10000 厘。
+const creditRegisterBonusLi int64 = 100 * 100
+
+// GrantRegisterBonus 注册赠送渠道（100 分；source=register_bonus）。
+// bizID 由 userID 推导（"register:<id>"），同一用户重复调用命中唯一索引 → 幂等。
+// 失败语义同 Grant：钱包懒创建 + 余额/流水同事务。
+func (s *CreditService) GrantRegisterBonus(
+	ctx context.Context,
+	userID uint,
+	meta map[string]any,
+) (*model.CreditTransaction, error) {
+	bizID := creditRegisterBonusPrefix + strconv.FormatUint(uint64(userID), 10)
+	return s.runGrant(ctx, creditRegisterBonusSource, userID, creditRegisterBonusLi, bizID, meta)
+}
+
+// runGrant 两条入账渠道（admin_grant / register_bonus / 未来）的共享原子原语：
+// 幂等查 → 事务内 lazy-create wallet → 余额增加 + 流水写入同事务。
+// source/bizID/amount 由调用方定，函数内不二次校验（Grant 已 validateBizID，
+// GrantRegisterBonus 走确定性键；新渠道复用时各自在公开方法校验）。
+func (s *CreditService) runGrant(
+	ctx context.Context,
+	source string,
+	userID uint,
+	amountLi int64,
+	bizID string,
+	meta map[string]any,
+) (*model.CreditTransaction, error) {
+	if existing, err := s.findTx(ctx, userID, source, bizID); err != nil {
 		return nil, err
 	} else if existing != nil {
 		return existing, nil
@@ -442,7 +483,7 @@ func (s *CreditService) Grant(
 				return err
 			}
 			if rows == 0 {
-				return fmt.Errorf("credit grant: wallet not found for user %d", userID)
+				return fmt.Errorf("credit grant(%s): wallet not found for user %d", source, userID)
 			}
 		}
 		after, err := creditBalanceAfter(txdb, userID)
@@ -452,7 +493,7 @@ func (s *CreditService) Grant(
 
 		tx = &model.CreditTransaction{
 			UserID:       userID,
-			Source:       creditGrantSource,
+			Source:       source,
 			BizID:        bizID,
 			Type:         "grant",
 			Amount:       amountLi,
@@ -469,14 +510,15 @@ func (s *CreditService) Grant(
 		return nil
 	})
 	if errors.Is(err, errIdempotentHit) {
-		return s.resolveIdempotentHit(ctx, userID, creditGrantSource, bizID)
+		return s.resolveIdempotentHit(ctx, userID, source, bizID)
 	}
 	if err != nil {
 		return nil, err
 	}
 
 	slog.InfoContext(ctx, "credit granted",
-		"user_id", userID, "biz_id", bizID, "amount", amountLi, "balance_after", tx.BalanceAfter)
+		"user_id", userID, "source", source, "biz_id", bizID,
+		"amount", amountLi, "balance_after", tx.BalanceAfter)
 	return tx, nil
 }
 

@@ -32,12 +32,13 @@ type Userer interface {
 
 // UserHandler 持有业务服务，gin 路由方法挂在其上。
 type UserHandler struct {
-	userSvc Userer
-	cfg     *config.Config
+	userSvc   Userer
+	cfg       *config.Config
+	creditSvc service.Creditser // 注入 nil 则跳过注册赠送（test 默认）
 }
 
-func NewUserHandler(userSvc Userer, cfg *config.Config) *UserHandler {
-	return &UserHandler{userSvc: userSvc, cfg: cfg}
+func NewUserHandler(userSvc Userer, cfg *config.Config, creditSvc service.Creditser) *UserHandler {
+	return &UserHandler{userSvc: userSvc, cfg: cfg, creditSvc: creditSvc}
 }
 
 func (h *UserHandler) Login(c *gin.Context) {
@@ -101,6 +102,16 @@ func (h *UserHandler) Register(c *gin.Context) {
 			response.APIError(c, "server error", 500)
 		}
 		return
+	}
+
+	// 注册赠送积分：仅本路径触发（密码注册）；GitHub 自动建号 /
+	// magic-login 不走 handler，不发。失败仅记日志、不阻断 200——积分是增值服务，
+	// 注册必须落。GrantRegisterBonus 内部 bizID 由 userID 推导、命中唯一键、幂等不双发。
+	if h.creditSvc != nil {
+		if _, gerr := h.creditSvc.GrantRegisterBonus(c.Request.Context(), u.ID, nil); gerr != nil {
+			slog.ErrorContext(c.Request.Context(), "register bonus grant failed",
+				"user_id", u.ID, "error", gerr)
+		}
 	}
 
 	response.Success(c, dto.FromUser(u, false), "注册成功")

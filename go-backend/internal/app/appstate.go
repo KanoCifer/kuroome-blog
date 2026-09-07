@@ -84,12 +84,14 @@ func NewAppState(
 	// -- services ---------------------------------------------------- //
 	// frontendURLs 按 mode 索引：blog / nomu 都指向同一 web 前端（kanocifer.chat），
 	// 区别只在落地路径（/auth/magic vs /nomu/login）。
+	// creditSvc 在 userHandler.Register 收尾处调 GrantRegisterBonus 赠送 100 积分；
+	// 只走密码注册 handler 这一条路径，GitHub 自动建号 / magic-login 不发。
+	creditSvc := service.NewCreditService(db)
 	userSvc := service.NewUserService(userRepo, redis, cfg.Admin.UserIDs, map[string]string{
 		"blog": cfg.Frontend.URLs.Blog,
 		"nomu": cfg.Frontend.URLs.Blog,
 	})
 	uploadSvc := service.NewUploadService(userRepo, cfg)
-	creditSvc := service.NewCreditService(db)
 	return &AppState{
 		config:     cfg,
 		userSvc:    userSvc,

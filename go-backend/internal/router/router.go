@@ -34,7 +34,7 @@ func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 	likeLimiter := middleware.NewRateLimiter(redis, "like", 25, 24*time.Hour)
 	currencyLimiter := middleware.NewRateLimiter(redis, "currency", 500, time.Hour)
 
-	userH := handler.NewUserHandler(state.UserSvc(), state.Cfg())
+	userH := handler.NewUserHandler(state.UserSvc(), state.Cfg(), state.CreditSvc())
 	userH.RegisterRoutes(v3, middleware.AuthMiddleware(), loginLimiter.Middleware(), registerLimiter.Middleware())
 
 	adminH := handler.NewAdminHandler(state.AdminSvc(), state.Cfg())

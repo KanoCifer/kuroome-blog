@@ -732,3 +732,58 @@ func openCreditPostgresTestDB(t *testing.T) *gorm.DB {
 	}
 	return db
 }
+
+// TestCreditGrantRegisterBonus_Idempotent 同 user 重复 GrantRegisterBonus 命中
+// (user_id, source=register_bonus, biz_id="register:<id>") 唯一索引，返回首次流水。
+// 保护注册失败重试场景不双发。
+func TestCreditGrantRegisterBonus_Idempotent(t *testing.T) {
+	svc := NewCreditService(newCreditSvcTestDB(t, "register_bonus_idempotent"))
+
+	tx1, err := svc.GrantRegisterBonus(context.Background(), 7, nil)
+	if err != nil {
+		t.Fatalf("GrantRegisterBonus #1: %v", err)
+	}
+	tx2, err := svc.GrantRegisterBonus(context.Background(), 7, nil)
+	if err != nil {
+		t.Fatalf("GrantRegisterBonus #2: %v", err)
+	}
+	if tx1.ID != tx2.ID {
+		t.Errorf("幂等失败: #1 ID=%d, #2 ID=%d", tx1.ID, tx2.ID)
+	}
+	bal, _, err := svc.GetBalance(context.Background(), 7)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if bal != 10000 {
+		t.Errorf("重复 Grant 后 balance = %d, want 10000", bal)
+	}
+}
+
+// TestCreditGrantRegisterBonus_ChannelIsolatedFromAdminGrant register_bonus 与
+// admin_grant 是两个独立 source：同一 user 各发一次都该各自落账，余额相加。
+func TestCreditGrantRegisterBonus_ChannelIsolatedFromAdminGrant(t *testing.T) {
+	svc := NewCreditService(newCreditSvcTestDB(t, "register_bonus_isolation"))
+
+	if _, err := svc.GrantRegisterBonus(context.Background(), 8, nil); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := svc.Grant(context.Background(), 8, 5000, "admin-1", nil); err != nil {
+		t.Fatal(err)
+	}
+	bal, _, err := svc.GetBalance(context.Background(), 8)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if bal != 15000 {
+		t.Errorf("balance = %d, want 15000 (10000 register_bonus + 5000 admin_grant)", bal)
+	}
+	var count int64
+	if err := svc.db.Model(&model.CreditTransaction{}).
+		Where("user_id = ? AND source IN ?", 8, []string{"register_bonus", "admin_grant"}).
+		Count(&count).Error; err != nil {
+		t.Fatal(err)
+	}
+	if count != 2 {
+		t.Errorf("流水数 = %d, want 2（两个 source 各一行）", count)
+	}
+}
