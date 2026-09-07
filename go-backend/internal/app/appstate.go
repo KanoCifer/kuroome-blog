@@ -21,6 +21,7 @@ import (
 
 type AppState struct {
 	config      *config.Config
+	userRepo    *postgres.UserRepo
 	userSvc     service.Userer
 	adminSvc    service.Adminer
 	blogSvc     service.Bloger
@@ -114,10 +115,12 @@ func NewAppState(
 		currencySvc: service.NewCurrencyService(httpCli, redis),
 		creditSvc:   creditSvc,
 		designSvc:   nomuSvc.NewDesignService(designHttp, cfg.Design.APIKey, uploadSvc, creditSvc),
+		userRepo:    userRepo,
 	}
 }
 
 // Dependency Injection
+func (a *AppState) UserRepo() *postgres.UserRepo        { return a.userRepo }
 func (a *AppState) UserSvc() service.Userer            { return a.userSvc }
 func (a *AppState) AdminSvc() service.Adminer          { return a.adminSvc }
 func (a *AppState) BlogSvc() service.Bloger            { return a.blogSvc }

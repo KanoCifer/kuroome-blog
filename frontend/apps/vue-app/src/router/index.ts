@@ -472,6 +472,20 @@ const router = createRouter({
       },
     },
     {
+      // 管理员积分管理页 — 与 ADMIN_USER_IDS 白名单配合，非管理员一律 NotFound。
+      path: '/admin/credits',
+      name: 'admin-credits',
+      component: () => import('@/features/credits/AdminCreditsView.vue'),
+      meta: {
+        requiresAuth: true,
+        requiresAdmin: true,
+        title: "管理员积分 - Kuroome's Blog",
+        description: '为用户发放积分与查看积分流水',
+        keywords: '积分,管理员,发放,流水',
+        transition: 'fade',
+      },
+    },
+    {
       // 通配符匹配所有未定义的路径
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
@@ -500,6 +514,15 @@ router.beforeEach(async (to) => {
 
   if (needsAuth && !auth.isAuthenticated) {
     return { name: 'login', query: { redirect: to.fullPath } };
+  }
+
+  // 管理员专属：放行需 auth.isHydrated 已就绪（上方已 await），
+  // 非管理员一律重定向到 NotFound，避免暴露页面存在性。
+  const needsAdmin = to.matched.some(
+    (route) => route.meta?.requiresAdmin === true,
+  );
+  if (needsAdmin && !auth.isAdmin) {
+    return { name: 'NotFound' };
   }
   return true;
 });

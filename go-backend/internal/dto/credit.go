@@ -32,8 +32,10 @@ type CreditTransactionsResponse struct {
 }
 
 // GrantCreditRequest POST /v3/admin/credits/grant 的请求体。
+// UserID 与 Email 二选一；同时给时 UserID 优先；都不给 → 400。
 type GrantCreditRequest struct {
-	UserID uint `json:"user_id" binding:"required"`
+	UserID uint   `json:"user_id"`
+	Email  string `json:"email,omitempty"`
 	// Amount 发放额度，单位"分"，支持两位小数；服务端 ×100 转厘。
 	Amount float64 `json:"amount" binding:"required"`
 	// BizID 可选幂等键；缺省服务端生成 UUID。重复 (admin_grant, biz_id) 不双发。

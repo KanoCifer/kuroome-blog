@@ -19,3 +19,4 @@ export * from './subscription';
 export * from './device';
 export * from './ai';
 export * from './learning';
+export * from './credit';

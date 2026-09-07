@@ -98,7 +98,8 @@ func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 	designH.RegisterRoutes(v3, middleware.AuthMiddleware())
 
 	// credits：余额/流水明细挂 Auth；admin grant 必先 Auth 再 Admin（docs/rules/auth.md）。
-	creditH := handler.NewCreditHandler(state.CreditSvc())
+	// grant 支持 email → user_id 解析（task-557），需要 UserRepo。
+	creditH := handler.NewCreditHandler(state.CreditSvc(), state.UserRepo())
 	creditH.RegisterRoutes(v3, middleware.AuthMiddleware(), middleware.AdminMiddleware(state.Cfg().Admin.UserIDs))
 
 	// 媒体静态服务：把上传的文件以 /api/v3/media/* 暴露，对齐 handler 返回的 url。

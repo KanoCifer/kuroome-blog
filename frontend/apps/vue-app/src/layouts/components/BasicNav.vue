@@ -109,6 +109,7 @@ import { useAuthStore } from '@/features/auth';
 import {
   BookOpenText,
   ChevronDown,
+  Coins,
   Ellipsis,
   CreditCard,
   Globe,
@@ -176,12 +177,14 @@ const navItems: NavItem[] = [
 ];
 
 // Others dropdown: orphan routes + utility entries not given a pill in the strip.
-// `to` = 路由链接；`action` = 按钮行为（如外部跳转移动版）
+// `to` = 路由链接；`action` = 按钮行为（如外部跳转移动版）；
+// `adminOnly` = 仅 isAdmin 可见（与路由 requiresAdmin 守卫配套）。
 interface OthersItem {
   label: string;
   icon: Component;
   to?: string;
   action?: () => void;
+  adminOnly?: boolean;
 }
 
 const othersItems: OthersItem[] = [
@@ -196,6 +199,7 @@ const othersItems: OthersItem[] = [
   { to: '/rss', label: 'RSS', icon: Rss },
   { to: '/subscription', label: 'Subscription', icon: CreditCard },
   { to: '/color', label: 'Schemes', icon: Palette },
+  { to: '/admin/credits', label: 'Admin Credits', icon: Coins, adminOnly: true },
   { label: 'Mobile', icon: Smartphone, action: switchToMobile },
 ];
 
@@ -234,12 +238,18 @@ function positionIndicator(index: number, animate = true) {
 }
 
 // Others dropdown state (open/close 委托给 HoverDropdown,此处只关心 active 高亮)
+// 列表过滤与 active 判定都先做 adminOnly 屏蔽，避免未登录/非管理员误高亮
 const isOthersActive = computed(() =>
-  othersItems.some((item) => item.to && isActive(item.to)),
+  othersItems.some(
+    (item) => item.to && (!item.adminOnly || auth.isAdmin) && isActive(item.to),
+  ),
 );
 
 const othersRouteItems = computed(() =>
-  othersItems.filter((item): item is OthersItem & { to: string } => !!item.to),
+  othersItems.filter(
+    (item): item is OthersItem & { to: string } =>
+      !!item.to && (!item.adminOnly || auth.isAdmin),
+  ),
 );
 
 const othersActionItems = computed(() =>

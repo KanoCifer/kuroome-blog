@@ -126,3 +126,11 @@ export type {
   CreateCourseExtras,
   CourseFileEntry,
 } from './gateways/learning';
+
+// ── credits ────────────────────────────────────────────────────────
+export { creditsGateway } from './gateways/credits';
+export type {
+  AdminCreditTarget,
+  AdminCreditTxQuery,
+  CreditsGateway,
+} from './gateways/credits';
