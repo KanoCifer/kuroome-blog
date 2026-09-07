@@ -25,9 +25,17 @@ class UsageMetrics(BaseModel):
 
 
 class TranslateResult(BaseModel):
-    """``POST /v2/translate`` 响应体（``data`` 字段）"""
+    """LLM 结构化输出（``output_schema``）；API 响应见 ``TranslateResponse``。"""
 
     text: str = Field(..., description="翻译后的文本")
     usage: UsageMetrics | None = Field(
         None, description="本次调用的 token 消耗（可选，向后兼容）"
+    )
+
+
+class TranslateResponse(TranslateResult):
+    """``POST /v2/translate`` 响应体（``data`` 字段）"""
+
+    credits_spent: float | None = Field(
+        None, description="本次实扣积分（分；退款后不回填）"
     )

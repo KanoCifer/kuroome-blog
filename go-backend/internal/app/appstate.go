@@ -36,6 +36,7 @@ type AppState struct {
 	weatherSvc  service.Weatherer
 	wereadSvc   wereadSvc.Reader
 	currencySvc service.Currencyer
+	creditSvc   service.Creditser
 	designSvc   *nomuSvc.DesignService
 }
 
@@ -88,6 +89,7 @@ func NewAppState(
 		"nomu": cfg.Frontend.URLs.Blog,
 	})
 	uploadSvc := service.NewUploadService(userRepo, cfg)
+	creditSvc := service.NewCreditService(db)
 	return &AppState{
 		config:     cfg,
 		userSvc:    userSvc,
@@ -108,7 +110,8 @@ func NewAppState(
 		weatherSvc:  service.NewWeatherService(httpCli, redis, cfg.Weather, signer),
 		wereadSvc:   wereadSvc.New(httpCli, redis, wereadRepo),
 		currencySvc: service.NewCurrencyService(httpCli, redis),
-		designSvc:   nomuSvc.NewDesignService(designHttp, cfg.Design.APIKey, uploadSvc),
+		creditSvc:   creditSvc,
+		designSvc:   nomuSvc.NewDesignService(designHttp, cfg.Design.APIKey, uploadSvc, creditSvc),
 	}
 }
 
@@ -128,6 +131,7 @@ func (a *AppState) MomentSvc() service.Momenter        { return a.momentSvc }
 func (a *AppState) WeatherSvc() service.Weatherer      { return a.weatherSvc }
 func (a *AppState) WereadSvc() wereadSvc.Reader        { return a.wereadSvc }
 func (a *AppState) CurrencySvc() service.Currencyer    { return a.currencySvc }
+func (a *AppState) CreditSvc() service.Creditser       { return a.creditSvc }
 func (a *AppState) DesignSvc() *nomuSvc.DesignService  { return a.designSvc }
 
 func (a *AppState) Cfg() *config.Config { return a.config }

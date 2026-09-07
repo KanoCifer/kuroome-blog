@@ -95,7 +95,7 @@ async def test_translate_parses_usage_and_records_usage(monkeypatch):
     )
 
     result = await TranslateService(model=_FakeModel()).translate(
-        "hello world", "中文", user_id=7
+        "hello world", "中文", user_id=7, credit_biz_id="biz-42"
     )
 
     # usage 随结果返回
@@ -114,7 +114,11 @@ async def test_translate_parses_usage_and_records_usage(monkeypatch):
     assert captured["total_tokens"] == 30
     assert captured["user_id"] == 7
     assert captured["duration_ms"] == 500
-    assert captured["meta"] == {"target_lang": "中文", "text_len": 11}
+    assert captured["meta"] == {
+        "target_lang": "中文",
+        "text_len": 11,
+        "credit_biz_id": "biz-42",
+    }
 
 
 async def test_translate_without_duration_metrics_duration_ms_none(monkeypatch):

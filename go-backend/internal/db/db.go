@@ -35,7 +35,7 @@ func InitDB() error {
 	if err != nil {
 		return err
 	}
-	return pgDB.AutoMigrate(
+	err = pgDB.AutoMigrate(
 		&model.User{},
 		&model.Profile{},
 		&model.VisitorTrack{},
@@ -47,7 +47,14 @@ func InitDB() error {
 		&model.Log{},
 		&model.Event{},
 		&model.LlmUsage{},
+		&model.CreditWallet{},
+		&model.CreditTransaction{},
+		&model.CreditPrice{},
 	)
+	if err != nil {
+		return err
+	}
+	return model.SeedCreditPrices(pgDB)
 }
 
 func GetDB() *gorm.DB {

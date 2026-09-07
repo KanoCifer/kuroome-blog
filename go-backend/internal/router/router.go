@@ -93,9 +93,13 @@ func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 	currencyH := handler.NewCurrencyHandler(state.CurrencySvc())
 	currencyH.RegisterRoutes(v3, currencyLimiter.Middleware())
 
-	// design：出图按 token 计费，要求登录；限流/计费待计费系统接入。
+	// design：出图按张预扣积分（余额不足 402，失败退款），要求登录。
 	designH := handler.NewDesignHandler(state.DesignSvc())
 	designH.RegisterRoutes(v3, middleware.AuthMiddleware())
+
+	// credits：余额/流水明细挂 Auth；admin grant 必先 Auth 再 Admin（docs/rules/auth.md）。
+	creditH := handler.NewCreditHandler(state.CreditSvc())
+	creditH.RegisterRoutes(v3, middleware.AuthMiddleware(), middleware.AdminMiddleware(state.Cfg().Admin.UserIDs))
 
 	// 媒体静态服务：把上传的文件以 /api/v3/media/* 暴露，对齐 handler 返回的 url。
 	// 挂在 Static 前，给响应打上公共缓存头，让 CDN 缓存命中（7d，uuid 命名不可变）。

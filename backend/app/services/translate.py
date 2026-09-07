@@ -14,7 +14,11 @@ class TranslateService:
         self.model = model
 
     async def translate(
-        self, text: str, target_lang: str, user_id: int | None = None
+        self,
+        text: str,
+        target_lang: str,
+        user_id: int | None = None,
+        credit_biz_id: str | None = None,
     ) -> TranslateResult:
         """把 ``text`` 翻译成 ``target_lang``，返回 ``TranslateResult`` 结构化对象。
 
@@ -70,7 +74,11 @@ class TranslateService:
                 total_tokens=total_tokens,
                 user_id=user_id,
                 duration_ms=duration_ms,
-                meta={"target_lang": target_lang, "text_len": len(text)},
+                meta={
+                    "target_lang": target_lang,
+                    "text_len": len(text),
+                    "credit_biz_id": credit_biz_id,
+                },
             )
 
         logger.bind(text=text, target_lang=target_lang).info(

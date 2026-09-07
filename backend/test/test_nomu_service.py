@@ -96,7 +96,7 @@ async def test_optimize_prompt_parses_usage_and_records(monkeypatch):
     )
 
     result = await NomuService(model=_FakeModel()).optimize_prompt(
-        "a cup", user_id=7
+        "a cup", user_id=7, credit_biz_id="biz-42"
     )
 
     assert result.usage is not None
@@ -110,7 +110,10 @@ async def test_optimize_prompt_parses_usage_and_records(monkeypatch):
     assert captured["model"] == "Ling-2.6-1T"
     assert captured["user_id"] == 7
     assert captured["duration_ms"] == 500
-    assert captured["meta"] == {"prompt_len": 5}
+    assert captured["meta"] == {
+        "prompt_len": 5,
+        "credit_biz_id": "biz-42",
+    }
 
 
 async def test_optimize_prompt_without_metrics_returns_no_usage(monkeypatch):

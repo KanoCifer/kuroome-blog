@@ -44,6 +44,8 @@ func NewDesignClient(http *httpclient.Client, opts ...DesignClientOption) *Desig
 // images 为空 → 文生图；参考图字段官方名为 image：
 // 1 张传字符串，多张传数组（不存在 images 字段）。
 // size 为上游语义（档位枚举 / WxH），原样透传；空则省略、用上游默认。
+// 本服务不传 count/组图参数；方舟响应 data[] 张数不定（实测可多张），
+// 积分以预扣 1 张为闸门、响应后按张数 Settle 结算。
 func (c *DesignClient) BuildPayload(prompt string, model string, images []string, size string) map[string]any {
 	payload := map[string]any{
 		"prompt":        prompt,

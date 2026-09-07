@@ -16,7 +16,10 @@ class NomuService:
         self.model = model
 
     async def optimize_prompt(
-        self, prompt: str, user_id: int | None = None
+        self,
+        prompt: str,
+        user_id: int | None = None,
+        credit_biz_id: str | None = None,
     ) -> PromptOptimizeResult:
         """把用户输入的图生成提示词优化改写，返回 ``PromptOptimizeResult``。
 
@@ -70,7 +73,10 @@ class NomuService:
                 total_tokens=total_tokens,
                 user_id=user_id,
                 duration_ms=duration_ms,
-                meta={"prompt_len": len(prompt)},
+                meta={
+                    "prompt_len": len(prompt),
+                    "credit_biz_id": credit_biz_id,
+                },
             )
 
         logger.bind(prompt=prompt).info(

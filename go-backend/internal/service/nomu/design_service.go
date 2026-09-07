@@ -4,8 +4,10 @@
 //   - 文生图：只传 Prompt；
 //   - 图生图：Images 传 1 张（单参考图，payload 用 image）或多张（多参考图，payload 用 images）。
 //
-// 编排流程：校验入参 → 解析模型别名 → DesignClient 组包发送 → 解析方舟响应
+// 编排流程：校验入参 → 解析模型别名（得出 lite/pro 档位）→ 积分预扣 1 张作闸门
+// （余额不足拒单，不调方舟）→ DesignClient 组包发送 → 解析方舟响应
 // → FetchBlob 拉取结果图 → ImageStore 落盘 → 返回本站 /v3/media 同源地址。
+// 失败全额退款；方舟响应 data[] 张数不定（实测可多张），成功按实际张数 Settle 校正。
 // 上游 TOS 临时 URL 无 CORS 头且会过期，不对前端暴露。
 package nomu
 
@@ -21,8 +23,10 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
+	"github.com/KanoCifer/kuroome-blog/internal/model"
 )
 
 const (
@@ -33,10 +37,16 @@ const (
 	defaultModelKey = "Doubao-Seedream-5.0-lite"
 )
 
-// models 面向用户的展示名 → 方舟模型 ID。直接传 ID 也接受。
-var models = map[string]string{
-	"Doubao-Seedream-5.0-pro":  "doubao-seedream-5-0-pro-260628",
-	"Doubao-Seedream-5.0-lite": "doubao-seedream-5-0-260128",
+// models 面向用户的展示名 → 方舟模型 ID + 计费档位。直接传 ID 也接受。
+var models = map[string]modelSpec{
+	"Doubao-Seedream-5.0-pro":  {id: "doubao-seedream-5-0-pro-260628", variant: "pro"},
+	"Doubao-Seedream-5.0-lite": {id: "doubao-seedream-5-0-260128", variant: "lite"},
+}
+
+// modelSpec 方舟模型 ID 与 credit_price.variant 档位（lite/pro）。
+type modelSpec struct {
+	id      string
+	variant string
 }
 
 var (
@@ -46,11 +56,17 @@ var (
 	ErrUnknownModel = errors.New("design: unknown model")
 	// ErrUpstream 上游（方舟）请求失败、响应异常或图片拉取失败。
 	ErrUpstream = errors.New("design: upstream generate failed")
+	// ErrCredit 积分预扣失败（余额不足 / 无定价 / DB 故障）。错误链保留
+	// service.CreditService 的哨兵（ErrInsufficientBalance）供 handler 映射 402。
+	ErrCredit = errors.New("design: credit preconsume failed")
 )
+
+// creditSourceDesign 生图计费的流水 source（对齐 credit_price 词表 design_generate）。
+const creditSourceDesign = "design_generate"
 
 // GenerateRequest 一次出图请求。
 type GenerateRequest struct {
-	// UserID 发起用户，用于结果图落盘目录归属；0 表示不落盘。
+	// UserID 发起用户，用于结果图落盘目录归属与积分扣减；0 表示不落盘。
 	UserID uint
 	// Prompt 画面描述，必填。
 	Prompt string
@@ -61,6 +77,9 @@ type GenerateRequest struct {
 	Size string
 	// Images 参考图（URL 或 base64 data URL）。0 张 = 文生图；1 张走 image；多张走 image 数组。
 	Images []string
+	// IdempotencyKey 计费幂等键（handler 从 Idempotency-Key 头透传）。
+	// 空则服务端生成 UUID。同键重试 Preconsume 命中唯一索引不双扣。
+	IdempotencyKey string
 }
 
 // GeneratedImage 单张结果图。URL 已落盘为本站同源媒体地址
@@ -116,33 +135,77 @@ type ImageStore interface {
 	UploadDesignImage(ctx context.Context, userID uint, src io.Reader) (string, error)
 }
 
-// DesignService 编排校验、请求发送与结果解析。
+// Creditser 积分扣退能力（*service.CreditService 提供）。本地最小接口避免
+// nomu ← service 的包依赖方向反转；nil 时不计费（测试/未装配兜底）。
+// Preconsume 的 created=false 表示幂等命中（本次未新扣），失败退款须跳过它。
+type Creditser interface {
+	Preconsume(ctx context.Context, userID uint, source, variant string, qty int, bizID string, meta map[string]any) (*model.CreditTransaction, bool, error)
+	Refund(ctx context.Context, userID uint, source, bizID string, amount int64, meta map[string]any) (*model.CreditTransaction, error)
+	Settle(ctx context.Context, userID uint, source, bizID string, actualQty int) (*model.CreditTransaction, error)
+}
+
+// DesignService 编排校验、积分预扣/退款、请求发送与结果解析。
 type DesignService struct {
-	client *DesignClient
-	store  ImageStore
+	client  *DesignClient
+	store   ImageStore
+	credits Creditser
 }
 
 // NewDesignService 构造 DesignService。默认指向方舟正式端点，
 // apiKey 来自 config.Design.APIKey；store 为结果图落盘实现（可 nil，
-// nil 时结果只携带上游临时 URL）；opts 可覆盖默认端点（测试注入用）。
-func NewDesignService(http *httpclient.Client, apiKey string, store ImageStore, opts ...DesignClientOption) *DesignService {
+// nil 时结果只携带上游临时 URL）；credits 为积分扣退实现（可 nil = 不计费）；
+// opts 可覆盖默认端点（测试注入用）。
+func NewDesignService(http *httpclient.Client, apiKey string, store ImageStore, credits Creditser, opts ...DesignClientOption) *DesignService {
 	opts = append(opts, WithAPIKey(apiKey))
 	client := NewDesignClient(http, append([]DesignClientOption{WithBaseURL(baseURL)}, opts...)...)
-	return &DesignService{client: client, store: store}
+	return &DesignService{client: client, store: store, credits: credits}
 }
 
-// Generate 校验入参并完成一次文生图/图生图，结果图字节随 GenerateResult 返回。
-func (s *DesignService) Generate(ctx context.Context, req GenerateRequest) (*GenerateResult, error) {
+// Generate 校验入参、预扣积分闸门（1 张），完成一次文生图/图生图。
+//
+// 计费时序：resolveModel 得出档位 → Preconsume(1)（余额连 1 张都不够直接返回，
+// 不调方舟）→ 方舟调用 → 响应 data[] 张数 Settle 校正（多张补扣可扣负、少张退差）
+// → 落盘 → 失败全额退。张数只有响应才知道，预扣只是闸门，结算以 len(data) 为准。
+// 退款用脱离请求 cancel 的 context，避免客户端断开导致退款一起被取消。
+func (s *DesignService) Generate(ctx context.Context, req GenerateRequest) (result *GenerateResult, err error) {
 	prompt := strings.TrimSpace(req.Prompt)
 	if prompt == "" {
 		return nil, ErrEmptyPrompt
 	}
 
-	model, err := resolveModel(req.Model)
+	spec, err := resolveModel(req.Model)
 	if err != nil {
 		return nil, err
 	}
+	model := spec.id
 	size := strings.TrimSpace(req.Size)
+
+	// ponytail: 崩溃窗口丢退款（预扣成功、退款前进程挂掉）由 credit_service 注释
+	// 统一认领，升级路径=对账 job。此处 defer 只覆盖 panic 路径。
+	bizID := req.IdempotencyKey
+	if s.credits != nil {
+		tx, created, cerr := s.credits.Preconsume(ctx, req.UserID, creditSourceDesign, spec.variant, 1, bizID, nil)
+		if cerr != nil {
+			// 双 %w：外层 ErrCredit 供笼统分流，内层保留 credit 哨兵
+			// （ErrInsufficientBalance）供 handler 映射 402。
+			return nil, fmt.Errorf("%w: %w", ErrCredit, cerr)
+		}
+		bizID = tx.BizID // 幂等命中/服务端生成时回填真实流水键，退款按它冲正
+		defer func() {
+			// 只对"本次新扣"的流水挂失败退款：created=false 的重放请求若在本轮失败，
+			// 首笔扣费可能已成功交付过，退掉它就等于重放免单。
+			if !created || err == nil {
+				return // 成功即扣满（单次最多 1 张）
+			}
+			rctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 10*time.Second)
+			defer cancel()
+			if _, rerr := s.credits.Refund(rctx, req.UserID, creditSourceDesign, bizID, 0, nil); rerr != nil {
+				slog.ErrorContext(rctx, "design credit refund failed",
+					"user_id", req.UserID, "biz_id", bizID,
+					"full", true, "error", rerr.Error())
+			}
+		}()
+	}
 
 	raw, err := s.client.SendRequest(ctx, s.client.BuildPayload(prompt, model, req.Images, size))
 	if err != nil {
@@ -180,6 +243,20 @@ func (s *DesignService) Generate(ctx context.Context, req GenerateRequest) (*Gen
 	slog.InfoContext(ctx, "design generated",
 		"model", model, "size", size, "ref_images", len(req.Images), "output", len(images),
 		"total_tokens", resp.Usage.TotalTokens)
+
+	// 计费结算：预扣只是 1 张闸门，实际张数 = len(data[])；多张补扣差额（可扣负，
+	// 见 CreditService.Settle）。无条件调用：张数与闸门相等时 Settle 内部 no-op，
+	// 少一条分支就少一个"忘了结算"的口子。结算失败不阻断结果返回（用户已拿到图），
+	// 只记日志留给对账。
+	if s.credits != nil {
+		sctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 10*time.Second)
+		defer cancel()
+		if _, serr := s.credits.Settle(sctx, req.UserID, creditSourceDesign, bizID, len(images)); serr != nil {
+			slog.ErrorContext(sctx, "design credit settle failed",
+				"user_id", req.UserID, "biz_id", bizID, "images", len(images), "error", serr.Error())
+		}
+	}
+
 	return &GenerateResult{
 		Model:   model,
 		Images:  images,
@@ -188,18 +265,20 @@ func (s *DesignService) Generate(ctx context.Context, req GenerateRequest) (*Gen
 	}, nil
 }
 
-// resolveModel 把展示名或模型 ID 归一为方舟模型 ID。
-func resolveModel(name string) (string, error) {
+// resolveModel 把展示名或模型 ID 归一为 modelSpec（方舟模型 ID + 计费档位）。
+func resolveModel(name string) (modelSpec, error) {
 	name = strings.TrimSpace(name)
 	if name == "" {
 		return models[defaultModelKey], nil
 	}
-	if id, ok := models[name]; ok {
-		return id, nil
+	if spec, ok := models[name]; ok {
+		return spec, nil
 	}
-	if slices.Contains(slices.Collect(maps.Values(models)), name) {
-		return name, nil
+	for _, spec := range models {
+		if spec.id == name {
+			return spec, nil
+		}
 	}
-	return "", fmt.Errorf("%w: %q (supported: %s)", ErrUnknownModel,
+	return modelSpec{}, fmt.Errorf("%w: %q (supported: %s)", ErrUnknownModel,
 		name, strings.Join(slices.Sorted(maps.Keys(models)), ", "))
 }

@@ -5,12 +5,14 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/KanoCifer/kuroome-blog/internal/service"
 	"github.com/KanoCifer/kuroome-blog/internal/service/nomu"
 )
 
@@ -149,6 +151,12 @@ func TestDesignGenerateServiceErrors(t *testing.T) {
 		{"unknown model", nomu.ErrUnknownModel, 400},
 		{"upstream", nomu.ErrUpstream, 502},
 		{"unexpected", errors.New("boom"), 500},
+		// 余额不足：service 层双 %w 包装（ErrCredit + ErrInsufficientBalance）→ 402
+		{"insufficient balance", fmt.Errorf("%w: %w", nomu.ErrCredit, service.ErrInsufficientBalance), 402},
+		// 非法幂等键（超长/保留前缀）→ 400 客户端错误，不落 500
+		{"invalid biz id", fmt.Errorf("%w: %w", nomu.ErrCredit, service.ErrInvalidBizID), 400},
+		// 其它计费错误（无定价/DB 故障）→ 500，不落 402
+		{"credit config error", fmt.Errorf("%w: %w", nomu.ErrCredit, service.ErrPriceNotFound), 500},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -161,6 +169,31 @@ func TestDesignGenerateServiceErrors(t *testing.T) {
 				t.Errorf("status = %d, want %d", w.Code, tc.want)
 			}
 		})
+	}
+}
+
+// Idempotency-Key 头透传到 service 层请求。
+func TestDesignGenerateForwardsIdempotencyKey(t *testing.T) {
+	var gotReq nomu.GenerateRequest
+	svc := &mockDesignService{generateFn: func(ctx context.Context, req nomu.GenerateRequest) (*nomu.GenerateResult, error) {
+		gotReq = req
+		return &nomu.GenerateResult{Model: "m", Images: []nomu.GeneratedImage{{Index: 0}}}, nil
+	}}
+	r := newDesignTestServer(t, svc)
+
+	req := httptest.NewRequest(http.MethodPost, "/v3/design/generate",
+		bytes.NewBufferString(`{"prompt":"x"}`))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Test-User", "1")
+	req.Header.Set("Idempotency-Key", "key-123")
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("status = %d, body=%s", w.Code, w.Body.String())
+	}
+	if gotReq.IdempotencyKey != "key-123" {
+		t.Errorf("service got %+v, want IdempotencyKey=key-123", gotReq)
 	}
 }
 

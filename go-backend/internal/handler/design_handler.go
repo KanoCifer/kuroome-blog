@@ -9,6 +9,7 @@ import (
 
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
+	"github.com/KanoCifer/kuroome-blog/internal/service"
 	"github.com/KanoCifer/kuroome-blog/internal/service/nomu"
 )
 
@@ -25,8 +26,7 @@ func NewDesignHandler(svc DesignGenerator) *DesignHandler {
 	return &DesignHandler{svc: svc}
 }
 
-// RegisterRoutes 挂载 /design 路由。出图按 token 计费，鉴权必挂；
-// 限流与用量计费待计费系统上线后接入。
+// RegisterRoutes 挂载 /design 路由。出图按张预扣积分（余额不足 402），鉴权必挂。
 func (h *DesignHandler) RegisterRoutes(r *gin.RouterGroup, mw ...gin.HandlerFunc) {
 	g := r.Group("/design")
 	g.POST("/generate", append(mw, h.Generate)...)
@@ -34,6 +34,7 @@ func (h *DesignHandler) RegisterRoutes(r *gin.RouterGroup, mw ...gin.HandlerFunc
 
 // Generate POST /v3/design/generate
 // 文生图：只传 prompt；图生图：images 传 1 张（单参考）或多张（多参考）。
+// Idempotency-Key 头作为积分预扣的幂等键（缺省服务端 UUID）。
 // 返回上游临时 URL（会过期），图片字节由前端自行拉取。
 func (h *DesignHandler) Generate(c *gin.Context) {
 	var req dto.GenerateDesignRequest
@@ -44,11 +45,12 @@ func (h *DesignHandler) Generate(c *gin.Context) {
 
 	userID := c.GetInt("user_id")
 	res, err := h.svc.Generate(c.Request.Context(), nomu.GenerateRequest{
-		UserID: uint(userID),
-		Prompt: req.Prompt,
-		Model:  req.Model,
-		Size:   req.Size,
-		Images: req.Images,
+		UserID:         uint(userID),
+		Prompt:         req.Prompt,
+		Model:          req.Model,
+		Size:           req.Size,
+		Images:         req.Images,
+		IdempotencyKey: c.GetHeader("Idempotency-Key"),
 	})
 	if err != nil {
 		h.respondError(c, err)
@@ -63,9 +65,21 @@ func (h *DesignHandler) Generate(c *gin.Context) {
 
 func (h *DesignHandler) respondError(c *gin.Context, err error) {
 	switch {
+	case errors.Is(err, service.ErrInsufficientBalance):
+		// 402 对齐 Python 端 InsufficientBalanceError(code=402)；信封沿用
+		// response.APIError 惯例：HTTP status + message，不带自定义 code 字段。
+		response.APIError(c, "insufficient credits", 402)
+	case errors.Is(err, service.ErrInvalidBizID):
+		// 幂等键非法（超长/保留前缀，被 Preconsume 包进 ErrCredit）→ 客户端错误。
+		response.APIError(c, err.Error(), 400)
 	case errors.Is(err, nomu.ErrEmptyPrompt),
 		errors.Is(err, nomu.ErrUnknownModel):
 		response.APIError(c, err.Error(), 400)
+	case errors.Is(err, nomu.ErrCredit):
+		// 无定价等计费配置错误 → 拒单，但与余额不同源：500 + 日志。
+		slog.ErrorContext(c.Request.Context(), "design credit error",
+			"user_id", c.GetInt("user_id"), "error", err.Error())
+		response.APIError(c, "credit check failed", 500)
 	case errors.Is(err, nomu.ErrUpstream):
 		// 上游真实错误（状态码/body 片段）只在日志里，响应保持笼统文案。
 		slog.WarnContext(c.Request.Context(), "design upstream error",

@@ -163,3 +163,56 @@ async def api_user(db_session) -> AsyncGenerator:
     _api_user_id = user.id
     yield user
     _api_user_id = None
+
+
+@pytest_asyncio.fixture
+async def billing(api_app, api_user, db_session) -> int:
+    """AI 端点计费用例环境：seed 两 source 定价 + api_user 钱包（1000 厘）。
+
+    端点在请求内显式 ``commit``（扣费/退款先落盘），会连带提交本 fixture
+    flush 的行，故 teardown 显式清行而非依赖 rollback 隔离。
+    依赖顺序：billing 依赖 api_user → 本 fixture 先于 api_user 清理。
+    """
+    from datetime import UTC, datetime
+
+    from sqlalchemy import delete
+
+    from app.models.credit import (
+        CreditPrice,
+        CreditTransaction,
+        CreditWallet,
+    )
+    from app.models.models import User
+
+    uid = api_user.id
+    now = datetime.now(UTC)
+    db_session.add_all(
+        [
+            CreditPrice(source="translate", variant="", unit_price=10),
+            CreditPrice(
+                source="nomu_prompt_optimize", variant="", unit_price=20
+            ),
+            CreditWallet(
+                user_id=uid,
+                balance=1000,
+                total_spent=0,
+                created_at=now,
+                updated_at=now,
+            ),
+        ]
+    )
+    await db_session.flush()
+    yield uid
+    await db_session.execute(
+        delete(CreditTransaction).where(CreditTransaction.user_id == uid)
+    )
+    await db_session.execute(
+        delete(CreditWallet).where(CreditWallet.user_id == uid)
+    )
+    await db_session.execute(
+        delete(CreditPrice).where(
+            CreditPrice.source.in_(("translate", "nomu_prompt_optimize"))
+        )
+    )
+    await db_session.execute(delete(User).where(User.id == uid))
+    await db_session.commit()
