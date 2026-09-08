@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"maps"
 	"strconv"
 	"strings"
 
@@ -17,10 +18,9 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 )
 
-// CreditService 积分核心服务（spec task-543 / task-545）：预扣、退款、发放、余额、流水。
+// CreditService 积分核心服务：预扣、退款、发放、余额、流水。
 //
-// 与其它 service 不同，本服务直接持有 *gorm.DB——计费的正确性依赖"条件 UPDATE +
-// 流水写入在同一事务内"这一原语，透传 repository 接口只会增加层次、减少保证。
+// 与其它 service 不同，本服务直接持有 *gorm.DB
 //
 // 数值全部厘制整型（单位 0.01 分）；Amount 正=入账、负=出账。
 // (UserID, Source, BizID) 联合唯一索引即幂等键：user 入键使跨用户同键互不命中，
@@ -32,16 +32,14 @@ type CreditService struct {
 	db *gorm.DB
 }
 
-// Creditser 定义 credit handler（task-546/547/549）依赖的能力集合。
+// Creditser 定义 credit handler依赖的能力集合。
 type Creditser interface {
-	// Preconsume 返回 created=true 表示本次调用真正新扣费；幂等命中返回 (首次流水, false)。
-	// 调用方只对"本次新扣"的流水挂失败退款——重放请求失败时不得退掉首笔已成功交付的扣费。
+
 	Preconsume(ctx context.Context, userID uint, source, variant string, qty int, bizID string, meta map[string]any) (*model.CreditTransaction, bool, error)
 	Refund(ctx context.Context, userID uint, source, bizID string, amount int64, meta map[string]any) (*model.CreditTransaction, error)
 	Settle(ctx context.Context, userID uint, source, bizID string, actualQty int) (*model.CreditTransaction, error)
 	Grant(ctx context.Context, userID uint, amountLi int64, bizID string, meta map[string]any) (*model.CreditTransaction, error)
-	// GrantRegisterBonus 注册赠送渠道（source=register_bonus），bizID 由 userID
-	// 推导，与 admin_grant 各自走 (user_id, source, biz_id) 唯一键、互不干扰。
+
 	GrantRegisterBonus(ctx context.Context, userID uint, meta map[string]any) (*model.CreditTransaction, error)
 	GetBalance(ctx context.Context, userID uint) (int64, int64, error)
 	ListTransactions(ctx context.Context, userID uint, page, pageSize int) ([]model.CreditTransaction, int64, error)
@@ -522,12 +520,20 @@ func (s *CreditService) runGrant(
 	return tx, nil
 }
 
-// GetBalance 只读查询余额与累计净消耗；钱包未创建返回 (0, 0, nil)。
+// GetBalance 只读查询余额与累计净消耗；钱包未创建返回时创建并赠送10000厘。
 func (s *CreditService) GetBalance(ctx context.Context, userID uint) (balance, totalSpent int64, err error) {
 	var w model.CreditWallet
 	err = s.db.WithContext(ctx).Where("user_id = ?", userID).First(&w).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return 0, 0, nil
+		w = model.CreditWallet{UserID: userID}
+		if err := s.db.WithContext(ctx).Create(&w).Error; err != nil {
+			return 0, 0, err
+		}
+		w.Balance = 10000
+		w.TotalSpent = 0
+		if err := s.db.WithContext(ctx).Save(&w).Error; err != nil {
+			return 0, 0, err
+		}
 	}
 	if err != nil {
 		return 0, 0, err
@@ -611,14 +617,8 @@ func (s *CreditService) resolveIdempotentHit(ctx context.Context, userID uint, s
 // creditMeta 把调用方 meta 与 service 注入的上下文合并为流水 Meta JSON；注入键不覆盖调用方键。
 func creditMeta(meta map[string]any, extra map[string]any) datatypes.JSON {
 	merged := make(map[string]any, len(meta)+len(extra))
-	for k, v := range meta {
-		merged[k] = v
-	}
-	for k, v := range extra {
-		if _, ok := merged[k]; !ok {
-			merged[k] = v
-		}
-	}
+	maps.Copy(merged, meta)
+	maps.Copy(merged, extra)
 	if len(merged) == 0 {
 		return nil
 	}

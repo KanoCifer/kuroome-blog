@@ -50,6 +50,7 @@ func InitDB() error {
 		&model.CreditWallet{},
 		&model.CreditTransaction{},
 		&model.CreditPrice{},
+		&model.NomuConfig{},
 	)
 	if err != nil {
 		return err
