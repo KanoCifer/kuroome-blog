@@ -50,8 +50,8 @@ async def initialize_resources(app: FastAPI):
     )
     app.state.redis = await init_redis()
 
-    # 异步初始化 Knowledge 向量库（创建表 + 混合检索索引）。
-    await init_knowledge()
+    # 初始化 Knowledge 向量库（创建表 + 混合检索索引）。
+    init_knowledge()
 
     # 构造 service 单例，挂载到 app.state.services（Go 端 app.NewAppState 对齐）。
     app.state.services = new_app_state(app.state.redis)

@@ -59,12 +59,13 @@ assert hasattr(knowledge, "search") and hasattr(knowledge, "insert"), \
     "Knowledge 半初始化 — 检查 Agno 版本兼容性"
 
 
-async def init_knowledge() -> None:
-    """异步初始化 Knowledge（创建表 + 启用混合检索索引）。
+def init_knowledge() -> None:
+    """初始化 Knowledge（创建表 + 启用混合检索索引）。
 
-    必须在 FastAPI lifespan 的异步上下文中调用一次。
+    PgVector.create() 是同步方法（内部用同步 SQLAlchemy session），
+    在 lifespan 中直接调用即可，不需要 await。
     """
-    await vector_db.create()
+    vector_db.create()
     logger.info("knowledge vector_db initialized", table=vector_db.table_name)
 
 
