@@ -17,19 +17,81 @@ from agno.models.base import Model
 from agno.models.deepseek import DeepSeek
 from agno.models.openai import OpenAIChat
 from agno.tools.websearch import WebSearchTools
+from agno.utils.log import log_warning
 from agno.vectordb.pgvector import PgVector, SearchType
 
 from app.core.config import get_settings
 from app.core.logger import logger
 
 
+class SiliconFlowEmbedder(OpenAIEmbedder):
+    """SiliconFlow embedding API — 不接受 dimensions 参数，覆盖 agno 默认注入逻辑。"""
+
+    def response(self, text: str):
+        req: dict[str, Any] = {
+            "input": text,
+            "model": self.id,
+            "encoding_format": self.encoding_format,
+        }
+        if self.user is not None:
+            req["user"] = self.user
+        if self.request_params:
+            req.update(self.request_params)
+        return self.client.embeddings.create(**req)
+
+    async def async_get_embedding(self, text: str) -> list[float]:
+        req: dict[str, Any] = {
+            "input": text,
+            "model": self.id,
+            "encoding_format": self.encoding_format,
+        }
+        if self.user is not None:
+            req["user"] = self.user
+        if self.request_params:
+            req.update(self.request_params)
+        try:
+            response = await self.aclient.embeddings.create(**req)
+            return response.data[0].embedding
+        except Exception as e:
+            log_warning(f"Failed to get async embedding: {str(e)}")
+            return []
+
+    async def async_get_embeddings_batch_and_usage(self, texts: list[str]) -> tuple[list[list[float]], list[dict | None]]:
+        all_embeddings: list[list[float]] = []
+        all_usage: list[dict | None] = []
+        for i in range(0, len(texts), self.batch_size):
+            batch_texts = texts[i : i + self.batch_size]
+            req: dict[str, Any] = {
+                "input": batch_texts,
+                "model": self.id,
+                "encoding_format": self.encoding_format,
+            }
+            if self.user is not None:
+                req["user"] = self.user
+            if self.request_params:
+                req.update(self.request_params)
+            try:
+                response = await self.aclient.embeddings.create(**req)
+                batch_embeddings = [d.embedding for d in response.data]
+                all_embeddings.extend(batch_embeddings)
+                usage_dict = response.usage.model_dump() if response.usage else None
+                all_usage.extend([usage_dict] * len(batch_embeddings))
+            except Exception as e:
+                log_warning(f"Error in async batch embedding: {str(e)}")
+                for text in batch_texts:
+                    embedding = await self.async_get_embedding(text)
+                    all_embeddings.append(embedding)
+                    all_usage.append(None)
+        return all_embeddings, all_usage
+
+
 def create_embedder() -> Embedder:
-    embedder = OpenAIEmbedder(
+    return SiliconFlowEmbedder(
         id="Qwen/Qwen3-Embedding-8B",
         base_url="https://api.siliconflow.cn/v1/embeddings",
         api_key=get_settings().SILICONFLOW_API_KEY,
+        dimensions=1024,  # Qwen3-Embedding-8B 默认输出维度，用于建表
     )
-    return embedder
 
 
 # ── PgVector + Knowledge（延迟初始化）────────────────────────────────── #
