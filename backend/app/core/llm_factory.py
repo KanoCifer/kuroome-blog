@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import inspect
+import re
 import time
 from collections.abc import Callable
 from typing import Any
@@ -32,13 +33,17 @@ def create_embedder() -> Embedder:
 
 
 # ── PgVector + Knowledge（延迟初始化）────────────────────────────────── #
-# Agno 2.8 的 Knowledge.__post_init__ 会同步调用 vector_db.create()，
-# 但 PgVector 现在是异步引擎（asyncpg），模块级实例化会报 MissingGreenlet。
-# 解决方案：用 object.__new__() 绕过 __post_init__，把 create() 延迟到
-# 异步启动阶段（main.py lifespan）执行。
+# Agno 的 PgVector 内部用同步 SQLAlchemy（create_engine + sessionmaker），
+# 不能接受 postgresql+asyncpg:// URL（会报 MissingGreenlet）。
+# 解决方案：剥离 +asyncpg 方言后缀，用同步 psycopg2 驱动连接。
+
+def _sync_db_url(url: str) -> str:
+    """将 postgresql+asyncpg:// 转为 postgresql://，供同步引擎使用。"""
+    return re.sub(r"\+asyncpg", "", url)
+
 
 vector_db = PgVector(
-    db_url=get_settings().LEARNING_DATABASE_URL,
+    db_url=_sync_db_url(get_settings().LEARNING_DATABASE_URL),
     table_name="agno_rag_documents",
     embedder=create_embedder(),
     search_type=SearchType.hybrid,

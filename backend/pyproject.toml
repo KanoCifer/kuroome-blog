@@ -55,6 +55,7 @@ dependencies = [
     "websockets>=16.0",
     "pyjwt>=2.13.0",
     "structlog>=26.1.0",
+    "psycopg2-binary>=2.9.12",
 ]
 
 [tool.setuptools.packages.find]
