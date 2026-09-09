@@ -9,13 +9,63 @@ from typing import Any
 
 from agno.agent import Agent
 from agno.db.postgres import AsyncPostgresDb
+from agno.knowledge.embedder import Embedder
+from agno.knowledge.embedder.openai import OpenAIEmbedder
+from agno.knowledge.knowledge import Knowledge
 from agno.models.base import Model
 from agno.models.deepseek import DeepSeek
 from agno.models.openai import OpenAIChat
 from agno.tools.websearch import WebSearchTools
+from agno.vectordb.pgvector import PgVector, SearchType
 
 from app.core.config import get_settings
 from app.core.logger import logger
+
+
+def create_embedder() -> Embedder:
+    embedder = OpenAIEmbedder(
+        id="Qwen/Qwen3-Embedding-8B",
+        base_url="https://api.siliconflow.cn/v1/embeddings",
+        api_key=get_settings().SILICONFLOW_API_KEY,
+    )
+    return embedder
+
+
+# ── PgVector + Knowledge（延迟初始化）────────────────────────────────── #
+# Agno 2.8 的 Knowledge.__post_init__ 会同步调用 vector_db.create()，
+# 但 PgVector 现在是异步引擎（asyncpg），模块级实例化会报 MissingGreenlet。
+# 解决方案：用 object.__new__() 绕过 __post_init__，把 create() 延迟到
+# 异步启动阶段（main.py lifespan）执行。
+
+vector_db = PgVector(
+    db_url=get_settings().LEARNING_DATABASE_URL,
+    table_name="agno_rag_documents",
+    embedder=create_embedder(),
+    search_type=SearchType.hybrid,
+    vector_score_weight=0.7,
+)
+
+# 绕过 __post_init__，避免同步 create() 触发异步 IO
+knowledge: Knowledge = object.__new__(Knowledge)
+knowledge.vector_db = vector_db
+knowledge.max_results = 5
+# Agno 升级时若 Knowledge.__init__ 新增必要属性，这里立刻暴露。
+assert hasattr(knowledge, "search") and hasattr(knowledge, "insert"), \
+    "Knowledge 半初始化 — 检查 Agno 版本兼容性"
+
+
+async def init_knowledge() -> None:
+    """异步初始化 Knowledge（创建表 + 启用混合检索索引）。
+
+    必须在 FastAPI lifespan 的异步上下文中调用一次。
+    """
+    await vector_db.create()
+    logger.info("knowledge vector_db initialized", table=vector_db.table_name)
+
+
+def get_knowledge() -> Knowledge:
+    """返回共享的 Knowledge 单例（混合检索已开启）。"""
+    return knowledge
 
 
 def create_postgres_db() -> AsyncPostgresDb:
@@ -23,7 +73,7 @@ def create_postgres_db() -> AsyncPostgresDb:
     try:
         return AsyncPostgresDb(db_url=get_settings().LEARNING_DATABASE_URL)
     except Exception as exc:
-        raise RuntimeError(f"Failed to create Redis DB: {exc!r}") from exc
+        raise RuntimeError(f"Failed to create Postgres DB: {exc!r}") from exc
 
 
 def create_llm_model(

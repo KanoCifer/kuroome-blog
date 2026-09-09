@@ -17,6 +17,7 @@ from app.api.des import (
 from app.appstate import new_app_state
 from app.core import get_settings, register_exception_handlers
 from app.core import logger as app_logger
+from app.core.llm_factory import init_knowledge
 from app.core.logger import drain_log_queue, start_log_worker
 from app.middleware import register_middleware
 from app.models.changelog import Changelog
@@ -48,6 +49,9 @@ async def initialize_resources(app: FastAPI):
         ],
     )
     app.state.redis = await init_redis()
+
+    # 异步初始化 Knowledge 向量库（创建表 + 混合检索索引）。
+    await init_knowledge()
 
     # 构造 service 单例，挂载到 app.state.services（Go 端 app.NewAppState 对齐）。
     app.state.services = new_app_state(app.state.redis)

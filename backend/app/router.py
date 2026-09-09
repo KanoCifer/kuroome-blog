@@ -6,6 +6,7 @@ from app.api.v2 import (
     device,
     fishing,
     friendlinks,
+    knowledge,
     learning,
     llm,
     nomu,
@@ -32,3 +33,4 @@ def register_router(app: FastAPI):
     app.include_router(router=learning.router, prefix="/v2")
     app.include_router(router=translate.router, prefix="/v2")
     app.include_router(router=nomu.router, prefix="/v2")
+    app.include_router(router=knowledge.router, prefix="/v2")

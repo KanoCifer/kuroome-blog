@@ -91,6 +91,11 @@ class Settings(BaseSettings):
 
     MEDIA_PATH: str = ""
 
+    SILICONFLOW_API_KEY: str = ""
+
+    # 知识库 Markdown 源目录。空字符串时 RagService 启动期校验会告警。
+    KNOWLEDGE_SOURCE_DIR: str = ""
+
     model_config = SettingsConfigDict(
         env_file=get_env_file_path(),
         env_file_encoding="utf-8",

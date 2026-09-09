@@ -12,7 +12,8 @@ from fastapi import Request
 from redis.asyncio import Redis as AsyncRedis
 
 from app.core.agent import AiAgent
-from app.core.llm_factory import create_llm_model
+from app.core.config import get_settings
+from app.core.llm_factory import create_llm_model, get_knowledge
 from app.core.nomu_llm_factory import create_nomu_model
 from app.plugins.notification import NotificationPlugin
 from app.repositories import (
@@ -36,6 +37,7 @@ from app.services.learning_progress_service import LearningProgressService
 from app.services.nomu_service import NomuService
 from app.services.notification_service import NotificationService
 from app.services.public_service import PublicService
+from app.services.rag_service import RagService
 from app.services.rss_service import RssService
 from app.services.status_service import StatusService
 from app.services.sub_service import SubService
@@ -70,6 +72,7 @@ class AppState:
     progress_svc: LearningProgressService
     course_gen_svc: CourseGeneratorService
     nomu_svc: NomuService
+    rag_svc: RagService
 
 
 def new_app_state(redis: AsyncRedis) -> AppState:
@@ -125,6 +128,10 @@ def new_app_state(redis: AsyncRedis) -> AppState:
     progress_svc = LearningProgressService()
     course_gen_svc = CourseGeneratorService(progress_svc=progress_svc)
     nomu_svc = NomuService(model=create_nomu_model())
+    rag_svc = RagService(
+        knowledge=get_knowledge(),
+        source_dir=get_settings().KNOWLEDGE_SOURCE_DIR,
+    )
 
     return AppState(
         user_svc=user_svc,
@@ -145,6 +152,7 @@ def new_app_state(redis: AsyncRedis) -> AppState:
         progress_svc=progress_svc,
         course_gen_svc=course_gen_svc,
         nomu_svc=nomu_svc,
+        rag_svc=rag_svc,
     )
 
 
