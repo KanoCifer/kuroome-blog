@@ -28,6 +28,7 @@ def create_embedder() -> Embedder:
         id="Qwen/Qwen3-Embedding-8B",
         base_url="https://api.siliconflow.cn/v1",
         api_key=get_settings().SILICONFLOW_API_KEY,
+        dimensions=1536,
     )
     return embedder
 
