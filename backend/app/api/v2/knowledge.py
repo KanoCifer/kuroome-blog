@@ -8,7 +8,9 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Request
+import asyncio
+
+from fastapi import APIRouter, Depends, Request, status
 from fastapi.sse import EventSourceResponse
 
 from app.api.des.auth import optional_user
@@ -44,7 +46,7 @@ async def ask(
         yield chunk
 
 
-@router.post("/ingest", response_model=APIResponse[IngestResponse])
+@router.post("/ingest", status_code=status.HTTP_202_ACCEPTED)
 @limiter.limit("5/hour")
 async def ingest(
     request: Request,
@@ -53,13 +55,11 @@ async def ingest(
 ):
     """触发文档入库：扫描源目录下的 Markdown 文件，切片后写入向量库。
 
-    限流 5 次/小时，避免重复嵌入造成 API 开销。
+    异步执行，立即返回 202。限流 5 次/小时，避免重复嵌入造成 API 开销。
+    入库结果通过日志查看。
     """
-    docs, chunks = await state.rag_svc.ingest_documents()
-    return APIResponse(
-        data=IngestResponse(ingested=docs, chunks=chunks),
-        message="文档入库完成",
-    )
+    asyncio.create_task(state.rag_svc.ingest_documents())
+    return {"message": "文档入库任务已启动，请稍后通过 /status 查询结果"}
 
 
 @router.get("/status", response_model=APIResponse[KnowledgeStatus])
