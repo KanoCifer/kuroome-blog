@@ -238,9 +238,8 @@ class RagService:
 
     def get_status(self) -> dict:
         """返回知识库状态（文档数 / 源目录）。"""
-        # ponytail: Agno Knowledge 不直接暴露 count，num_documents 为 None 时
-        # 返回 0；后续若 PgVector 暴露 count() 可替换为真实查询。
-        docs = getattr(self.knowledge, "num_documents", None) or 0
+        # ponytail: Agno Knowledge 不直接暴露 count，直查 PgVector 表行数。
+        docs = self.knowledge.vector_db.get_count()
         return {
             "documents": docs,
             "source_dir": str(self.source_dir),
