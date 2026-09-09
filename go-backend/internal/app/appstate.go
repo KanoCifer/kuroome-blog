@@ -39,6 +39,7 @@ type AppState struct {
 	currencySvc service.Currencyer
 	creditSvc   service.Creditser
 	designSvc   *nomuSvc.DesignService
+	nomuSvc     service.NomuService
 }
 
 // NewAppState 组装所有 service，作为唯一的组合根入口。
@@ -93,6 +94,7 @@ func NewAppState(
 		"nomu": cfg.Frontend.URLs.Blog,
 	})
 	uploadSvc := service.NewUploadService(userRepo, cfg)
+	nomuRepo := postgres.NewNomuRepository(db)
 	return &AppState{
 		config:     cfg,
 		userSvc:    userSvc,
@@ -115,6 +117,7 @@ func NewAppState(
 		currencySvc: service.NewCurrencyService(httpCli, redis),
 		creditSvc:   creditSvc,
 		designSvc:   nomuSvc.NewDesignService(designHttp, cfg.Design.APIKey, uploadSvc, creditSvc),
+		nomuSvc:     service.NewNomuService(nomuRepo),
 		userRepo:    userRepo,
 	}
 }
@@ -138,5 +141,6 @@ func (a *AppState) WereadSvc() wereadSvc.Reader        { return a.wereadSvc }
 func (a *AppState) CurrencySvc() service.Currencyer    { return a.currencySvc }
 func (a *AppState) CreditSvc() service.Creditser       { return a.creditSvc }
 func (a *AppState) DesignSvc() *nomuSvc.DesignService  { return a.designSvc }
+func (a *AppState) NomuSvc() service.NomuService        { return a.nomuSvc }
 
 func (a *AppState) Cfg() *config.Config { return a.config }

@@ -97,6 +97,10 @@ func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 	designH := handler.NewDesignHandler(state.DesignSvc())
 	designH.RegisterRoutes(v3, middleware.AuthMiddleware())
 
+	// nomu config sync：云端配置同步，要求登录。
+	nomuH := handler.NewNomuHandler(state.NomuSvc())
+	nomuH.RegisterRoutes(v3, middleware.AuthMiddleware())
+
 	// credits：余额/流水明细挂 Auth；admin grant 必先 Auth 再 Admin（docs/rules/auth.md）。
 	// grant 支持 email → user_id 解析（task-557），需要 UserRepo。
 	creditH := handler.NewCreditHandler(state.CreditSvc(), state.UserRepo())
