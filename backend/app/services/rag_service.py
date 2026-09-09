@@ -72,33 +72,27 @@ class RagService:
 
     # ── 文档入库 ───────────────────────────────────────────────────── #
 
-    async def ingest_documents(self) -> tuple[int, int]:
-        """扫描源目录，将所有 Markdown 文件切片后入库。
-
-        Returns:
-            (文档数, 段落总数)
-        """
+    async def ingest_documents(self) -> None:
+        """扫描源目录，将所有 Markdown 文件切片后入库（异步后台任务）。"""
         if not self.source_dir.exists():
             logger.warning(
                 "knowledge source dir not found", path=str(self.source_dir)
             )
-            return 0, 0
+            return
 
         md_files = list(self.source_dir.rglob("*.md"))
         if not md_files:
             logger.warning(
                 "no markdown files found", path=str(self.source_dir)
             )
-            return 0, 0
+            return
 
-        total_chunks = 0
+        success = 0
         for md_file in md_files:
             try:
                 # 在线程池执行同步 I/O + 嵌入
-                chunks = await asyncio.to_thread(
-                    self._ingest_single_file, md_file
-                )
-                total_chunks += chunks
+                await asyncio.to_thread(self._ingest_single_file, md_file)
+                success += 1
             except Exception as exc:
                 logger.warning(
                     "failed to ingest file",
@@ -108,28 +102,19 @@ class RagService:
 
         logger.info(
             "knowledge ingestion complete",
-            documents=len(md_files),
-            chunks=total_chunks,
+            documents=success,
+            total=len(md_files),
         )
-        return len(md_files), total_chunks
 
     def _ingest_single_file(self, file_path: Path) -> int:
-        """入库单个 Markdown 文件，返回生成的段落数。"""
+        """入库单个 Markdown 文件。返回 0（insert 不返回计数，无需解析）。"""
         reader = MarkdownReader(
             chunking_strategy=MarkdownChunking(chunk_size=300),
         )
-        # Agno insert 返回插入的文档数（即 chunk 数）
-        result = self.knowledge.insert(
-            path=file_path,
-            reader=reader,
-        )
-        chunks = result.get("count", 0) if isinstance(result, dict) else 0
-        logger.debug(
-            "ingested file",
-            file=file_path.name,
-            chunks=chunks,
-        )
-        return chunks
+        # Knowledge.insert() 返回 None，不返回插入数量
+        self.knowledge.insert(path=file_path, reader=reader)
+        logger.debug("ingested file", file=file_path.name)
+        return 0
 
     # ── 流式问答 ───────────────────────────────────────────────────── #
 
