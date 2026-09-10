@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/alicebob/miniredis/v2"
 	"github.com/redis/go-redis/v9"
@@ -18,6 +19,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/logger"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/pkg/emailtemplates"
+	jwtpkg "github.com/KanoCifer/kuroome-blog/pkg/jwt"
 )
 
 func TestCheckPassword_Correct(t *testing.T) {
@@ -260,7 +262,7 @@ func TestGetByID_NotFound(t *testing.T) {
 	repo := &mockUserRepo{
 		getByIDFn: func(ctx context.Context, id uint) (*model.User, error) { return nil, nil },
 	}
-	svc := NewUserService(repo, nil, nil, nil)
+	svc := NewUserService(repo, nil, nil, nil, 0)
 
 	_, _, err := svc.GetByID(context.Background(), 999)
 	if !errors.Is(err, usererrs.ErrUserNotFound) {
@@ -274,7 +276,7 @@ func TestGetByID_RepoError(t *testing.T) {
 			return nil, errors.New("db error")
 		},
 	}
-	svc := NewUserService(repo, nil, nil, nil)
+	svc := NewUserService(repo, nil, nil, nil, 0)
 
 	_, _, err := svc.GetByID(context.Background(), 1)
 	if err == nil {
@@ -288,7 +290,7 @@ func TestGetByID_Success(t *testing.T) {
 			return &model.User{Model: gormModel(id), Username: "alice"}, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil, nil)
+	svc := NewUserService(repo, nil, nil, nil, 0)
 
 	u, p, err := svc.GetByID(context.Background(), uint(1))
 	if err != nil {
@@ -310,7 +312,7 @@ func TestAuthenticate_UserNotFound(t *testing.T) {
 			return nil, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil, nil)
+	svc := NewUserService(repo, nil, nil, nil, 0)
 
 	_, err := svc.Authenticate(context.Background(), "ghost", "pass")
 	if !errors.Is(err, usererrs.ErrInvalidCredentials) {
@@ -325,7 +327,7 @@ func TestAuthenticate_WrongPassword(t *testing.T) {
 			return &model.User{Model: gormModel(1), PasswordHash: string(hash)}, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil, nil)
+	svc := NewUserService(repo, nil, nil, nil, 0)
 
 	_, err := svc.Authenticate(context.Background(), "alice", "wrong")
 	if !errors.Is(err, usererrs.ErrInvalidCredentials) {
@@ -340,7 +342,7 @@ func TestAuthenticate_Success(t *testing.T) {
 			return &model.User{Model: gormModel(1), Username: "alice", PasswordHash: string(hash)}, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil, nil)
+	svc := NewUserService(repo, nil, nil, nil, 0)
 
 	u, err := svc.Authenticate(context.Background(), "alice", "secret")
 	if err != nil {
@@ -367,7 +369,7 @@ func TestAuthenticate_LogPropagatesTraceID(t *testing.T) {
 			return &model.User{Model: gormModel(1), Username: "alice", PasswordHash: string(hash)}, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil, nil)
+	svc := NewUserService(repo, nil, nil, nil, 0)
 
 	ctx := logger.WithTraceID(context.Background(), "trace-xyz")
 	if _, err := svc.Authenticate(ctx, "alice", "secret"); err != nil {
@@ -389,21 +391,280 @@ func TestAuthenticate_LogPropagatesTraceID(t *testing.T) {
 	}
 }
 
+// ---------- CreateTokens (multi-device Hash) ----------
+
+func TestCreateTokens_NilRedis(t *testing.T) {
+	prevCfg := config.Cfg
+	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
+	t.Cleanup(func() { config.Cfg = prevCfg })
+
+	svc := &userService{redis: nil, maxDevices: 5}
+	u := &model.User{Model: gormModel(1)}
+	toks, err := svc.CreateTokens(context.Background(), u)
+	if err != nil {
+		t.Fatalf("CreateTokens with nil redis: %v", err)
+	}
+	if toks.AccessToken == "" || toks.RefreshToken == "" {
+		t.Error("expected non-empty tokens with nil redis")
+	}
+}
+
+func TestCreateTokens_MultiDeviceHash_EvictOldest(t *testing.T) {
+	mr, err := miniredis.Run()
+	if err != nil {
+		t.Fatalf("miniredis: %v", err)
+	}
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+
+	prevCfg := config.Cfg
+	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
+	t.Cleanup(func() { config.Cfg = prevCfg })
+
+	svc := &userService{redis: rdb, maxDevices: 3}
+	u := &model.User{Model: gormModel(10)}
+
+	// 记录第 1 个 jti（最早）
+	tokens := make([]string, 0, 4)
+	// 错开 1s 确保 iat 递增
+	for i := 0; i < 4; i++ {
+		if i > 0 {
+			time.Sleep(1100 * time.Millisecond)
+		}
+		toks, err := svc.CreateTokens(context.Background(), u)
+		if err != nil {
+			t.Fatalf("CreateTokens #%d: %v", i, err)
+		}
+		tokens = append(tokens, toks.RefreshToken)
+	}
+
+	firstJTI := jwtpkg.MustParseID(tokens[0])
+
+	// Hash field 数应被驱逐到 ≤ 3
+	n, err := rdb.HLen(context.Background(), "refresh:10").Result()
+	if err != nil {
+		t.Fatalf("HLen: %v", err)
+	}
+	if n != 3 {
+		t.Errorf("HLen = %d, want 3 (evicted oldest)", n)
+	}
+
+	// 最早写入的 jti 必须已被驱逐
+	if rdb.HExists(context.Background(), "refresh:10", firstJTI).Val() {
+		t.Error("first (oldest) jti should be evicted, but still exists in hash")
+	}
+
+	// 最近 3 个 jti 必须都还在
+	for _, tok := range tokens[1:] {
+		jti := jwtpkg.MustParseID(tok)
+		if !rdb.HExists(context.Background(), "refresh:10", jti).Val() {
+			t.Errorf("jti %s should still exist after eviction", jti)
+		}
+	}
+}
+
+func TestCreateTokens_NoLimitWhenMaxDevicesZero(t *testing.T) {
+	mr, err := miniredis.Run()
+	if err != nil {
+		t.Fatalf("miniredis: %v", err)
+	}
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+
+	prevCfg := config.Cfg
+	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
+	t.Cleanup(func() { config.Cfg = prevCfg })
+
+	svc := &userService{redis: rdb, maxDevices: 0}
+	u := &model.User{Model: gormModel(20)}
+
+	for i := 0; i < 10; i++ {
+		if _, err := svc.CreateTokens(context.Background(), u); err != nil {
+			t.Fatalf("CreateTokens #%d: %v", i, err)
+		}
+	}
+	n, err := rdb.HLen(context.Background(), "refresh:20").Result()
+	if err != nil {
+		t.Fatalf("HLen: %v", err)
+	}
+	if n != 10 {
+		t.Errorf("HLen = %d, want 10 (maxDevices=0 means unlimited)", n)
+	}
+}
+
+// ---------- RefreshTokens (Hash field 校验 + 轮换) ----------
+
+func TestRefreshTokens_HashFieldMatch(t *testing.T) {
+	mr, err := miniredis.Run()
+	if err != nil {
+		t.Fatalf("miniredis: %v", err)
+	}
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+
+	prevCfg := config.Cfg
+	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
+	t.Cleanup(func() { config.Cfg = prevCfg })
+
+	svc := &userService{redis: rdb, maxDevices: 5}
+	u := &model.User{Model: gormModel(1)}
+
+	// 设备 A 登录，记录旧 token
+	old, err := svc.CreateTokens(context.Background(), u)
+	if err != nil {
+		t.Fatalf("CreateTokens: %v", err)
+	}
+
+	// 设备 B 登录（不应覆盖 A 的 field）
+	tokB, err := svc.CreateTokens(context.Background(), u)
+	if err != nil {
+		t.Fatalf("CreateTokens device B: %v", err)
+	}
+	jtiB := jwtpkg.MustParseID(tokB.RefreshToken)
+
+	// 设备 A 用旧 token 刷新 → 应成功
+	newTokens, err := svc.RefreshTokens(context.Background(), old.RefreshToken)
+	if err != nil {
+		t.Fatalf("RefreshTokens with valid token: %v", err)
+	}
+	if newTokens.RefreshToken == old.RefreshToken {
+		t.Error("expected rotated refresh token, got same as old")
+	}
+
+	// 设备 B 的 field 仍存在（多设备隔离）
+	if !rdb.HExists(context.Background(), "refresh:1", jtiB).Val() {
+		t.Error("device B field should remain after device A refresh")
+	}
+}
+
+func TestRefreshTokens_StaleJTIRejected(t *testing.T) {
+	mr, err := miniredis.Run()
+	if err != nil {
+		t.Fatalf("miniredis: %v", err)
+	}
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+
+	prevCfg := config.Cfg
+	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
+	t.Cleanup(func() { config.Cfg = prevCfg })
+
+	svc := &userService{redis: rdb, maxDevices: 5}
+	u := &model.User{Model: gormModel(1)}
+
+	old, err := svc.CreateTokens(context.Background(), u)
+	if err != nil {
+		t.Fatalf("CreateTokens: %v", err)
+	}
+
+	// 手动删掉旧 jti field（模拟被盗用后用户登出该设备）
+	claims, _ := jwtpkg.ParseToken(old.RefreshToken)
+	rdb.HDel(context.Background(), "refresh:1", claims.ID)
+
+	// 用已删 jti 的 token 刷新 → 应 401
+	if _, err := svc.RefreshTokens(context.Background(), old.RefreshToken); !errors.Is(err, usererrs.ErrInvalidToken) {
+		t.Errorf("RefreshTokens with stale jti: err = %v, want ErrInvalidToken", err)
+	}
+}
+
+func TestRefreshTokens_RotationSwapsField(t *testing.T) {
+	mr, err := miniredis.Run()
+	if err != nil {
+		t.Fatalf("miniredis: %v", err)
+	}
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+
+	prevCfg := config.Cfg
+	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
+	t.Cleanup(func() { config.Cfg = prevCfg })
+
+	svc := &userService{redis: rdb, maxDevices: 5}
+	u := &model.User{Model: gormModel(1)}
+
+	old, err := svc.CreateTokens(context.Background(), u)
+	if err != nil {
+		t.Fatalf("CreateTokens: %v", err)
+	}
+	oldClaims, _ := jwtpkg.ParseToken(old.RefreshToken)
+
+	newTokens, err := svc.RefreshTokens(context.Background(), old.RefreshToken)
+	if err != nil {
+		t.Fatalf("RefreshTokens: %v", err)
+	}
+	newClaims, _ := jwtpkg.ParseToken(newTokens.RefreshToken)
+
+	// 旧 field 已删
+	if rdb.HExists(context.Background(), "refresh:1", oldClaims.ID).Val() {
+		t.Error("old jti field should be deleted after rotation")
+	}
+	// 新 field 已写
+	if !rdb.HExists(context.Background(), "refresh:1", newClaims.ID).Val() {
+		t.Error("new jti field should exist after rotation")
+	}
+}
+
 // ---------- Logout ----------
 
 func TestLogout_NilRedis(t *testing.T) {
 	// redis 为 nil 时不应 panic
 	svc := &userService{redis: nil}
-	svc.Logout(context.Background(), 1) // should not panic
+	svc.Logout(context.Background(), 1, "jti-old") // should not panic
 }
 
 func TestLogout_WithRedis(t *testing.T) {
-	// 用真实 redis 客户端验证 Logout 调用 Del（需要 redis 可用，这里仅验证不 panic）
+	// 用真实 redis 客户端验证 Logout 调用 HDel（需要 redis 可用，这里仅验证不 panic）
 	// 完整集成测试留到 e2e；此处验证 nil 安全与接口签名
 	var r *redis.Client
 	svc := &userService{redis: r}
-	svc.Logout(context.Background(), 1)
+	svc.Logout(context.Background(), 1, "jti-old")
 }
+
+func TestLogout_OnlyDeletesOwnDevice(t *testing.T) {
+	mr, err := miniredis.Run()
+	if err != nil {
+		t.Fatalf("miniredis: %v", err)
+	}
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+
+	prevCfg := config.Cfg
+	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
+	t.Cleanup(func() { config.Cfg = prevCfg })
+
+	svc := &userService{redis: rdb, maxDevices: 5}
+	u := &model.User{Model: gormModel(1)}
+
+	tokA, err := svc.CreateTokens(context.Background(), u)
+	if err != nil {
+		t.Fatalf("CreateTokens A: %v", err)
+	}
+	tokB, err := svc.CreateTokens(context.Background(), u)
+	if err != nil {
+		t.Fatalf("CreateTokens B: %v", err)
+	}
+
+	claimsA, _ := jwtpkg.ParseToken(tokA.RefreshToken)
+	claimsB, _ := jwtpkg.ParseToken(tokB.RefreshToken)
+
+	svc.Logout(context.Background(), 1, claimsA.ID)
+
+	// A 的 field 被删
+	if rdb.HExists(context.Background(), "refresh:1", claimsA.ID).Val() {
+		t.Error("device A field should be deleted after logout")
+	}
+	// B 的 field 仍在
+	if !rdb.HExists(context.Background(), "refresh:1", claimsB.ID).Val() {
+		t.Error("device B field should remain after device A logout")
+	}
+}
+
 
 // ---------- VerifyEmailCode ----------
 
@@ -499,7 +760,7 @@ func TestEmailCode_CrossModeIsolation(t *testing.T) {
 // 防止枚举；不调用 redis。
 func TestSendMagicLoginEmail_EmailNotRegistered(t *testing.T) {
 	repo := &mockUserRepo{emailExists: false}
-	svc := NewUserService(repo, nil, nil, nil)
+	svc := NewUserService(repo, nil, nil, nil, 0)
 
 	if !svc.SendMagicLoginEmail(context.Background(), "ghost@example.com", "blog", "") {
 		t.Error("SendMagicLoginEmail should return true (silent success) for unregistered email")
@@ -508,7 +769,7 @@ func TestSendMagicLoginEmail_EmailNotRegistered(t *testing.T) {
 
 // TestAuthenticateMagicLogin_NilRedis 无 redis 直接 401 等价。
 func TestAuthenticateMagicLogin_NilRedis(t *testing.T) {
-	svc := NewUserService(&mockUserRepo{}, nil, nil, nil)
+	svc := NewUserService(&mockUserRepo{}, nil, nil, nil, 0)
 	_, _, err := svc.AuthenticateMagicLogin(context.Background(), "any-token:blog")
 	if !errors.Is(err, usererrs.ErrInvalidMagicToken) {
 		t.Errorf("err = %v, want ErrInvalidMagicToken", err)
@@ -518,7 +779,7 @@ func TestAuthenticateMagicLogin_NilRedis(t *testing.T) {
 // TestAuthenticateMagicLogin_BadLengthToken 长度不符直接拒绝，避免污染 key。
 // 缺冒号、缺 mode 段、hex 长度不对都视为非法 token。
 func TestAuthenticateMagicLogin_BadLengthToken(t *testing.T) {
-	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil, nil)
+	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil, nil, 0)
 	bad := []string{
 		"short",                           // 无冒号、无 mode
 		"short:blog",                      // hex 段太短
@@ -538,7 +799,7 @@ func TestAuthenticateMagicLogin_BadLengthToken(t *testing.T) {
 
 // TestAuthenticateMagicLogin_EmptyToken 空 token 立即拒绝。
 func TestAuthenticateMagicLogin_EmptyToken(t *testing.T) {
-	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil, nil)
+	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil, nil, 0)
 	_, _, err := svc.AuthenticateMagicLogin(context.Background(), "")
 	if !errors.Is(err, usererrs.ErrInvalidMagicToken) {
 		t.Errorf("err = %v, want ErrInvalidMagicToken", err)
@@ -641,7 +902,7 @@ func TestMagicLoginLink_HostMissing(t *testing.T) {
 func TestMagicLoginLink_HostTrailingSlash(t *testing.T) {
 	svc := NewUserService(&mockUserRepo{}, nil, nil, map[string]string{
 		"nomu": "https://kanocifer.chat/",
-	})
+	}, 0)
 	link := svc.magicLoginLink("h:nomu", "nomu")
 	if strings.Contains(link, "//nomu/login") {
 		t.Errorf("double slash detected: %q", link)
@@ -665,7 +926,7 @@ func TestAuthenticateMagicLogin_CrossModeIsolation(t *testing.T) {
 			return &model.User{Model: gormModel(1), Username: "alice"}, nil, nil
 		},
 	}
-	svc := NewUserService(repo, rdb, nil, nil)
+	svc := NewUserService(repo, rdb, nil, nil, 0)
 
 	const hex = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 	emailKey := "magiclogintoken:" + hex + ":blog"
@@ -719,7 +980,7 @@ func TestPollNomuLogin_DoneAfterConfirm(t *testing.T) {
 			return &model.User{Model: gormModel(1), Username: "alice"}, nil, nil
 		},
 	}
-	svc := NewUserService(repo, rdb, nil, nil)
+	svc := NewUserService(repo, rdb, nil, nil, 0)
 
 	const hex = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 	const deviceID = "nomu-device-abc"
@@ -768,7 +1029,7 @@ func TestPollNomuLogin_PendingWhenMissing(t *testing.T) {
 	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
 	t.Cleanup(func() { _ = rdb.Close() })
 
-	svc := NewUserService(&mockUserRepo{}, rdb, nil, nil)
+	svc := NewUserService(&mockUserRepo{}, rdb, nil, nil, 0)
 	st, err := svc.PollNomuLogin(context.Background(), "no-such-device")
 	if err != nil {
 		t.Fatalf("PollNomuLogin: %v", err)
@@ -780,7 +1041,7 @@ func TestPollNomuLogin_PendingWhenMissing(t *testing.T) {
 
 // TestPollNomuLogin_PendingWhenNilRedis redis 未配置同样回 pending，禁止 500。
 func TestPollNomuLogin_PendingWhenNilRedis(t *testing.T) {
-	svc := NewUserService(&mockUserRepo{}, nil, nil, nil)
+	svc := NewUserService(&mockUserRepo{}, nil, nil, nil, 0)
 	st, err := svc.PollNomuLogin(context.Background(), "dev")
 	if err != nil {
 		t.Fatalf("PollNomuLogin: %v", err)

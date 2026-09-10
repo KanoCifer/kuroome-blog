@@ -92,7 +92,7 @@ func NewAppState(
 	userSvc := service.NewUserService(userRepo, redis, cfg.Admin.UserIDs, map[string]string{
 		"blog": cfg.Frontend.URLs.Blog,
 		"nomu": cfg.Frontend.URLs.Blog,
-	})
+	}, cfg.Security.MaxRefreshDevices)
 	uploadSvc := service.NewUploadService(userRepo, cfg)
 	nomuRepo := postgres.NewNomuRepository(db)
 	return &AppState{

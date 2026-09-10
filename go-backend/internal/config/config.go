@@ -50,6 +50,10 @@ type SecurityConfig struct {
 	APIKey        string `mapstructure:"API_KEY"`
 
 	DevTaskSecret string `mapstructure:"DEV_TASK_SECRET"`
+
+	// MaxRefreshDevices 单用户同时持有的最大 refresh token 设备数，默认 5。
+	// 超出时驱逐 iat 最早的设备。<= 0 表示不限。
+	MaxRefreshDevices int `mapstructure:"MAX_REFRESH_DEVICES"`
 }
 
 // DatabaseConfig 数据库连接。
@@ -257,6 +261,14 @@ func Load(cfgFile ...string) (*Config, error) {
 	// （容器内 config.yaml 不打进镜像），只能从平铺 env 回填。
 	if v := viper.GetString("DESIGN_API_KEY"); v != "" {
 		cfg.Design.APIKey = v
+	}
+
+	// security 嵌套字段同上：viper.Unmarshal 对未显式配置的 int 字段会清零 defaultConfig 默认值。
+	// 必须 IsSet 判显式存在再回填，避免覆盖已配置的值。<= 0 表示不限制（保留语义）。
+	if viper.IsSet("MAX_REFRESH_DEVICES") {
+		cfg.Security.MaxRefreshDevices = viper.GetInt("MAX_REFRESH_DEVICES")
+	} else if cfg.Security.MaxRefreshDevices <= 0 {
+		cfg.Security.MaxRefreshDevices = 5
 	}
 
 	// 兼容旧部署：env FRONTEND_URL 回退为 blog URL（多 mode 拆分前的形态）。

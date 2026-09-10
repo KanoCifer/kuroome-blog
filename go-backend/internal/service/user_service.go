@@ -69,7 +69,7 @@ type Userer interface {
 	AuthenticateMagicLogin(ctx context.Context, token string) (*model.User, *model.Profile, error)
 	CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
 	RefreshTokens(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
-	Logout(ctx context.Context, userID uint)
+	Logout(ctx context.Context, userID uint, jti string)
 	UserToDict(u *model.User, p *model.Profile) map[string]any
 	PollNomuLogin(ctx context.Context, deviceID string) (*NomuLoginState, error)
 }
@@ -79,6 +79,7 @@ type userService struct {
 	redis        *redis.Client
 	adminUserIDs []int
 	frontendURLs map[string]string
+	maxDevices   int
 }
 
 func NewUserService(
@@ -86,6 +87,7 @@ func NewUserService(
 	redis *redis.Client,
 	adminUserIDs []int,
 	frontendURLs map[string]string,
+	maxDevices int,
 ) *userService {
 	trimmed := make(map[string]string, len(frontendURLs))
 	for k, v := range frontendURLs {
@@ -96,6 +98,7 @@ func NewUserService(
 		redis:        redis,
 		adminUserIDs: adminUserIDs,
 		frontendURLs: trimmed,
+		maxDevices:   maxDevices,
 	}
 }
 
