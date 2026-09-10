@@ -21,6 +21,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/middleware"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
+	"github.com/KanoCifer/kuroome-blog/pkg/jwt"
 )
 
 func init() {
@@ -42,7 +43,7 @@ type mockUserService struct {
 	createUserFn          func(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error)
 	getByIDFn             func(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
 	getByUsernameFn       func(ctx context.Context, username string) (*model.User, *model.Profile, error)
-	logoutFn              func(ctx context.Context, userID uint)
+	logoutFn              func(ctx context.Context, userID uint, jti string)
 	refreshFn             func(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
 	sendEmailCodeFn       func(ctx context.Context, email, mode string) bool
 	sendMagicLoginEmailFn func(ctx context.Context, email, mode, deviceID string) bool
@@ -76,9 +77,9 @@ func (m *mockUserService) GetByUsername(ctx context.Context, username string) (*
 	return nil, nil, nil
 }
 
-func (m *mockUserService) Logout(ctx context.Context, userID uint) {
+func (m *mockUserService) Logout(ctx context.Context, userID uint, jti string) {
 	if m.logoutFn != nil {
-		m.logoutFn(ctx, userID)
+		m.logoutFn(ctx, userID, jti)
 	}
 }
 
@@ -611,9 +612,53 @@ func TestMe_UserNotFound(t *testing.T) {
 // ---------- Logout ----------
 
 func TestLogout_CallsService(t *testing.T) {
-	var calledWith uint
+	prevCfg := config.Cfg
+	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
+	t.Cleanup(func() { config.Cfg = prevCfg })
+
+	validToken, err := jwt.GenerateToken(42, time.Now().Add(time.Hour))
+	if err != nil {
+		t.Fatalf("GenerateToken: %v", err)
+	}
+	validClaims, _ := jwt.ParseToken(validToken)
+	validJTI := validClaims.ID
+
+	var calledUserID uint
+	var calledJTI string
 	svc := &mockUserService{
-		logoutFn: func(ctx context.Context, userID uint) { calledWith = userID },
+		logoutFn: func(ctx context.Context, userID uint, jti string) {
+			calledUserID = userID
+			calledJTI = jti
+		},
+	}
+	h := NewUserHandler(svc, config.Cfg, nil)
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Request, _ = http.NewRequest(http.MethodPost, "/logout", nil)
+	c.Request.AddCookie(&http.Cookie{Name: "refresh_token", Value: validToken})
+	c.Set("user_id", 42)
+	h.Logout(c)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("status = %d, want %d", w.Code, http.StatusOK)
+	}
+	if calledUserID != 42 {
+		t.Errorf("Logout called with userID=%d, want 42", calledUserID)
+	}
+	if calledJTI != validJTI {
+		t.Errorf("Logout called with jti=%q, want %q", calledJTI, validJTI)
+	}
+}
+
+func TestLogout_NoCookie_EmptyJTI(t *testing.T) {
+	prevCfg := config.Cfg
+	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
+	t.Cleanup(func() { config.Cfg = prevCfg })
+
+	var calledJTI string
+	svc := &mockUserService{
+		logoutFn: func(ctx context.Context, userID uint, jti string) { calledJTI = jti },
 	}
 	h := NewUserHandler(svc, config.Cfg, nil)
 
@@ -626,8 +671,8 @@ func TestLogout_CallsService(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Errorf("status = %d, want %d", w.Code, http.StatusOK)
 	}
-	if calledWith != 42 {
-		t.Errorf("Logout called with %d, want 42", calledWith)
+	if calledJTI != "" {
+		t.Errorf("expected empty jti when no cookie, got %q", calledJTI)
 	}
 }
 

@@ -14,6 +14,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 	"github.com/KanoCifer/kuroome-blog/internal/util"
+	"github.com/KanoCifer/kuroome-blog/pkg/jwt"
 )
 
 type Userer interface {
@@ -22,7 +23,7 @@ type Userer interface {
 	CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
 	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error)
 	GetByID(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
-	Logout(ctx context.Context, userID uint)
+	Logout(ctx context.Context, userID uint, jti string)
 	RefreshTokens(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
 	UserToDict(u *model.User, p *model.Profile) map[string]any
 	SendEmailCode(ctx context.Context, email, mode string) bool
@@ -147,10 +148,28 @@ func (h *UserHandler) Logout(c *gin.Context) {
 		return
 	}
 
-	h.userSvc.Logout(c.Request.Context(), uint(c.GetInt("user_id")))
+	// 从 cookie 取 refresh token 解析 jti，删自己的 device field。
+	userID := uint(c.GetInt("user_id"))
+	jti := h.currentRefreshJTI(c)
+	h.userSvc.Logout(c.Request.Context(), userID, jti)
+
 	// 清除 refresh_token cookie（与 Python 端一致）。
 	util.ClearRefreshCookie(c, h.cfg)
 	response.Success(c, nil, "已退出登录")
+}
+
+// currentRefreshJTI 从请求的 refresh_token cookie 解析出 jti。
+// cookie 缺失或解析失败时返回空串（Logout 仍会执行，只是不删 Hash field）。
+func (h *UserHandler) currentRefreshJTI(c *gin.Context) string {
+	cookie, err := c.Cookie("refresh_token")
+	if err != nil {
+		return ""
+	}
+	claims, err := jwt.ParseToken(cookie)
+	if err != nil {
+		return ""
+	}
+	return claims.ID
 }
 
 func (h *UserHandler) RefreshToken(c *gin.Context) {
