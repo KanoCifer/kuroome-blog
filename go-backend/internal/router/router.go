@@ -101,6 +101,10 @@ func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 	nomuH := handler.NewNomuHandler(state.NomuSvc())
 	nomuH.RegisterRoutes(v3, middleware.AuthMiddleware())
 
+	// nomu 多设备同步总线：/sync/ws 走 query token 自鉴权，/sync/devices 走 Bearer。
+	syncH := handler.NewNomuSyncWSHandler(state.SyncBus())
+	syncH.RegisterRoutes(v3, middleware.AuthMiddleware())
+
 	// credits：余额/流水明细挂 Auth；admin grant 必先 Auth 再 Admin（docs/rules/auth.md）。
 	// grant 支持 email → user_id 解析（task-557），需要 UserRepo。
 	creditH := handler.NewCreditHandler(state.CreditSvc(), state.UserRepo())

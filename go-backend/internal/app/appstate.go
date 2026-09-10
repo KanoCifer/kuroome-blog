@@ -14,6 +14,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 	nomuSvc "github.com/KanoCifer/kuroome-blog/internal/service/nomu"
+	"github.com/KanoCifer/kuroome-blog/internal/service/syncbus"
 	wereadSvc "github.com/KanoCifer/kuroome-blog/internal/service/weread"
 	"github.com/KanoCifer/kuroome-blog/pkg/qweather"
 	"github.com/redis/go-redis/v9"
@@ -40,6 +41,7 @@ type AppState struct {
 	creditSvc   service.Creditser
 	designSvc   *nomuSvc.DesignService
 	nomuSvc     service.NomuService
+	syncBus     *syncbus.Bus
 }
 
 // NewAppState 组装所有 service，作为唯一的组合根入口。
@@ -95,6 +97,10 @@ func NewAppState(
 	}, cfg.Security.MaxRefreshDevices)
 	uploadSvc := service.NewUploadService(userRepo, cfg)
 	nomuRepo := postgres.NewNomuRepository(db)
+
+	// 多设备同步总线：注册各同步服务后由 router 注入 handler。
+	syncBus := syncbus.New(redis)
+	syncBus.Register(syncbus.DuplicateSnapshotHandler{})
 	return &AppState{
 		config:     cfg,
 		userSvc:    userSvc,
@@ -118,12 +124,13 @@ func NewAppState(
 		creditSvc:   creditSvc,
 		designSvc:   nomuSvc.NewDesignService(designHttp, cfg.Design.APIKey, uploadSvc, creditSvc),
 		nomuSvc:     service.NewNomuService(nomuRepo),
+		syncBus:     syncBus,
 		userRepo:    userRepo,
 	}
 }
 
 // Dependency Injection
-func (a *AppState) UserRepo() *postgres.UserRepo        { return a.userRepo }
+func (a *AppState) UserRepo() *postgres.UserRepo       { return a.userRepo }
 func (a *AppState) UserSvc() service.Userer            { return a.userSvc }
 func (a *AppState) AdminSvc() service.Adminer          { return a.adminSvc }
 func (a *AppState) BlogSvc() service.Bloger            { return a.blogSvc }
@@ -141,6 +148,7 @@ func (a *AppState) WereadSvc() wereadSvc.Reader        { return a.wereadSvc }
 func (a *AppState) CurrencySvc() service.Currencyer    { return a.currencySvc }
 func (a *AppState) CreditSvc() service.Creditser       { return a.creditSvc }
 func (a *AppState) DesignSvc() *nomuSvc.DesignService  { return a.designSvc }
-func (a *AppState) NomuSvc() service.NomuService        { return a.nomuSvc }
+func (a *AppState) NomuSvc() service.NomuService       { return a.nomuSvc }
+func (a *AppState) SyncBus() *syncbus.Bus              { return a.syncBus }
 
 func (a *AppState) Cfg() *config.Config { return a.config }

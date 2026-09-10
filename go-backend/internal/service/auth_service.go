@@ -121,7 +121,7 @@ func evictOldest(ctx context.Context, r *redis.Client, key string, max int) {
 	// 按 iat 升序排，最早的在前，收集要删的 field。
 	sort.Slice(parsed, func(i, j int) bool { return parsed[i].iat < parsed[j].iat })
 	toDelete := len(parsed) - max
-	for i := 0; i < toDelete; i++ {
+	for i := range toDelete {
 		r.HDel(ctx, key, parsed[i].field)
 	}
 }
