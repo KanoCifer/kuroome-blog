@@ -55,6 +55,8 @@ type syncClientMsg struct {
 	// Name 仅 ping 携带：心跳顺带刷新设备名（如店铺 code 变更）。空则保留旧名。
 	Name    string          `json:"name,omitempty"`
 	Payload json.RawMessage `json:"payload,omitempty"`
+	// RequestID 由客户端生成，服务端在响应帧原样回传，供客户端关联请求。
+	RequestID string `json:"requestId,omitempty"`
 }
 
 // HandleSyncWS Nomu 同步设备长连接：鉴权 → 回放积压 → 实时投递/确认循环。
@@ -162,12 +164,12 @@ func (h *NomuSyncWSHandler) readLoop(ctx context.Context, userID uint, deviceID 
 				Payload: msg.Payload,
 			}
 			if err := h.bus.Publish(ctx, userID, env); err != nil {
-				if werr := w.write(ctx, map[string]any{"type": "push_error", "id": msg.ID, "error": err.Error()}); werr != nil {
+				if werr := w.write(ctx, map[string]any{"type": "push_error", "id": msg.ID, "requestId": msg.RequestID, "error": err.Error()}); werr != nil {
 					return werr
 				}
 				continue
 			}
-			if err := w.write(ctx, map[string]any{"type": "push_ok", "id": msg.ID}); err != nil {
+			if err := w.write(ctx, map[string]any{"type": "push_ok", "id": msg.ID, "requestId": msg.RequestID}); err != nil {
 				return err
 			}
 		case "ack":
@@ -182,7 +184,11 @@ func (h *NomuSyncWSHandler) readLoop(ctx context.Context, userID uint, deviceID 
 			if err := h.bus.TouchPresence(ctx, userID, deviceID, msg.Name); err != nil {
 				return err
 			}
-			if err := w.write(ctx, map[string]any{"type": "pong"}); err != nil {
+			pong := map[string]any{"type": "pong"}
+			if msg.RequestID != "" {
+				pong["requestId"] = msg.RequestID
+			}
+			if err := w.write(ctx, pong); err != nil {
 				return err
 			}
 		}
