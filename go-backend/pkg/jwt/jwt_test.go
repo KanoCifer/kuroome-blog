@@ -43,6 +43,39 @@ func TestParseToken_Valid(t *testing.T) {
 	if claims.ExpiresAt == nil {
 		t.Fatal("ExpiresAt should not be nil")
 	}
+	if claims.ID == "" {
+		t.Fatal("ID (jti) should not be nil")
+	}
+}
+
+func TestGenerateToken_JTIUnique(t *testing.T) {
+	tok1, err := GenerateToken(1, time.Now().Add(time.Hour))
+	if err != nil {
+		t.Fatalf("GenerateToken 1 error: %v", err)
+	}
+	tok2, err := GenerateToken(1, time.Now().Add(time.Hour))
+	if err != nil {
+		t.Fatalf("GenerateToken 2 error: %v", err)
+	}
+	c1, err := ParseToken(tok1)
+	if err != nil {
+		t.Fatalf("ParseToken 1 error: %v", err)
+	}
+	c2, err := ParseToken(tok2)
+	if err != nil {
+		t.Fatalf("ParseToken 2 error: %v", err)
+	}
+	if c1.ID == "" || c2.ID == "" {
+		t.Fatal("jti should not be empty")
+	}
+	if c1.ID == c2.ID {
+		t.Fatalf("two tokens got same jti: %q", c1.ID)
+	}
+	// 当前时间窗口下锁定长度契约：8 hex 秒时间戳(2026 ≈ 1.7e9 已达 8 位) + 12 hex 随机 = 20 字符。
+	// ponytail: 2106 年后时间戳突破 2^32,长度会扩到 21。届时人工调整 %08x 宽度或接受契约变化。
+	if len(c1.ID) != 20 {
+		t.Fatalf("jti length = %d, want 20 for current era: %q", len(c1.ID), c1.ID)
+	}
 }
 
 func TestParseToken_InvalidSignature(t *testing.T) {

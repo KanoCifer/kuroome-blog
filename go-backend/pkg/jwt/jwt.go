@@ -1,7 +1,9 @@
 package jwt
 
 import (
+	"crypto/rand"
 	"errors"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -11,11 +13,20 @@ import (
 )
 
 // GenerateToken 为指定 userID 签发 HS256 JWT，过期时间由 expiresAt 控制。
+// jti = unix 秒时间戳 hex(8) + 随机 hex(12)，共 20 字符；时间戳前缀保证字典序 ≈ 时间序，
+// 便于多设备场景下按 jti 驱逐最老设备。
 func GenerateToken(userID uint, expiresAt time.Time) (string, error) {
+	randomBytes := make([]byte, 6)
+	if _, err := rand.Read(randomBytes); err != nil {
+		return "", fmt.Errorf("generate jti random: %w", err)
+	}
+	jti := fmt.Sprintf("%08x%x", time.Now().Unix(), randomBytes)
+
 	claims := jwt.RegisteredClaims{
 		ExpiresAt: jwt.NewNumericDate(expiresAt),
 		IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
 		Subject:   strconv.FormatUint(uint64(userID), 10),
+		ID:        jti,
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(config.Cfg.Security.SecretKey))
@@ -37,6 +48,16 @@ func ParseToken(tokenString string) (*jwt.RegisteredClaims, error) {
 		return claims, nil
 	}
 	return nil, errors.New("invalid token")
+}
+
+// MustParseID 是测试便捷函数：ParseToken 后取 claims.ID。panic 而非返回 error，
+// 让测试 setup 失败立即暴露。仅供 _test.go 使用。
+func MustParseID(tokenString string) string {
+	claims, err := ParseToken(tokenString)
+	if err != nil {
+		panic(fmt.Sprintf("MustParseID: %v", err))
+	}
+	return claims.ID
 }
 
 // ── 服务级 JWT（devtask / MCP 专用，独立于用户 JWT） ──
