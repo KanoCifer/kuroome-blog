@@ -76,7 +76,7 @@ type UserHandler struct { svc UserService }
 认证统一契约见 **[auth.md](auth.md)**。Go 端要点:
 
 - JWT: `pkg/jwt`, HS256, RegisteredClaims(sub/exp/jti)
-- Refresh 白名单: `refresh:{uid}` 于 Redis,单设备轮换
+- Refresh 白名单: `refresh:{uid}` 于 Redis (Hash,field=jti,value=token),多设备模型;设备上限由 env `MAX_REFRESH_DEVICES` 控制,默认 5(`<=0` 不限);详情见 [auth.md](auth.md)
 - Admin: `ADMIN_USER_IDS` 白名单;AdminMiddleware 必须在 AuthMiddleware 之后
 - 注册校验 Redis `signup_code:{email}`;非法 admin post id 返回 400
 

@@ -24,7 +24,7 @@
 
 - `sub`: 用户 ID 的十进制字符串
 - `exp`: 过期时间(Unix timestamp,**必需**)
-- `jti`: 唯一标识(secrets.token_hex(16),**必需** — 用于 refresh 轮换时区分相同 sub 的 token)
+- `jti`: 唯一标识(8 位秒时间戳 hex + 12 位随机 hex,共 20 字符,**必需** — 用于多设备场景下区分同用户的不同 token;同时也是 Redis Hash 的 field)
 
 > **为何需要 jti**: 没有 `jti` 时,相同 `sub` + 相同 `exp` 会产出完全相同的 JWT,refresh 轮换后旧 token 与新 token 无法区分,白名单校验形同虚设。
 
@@ -39,28 +39,60 @@
 ### Key 设计
 
 ```
-refresh:{user_id}  →  "<jwt_string>"   TTL=7d
+refresh:{user_id}  →  HASH
+  field  = "<jti>"            # 20 字符,8 位秒时间戳 hex + 12 位随机 hex,可按字典序 ≈ 时间序
+  value  = "<refresh_jwt>"    # refresh token 字符串
+  TTL    = 7d                 # 整个 Hash 的过期时间,每次 HSet 后 Expire 续期
 ```
 
-- **单设备模型**: 同一用户同时只有一个有效 refresh token;新登录覆盖旧值。
-- 未来如需多设备,改为 `refresh:{user_id}:{jti}` 的哈希结构(二期)。
+- **多设备模型**: 同一用户可同时持有多个 refresh token,每个 device 对应 Hash 的一个 field。Cookie 天然按浏览器/扩展隔离,前端无需改动。
+- **设备上限**: 环境变量 `MAX_REFRESH_DEVICES` 控制,默认 5。`<= 0` 表示不限制。
+- **驱逐策略**: 写入后若 `HLEN > MAX_REFRESH_DEVICES`,解析各 field 的 `iat`,按时间升序删最早的若干 field 使剩余 ≤ 上限。
 
 ### 生命周期
 
 ```
 login / refresh / passkey-login / github-login
     → create_tokens()
-        → redis.set(f"refresh:{uid}", refresh_jwt, ex=7d)
+        → redis.hset(f"refresh:{uid}", jti, refresh_jwt)
+        → redis.expire(f"refresh:{uid}", 7d)
+        → 若 HLEN > MAX_REFRESH_DEVICES → hdel 最早 iat 的 field
 
 refresh-token request
-    → redis.get(f"refresh:{uid}")
-    → 严格模式(ENFORCE_REDIS_REFRESH=True): key 必须存在且 == token
-    → 兼容模式(default): key 存在且 != token 时拒绝; key 不存在 = 放行(旧 token 过渡)
-    → 校验通过: 覆盖为新 refresh token(轮换)
+    → redis.hget(f"refresh:{uid}", claims.jti)
+    → 严格模式: field 必须存在且 == token,否则 401
+    → 校验通过: create_tokens() 写入新 jti field → hdel 旧 jti field
 
-logout
-    → redis.delete(f"refresh:{uid}")
+logout (current device)
+    → redis.hdel(f"refresh:{uid}", jti)        # 从 cookie 解析 jti
 ```
+
+### 上线迁移 (一次性的不兼容变更)
+
+旧版以 `SET refresh:{uid} <jwt>` 单字符串存储 refresh token,新版改为 `HSET refresh:{uid} <jti> <jwt>`。部署后老用户的 refresh token 在旧 SET 形态下走新 `HGET` 会拿到 `redis.Nil`,被判定为 401 → 用户被强制重新登录。
+
+**SOP**:
+
+```bash
+# 部署前清掉旧 key (按用户量决定是否可接受强制登出)
+redis-cli --scan --pattern 'refresh:*' | xargs -r redis-cli del
+```
+
+或者接受一次性强制重新登录(对线上用户可见)。无需代码层兼容。
+
+### 配置 (env / yaml)
+
+`MAX_REFRESH_DEVICES` 支持两种写法:
+
+- 环境变量(平铺,推荐容器化部署): `MAX_REFRESH_DEVICES=5`
+- YAML(嵌套,字段名必须平铺大写):
+
+  ```yaml
+  security:
+    MAX_REFRESH_DEVICES: 5
+  ```
+
+低于或等于 0 表示不限制设备数。配置层显式回填(避免 viper.Unmarshal 把 defaultConfig 默认值清零)。
 
 ## Admin 校验
 
