@@ -188,6 +188,11 @@ func (h *NomuSyncWSHandler) readLoop(ctx context.Context, userID uint, deviceID 
 			if msg.RequestID != "" {
 				pong["requestId"] = msg.RequestID
 			}
+			// 心跳顺带回当前已知设备(含 online 标记),扩展侧据此即时刷新设备选择器;
+			// Devices 读失败只少一个字段,不影响 pong 本身的保活语义。
+			if devices, err := h.bus.Devices(ctx, userID); err == nil {
+				pong["devices"] = devices
+			}
 			if err := w.write(ctx, pong); err != nil {
 				return err
 			}
