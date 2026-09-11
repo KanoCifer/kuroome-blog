@@ -27,8 +27,20 @@ type Config struct {
 	Design   DesignConfig
 }
 
+// DesignConfig 设计出图服务商接入参数。
+//
+// Provider 选择协议实现："ark"（火山方舟，默认）或 "apiyi"（gpt-image-2-all，
+// OpenAI 兼容）。apiyi 密钥独立走 APIYI_API_KEY，不复用 DESIGN_API_KEY。
+// 两者的 BASE_URL 可各自指向中转；缺省用官方地址。
 type DesignConfig struct {
-	APIKey string `mapstructure:"API_KEY"`
+	Provider string `mapstructure:"PROVIDER"`
+
+	APIKey     string `mapstructure:"API_KEY"`
+	BaseURL    string `mapstructure:"BASE_URL"`
+	AuthScheme string `mapstructure:"AUTH_SCHEME"`
+
+	APIYIAPIKey  string `mapstructure:"APIYI_API_KEY"`
+	APIYIBaseURL string `mapstructure:"APIYI_BASE_URL"`
 }
 
 // ServerConfig 服务运行与日志。
@@ -259,8 +271,23 @@ func Load(cfgFile ...string) (*Config, error) {
 
 	// design 是嵌套 section，viper AutomaticEnv 对嵌套 key 不生效
 	// （容器内 config.yaml 不打进镜像），只能从平铺 env 回填。
+	if v := viper.GetString("DESIGN_PROVIDER"); v != "" {
+		cfg.Design.Provider = v
+	}
 	if v := viper.GetString("DESIGN_API_KEY"); v != "" {
 		cfg.Design.APIKey = v
+	}
+	if v := viper.GetString("DESIGN_BASE_URL"); v != "" {
+		cfg.Design.BaseURL = v
+	}
+	if v := viper.GetString("DESIGN_AUTH_SCHEME"); v != "" {
+		cfg.Design.AuthScheme = v
+	}
+	if v := viper.GetString("APIYI_API_KEY"); v != "" {
+		cfg.Design.APIYIAPIKey = v
+	}
+	if v := viper.GetString("APIYI_BASE_URL"); v != "" {
+		cfg.Design.APIYIBaseURL = v
 	}
 
 	// security 嵌套字段同上：viper.Unmarshal 对未显式配置的 int 字段会清零 defaultConfig 默认值。

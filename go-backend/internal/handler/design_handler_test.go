@@ -210,3 +210,19 @@ func TestDesignGenerateUnauthorized(t *testing.T) {
 		t.Errorf("status = %d, want 401", w.Code)
 	}
 }
+
+// response_format 从 DTO 透传到 service。
+func TestDesignGenerateForwardsResponseFormat(t *testing.T) {
+	var got nomu.GenerateRequest
+	svc := &mockDesignService{generateFn: func(ctx context.Context, req nomu.GenerateRequest) (*nomu.GenerateResult, error) {
+		got = req
+		return &nomu.GenerateResult{Model: "m"}, nil
+	}}
+	w, _ := doDesignRequest(t, newDesignTestServer(t, svc), `{"prompt":"x","response_format":"url"}`, "1")
+	if w.Code != http.StatusOK {
+		t.Fatalf("status = %d, body = %s", w.Code, w.Body.String())
+	}
+	if got.ResponseFormat != "url" {
+		t.Errorf("response_format = %q, want url", got.ResponseFormat)
+	}
+}

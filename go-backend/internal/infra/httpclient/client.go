@@ -49,6 +49,13 @@ func WithLogger(l *slog.Logger) Option {
 	}
 }
 
+const longTimeout = 360 * time.Second
+
+// WithLongTimeout 面向图片生成的长超时客户端。
+func WithLongTimeout() *Client {
+	return New(WithTimeout(longTimeout))
+}
+
 // New 构造一个 Client。
 func New(opts ...Option) *Client {
 	c := &Client{

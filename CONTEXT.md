@@ -33,3 +33,5 @@ kanocifer.chat是一个个人阅读追踪 + 博客系统，名称源于日语 "k
 | Learning          | AI 课程生成模块（后端 service，agno/DeepSeek agent 驱动，课程包落盘）                                              |
 | LearningProgress  | 用户/课程学习进度（MongoDB `learning_progress`，`(owner, course_id)` 唯一），状态三态 pending/ready/failed，字段 sessions_done / exercise_done / session_id |
 | CoursePackage     | 磁盘课程包（CoursePackageRepo 持有），布局 `<course_id>/{lessons/0001-<slug>.md, 0001-<slug>.exercise.md, resource.md, MISSION.md}`，course_id 格式 `<slug>--<8hex>` |
+| DesignProvider    | 设计出图的服务商接入参数（协议 / 端点 / 鉴权 / 模型目录）。现有 `ark`（火山方舟 Seedream）与 `apiyi`（gpt-image-2-all，OpenAI 兼容协议）；换服务商＝换此参数。**服务商统一称 Provider，不称 Agent**（Agent 专指 `Learning` 的 LLM agent） |
+| DesignRouter      | 设计出图的服务商路由：按请求的 `model`（展示名或上游 ID）自动选择 Provider——模型属于哪个 Provider 的目录就发给谁。全部 Provider 同时注册，`DESIGN_PROVIDER` 只表示 `model` 缺省时的默认服务商。 |

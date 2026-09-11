@@ -154,14 +154,14 @@ func TestCreditPreconsume_IdempotentSameBizID(t *testing.T) {
 	if _, err := svc.Grant(ctx, 1, 10000, "seed-1", nil); err != nil {
 		t.Fatal(err)
 	}
-	first, created, err := svc.Preconsume(ctx, 1, "design_generate", "pro", 1, "img-1", nil)
+	first, created, err := svc.Preconsume(ctx, 1, "design_generate", model.DesignVariantArkPro, 1, "img-1", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if !created {
 		t.Error("首笔 Preconsume created = false, want true")
 	}
-	again, created, err := svc.Preconsume(ctx, 1, "design_generate", "pro", 1, "img-1", nil)
+	again, created, err := svc.Preconsume(ctx, 1, "design_generate", model.DesignVariantArkPro, 1, "img-1", nil)
 	if err != nil {
 		t.Fatalf("重复 Preconsume 应幂等成功: %v", err)
 	}
@@ -204,7 +204,7 @@ func TestCreditPreconsume_MetaRecordsVariantQty(t *testing.T) {
 	if _, err := svc.Grant(ctx, 3, 100000, "seed-3", nil); err != nil {
 		t.Fatal(err)
 	}
-	tx, _, err := svc.Preconsume(ctx, 3, "design_generate", "lite", 2, "m1", map[string]any{"prompt_id": "p9"})
+	tx, _, err := svc.Preconsume(ctx, 3, "design_generate", model.DesignVariantArkLite, 2, "m1", map[string]any{"prompt_id": "p9"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -215,7 +215,7 @@ func TestCreditPreconsume_MetaRecordsVariantQty(t *testing.T) {
 	if err := json.Unmarshal(tx.Meta, &meta); err != nil {
 		t.Fatalf("meta 非法 JSON: %v", err)
 	}
-	if meta["variant"] != "lite" || meta["qty"] != float64(2) || meta["prompt_id"] != "p9" {
+	if meta["variant"] != model.DesignVariantArkLite || meta["qty"] != float64(2) || meta["prompt_id"] != "p9" {
 		t.Errorf("meta = %v, want variant/qty/prompt_id", meta)
 	}
 }
@@ -397,7 +397,7 @@ func TestCreditRefund_RestoresBalanceAndChain(t *testing.T) {
 	if _, err := svc.Grant(ctx, 5, 10000, "seed-5", nil); err != nil {
 		t.Fatal(err)
 	}
-	consume, _, err := svc.Preconsume(ctx, 5, "design_generate", "pro", 1, "img-5", nil)
+	consume, _, err := svc.Preconsume(ctx, 5, "design_generate", model.DesignVariantArkPro, 1, "img-5", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -437,7 +437,7 @@ func TestCreditRefund_IdempotentOnce(t *testing.T) {
 	if _, err := svc.Grant(ctx, 6, 10000, "seed-6", nil); err != nil {
 		t.Fatal(err)
 	}
-	if _, _, err := svc.Preconsume(ctx, 6, "design_generate", "pro", 1, "img-6", nil); err != nil {
+	if _, _, err := svc.Preconsume(ctx, 6, "design_generate", model.DesignVariantArkPro, 1, "img-6", nil); err != nil {
 		t.Fatal(err)
 	}
 	first, err := svc.Refund(ctx, 6, "design_generate", "img-6", 4000, nil)
@@ -469,7 +469,7 @@ func TestCreditRefund_PartialAndGuards(t *testing.T) {
 	if _, err := svc.Grant(ctx, 8, 10000, "seed-8", nil); err != nil {
 		t.Fatal(err)
 	}
-	if _, _, err := svc.Preconsume(ctx, 8, "design_generate", "pro", 1, "img-8", nil); err != nil {
+	if _, _, err := svc.Preconsume(ctx, 8, "design_generate", model.DesignVariantArkPro, 1, "img-8", nil); err != nil {
 		t.Fatal(err)
 	}
 	part, err := svc.Refund(ctx, 8, "design_generate", "img-8", 1000, nil)

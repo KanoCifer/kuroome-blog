@@ -2,6 +2,7 @@ package nomu
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -89,7 +90,7 @@ func newCreditTestService(t *testing.T, credit Creditser, outImages int, arkFail
 	})
 	srv := httptest.NewServer(mux)
 	t.Cleanup(srv.Close)
-	svc := NewDesignService(httpclient.New(), "k", nil, credit, WithBaseURL(srv.URL+"/api/v3/images/generations"))
+	svc := NewSingleDesignService(httpclient.New(), DefaultProvider("k", srv.URL+"/api/v3/images/generations", ""), nil, credit)
 	return svc, &hits
 }
 
@@ -132,8 +133,8 @@ func TestGenerate_ArkFailure_FullRefund(t *testing.T) {
 		t.Fatalf("preconsumes = %d, want 1", len(credit.preconsumes))
 	}
 	pc := credit.preconsumes[0]
-	if pc.variant != "pro" || pc.qty != 1 || pc.bizID != "idem-1" {
-		t.Errorf("preconsume = %+v, want variant=pro qty=1 bizID=idem-1", pc)
+	if pc.variant != model.DesignVariantArkPro || pc.qty != 1 || pc.bizID != "idem-1" {
+		t.Errorf("preconsume = %+v, want variant=%s qty=1 bizID=idem-1", pc, model.DesignVariantArkPro)
 	}
 	if len(credit.refunds) != 1 {
 		t.Fatalf("refunds = %d, want 1", len(credit.refunds))
@@ -260,5 +261,52 @@ func TestGenerate_SameIdempotencyKey_NoDoubleDeduct(t *testing.T) {
 	}
 	if balance != 17000 { // 20000 - 3000×1，只扣一次
 		t.Errorf("balance = %d, want 17000 (single deduction for repeated key)", balance)
+	}
+}
+
+// AC: apiyi provider 真按 credit_price 的 (design_generate, apiyi) 档扣费。
+// 端到端（真 CreditService + sqlite）：grant 10000 厘 → 出 1 张 → 扣 3000（¥0.30）。
+func TestGenerate_Apiyi_DeductsViaCreditPrice(t *testing.T) {
+	db, err := gorm.Open(sqlite.Open(
+		"file:nomu_apiyi_credit?mode=memory&cache=shared&_pragma=busy_timeout(5000)"),
+		&gorm.Config{NamingStrategy: model.NewNamer(), Logger: gormlogger.Discard})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := db.AutoMigrate(&model.CreditWallet{}, &model.CreditTransaction{}, &model.CreditPrice{}); err != nil {
+		t.Fatal(err)
+	}
+	if err := model.SeedCreditPrices(db); err != nil {
+		t.Fatal(err)
+	}
+	credits := service.NewCreditService(db)
+
+	// 伪 apiyi 上游：文生图端点返回 b64。
+	mux := http.NewServeMux()
+	mux.HandleFunc("/v1/images/generations", func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(map[string]any{
+			"data": []map[string]any{{"b64_json": base64.StdEncoding.EncodeToString([]byte("img"))}},
+		})
+	})
+	srv := httptest.NewServer(mux)
+	t.Cleanup(srv.Close)
+	svc := NewSingleDesignService(httpclient.New(), ApiyiProvider("k", srv.URL+"/v1"), nil, credits)
+
+	ctx := context.Background()
+	if _, err := credits.Grant(ctx, 11, 10000, "fund", nil); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := svc.Generate(ctx, GenerateRequest{
+		UserID: 11, Prompt: "横版 16:9 一只猫", IdempotencyKey: "apiyi-key",
+	}); err != nil {
+		t.Fatalf("Generate: %v", err)
+	}
+
+	balance, _, err := credits.GetBalance(ctx, 11)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if balance != 7000 { // 10000 - 3000（apiyi 档 ¥0.30/张）
+		t.Errorf("balance = %d, want 7000 (apiyi variant priced in credit_price)", balance)
 	}
 }

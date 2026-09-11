@@ -50,6 +50,7 @@ func (h *DesignHandler) Generate(c *gin.Context) {
 		Model:          req.Model,
 		Size:           req.Size,
 		Images:         req.Images,
+		ResponseFormat: req.ResponseFormat,
 		IdempotencyKey: c.GetHeader("Idempotency-Key"),
 	})
 	if err != nil {
@@ -57,8 +58,13 @@ func (h *DesignHandler) Generate(c *gin.Context) {
 		return
 	}
 
+	// 出图阶段由 images 是否为空决定：空=文生图，非空=图生图/图片编辑。
+	stage := "text2image"
+	if len(req.Images) > 0 {
+		stage = "image2image"
+	}
 	slog.InfoContext(c.Request.Context(), "design generate ok",
-		"user_id", userID, "model", res.Model, "output", len(res.Images),
+		"user_id", userID, "model", res.Model, "stage", stage, "output", len(res.Images),
 		"total_tokens", res.Usage.TotalTokens)
 	response.Success(c, res, "generated successfully")
 }

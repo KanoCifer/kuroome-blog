@@ -78,3 +78,6 @@ real_ip_recursive on;
 | `ADMIN_USER_IDS`                                                    | 逗号分隔的管理员 user ID 列表（如 `1,2`） |
 | `WEBAUTHN_RP_ID` / `WEBAUTHN_ORIGIN`                                | Passkey 认证（默认 `kanocifer.chat`）     |
 | `AMAP_SECURITY_CODE` / `AMAP_WEB_KEY`                               | 高德地图天气                              |
+| `DESIGN_PROVIDER`                                                   | 出图**默认**服务商（`model` 缺省时用）：`ark`（默认，火山方舟 Seedream）/ `apiyi`（gpt-image-2-all）。两只都注册，请求带 `model` 时按模型自动路由，不由此变量决定可用性。 |
+| `DESIGN_API_KEY` / `DESIGN_BASE_URL` / `DESIGN_AUTH_SCHEME`         | 方舟出图密钥、端点、鉴权前缀（默认官方端点 + `Bearer`）。 |
+| `APIYI_API_KEY` / `APIYI_BASE_URL`                                  | apiyi 密钥、base_url（默认 `https://api.apiyi.com/v1`）。密钥只走环境变量，不提交 git。 |

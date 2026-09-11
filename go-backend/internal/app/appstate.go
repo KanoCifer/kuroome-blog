@@ -2,7 +2,6 @@ package app
 
 import (
 	"log/slog"
-	"time"
 
 	"github.com/go-webauthn/webauthn/webauthn"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -74,7 +73,16 @@ func NewAppState(
 	// weather / 未来其它出站调用都复用这一份，不另起 *http.Client。
 	httpCli := httpclient.New()
 
-	designHttp := httpclient.New(httpclient.WithTimeout(120 * time.Second))
+	designHttp := httpclient.WithLongTimeout()
+
+	// design 出图服务商：同时注册方舟与 apiyi，前端按 model 自动路由
+	// （gpt-image-* → apiyi；Doubao-* → 方舟）。DESIGN_PROVIDER 退化为
+	// 「model 为空时的默认服务商」，不再决定谁可用。密钥各自独立，缺失
+	// 只会在请求打到该服务商时才报错。
+	designRouter := nomuSvc.NewRouter(cfg.Design.Provider,
+		nomuSvc.DefaultProvider(cfg.Design.APIKey, cfg.Design.BaseURL, cfg.Design.AuthScheme),
+		nomuSvc.ApiyiProvider(cfg.Design.APIYIAPIKey, cfg.Design.APIYIBaseURL),
+	)
 
 	// QWeather EdDSA 签名器。私钥未配置时不阻断启动；weather 接口会
 	// 在首次请求时 fail-fast（service 层 nil signer 会 panic，可观测）。
@@ -122,7 +130,7 @@ func NewAppState(
 		wereadSvc:   wereadSvc.New(httpCli, redis, wereadRepo),
 		currencySvc: service.NewCurrencyService(httpCli, redis),
 		creditSvc:   creditSvc,
-		designSvc:   nomuSvc.NewDesignService(designHttp, cfg.Design.APIKey, uploadSvc, creditSvc),
+		designSvc:   nomuSvc.NewDesignService(designHttp, designRouter, uploadSvc, creditSvc),
 		nomuSvc:     service.NewNomuService(nomuRepo),
 		syncBus:     syncBus,
 		userRepo:    userRepo,

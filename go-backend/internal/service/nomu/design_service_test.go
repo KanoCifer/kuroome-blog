@@ -25,7 +25,7 @@ func newTestService(t *testing.T, generate func(w http.ResponseWriter, r *http.R
 	srvURL = srv.URL
 	t.Cleanup(srv.Close)
 
-	svc := NewDesignService(httpclient.New(), "test-key", nil, nil, WithBaseURL(srv.URL+"/api/v3/images/generations"))
+	svc := NewSingleDesignService(httpclient.New(), DefaultProvider("test-key", srv.URL+"/api/v3/images/generations", ""), nil, nil)
 	return svc, srv
 }
 
@@ -181,7 +181,7 @@ func TestGeneratePersistsWithStore(t *testing.T) {
 	defer srv.Close()
 
 	store := &fakeStore{}
-	svc := NewDesignService(httpclient.New(), "test-key", store, nil, WithBaseURL(srv.URL+"/api/v3/images/generations"))
+	svc := NewSingleDesignService(httpclient.New(), DefaultProvider("test-key", srv.URL+"/api/v3/images/generations", ""), store, nil)
 
 	res, err := svc.Generate(context.Background(), GenerateRequest{Prompt: "x", UserID: 1})
 	if err != nil {

@@ -59,10 +59,14 @@ func (t CreditTransaction) PreconsumedQty() int {
 
 // CreditPrice 按次定额价格表。(Source, Variant) 联合唯一；
 // 非档位服务 Variant 为空串。调价第一期直改表数据，不做 API。
+//
+// Variant 命名空间化：`<服务商>:<模型/档位>`（如 ark:lite / apiyi:gpt-image-2-all）。
+// 单字段容纳服务商与模型两个维度——每个上游模型可独立定价，换服务商只是换前缀。
+// 常量见 DesignVariant*。
 type CreditPrice struct {
 	ID        uint   `gorm:"primaryKey;autoIncrement"`
 	Source    string `gorm:"size:50;uniqueIndex:uq_credit_price_source_variant"`
-	Variant   string `gorm:"size:20;uniqueIndex:uq_credit_price_source_variant;default:''"`
+	Variant   string `gorm:"size:64;uniqueIndex:uq_credit_price_source_variant;default:''"`
 	UnitPrice int64  `gorm:""` // 厘/次（生图为厘/张）
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -70,12 +74,30 @@ type CreditPrice struct {
 
 func (CreditPrice) TableName() string { return "credit_price" }
 
+// design_generate 的计价档位（命名空间化 variant 单一真源）。
+// 形如 `<provider>:<model/档位>`，与 DesignProvider 的 Provider.Name 前缀一致。
+const (
+	// DesignVariantArkLite 方舟 lite 档。
+	DesignVariantArkLite = "ark:seedream-5.0"
+	// DesignVariantArkPro 方舟 pro 档。
+	DesignVariantArkPro = "ark:seedream-5.0-pro"
+	// DesignVariantApiyiGptImage2All apiyi gpt-image-2-all。
+	DesignVariantApiyiGptImage2All = "apiyi:gpt-image-2-all"
+	// DesignVariantApiyiGptImage25All apiyi gpt-image-2.5-all（可与上者独立定价）。
+	DesignVariantApiyiGptImage25All = "apiyi:gpt-image-2.5-all"
+)
+
 // creditPriceSeeds 初始定价（厘制 = 展示分 ×100），与 spec 定价表一致。
+// 注意：旧命名（lite / pro / apiyi 无前缀）的行已存在于生产库，
+// SeedCreditPrices 冲突即跳过、不清理，本表只负责新命名空间的行。
 var creditPriceSeeds = []CreditPrice{
 	{Source: "translate", Variant: "", UnitPrice: 10},
 	{Source: "nomu_prompt_optimize", Variant: "", UnitPrice: 20},
-	{Source: "design_generate", Variant: "lite", UnitPrice: 3000},
-	{Source: "design_generate", Variant: "pro", UnitPrice: 4000},
+	{Source: "design_generate", Variant: DesignVariantArkLite, UnitPrice: 3000},
+	{Source: "design_generate", Variant: DesignVariantArkPro, UnitPrice: 4000},
+	// gpt-image-2 系列：成本 $0.03/张 ≈ ¥0.22，零售价暂对齐 lite（¥0.30），
+	{Source: "design_generate", Variant: DesignVariantApiyiGptImage2All, UnitPrice: 3000},
+	{Source: "design_generate", Variant: DesignVariantApiyiGptImage25All, UnitPrice: 3000},
 }
 
 // SeedCreditPrices 幂等 seed：冲突（source,variant 已存在）即跳过，不覆盖人工调价。

@@ -36,17 +36,17 @@ func TestSeedCreditPrices_Idempotent(t *testing.T) {
 	}
 	var n int64
 	db.Model(&CreditPrice{}).Count(&n)
-	if n != 4 {
-		t.Errorf("seed 重复执行后价格行数 = %d, want 4", n)
+	if want := int64(len(creditPriceSeeds)); n != want {
+		t.Errorf("seed 重复执行后价格行数 = %d, want %d", n, want)
 	}
 	// 不覆盖人工调价
-	db.Model(&CreditPrice{}).Where("source = ? AND variant = ?", "design_generate", "pro").
+	db.Model(&CreditPrice{}).Where("source = ? AND variant = ?", "design_generate", DesignVariantArkPro).
 		Update("unit_price", 9999)
 	if err := SeedCreditPrices(db); err != nil {
 		t.Fatal(err)
 	}
 	var p CreditPrice
-	db.Where("source = ? AND variant = ?", "design_generate", "pro").First(&p)
+	db.Where("source = ? AND variant = ?", "design_generate", DesignVariantArkPro).First(&p)
 	if p.UnitPrice != 9999 {
 		t.Errorf("seed 覆盖了人工调价: %d, want 9999", p.UnitPrice)
 	}

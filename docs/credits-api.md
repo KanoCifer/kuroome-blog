@@ -33,6 +33,9 @@ Authorization: Bearer <access_token>
 | 提示词优化 | `POST /v2/nomu/prompt-optimize` | `nomu_prompt_optimize` | 0.2 分/次 | 每次调用固定 |
 | 生图（lite 档） | `POST /v3/design/generate` | `design_generate` | 30 分/张 | 按实际出图张数 |
 | 生图（pro 档） | `POST /v3/design/generate` | `design_generate` | 40 分/张 | 按实际出图张数 |
+| 生图（apiyi gpt-image-2-all） | `POST /v3/design/generate` | `design_generate` | 30 分/张 | 按实际出图张数 |
+
+生图的计价档位为**命名空间化 variant**：`<服务商>:<模型/档位>`，即 `ark:seedream-5.0` / `ark:seedream-5.0-pro` / `apiyi:gpt-image-2-all` / `apiyi:gpt-image-2.5-all`。每个上游模型独立成档，可单独调价（改 `credit_price` 表对应行的 `unit_price`）。旧命名（`lite` / `pro` / `apiyi`）的历史行保留不清理，新代码只写新命名。
 
 失败一律不扣费：上游报错、进程内异常、客户端断连均全额退还本次预扣（退还成功后 `credits_spent` 字段不回填，用户实际净扣 0）。
 
@@ -84,7 +87,7 @@ Idempotency-Key: <客户端生成的唯一字符串>
 ```json
 {
   "prompt": "画面描述（必填）",
-  "model": "Doubao-Seedream-5.0-pro | Doubao-Seedream-5.0-lite（缺省 lite）",
+  "model": "Doubao-Seedream-5.0-lite | Doubao-Seedream-5.0-pro | gpt-image-2-all | gpt-image-2.5-all（缺省用 DESIGN_PROVIDER 的默认档）",
   "size": "上游尺寸，可选，如 1K / 2K / 宽x高",
   "images": ["可选参考图 URL 或 data URL，图生图时传"]
 }
@@ -101,7 +104,11 @@ Idempotency-Key: <客户端生成的唯一字符串>
 }
 ```
 
-`images[].url` 为本站同源媒体地址（已落盘，不过期）。响应为异步长任务（上游生成 120s 超时），前端 loading 与重试逻辑按此设计。**重试务必携带首次请求的 `Idempotency-Key`。**
+`images[].url` 为本站同源媒体地址（已落盘，不过期）。同步长任务：上游生图典型 30–60s，出站超时兜底 360s；中间层（反向代理/网关/Serverless 执行上限）也必须放宽到 ≥360s，任一层小于生成时间都会掐断请求。**重试务必携带首次请求的 `Idempotency-Key`。**
+
+服务商由请求的 `model` 自动路由：`gpt-image-*` → apiyi，`Doubao-*` → 方舟，两个服务商同时可用，无需切配置。`model` 缺省时用 `DESIGN_PROVIDER`（默认 `ark`）。apiyi 走 OpenAI 兼容协议——无参考图 `POST /v1/images/generations`，有参考图 `POST /v1/images/edits`（multipart，`image` 可重复）。apiyi 密钥读环境变量 `APIYI_API_KEY`，base_url `https://api.apiyi.com/v1`（可被 `APIYI_BASE_URL` 覆盖），均不硬编码。
+
+apiyi 参数红线：请求**不带** `size` / `quality` / `n` / `aspect_ratio`（会被忽略甚至触发校验错误；`n=3` 按 3 张计费却只回 1 张）。输出尺寸靠 prompt 前缀控制，如开头写「横版 16:9」。`response_format` 由服务端显式下发（默认 `b64_json`），不依赖上游默认值；`b64_json` 与 `url` 在 `data[]` 中二选一，两者都兜住。参考图 >1.5MB 才压缩：长边等比缩到 2048px 内（不放大小图）、质量 0.9 原格式重编码；多图合计 ≤6MB，单图 ≤10MB；压缩失败回退原图继续。
 
 ## 5. 积分查询接口
 
@@ -125,7 +132,7 @@ Idempotency-Key: <客户端生成的唯一字符串>
     {
       "id": 12, "source": "design_generate", "biz_id": "uuid-or-client-key",
       "type": "consume", "amount": -30, "balance_after": 0,
-      "meta": { "variant": "lite", "qty": 1 }, "created_at": "2026-09-07T10:00:00Z"
+      "meta": { "variant": "ark:seedream-5.0", "qty": 1 }, "created_at": "2026-09-07T10:00:00Z"
     }
   ],
   "pagination": { "page": 1, "per_page": 10, "total": 12, "pages": 2, "has_prev": false, "has_next": true, "prev_num": null, "next_num": 2 }

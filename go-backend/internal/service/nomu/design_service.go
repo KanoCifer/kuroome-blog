@@ -1,53 +1,36 @@
-// Package nomu —— 设计出图业务（火山方舟豆包 Seedream）。
+// Package nomu —— 设计出图业务。
 //
 // DesignService 面向 handler 只暴露一个 Generate 入口：
 //   - 文生图：只传 Prompt；
 //   - 图生图：Images 传 1 张（单参考图，payload 用 image）或多张（多参考图，payload 用 images）。
 //
-// 编排流程：校验入参 → 解析模型别名（得出 lite/pro 档位）→ 积分预扣 1 张作闸门
-// （余额不足拒单，不调方舟）→ DesignClient 组包发送 → 解析方舟响应
-// → FetchBlob 拉取结果图 → ImageStore 落盘 → 返回本站 /v3/media 同源地址。
-// 失败全额退款；方舟响应 data[] 张数不定（实测可多张），成功按实际张数 Settle 校正。
-// 上游 TOS 临时 URL 无 CORS 头且会过期，不对前端暴露。
+// 服务商接入参数由 Provider 承载（协议 / 端点 / 鉴权 / 模型目录）：默认方舟
+// 豆包 Seedream；apiyi 的 gpt-image-2-all 走 OpenAI 兼容协议（文生图
+// /images/generations，图片编辑 /images/edits multipart）。换服务商只换 Provider。
+//
+// 编排流程：校验入参 → 解析模型别名（得出计费档位）→ 积分预扣 1 张作闸门
+// （余额不足拒单，不调上游）→ 按协议组包发送（参考图先压缩）→ 解析上游响应
+// （data[] 里 url / b64_json 二选一，两种都兜）→ 结果图落盘 → 返回本站
+// /v3/media 同源地址。失败全额退款；上游响应 data[] 张数不定，成功按实际张数
+// Settle 校正。上游临时 URL 无 CORS 头且会过期（apiyi 约 24h），一律立即转存。
 package nomu
 
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"log/slog"
-	"maps"
 	"path/filepath"
-	"slices"
 	"strings"
 	"time"
 
 	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 )
-
-const (
-	// baseURL 火山方舟图片生成端点（doubao-seedream 系列）。
-	baseURL = "https://ark.cn-beijing.volces.com/api/v3/images/generations"
-
-	// defaultModelKey 未指定模型时的兜底（成本低档）。
-	defaultModelKey = "Doubao-Seedream-5.0-lite"
-)
-
-// models 面向用户的展示名 → 方舟模型 ID + 计费档位。直接传 ID 也接受。
-var models = map[string]modelSpec{
-	"Doubao-Seedream-5.0-pro":  {id: "doubao-seedream-5-0-pro-260628", variant: "pro"},
-	"Doubao-Seedream-5.0-lite": {id: "doubao-seedream-5-0-260128", variant: "lite"},
-}
-
-// modelSpec 方舟模型 ID 与 credit_price.variant 档位（lite/pro）。
-type modelSpec struct {
-	id      string
-	variant string
-}
 
 var (
 	// ErrEmptyPrompt 入参校验失败：prompt 为空。
@@ -70,13 +53,18 @@ type GenerateRequest struct {
 	UserID uint
 	// Prompt 画面描述，必填。
 	Prompt string
-	// Model models 的展示名或方舟模型 ID，空则取默认模型。
+	// Model models 的展示名或上游模型 ID，空则取默认模型。
 	Model string
-	// Size 上游 size 字符串（如 '1K' / '1.5K' / '2K' 档位或 'WxH'）。
-	// 原样透传给方舟，不做本地推导；空则省略字段、用上游默认。
+	// Size 上游 size 字符串（档位枚举 / WxH）。仅方舟协议透传；
+	// OpenAI 系协议（apiyi）禁传 size（会被静默忽略甚至触发校验错误）。
 	Size string
-	// Images 参考图（URL 或 base64 data URL）。0 张 = 文生图；1 张走 image；多张走 image 数组。
+	// Images 参考图。方舟协议：URL 或 base64 data URL；OpenAI 系协议：
+	// base64 data URL（http(s) URL 会由 service 拉取后压缩）。
+	// 0 张 = 文生图；1 张 = 单参考图；多张 = 多参考图（顺序即 prompt 中 图1/图2 引用）。
 	Images []string
+	// ResponseFormat 仅 OpenAI 系协议使用，显式下发 "b64_json" / "url"。
+	// 空则用 provider 默认（apiyi=b64_json）。不依赖上游默认值。
+	ResponseFormat string
 	// IdempotencyKey 计费幂等键（handler 从 Idempotency-Key 头透传）。
 	// 空则服务端生成 UUID。同键重试 Preconsume 命中唯一索引不双扣。
 	IdempotencyKey string
@@ -105,10 +93,10 @@ type GenerateUsage struct {
 	TotalTokens     int `json:"total_tokens"`
 }
 
-// arkResponse 方舟 images/generations 响应的解析所需子集。
-// 实测 data[] 元素只有 url + size（无 index、无 b64_json）；
-// b64_json 字段保留为防御性兼容，Index 缺失时以切片位置代替。
-type arkResponse struct {
+// generateResponse 各服务商 images/* 响应的公共子集（方舟与 OpenAI 系共用一个信封）。
+// 方舟 data[] 元素为 url + size；apiyi（OpenAI 系）为 b64_json 或 url 二选一。
+// Index 缺失时以切片位置代替。
+type generateResponse struct {
 	Model   string `json:"model"`
 	Created int64  `json:"created"`
 	Data    []struct {
@@ -144,27 +132,35 @@ type Creditser interface {
 	Settle(ctx context.Context, userID uint, source, bizID string, actualQty int) (*model.CreditTransaction, error)
 }
 
-// DesignService 编排校验、积分预扣/退款、请求发送与结果解析。
+// DesignService 编排校验、模型路由、积分预扣/退款、请求发送与结果解析。
 type DesignService struct {
-	client  *DesignClient
+	router  *Router
+	clients map[string]*DesignClient // provider.Name → 客户端（鉴权/端点随 provider 不同）
 	store   ImageStore
 	credits Creditser
 }
 
-// NewDesignService 构造 DesignService。默认指向方舟正式端点，
-// apiKey 来自 config.Design.APIKey；store 为结果图落盘实现（可 nil，
-// nil 时结果只携带上游临时 URL）；credits 为积分扣退实现（可 nil = 不计费）；
-// opts 可覆盖默认端点（测试注入用）。
-func NewDesignService(http *httpclient.Client, apiKey string, store ImageStore, credits Creditser, opts ...DesignClientOption) *DesignService {
-	opts = append(opts, WithAPIKey(apiKey))
-	client := NewDesignClient(http, append([]DesignClientOption{WithBaseURL(baseURL)}, opts...)...)
-	return &DesignService{client: client, store: store, credits: credits}
+// NewDesignService 构造 DesignService。router 按模型名路由到服务商；
+// store 为结果图落盘实现（可 nil，nil 时结果只携带上游临时 URL）；
+// credits 为积分扣退实现（可 nil = 不计费）。
+func NewDesignService(http *httpclient.Client, router *Router, store ImageStore, credits Creditser) *DesignService {
+	clients := make(map[string]*DesignClient, len(router.Providers()))
+	for _, p := range router.Providers() {
+		clients[p.Name] = NewDesignClient(http, p)
+	}
+	return &DesignService{router: router, clients: clients, store: store, credits: credits}
+}
+
+// NewSingleDesignService 单服务商装配（测试 / 只接一个上游的部署）。
+func NewSingleDesignService(http *httpclient.Client, provider Provider, store ImageStore, credits Creditser) *DesignService {
+	return NewDesignService(http, Single(provider), store, credits)
 }
 
 // Generate 校验入参、预扣积分闸门（1 张），完成一次文生图/图生图。
 //
-// 计费时序：resolveModel 得出档位 → Preconsume(1)（余额连 1 张都不够直接返回，
-// 不调方舟）→ 方舟调用 → 响应 data[] 张数 Settle 校正（多张补扣可扣负、少张退差）
+// 计费时序：Router.Resolve 按 model 选服务商并得出档位 → Preconsume(1)
+// （余额连 1 张都不够直接返回，不调上游）→ 上游调用 → 响应 data[] 张数
+// Settle 校正（多张补扣可扣负、少张退差）
 // → 落盘 → 失败全额退。张数只有响应才知道，预扣只是闸门，结算以 len(data) 为准。
 // 退款用脱离请求 cancel 的 context，避免客户端断开导致退款一起被取消。
 func (s *DesignService) Generate(ctx context.Context, req GenerateRequest) (result *GenerateResult, err error) {
@@ -173,18 +169,19 @@ func (s *DesignService) Generate(ctx context.Context, req GenerateRequest) (resu
 		return nil, ErrEmptyPrompt
 	}
 
-	spec, err := resolveModel(req.Model)
+	prov, spec, err := s.router.Resolve(req.Model)
 	if err != nil {
 		return nil, err
 	}
-	model := spec.id
+	client := s.clients[prov.Name]
+	model := spec.ID
 	size := strings.TrimSpace(req.Size)
 
 	// ponytail: 崩溃窗口丢退款（预扣成功、退款前进程挂掉）由 credit_service 注释
 	// 统一认领，升级路径=对账 job。此处 defer 只覆盖 panic 路径。
 	bizID := req.IdempotencyKey
 	if s.credits != nil {
-		tx, created, cerr := s.credits.Preconsume(ctx, req.UserID, creditSourceDesign, spec.variant, 1, bizID, nil)
+		tx, created, cerr := s.credits.Preconsume(ctx, req.UserID, creditSourceDesign, spec.Variant, 1, bizID, nil)
 		if cerr != nil {
 			// 双 %w：外层 ErrCredit 供笼统分流，内层保留 credit 哨兵
 			// （ErrInsufficientBalance）供 handler 映射 402。
@@ -207,17 +204,19 @@ func (s *DesignService) Generate(ctx context.Context, req GenerateRequest) (resu
 		}()
 	}
 
-	raw, err := s.client.SendRequest(ctx, s.client.BuildPayload(prompt, model, req.Images, size))
+	raw, err := s.sendUpstream(ctx, client, model, prompt, req)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", ErrUpstream, err)
 	}
 
-	var resp arkResponse
+	var resp generateResponse
 	if err := json.Unmarshal(raw, &resp); err != nil {
 		return nil, fmt.Errorf("%w: decode response: %v", ErrUpstream, err)
 	}
-	if resp.Error.Code != "" {
-		return nil, fmt.Errorf("%w: %s %s", ErrUpstream, resp.Error.Code, resp.Error.Message)
+	// OpenAI 系错误体只有 message、无 code；方舟两者都有。任一非空即属错误。
+	if resp.Error.Code != "" || resp.Error.Message != "" {
+		return nil, fmt.Errorf("%w: %s %s", ErrUpstream,
+			resp.Error.Code, strings.TrimSpace(resp.Error.Message))
 	}
 	if len(resp.Data) == 0 {
 		return nil, fmt.Errorf("%w: no image in response", ErrUpstream)
@@ -226,14 +225,30 @@ func (s *DesignService) Generate(ctx context.Context, req GenerateRequest) (resu
 	images := make([]GeneratedImage, 0, len(resp.Data))
 	for i, d := range resp.Data {
 		img := GeneratedImage{Index: i, Size: d.Size, URL: d.URL}
-		if s.store != nil && d.URL != "" {
-			data, err := s.client.FetchBlob(ctx, d.URL)
-			if err != nil {
-				return nil, fmt.Errorf("%w: fetch image %d: %v", ErrUpstream, i, err)
+		// b64_json 与 url 同一条 data[] 里二选一（两种都要兜住）。
+		// b64 无 data: 前缀；url 会过期（apiyi 约 24h），必须立即转存。
+		switch {
+		case d.B64JSON != "" && s.store != nil:
+			data, derr := decodeB64(d.B64JSON)
+			if derr != nil {
+				return nil, fmt.Errorf("%w: decode b64 image %d: %v", ErrUpstream, i, derr)
 			}
-			rel, err := s.store.UploadDesignImage(ctx, req.UserID, bytes.NewReader(data))
-			if err != nil {
-				return nil, err
+			rel, uerr := s.store.UploadDesignImage(ctx, req.UserID, bytes.NewReader(data))
+			if uerr != nil {
+				return nil, uerr
+			}
+			img.URL = mediaPrefix + filepath.ToSlash(rel)
+		case d.B64JSON != "":
+			// 未装配 store：直接回传 base64（前端拼 data: 前缀渲染，可另存）。
+			img.URL = "data:image/png;base64," + d.B64JSON
+		case d.URL != "" && s.store != nil:
+			data, ferr := client.FetchBlob(ctx, d.URL)
+			if ferr != nil {
+				return nil, fmt.Errorf("%w: fetch image %d: %v", ErrUpstream, i, ferr)
+			}
+			rel, uerr := s.store.UploadDesignImage(ctx, req.UserID, bytes.NewReader(data))
+			if uerr != nil {
+				return nil, uerr
 			}
 			img.URL = mediaPrefix + filepath.ToSlash(rel)
 		}
@@ -265,20 +280,73 @@ func (s *DesignService) Generate(ctx context.Context, req GenerateRequest) (resu
 	}, nil
 }
 
-// resolveModel 把展示名或模型 ID 归一为 modelSpec（方舟模型 ID + 计费档位）。
-func resolveModel(name string) (modelSpec, error) {
-	name = strings.TrimSpace(name)
-	if name == "" {
-		return models[defaultModelKey], nil
+// sendUpstream 按服务商协议组包发送。client 由模型路由得出，协议与默认
+// response_format 从 client 自身的 provider 读——三者同源，不会错配。
+//
+//   - OpenAI 系（apiyi）：无图走 /images/generations（JSON），有图走 /images/edits
+//     （multipart，参考图先压缩）；只带 model/prompt/response_format。
+//   - 方舟：单一 JSON 端点，image 字段内嵌，size 透传。
+func (s *DesignService) sendUpstream(ctx context.Context, client *DesignClient, model, prompt string, req GenerateRequest) (json.RawMessage, error) {
+	if client.provider.Protocol == ProtocolOpenAI {
+		rf := client.provider.ResponseFormat
+		if req.ResponseFormat != "" {
+			rf = req.ResponseFormat
+		}
+		if len(req.Images) == 0 {
+			return client.SendOpenAIGenerate(ctx, model, prompt, rf)
+		}
+		refs, err := s.loadRefImages(ctx, client, req.Images)
+		if err != nil {
+			return nil, err
+		}
+		return client.SendOpenAIEdit(ctx, model, prompt, rf, refs)
 	}
-	if spec, ok := models[name]; ok {
-		return spec, nil
-	}
-	for _, spec := range models {
-		if spec.id == name {
-			return spec, nil
+	return client.SendRequest(ctx, client.BuildPayload(prompt, model, req.Images, strings.TrimSpace(req.Size)))
+}
+
+// loadRefImages 把参考图归一为可上传的字节：base64 data URL 直接解码，
+// http(s) URL 先拉取（用目标服务商的 client，鉴权/超时一致）；随后统一压缩
+// （>1.5MB 才处理）到上传预算内。
+func (s *DesignService) loadRefImages(ctx context.Context, client *DesignClient, images []string) ([][]byte, error) {
+	raws := make([][]byte, 0, len(images))
+	for i, img := range images {
+		img = strings.TrimSpace(img)
+		switch {
+		case strings.HasPrefix(img, "data:"):
+			// data:[mime][;base64],<payload>
+			idx := strings.Index(img, ",")
+			if idx < 0 {
+				return nil, fmt.Errorf("ref image %d: malformed data URL", i)
+			}
+			data, derr := decodeB64(img[idx+1:])
+			if derr != nil {
+				return nil, fmt.Errorf("ref image %d: decode base64: %w", i, derr)
+			}
+			raws = append(raws, data)
+		case strings.HasPrefix(img, "http://"), strings.HasPrefix(img, "https://"):
+			data, ferr := client.FetchBlob(ctx, img)
+			if ferr != nil {
+				return nil, fmt.Errorf("ref image %d: fetch: %w", i, ferr)
+			}
+			raws = append(raws, data)
+		default:
+			return nil, fmt.Errorf("ref image %d: unsupported reference (want data URL or http(s) URL)", i)
 		}
 	}
-	return modelSpec{}, fmt.Errorf("%w: %q (supported: %s)", ErrUnknownModel,
-		name, strings.Join(slices.Sorted(maps.Keys(models)), ", "))
+	return compressImages(raws)
+}
+
+// decodeB64 宽容解码 base64，兼容标准/URL-safe 与有/无填充变体。
+func decodeB64(s string) ([]byte, error) {
+	s = strings.TrimSpace(s)
+	if data, err := base64.StdEncoding.DecodeString(s); err == nil {
+		return data, nil
+	}
+	if data, err := base64.RawStdEncoding.DecodeString(s); err == nil {
+		return data, nil
+	}
+	if data, err := base64.URLEncoding.DecodeString(s); err == nil {
+		return data, nil
+	}
+	return base64.RawURLEncoding.DecodeString(s)
 }
