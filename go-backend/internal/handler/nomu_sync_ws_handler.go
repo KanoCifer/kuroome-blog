@@ -18,7 +18,6 @@ import (
 	"github.com/KanoCifer/kuroome-blog/pkg/jwt"
 )
 
-// SyncBuser 是 handler 依赖的同步总线窄接口，*syncbus.Bus 满足。
 type SyncBuser interface {
 	Publish(ctx context.Context, userID uint, env syncbus.Envelope) error
 	Replay(ctx context.Context, userID uint, deviceID string, write func(syncbus.Envelope) error) error
@@ -26,6 +25,12 @@ type SyncBuser interface {
 	Ack(ctx context.Context, userID uint, deviceID, service, id string) error
 	TouchPresence(ctx context.Context, userID uint, deviceID, name string) error
 	Devices(ctx context.Context, userID uint) ([]syncbus.DeviceInfo, error)
+	// 采集快照云端池：写入 / 列池 / 只读认领 / 认领并清除，以及池变更订阅。
+	CollectionPut(ctx context.Context, userID uint, snap syncbus.CollectionSnapshot) error
+	CollectionList(ctx context.Context, userID uint) ([]syncbus.CollectionSnapshot, error)
+	CollectionClaim(ctx context.Context, userID uint, id string) (*syncbus.CollectionSnapshot, error)
+	CollectionClaimClear(ctx context.Context, userID uint, from, id string) (*syncbus.CollectionSnapshot, error)
+	SubscribeCollection(ctx context.Context, userID uint) (<-chan syncbus.CollectionSnapshotUpdate, func(), error)
 }
 
 type NomuSyncWSHandler struct {
@@ -36,22 +41,20 @@ func NewNomuSyncWSHandler(bus SyncBuser) *NomuSyncWSHandler {
 	return &NomuSyncWSHandler{bus: bus}
 }
 
-// RegisterRoutes 挂载同步总线路由。
-// /sync/ws 用 query token 自鉴权（浏览器 WebSocket 无法设置 Authorization 头）；
-// /sync/devices 走常规 Bearer，供发送端列举目标设备。
 func (h *NomuSyncWSHandler) RegisterRoutes(r *gin.RouterGroup, mw ...gin.HandlerFunc) {
 	g := r.Group("/nomu")
 	g.GET("/sync/ws", h.HandleSyncWS)
 	g.GET("/sync/devices", append(mw, h.ListDevices)...)
 }
 
-// syncClientMsg 是接收端/发送端 → 服务端的控制消息。
 type syncClientMsg struct {
-	Type    string          `json:"type"`
-	ID      string          `json:"id,omitempty"`
-	To      string          `json:"to,omitempty"`
-	Service string          `json:"service,omitempty"`
-	Kind    string          `json:"kind,omitempty"`
+	Type    string `json:"type"`
+	ID      string `json:"id,omitempty"`
+	To      string `json:"to,omitempty"`
+	Service string `json:"service,omitempty"`
+	Kind    string `json:"kind,omitempty"`
+	// Source 仅 collection_put 携带：采集来源 [taobao,1688,jd,other...]。
+	Source string `json:"source,omitempty"`
 	// Name 仅 ping 携带：心跳顺带刷新设备名（如店铺 code 变更）。空则保留旧名。
 	Name    string          `json:"name,omitempty"`
 	Payload json.RawMessage `json:"payload,omitempty"`
@@ -106,7 +109,7 @@ func (h *NomuSyncWSHandler) HandleSyncWS(c *gin.Context) {
 	w := &syncWriter{conn: conn}
 	errc := make(chan error, 2)
 	go func() { errc <- h.deliveryLoop(ctx, userID, deviceID, w) }()
-	go func() { errc <- h.readLoop(ctx, userID, deviceID, w) }()
+	go func() { errc <- h.readLoop(ctx, userID, deviceID, name, w) }()
 	<-errc
 	cancel()
 	<-errc
@@ -114,17 +117,20 @@ func (h *NomuSyncWSHandler) HandleSyncWS(c *gin.Context) {
 	slog.InfoContext(reqCtx, "sync ws disconnected", "user_id", userID, "device_id", deviceID)
 }
 
-// deliveryLoop 先订阅实时投递，再回放队列积压。
-// 顺序不能反：先回放再订阅会留下「回放读完 → 订阅生效」的窗口，落在窗口里的
-// Publish 其 pubsub 消息早于 Receive 被丢弃，只能等下次重连 —— 对常驻 UI 页
-// 可能是无限期。先订阅只可能让窗口内的条目重复投递一次（回放与实时各一次），
-// 由接收端幂等入队 + ack 幂等吸收。
 func (h *NomuSyncWSHandler) deliveryLoop(ctx context.Context, userID uint, deviceID string, w *syncWriter) error {
 	ch, cancelSub, err := h.bus.Subscribe(ctx, userID, deviceID)
 	if err != nil {
 		return err
 	}
 	defer cancelSub()
+
+	// 采集快照池订阅与设备投递共用本连接的写锁，两路并行推送互不踩踏。
+	poolCh, cancelPool, err := h.bus.SubscribeCollection(ctx, userID)
+	if err != nil {
+		return err
+	}
+	defer cancelPool()
+
 	if err := h.bus.Replay(ctx, userID, deviceID, func(env syncbus.Envelope) error {
 		return w.write(ctx, env)
 	}); err != nil {
@@ -141,12 +147,19 @@ func (h *NomuSyncWSHandler) deliveryLoop(ctx context.Context, userID uint, devic
 			if err := w.write(ctx, env); err != nil {
 				return err
 			}
+		case upd, ok := <-poolCh:
+			if !ok {
+				return nil
+			}
+			if err := w.write(ctx, map[string]any{"type": "collection_update", "update": upd}); err != nil {
+				return err
+			}
 		}
 	}
 }
 
-// readLoop 处理接收端的 ack/ping 与发送端的 push。
-func (h *NomuSyncWSHandler) readLoop(ctx context.Context, userID uint, deviceID string, w *syncWriter) error {
+// readLoop 处理接收端的 ack/ping 与发送端的 push/采集快照池操作。
+func (h *NomuSyncWSHandler) readLoop(ctx context.Context, userID uint, deviceID, name string, w *syncWriter) error {
 	for {
 		var msg syncClientMsg
 		if err := wsjson.Read(ctx, w.conn, &msg); err != nil {
@@ -179,8 +192,60 @@ func (h *NomuSyncWSHandler) readLoop(ctx context.Context, userID uint, deviceID 
 				}
 				continue
 			}
+		case "collection_put":
+			// payload 原始 JSON 透传，服务端不解释；写入方设备名与来源由连接上下文补全。
+			snap := syncbus.CollectionSnapshot{
+				ID:         msg.ID,
+				Source:     msg.Source,
+				CapturedAt: time.Now().Unix(),
+				From:       deviceID,
+				Name:       name,
+				Snapshot:   msg.Payload,
+			}
+			if err := h.bus.CollectionPut(ctx, userID, snap); err != nil {
+				if werr := w.write(ctx, map[string]any{"type": "collection_put_error", "id": msg.ID, "requestId": msg.RequestID, "error": err.Error()}); werr != nil {
+					return werr
+				}
+				continue
+			}
+			if err := w.write(ctx, map[string]any{"type": "collection_put_ok", "id": msg.ID, "requestId": msg.RequestID}); err != nil {
+				return err
+			}
+		case "collection_list":
+			snaps, err := h.bus.CollectionList(ctx, userID)
+			frame := map[string]any{"type": "collection_list_result", "requestId": msg.RequestID}
+			if err != nil {
+				slog.WarnContext(ctx, "collection list failed", "error", err, "device_id", deviceID)
+				frame["ok"] = false
+			} else {
+				frame["ok"] = true
+				frame["snapshots"] = snaps
+			}
+			if err := w.write(ctx, frame); err != nil {
+				return err
+			}
+		case "collection_claim", "collection_claim_clear":
+			var (
+				snap *syncbus.CollectionSnapshot
+				err  error
+			)
+			if msg.Type == "collection_claim" {
+				snap, err = h.bus.CollectionClaim(ctx, userID, msg.ID)
+			} else {
+				snap, err = h.bus.CollectionClaimClear(ctx, userID, deviceID, msg.ID)
+			}
+			frame := map[string]any{"type": msg.Type + "_result", "id": msg.ID, "requestId": msg.RequestID}
+			if err != nil {
+				slog.WarnContext(ctx, "collection claim failed", "error", err, "id", msg.ID, "device_id", deviceID)
+				frame["ok"] = false
+			} else {
+				frame["ok"] = true
+				frame["snapshot"] = snap // nil 表示条目不存在或已被他人认领
+			}
+			if err := w.write(ctx, frame); err != nil {
+				return err
+			}
 		case "ping":
-			// 心跳可带 name 刷新设备名；空则保留握手时写入的名字。
 			if err := h.bus.TouchPresence(ctx, userID, deviceID, msg.Name); err != nil {
 				return err
 			}
@@ -188,8 +253,7 @@ func (h *NomuSyncWSHandler) readLoop(ctx context.Context, userID uint, deviceID 
 			if msg.RequestID != "" {
 				pong["requestId"] = msg.RequestID
 			}
-			// 心跳顺带回当前已知设备(含 online 标记),扩展侧据此即时刷新设备选择器;
-			// Devices 读失败只少一个字段,不影响 pong 本身的保活语义。
+
 			if devices, err := h.bus.Devices(ctx, userID); err == nil {
 				pong["devices"] = devices
 			}

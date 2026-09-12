@@ -187,6 +187,104 @@ func TestSyncWS_PushDeliversOnline(t *testing.T) {
 	}
 }
 
+// TestSyncWS_CollectionPoolFlow A 写入池 → 两设备收到池变更 → B 认领并清除拿到条目。
+func TestSyncWS_CollectionPoolFlow(t *testing.T) {
+	withTestSecret(t)
+	bus, _ := newSyncTestBus(t)
+
+	h := NewNomuSyncWSHandler(bus)
+	engine := gin.New()
+	h.RegisterRoutes(engine.Group("/v3"))
+	srv := httptest.NewServer(engine)
+	defer srv.Close()
+
+	tokenA, _ := jwt.GenerateToken(7, time.Now().Add(time.Hour))
+	connA := dialSyncWS(t, srv.URL, tokenA, "A")
+	defer connA.Close(websocket.StatusNormalClosure, "")
+	connB := dialSyncWS(t, srv.URL, tokenA, "B")
+	defer connB.Close(websocket.StatusNormalClosure, "")
+	waitForOnline(t, bus, 7)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// A 写入采集快照。
+	if err := wsjson.Write(ctx, connA, map[string]any{
+		"type": "collection_put", "id": "s1", "source": "1688",
+		"payload": json.RawMessage(`{"title":"x"}`), "requestId": "r1",
+	}); err != nil {
+		t.Fatalf("write collection_put: %v", err)
+	}
+	ok := readFrameType(t, ctx, connA, "collection_put_ok")
+	if ok["id"] != "s1" || ok["requestId"] != "r1" {
+		t.Fatalf("collection_put_ok = %+v", ok)
+	}
+
+	// B 收到池变更通知（put）。
+	if upd := readCollectionKind(t, ctx, connB, "put"); upd["id"] != "s1" {
+		t.Fatalf("B update = %+v, want id=s1 kind=put", upd)
+	}
+
+	// B 列全池，应看到 A 写入的 s1。
+	if err := wsjson.Write(ctx, connB, map[string]any{"type": "collection_list"}); err != nil {
+		t.Fatalf("write collection_list: %v", err)
+	}
+	list := readFrameType(t, ctx, connB, "collection_list_result")
+	snaps, _ := list["snapshots"].([]any)
+	if list["ok"] != true || len(snaps) != 1 {
+		t.Fatalf("collection_list_result = %+v, want ok with 1 snapshot", list)
+	}
+	if first, _ := snaps[0].(map[string]any); first["id"] != "s1" {
+		t.Fatalf("listed snapshot = %+v, want id=s1", snaps[0])
+	}
+
+	// B 认领并清除。
+	if err := wsjson.Write(ctx, connB, map[string]any{"type": "collection_claim_clear", "id": "s1"}); err != nil {
+		t.Fatalf("write claim_clear: %v", err)
+	}
+	res := readFrameType(t, ctx, connB, "collection_claim_clear_result")
+	if res["ok"] != true {
+		t.Fatalf("claim_clear result = %+v, want ok", res)
+	}
+	snap, _ := res["snapshot"].(map[string]any)
+	if snap == nil || snap["id"] != "s1" || snap["name"] != "A" {
+		t.Fatalf("claimed snapshot = %+v, want id=s1 name=A (写入方设备名)", snap)
+	}
+	if at, _ := snap["captured_at"].(float64); at <= 0 {
+		t.Fatalf("captured_at = %v, want a positive unix ts", snap["captured_at"])
+	}
+
+	// A 收到摘除通知（A 也会先收到自己写的 put，跳过）。
+	if upd := readCollectionKind(t, ctx, connA, "claim_clear"); upd["id"] != "s1" {
+		t.Fatalf("A update = %+v, want id=s1 kind=claim_clear", upd)
+	}
+}
+
+// readFrameType 读取连接上的帧直到指定 type（投递与池通知可能交错），超时即失败。
+func readFrameType(t *testing.T, ctx context.Context, conn *websocket.Conn, want string) map[string]any {
+	t.Helper()
+	for {
+		var frame map[string]any
+		if err := wsjson.Read(ctx, conn, &frame); err != nil {
+			t.Fatalf("read frame waiting for %s: %v", want, err)
+		}
+		if frame["type"] == want {
+			return frame
+		}
+	}
+}
+
+// readCollectionKind 读取池变更帧直到 kind 匹配。
+func readCollectionKind(t *testing.T, ctx context.Context, conn *websocket.Conn, kind string) map[string]any {
+	t.Helper()
+	for {
+		frame := readFrameType(t, ctx, conn, "collection_update")
+		if upd, _ := frame["update"].(map[string]any); upd["kind"] == kind {
+			return upd
+		}
+	}
+}
+
 // TestSyncWS_RequiresToken 缺 token / device_id 时握手失败。
 func TestSyncWS_RequiresToken(t *testing.T) {
 	withTestSecret(t)

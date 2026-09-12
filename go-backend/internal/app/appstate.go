@@ -106,7 +106,6 @@ func NewAppState(
 	uploadSvc := service.NewUploadService(userRepo, cfg)
 	nomuRepo := postgres.NewNomuRepository(db)
 
-	// 多设备同步总线：注册各同步服务后由 router 注入 handler。
 	syncBus := syncbus.New(redis)
 	syncBus.Register(syncbus.DuplicateSnapshotHandler{})
 	return &AppState{

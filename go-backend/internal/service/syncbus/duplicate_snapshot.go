@@ -6,13 +6,8 @@ import (
 	"time"
 )
 
-// DuplicateSnapshotService 是「复制任务快照跨设备同步」服务名。
 const DuplicateSnapshotService = "duplicate_snapshot"
 
-// DuplicateSnapshotPayload 是复制快照同步的 payload。
-// productDraft / publicationInput 保持原始 JSON 透传：这两份草稿由扩展端
-// buildProductDraft / buildPublicationInput 生成，服务端不解释其内部字段，
-// 只保证顶层信封可路由（对齐 nomu config sync 的 config_data 透传语义）。
 type DuplicateSnapshotPayload struct {
 	SourceSku        string          `json:"sourceSku"`
 	CapturedAt       int64           `json:"capturedAt"`

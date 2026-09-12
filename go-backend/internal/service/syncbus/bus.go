@@ -1,7 +1,6 @@
 // Package syncbus 实现 Nomu 多设备同步总线：
 // 每设备一个 Redis LIST 队列（离线积压，连上 LRANGE 回放）+ 每设备一个 pubsub 频道
 // （在线实时投递），接收端 ack 后 LREM 弹出。payload 由注册的 service handler 校验，
-// 内容本身透传（对齐 nomu config sync 的 config_data 语义）。
 package syncbus
 
 import (
@@ -31,14 +30,11 @@ var (
 	ErrExpired = errors.New("syncbus: payload expired")
 )
 
-// Handler 是各同步服务的接入契约：注册时声明服务名与 payload 校验规则。
 type Handler interface {
 	Service() string
 	Validate(payload json.RawMessage) error
 }
 
-// Envelope 是同步总线上的统一信封，新同步服务复用同一结构（service 区分）。
-// Type 仅用于服务端→客户端的 wire frame，落队列时已置为 "delivery"。
 type Envelope struct {
 	Type    string          `json:"type"`
 	Service string          `json:"service"`
@@ -50,8 +46,6 @@ type Envelope struct {
 	Payload json.RawMessage `json:"payload"`
 }
 
-// DeviceInfo 是 /nomu/sync/devices 返回的单台设备在线信息。
-// 字段用 camelCase，与 Envelope 的 wire 命名保持一致。
 type DeviceInfo struct {
 	DeviceID string `json:"deviceId"`
 	Name     string `json:"name"`
@@ -59,7 +53,6 @@ type DeviceInfo struct {
 	LastSeen int64  `json:"lastSeen"`
 }
 
-// Bus 是同步总线，持有 Redis 客户端与服务注册表。
 type Bus struct {
 	redis    *redis.Client
 	services map[string]Handler
@@ -94,8 +87,6 @@ func presenceKey(userID uint) string {
 	return fmt.Sprintf("nomu:sync:presence:%d", userID)
 }
 
-// Publish 校验 payload 后把信封写入目标设备队列并 pubsub 通知。
-// 目标设备不在线不报错：条目留在队列，下次连接回放。
 func (b *Bus) Publish(ctx context.Context, userID uint, env Envelope) error {
 	h, ok := b.services[env.Service]
 	if !ok {

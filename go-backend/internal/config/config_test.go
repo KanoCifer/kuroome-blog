@@ -72,6 +72,13 @@ server:
 	if got, want := cfg.Upload.MaxUploadMB, 10; got != want {
 		t.Errorf("MaxUploadMB = %d, want default %d", got, want)
 	}
+	// design 也是嵌套 section，同样受"文件没写、默认值被清零"的坑影响。
+	if got, want := cfg.Design.APIYIBaseURL, "https://api.apiyi.com/v1"; got != want {
+		t.Errorf("APIYIBaseURL = %q, want default %q", got, want)
+	}
+	if got, want := cfg.Design.Provider, "ark"; got != want {
+		t.Errorf("Provider = %q, want default %q", got, want)
+	}
 }
 
 func TestParseIntList(t *testing.T) {

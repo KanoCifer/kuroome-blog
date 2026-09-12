@@ -223,7 +223,9 @@ func defaultConfig() Config {
 			MaxUploadMB: 10,
 		},
 		Design: DesignConfig{
-			APIKey: "",
+			Provider:     "ark",
+			APIKey:       "",
+			APIYIBaseURL: "https://api.apiyi.com/v1",
 		},
 	}
 }
