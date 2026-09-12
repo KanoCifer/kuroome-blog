@@ -12,6 +12,8 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
+
+	"github.com/KanoCifer/kuroome-blog/internal/infra/pubsub"
 )
 
 const (
@@ -54,12 +56,15 @@ type DeviceInfo struct {
 }
 
 type Bus struct {
-	redis    *redis.Client
-	services map[string]Handler
+	redis      *redis.Client
+	dispatcher *pubsub.Dispatcher
+	services   map[string]Handler
 }
 
-func New(client *redis.Client) *Bus {
-	return &Bus{redis: client, services: make(map[string]Handler)}
+// NewSyncBus 构造 Bus。dispatcher 为进程级共享订阅调度器，由组合根注入：
+// 所有设备频道订阅复用同一条 Redis pubsub 连接。
+func NewSyncBus(client *redis.Client, dispatcher *pubsub.Dispatcher) *Bus {
+	return &Bus{redis: client, dispatcher: dispatcher, services: make(map[string]Handler)}
 }
 
 // Register 注册一个同步服务；同名覆盖。
@@ -160,22 +165,21 @@ func (b *Bus) Replay(ctx context.Context, userID uint, deviceID string, write fu
 }
 
 // Subscribe 订阅本设备频道的实时投递，返回信封 channel 与取消函数。
+// 复用进程级共享 Dispatcher：同账号多设备仅占一条 Redis pubsub 连接。
 func (b *Bus) Subscribe(ctx context.Context, userID uint, deviceID string) (<-chan Envelope, func(), error) {
-	pubsub := b.redis.Subscribe(ctx, channelKey(userID, deviceID))
-	if _, err := pubsub.Receive(ctx); err != nil {
-		_ = pubsub.Close()
+	rawCh, cancel, err := b.dispatcher.Subscribe(ctx, channelKey(userID, deviceID))
+	if err != nil {
 		return nil, nil, err
 	}
 
 	out := make(chan Envelope, 16)
-	ch := pubsub.Channel()
 	go func() {
 		defer close(out)
 		for {
 			select {
 			case <-ctx.Done():
 				return
-			case msg, ok := <-ch:
+			case msg, ok := <-rawCh:
 				if !ok {
 					return
 				}
@@ -195,7 +199,7 @@ func (b *Bus) Subscribe(ctx context.Context, userID uint, deviceID string) (<-ch
 			}
 		}
 	}()
-	return out, func() { _ = pubsub.Close() }, nil
+	return out, cancel, nil
 }
 
 // Ack 接收端确认后弹出队列条目。仅本设备（deviceID）自己的队列可 ack。

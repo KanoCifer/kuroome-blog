@@ -9,6 +9,7 @@ import (
 
 	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
+	"github.com/KanoCifer/kuroome-blog/internal/infra/pubsub"
 	"github.com/KanoCifer/kuroome-blog/internal/repository/mongodb"
 	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
@@ -41,6 +42,7 @@ type AppState struct {
 	designSvc   *nomuSvc.DesignService
 	nomuSvc     service.NomuService
 	syncBus     *syncbus.Bus
+	dispatcher  *pubsub.Dispatcher
 }
 
 // NewAppState 组装所有 service，作为唯一的组合根入口。
@@ -106,7 +108,9 @@ func NewAppState(
 	uploadSvc := service.NewUploadService(userRepo, cfg)
 	nomuRepo := postgres.NewNomuRepository(db)
 
-	syncBus := syncbus.New(redis)
+	dispatcher := pubsub.NewDispatcher(redis)
+
+	syncBus := syncbus.NewSyncBus(redis, dispatcher)
 	syncBus.Register(syncbus.DuplicateSnapshotHandler{})
 	return &AppState{
 		config:     cfg,
@@ -117,7 +121,7 @@ func NewAppState(
 		passkeySvc: service.NewPasskeyService(wa, redis, passkeyRepo, userRepo),
 		monitorSvc: service.NewMonitorService(visitorRepo, userRepo, cfg.API.Version),
 		systemSvc:  service.NewSystemService(eventRepo),
-		wsSvc:      service.NewWSService(redis),
+		wsSvc:      service.NewWSService(redis, dispatcher),
 		githubOAuth: service.NewGitHubOAuth(
 			redis, userRepo, userSvc,
 			cfg.GitHub.ClientID, cfg.GitHub.ClientSecret, cfg.GitHub.RedirectURI,
@@ -132,6 +136,7 @@ func NewAppState(
 		designSvc:   nomuSvc.NewDesignService(designHttp, designRouter, uploadSvc, creditSvc),
 		nomuSvc:     service.NewNomuService(nomuRepo),
 		syncBus:     syncBus,
+		dispatcher:  dispatcher,
 		userRepo:    userRepo,
 	}
 }
@@ -157,5 +162,7 @@ func (a *AppState) CreditSvc() service.Creditser       { return a.creditSvc }
 func (a *AppState) DesignSvc() *nomuSvc.DesignService  { return a.designSvc }
 func (a *AppState) NomuSvc() service.NomuService       { return a.nomuSvc }
 func (a *AppState) SyncBus() *syncbus.Bus              { return a.syncBus }
+
+func (a *AppState) PubSub() *pubsub.Dispatcher { return a.dispatcher }
 
 func (a *AppState) Cfg() *config.Config { return a.config }

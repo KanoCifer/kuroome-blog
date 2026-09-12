@@ -10,6 +10,8 @@ import (
 	"github.com/coder/websocket"
 	"github.com/coder/websocket/wsjson"
 	"github.com/redis/go-redis/v9"
+
+	"github.com/KanoCifer/kuroome-blog/internal/infra/pubsub"
 )
 
 // WSer 定义 handler 层依赖的 WS 能力集合。
@@ -30,13 +32,15 @@ const (
 )
 
 type WSService struct {
-	redis *redis.Client
-	mu    sync.Mutex // 保护 conn 并发写（RedisListener + wsReceiver 同时 SendMsg）
+	redis      *redis.Client
+	dispatcher *pubsub.Dispatcher
+	mu         sync.Mutex // 保护 conn 并发写（RedisListener + wsReceiver 同时 SendMsg）
 }
 
-func NewWSService(redis *redis.Client) *WSService {
+func NewWSService(redis *redis.Client, dispatcher *pubsub.Dispatcher) *WSService {
 	return &WSService{
-		redis: redis,
+		redis:      redis,
+		dispatcher: dispatcher,
 	}
 }
 
@@ -101,12 +105,16 @@ func buildCountPayload(count int64) ([]byte, error) {
 }
 
 // RedisListener 订阅计数频道，逐条转发到 WebSocket 连接。
+// 复用进程级共享 Dispatcher：所有公开 WS 连接共享同一条 Redis pubsub 连接上的
+// visitorChannel 订阅，各自拿独立 channel。
 // 运行直到 ctx 取消或读取失败。
 func (s *WSService) RedisListener(ctx context.Context, conn *websocket.Conn) error {
-	pubsub := s.redis.Subscribe(ctx, visitorChannel)
-	defer pubsub.Close()
+	ch, cancel, err := s.dispatcher.Subscribe(ctx, visitorChannel)
+	if err != nil {
+		return err
+	}
+	defer cancel()
 
-	ch := pubsub.Channel()
 	for {
 		select {
 		case <-ctx.Done():

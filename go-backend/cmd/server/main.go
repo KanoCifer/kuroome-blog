@@ -84,6 +84,8 @@ func main() {
 		db.GetRedis(),
 		wa,
 	)
+	// 退出时关闭共享 pubsub 连接（幂等）。
+	defer func() { _ = state.PubSub().Close() }()
 
 	router.Setup(r, state, db.GetRedis())
 

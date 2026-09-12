@@ -118,22 +118,21 @@ func (b *Bus) CollectionClaimClear(ctx context.Context, userID uint, from, id st
 }
 
 // SubscribeCollection 订阅本账号采集快照池的变更通知，返回更新 channel 与取消函数。
+// 复用进程级共享 Dispatcher：同账号多设备合并为共享连接上的同一 channel 订阅。
 func (b *Bus) SubscribeCollection(ctx context.Context, userID uint) (<-chan CollectionSnapshotUpdate, func(), error) {
-	pubsub := b.redis.Subscribe(ctx, collectionChannel(userID))
-	if _, err := pubsub.Receive(ctx); err != nil {
-		_ = pubsub.Close()
+	rawCh, cancel, err := b.dispatcher.Subscribe(ctx, collectionChannel(userID))
+	if err != nil {
 		return nil, nil, err
 	}
 
 	out := make(chan CollectionSnapshotUpdate, 16)
-	ch := pubsub.Channel()
 	go func() {
 		defer close(out)
 		for {
 			select {
 			case <-ctx.Done():
 				return
-			case msg, ok := <-ch:
+			case msg, ok := <-rawCh:
 				if !ok {
 					return
 				}
@@ -150,7 +149,7 @@ func (b *Bus) SubscribeCollection(ctx context.Context, userID uint) (<-chan Coll
 			}
 		}
 	}()
-	return out, func() { _ = pubsub.Close() }, nil
+	return out, cancel, nil
 }
 
 func decodeCollectionSnapshot(raw []byte) (*CollectionSnapshot, error) {

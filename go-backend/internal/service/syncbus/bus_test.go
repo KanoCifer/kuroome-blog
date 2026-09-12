@@ -9,6 +9,8 @@ import (
 
 	"github.com/alicebob/miniredis/v2"
 	"github.com/redis/go-redis/v9"
+
+	"github.com/KanoCifer/kuroome-blog/internal/infra/pubsub"
 )
 
 func newTestBus(t *testing.T) (*Bus, *miniredis.Miniredis) {
@@ -18,9 +20,10 @@ func newTestBus(t *testing.T) (*Bus, *miniredis.Miniredis) {
 		t.Fatalf("miniredis.Run: %v", err)
 	}
 	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
-	t.Cleanup(func() { _ = rdb.Close(); mr.Close() })
+	dispatcher := pubsub.NewDispatcher(rdb)
+	t.Cleanup(func() { _ = dispatcher.Close(); _ = rdb.Close(); mr.Close() })
 
-	bus := New(rdb)
+	bus := NewSyncBus(rdb, dispatcher)
 	bus.Register(DuplicateSnapshotHandler{})
 	return bus, mr
 }

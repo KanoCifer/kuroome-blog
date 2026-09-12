@@ -15,6 +15,7 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"github.com/KanoCifer/kuroome-blog/internal/config"
+	"github.com/KanoCifer/kuroome-blog/internal/infra/pubsub"
 	"github.com/KanoCifer/kuroome-blog/internal/service/syncbus"
 	"github.com/KanoCifer/kuroome-blog/pkg/jwt"
 )
@@ -26,8 +27,9 @@ func newSyncTestBus(t *testing.T) (*syncbus.Bus, *miniredis.Miniredis) {
 		t.Fatalf("miniredis.Run: %v", err)
 	}
 	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
-	t.Cleanup(func() { _ = rdb.Close(); mr.Close() })
-	bus := syncbus.New(rdb)
+	dispatcher := pubsub.NewDispatcher(rdb)
+	t.Cleanup(func() { _ = dispatcher.Close(); _ = rdb.Close(); mr.Close() })
+	bus := syncbus.NewSyncBus(rdb, dispatcher)
 	bus.Register(syncbus.DuplicateSnapshotHandler{})
 	return bus, mr
 }
