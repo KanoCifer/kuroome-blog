@@ -115,7 +115,7 @@ def create_llm_model(
 # 校验都从这里出，避免前端与后端硬编码同步漂移。
 LEARNING_MODELS = (
     {
-        "id": "deepseek-v4.1-flash",
+        "id": "deepseek-flash",
         "label": "Flash（快速）",
         "is_premium": False,
     },
@@ -125,7 +125,7 @@ LEARNING_MODEL_IDS = frozenset(m["id"] for m in LEARNING_MODELS)
 
 
 def create_deepseek_model(
-    model_id: str = "deepseek-v4.1-flash", **kwargs
+    model_id: str = "deepseek-flash", **kwargs
 ) -> DeepSeek:
     """创建 DeepSeek 模型实例（用于 Learning 模块）。
 

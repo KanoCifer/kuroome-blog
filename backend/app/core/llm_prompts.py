@@ -38,7 +38,7 @@ NOMU_PROMPT_OPTIMIZE_INSTRUCTIONS = (
 
 # exercise.md 是课程包唯一保留 YAML front matter 的产物（练习题序列化）；
 # lesson body / resource / MISSION 均为纯 Markdown，不维护 front matter。
-LEARNING_MODEL_ID = "deepseek-v4.1-flash"
+LEARNING_MODEL_ID = "deepseek-flash"
 LANGUAGE = "zh"
 # 用户未提供 goal 时填入用户消息的缺省提示。
 DEFAULT_GOAL_HINT = "未提供,请从主题推断学习目标"

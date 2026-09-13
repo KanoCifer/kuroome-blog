@@ -10,15 +10,18 @@ token 消耗从 ``response.metrics`` 解析并随草稿返回；``llm_usage`` �
 
 import base64
 import re
+from typing import Any
 
 import httpx
 from agno.media import Image
 from agno.models.openai import OpenAIChat
 from agno.tools.exa import ExaTools
+from pydantic import ValidationError
 
 from app.core.config import get_settings
 from app.core.llm_factory import create_agent
 from app.core.llm_prompts import PRODUCT_PARSE_INSTRUCTIONS
+from app.core.logger import logger
 from app.schemas.nomu import ProductDraft, ProductParseRequest
 from app.schemas.translate import UsageMetrics
 
@@ -138,6 +141,9 @@ class ProductParseService:
             tools=build_research_tools(),
             tool_call_limit=TOOL_CALL_LIMIT,
             use_json_mode=True,
+            # 官方推荐形态：schema 挂构造器（与 arun 传参最终归一到 run_context，
+            # 但构造器挂载让 agent 实例自带输出契约，create_agent 经 kwargs 透传）
+            output_schema=ProductDraft,
         )
 
         images: list[Image] | None = None
@@ -150,12 +156,11 @@ class ProductParseService:
                 )
             ]
 
-        response = await agent.arun(
-            build_user_message(req),
-            images=images,
-            output_schema=ProductDraft,
-        )
-        draft: ProductDraft = response.content  # pyright: ignore[reportAssignmentType]
+        response = await agent.arun(build_user_message(req), images=images)
+        # 构造器 schema 下 agno 通常回填 Pydantic 实例；json_object + 工具 loop
+        # 仍可能交付 str（其内置 str 转换失败只打 warning 不抛错），统一收敛，
+        # 非法 JSON 抛错走退款。
+        draft = _coerce_draft(response.content)
 
         metrics = getattr(response, "metrics", None)
         if metrics is not None:
@@ -177,3 +182,33 @@ class ProductParseService:
             )
 
         return draft
+
+
+def _coerce_draft(content: Any) -> ProductDraft:
+    """把 agent 输出收敛成 :class:`ProductDraft`。
+
+    agno 视模型/路径不同可能回填 Pydantic 实例、dict 或 JSON 字符串
+    （json_object 模式 + 工具 loop 时是后者；其内置 str 转换失败只打
+    warning 不抛错），这里统一收敛，产出非法 JSON 时抛错走退款。
+    """
+    try:
+        if isinstance(content, ProductDraft):
+            return content
+        if isinstance(content, dict):
+            return ProductDraft.model_validate(content)
+        if isinstance(content, str):
+            text = content.strip()
+            # 兜底剥掉可能的 markdown 围栏（json_object 模式下通常不会有）
+            if text.startswith("```"):
+                text = re.sub(r"^```(?:json)?\s*", "", text)
+                text = re.sub(r"\s*```$", "", text)
+            return ProductDraft.model_validate_json(text)
+    except (ValidationError, ValueError) as exc:
+        logger.bind(component="nomu_parse").warning(
+            "product parse output coerce failed",
+            content_type=type(content).__name__,
+            content_preview=str(content)[:500],
+            error=repr(exc),
+        )
+        raise
+    raise RuntimeError(f"商品解析输出类型异常: {type(content)!r}")
