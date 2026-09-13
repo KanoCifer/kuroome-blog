@@ -162,9 +162,11 @@ def create_deepseek_model(
 def create_product_parse_model() -> OpenAIChat | None:
     """创建 Nomu 商品解析模型 —— OpenAIChat 直连 DeepSeek 的 OpenAI 兼容端点。
 
-    与 :func:`create_deepseek_model` 的差异：不走 agno DeepSeek 封装
-    （免去 thinking/role_map 附加参数），结构化输出统一走 ``use_json_mode``
-    （json_object + schema 注入）路径。
+    与 :func:`create_deepseek_model` 的差异：不走 agno DeepSeek 封装，
+    结构化输出统一走 ``use_json_mode``（json_object + schema 注入）路径。
+    ``role_map`` 必须显式还原 ``system`` —— OpenAIChat 默认把 system 映射为
+    OpenAI 新版 ``developer`` 角色，DeepSeek 端点不认该角色（报
+    ``unknown variant 'developer'``，与 create_llm_model 的 Ling 网关同因）。
 
     Returns:
         已配置的 :class:`OpenAIChat`；``DEEPSEEK_API_KEY`` 未配置时返回
@@ -180,6 +182,17 @@ def create_product_parse_model() -> OpenAIChat | None:
         api_key=api_key,
         base_url="https://api.deepseek.com/v1",
         timeout=120,  # agentic 工具 loop，长于默认 60s
+        role_map={
+            "system": "system",
+            "user": "user",
+            "assistant": "assistant",
+            "tool": "tool",
+            "model": "assistant",
+        },
+        # 显式开思考模式（OpenAIChat 封装不默认携带；不传则随服务端默认漂移），
+        # 与 DeepSeek 封装 _thinking_enabled 的线上行为对齐
+        extra_body={"thinking": {"type": "enabled"}},
+        reasoning_effort="high",
     )
 
 
