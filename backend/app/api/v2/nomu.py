@@ -8,6 +8,10 @@
 service 层，见 ``credit_service._validate_biz_id``），同 key 重试不双扣。
 限流：``@limiter.limit`` 按 IP（``client_key``）计数，与积分扣费并存的
 第二道闸；超过阈值返回 429。
+
+例外：``/product-parse`` 是 TaskIQ 异步任务受理端点，不适用内联的
+``call_with_billing`` —— 走 ``_billing.dispatch_with_billing``（派发失败/
+取消退款，重放不重复派发）；业务失败的退款在任务侧（``tasks/nomu_parse.py``）。
 """
 
 from fastapi import APIRouter, Depends, Header, Request
@@ -16,10 +20,20 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.des.auth import get_current_user
 from app.api.des.db import get_session
 from app.api.des.limiter import limiter
-from app.api.v2._billing import call_with_billing
+from app.api.v2._billing import call_with_billing, dispatch_with_billing
 from app.appstate import AppState, get_app_state
+from app.core.exceptions import APIError
 from app.core.response import APIResponse
-from app.schemas.nomu import PromptOptimizeRequest, PromptOptimizeResponse
+from app.plugins.task.tasks.nomu_parse import (
+    PARSE_CREDIT_SOURCE,
+    parse_product_snapshot,
+)
+from app.schemas.nomu import (
+    ProductParseRequest,
+    ProductParseResponse,
+    PromptOptimizeRequest,
+    PromptOptimizeResponse,
+)
 
 router = APIRouter(prefix="/nomu", tags=["nomu"])
 
@@ -60,6 +74,44 @@ async def prompt_optimize(
     return APIResponse(
         data=PromptOptimizeResponse(
             **result.model_dump(),
+            credits_spent=-txn.amount / 100,  # 厘 → 分
+        ),
+        message="success",
+    )
+
+
+@router.post("/product-parse", response_model=APIResponse[ProductParseResponse])
+@limiter.limit("20/minute")
+async def product_parse(
+    request: Request,
+    payload: ProductParseRequest,
+    idempotency_key: str | None = Header(None, alias="Idempotency-Key"),
+    user: int = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+    state: AppState = Depends(get_app_state),
+):
+    """受理通用采集商品解析任务，返回 ``{job_id, credits_spent}``。
+
+    解析由 TaskIQ worker 异步执行：成品 Product 行写入用户云端共享池并
+    广播 ``collection_update``（扩展灵动岛感知）；任务内失败自动全额退款。
+    幂等重放（``created=False``）不重复派发，回执引用 ``biz_id``。
+    """
+    if not state.product_parse_svc.is_configured():
+        raise APIError(message="AI 解析服务未配置，请联系管理员")
+
+    async def _dispatch(biz_id: str) -> str:
+        result = await parse_product_snapshot.kiq(
+            user_id=user, request=payload.model_dump(by_alias=True), biz_id=biz_id
+        )
+        return result.task_id
+
+    txn, _created, job_id = await dispatch_with_billing(
+        session, user, PARSE_CREDIT_SOURCE, idempotency_key, _dispatch
+    )
+
+    return APIResponse(
+        data=ProductParseResponse(
+            job_id=job_id or txn.biz_id,
             credits_spent=-txn.amount / 100,  # 厘 → 分
         ),
         message="success",

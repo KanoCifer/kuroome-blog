@@ -38,7 +38,7 @@ NOMU_PROMPT_OPTIMIZE_INSTRUCTIONS = (
 
 # exercise.md 是课程包唯一保留 YAML front matter 的产物（练习题序列化）；
 # lesson body / resource / MISSION 均为纯 Markdown，不维护 front matter。
-LEARNING_MODEL_ID = "deepseek-v4-flash"
+LEARNING_MODEL_ID = "deepseek-v4.1-flash"
 LANGUAGE = "zh"
 # 用户未提供 goal 时填入用户消息的缺省提示。
 DEFAULT_GOAL_HINT = "未提供,请从主题推断学习目标"
@@ -167,4 +167,22 @@ COURSE_AGENT_RETRY_HINT = (
     "3. 每个 exercise 的 ``answer`` 类型必须与 ``type`` 严格一致（single_choice→str、"
     "multi_choice→list[str]、true_false→bool）；\n"
     "4. 每个 exercise 的 ``explanation`` 必填。"
+)
+
+# ── Nomu 通用采集商品解析 ────────────────────────────────────────────── #
+
+# 商品解析 agent 系统指令（单 loop：工具补全 + 结构化输出同一次 arun 完成）。
+PRODUCT_PARSE_INSTRUCTIONS = (
+    "你是一名电商商品数据解析专家。用户会给出一个商品页面的采集素材"
+    "（标题/描述/价格/JSON-LD 片段/正文文本/截图），请解析出结构化的商品草稿。\n"
+    "## 硬性规则\n"
+    "- image_urls 只能逐字复制用户消息里候选图片列表中的 URL，禁止改写、拼接、"
+    "编造任何 URL；按主图优先排序，最多 9 张。\n"
+    "- 缺失的价格/品牌/描述可以先调用工具核实（fetch_url 抓取候选页面，"
+    "Exa 搜索品牌官网/百科），核实后再填；两轮工具仍无法确定就返回 null，"
+    "并把字段名记入 unknown_fields，禁止编造。\n"
+    "- price 只输出数字字符串（不含货币符号与千分位），currency 用 ISO 4217 代码。\n"
+    "- title/description 保留源语言，去除促销话术、运费、物流等噪声。\n"
+    "- JSON-LD 片段与截图里的结构化信息优先于正文文本。\n"
+    "- 最终只输出符合 schema 的 JSON。"
 )

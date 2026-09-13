@@ -13,7 +13,11 @@ from redis.asyncio import Redis as AsyncRedis
 
 from app.core.agent import AiAgent
 from app.core.config import get_settings
-from app.core.llm_factory import create_llm_model, get_knowledge
+from app.core.llm_factory import (
+    create_llm_model,
+    create_product_parse_model,
+    get_knowledge,
+)
 from app.core.nomu_llm_factory import create_nomu_model
 from app.plugins.notification import NotificationPlugin
 from app.repositories import (
@@ -36,6 +40,7 @@ from app.services.gallery_service import GalleryService
 from app.services.learning_progress_service import LearningProgressService
 from app.services.nomu_service import NomuService
 from app.services.notification_service import NotificationService
+from app.services.product_parse_service import ProductParseService
 from app.services.public_service import PublicService
 from app.services.rag_service import RagService
 from app.services.rss_service import RssService
@@ -69,6 +74,7 @@ class AppState:
     friendlink_svc: FriendLinkService
     ai_svc: AiService
     translate_svc: TranslateService
+    product_parse_svc: ProductParseService
     progress_svc: LearningProgressService
     course_gen_svc: CourseGeneratorService
     nomu_svc: NomuService
@@ -99,6 +105,7 @@ def new_app_state(redis: AsyncRedis) -> AppState:
     ai_agent = AiAgent(expert_weights=FishingExpertScorer.WEIGHTS)
     ai_svc = AiService(agent=ai_agent)
     translate_svc = TranslateService(model=create_llm_model())
+    product_parse_svc = ProductParseService(model=create_product_parse_model())
     public_svc = PublicService(repo=public_repo)
     status_svc = StatusService(repo=public_repo)
     gallery_svc = GalleryService(gallery_repo=gallery_repo)
@@ -149,6 +156,7 @@ def new_app_state(redis: AsyncRedis) -> AppState:
         friendlink_svc=friendlink_svc,
         ai_svc=ai_svc,
         translate_svc=translate_svc,
+        product_parse_svc=product_parse_svc,
         progress_svc=progress_svc,
         course_gen_svc=course_gen_svc,
         nomu_svc=nomu_svc,

@@ -1,0 +1,105 @@
+"""nomu_collection_pool 载荷契约测试。
+
+池条目 snapshot 必须与扩展 Product 行（db-model.ts）逐字段对齐 ——
+领取路径 ``dbClient.product.create({ input: snap.snapshot })`` 直接消费；
+key/字段与 go-backend syncbus/collection_snapshot.go 对齐。
+"""
+
+from app.schemas.nomu import ProductDraft, ProductParseRequest
+from app.services.nomu_collection_pool import (
+    build_pool_snapshot,
+    build_product_row,
+    collection_channel,
+    collection_key,
+)
+
+
+def _request(**overrides) -> ProductParseRequest:
+    base = {
+        "sourceUrl": "https://example.com/item/1",
+        "title": "Page Title",
+        "description": "page desc",
+        "primaryImages": ["https://cdn.example.com/a.jpg"],
+        "pageImages": ["https://cdn.example.com/a.jpg", "https://cdn.example.com/b.jpg"],
+        "bodyText": "body",
+    }
+    base.update(overrides)
+    return ProductParseRequest.model_validate(base)
+
+
+def test_product_row_matches_extension_shape():
+    req = _request()
+    draft = ProductDraft(
+        title="Silk Scarf",
+        description="100% mulberry silk",
+        brand="AURAVE",
+        price="$ 29.99",
+        currency="USD",
+        image_urls=["https://cdn.example.com/b.jpg", "https://cdn.example.com/a.jpg"],
+    )
+
+    row = build_product_row(req, draft)
+
+    assert set(row) == {"id", "revision", "partnerSku", "title", "description", "images", "source", "status", "createdAt", "updatedAt"}
+    assert row["revision"] == 0 and row["partnerSku"] == "" and row["status"] == "draft"
+    assert row["title"] == "Silk Scarf" and row["description"] == "100% mulberry silk"
+    assert row["source"]["platform"] == "other"
+    assert row["source"]["url"] == req.source_url
+    # 价格数字提取：去掉符号，currency 透传
+    assert row["source"]["priceRaw"] == "$ 29.99"
+    assert row["source"]["price"] == {"amount": "29.99", "currency": "USD"}
+    # 主图排序 + isPrimary
+    assert [i["url"] for i in row["images"]] == [
+        "https://cdn.example.com/b.jpg",
+        "https://cdn.example.com/a.jpg",
+    ]
+    assert row["images"][0]["isPrimary"] is True
+    assert all(i["source"] == "source" for i in row["images"])
+
+
+def test_product_row_drops_hallucinated_urls():
+    """候选集之外的 URL 一律丢弃 —— LLM 幻觉防线最后一道。"""
+    req = _request()
+    draft = ProductDraft(
+        title="T",
+        image_urls=["https://cdn.example.com/a.jpg", "https://evil.com/fake.jpg"],
+    )
+
+    row = build_product_row(req, draft)
+
+    assert [i["url"] for i in row["images"]] == ["https://cdn.example.com/a.jpg"]
+
+
+def test_product_row_falls_back_to_snapshot_fields():
+    """草稿字段缺失时回落快照值；title 永不兜成空串。"""
+    req = _request(price="129,00 EUR", currency="EUR")
+    draft = ProductDraft()
+
+    row = build_product_row(req, draft)
+
+    assert row["title"] == "Page Title"
+    assert row["description"] == "page desc"
+    assert row["source"]["priceRaw"] == "129,00 EUR"
+    assert "price" not in row["source"]  # LLM 未给数字价，不硬造 Money
+    assert row["images"] == []
+
+
+def test_pool_snapshot_and_update_align_with_syncbus():
+    req = _request()
+    row = build_product_row(req, ProductDraft(title="T"))
+
+    snap_id, snap_json, update_json = build_pool_snapshot(row)
+
+    import json
+
+    snap = json.loads(snap_json)
+    update = json.loads(update_json)
+    assert snap_id.startswith("ai-")
+    assert snap["id"] == snap_id and snap["snapshot"] == row
+    assert snap["source"] == "other" and snap["from"] == "ai-parse" and snap["name"] == "AI 解析"
+    assert update == {"kind": "put", "id": snap_id, "from": "ai-parse", "at": snap["captured_at"]}
+
+
+def test_redis_keys_match_go_contract():
+    assert collection_key(42) == "nomu:sync:collection:42"
+    assert collection_channel(42) == "nomu:sync:collection:ch:42"

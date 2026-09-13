@@ -20,6 +20,7 @@ from agno.tools.websearch import WebSearchTools
 from agno.vectordb.pgvector import PgVector, SearchType
 
 from app.core.config import get_settings
+from app.core.llm_prompts import LEARNING_MODEL_ID
 from app.core.logger import logger
 
 
@@ -113,14 +114,18 @@ def create_llm_model(
 # ``GET /v2/learning/models`` 端点数据与 :func:`create_deepseek_model` 的白名单
 # 校验都从这里出，避免前端与后端硬编码同步漂移。
 LEARNING_MODELS = (
-    {"id": "deepseek-v4-flash", "label": "Flash（快速）", "is_premium": False},
+    {
+        "id": "deepseek-v4.1-flash",
+        "label": "Flash（快速）",
+        "is_premium": False,
+    },
     {"id": "deepseek-v4-pro", "label": "Pro（深度）", "is_premium": True},
 )
 LEARNING_MODEL_IDS = frozenset(m["id"] for m in LEARNING_MODELS)
 
 
 def create_deepseek_model(
-    model_id: str = "deepseek-v4-flash", **kwargs
+    model_id: str = "deepseek-v4.1-flash", **kwargs
 ) -> DeepSeek:
     """创建 DeepSeek 模型实例（用于 Learning 模块）。
 
@@ -151,6 +156,30 @@ def create_deepseek_model(
         id=model_id,
         api_key=api_key,
         reasoning_effort="high",
+    )
+
+
+def create_product_parse_model() -> OpenAIChat | None:
+    """创建 Nomu 商品解析模型 —— OpenAIChat 直连 DeepSeek 的 OpenAI 兼容端点。
+
+    与 :func:`create_deepseek_model` 的差异：不走 agno DeepSeek 封装
+    （免去 thinking/role_map 附加参数），结构化输出统一走 ``use_json_mode``
+    （json_object + schema 注入）路径。
+
+    Returns:
+        已配置的 :class:`OpenAIChat`；``DEEPSEEK_API_KEY`` 未配置时返回
+        ``None``（服务可用性由调用方守卫，不阻断进程启动）。
+    """
+    api_key = get_settings().DEEPSEEK_API_KEY
+    if not api_key:
+        logger.warning("DEEPSEEK_API_KEY 未配置，Nomu 商品解析服务不可用")
+        return None
+
+    return OpenAIChat(
+        id=LEARNING_MODEL_ID,
+        api_key=api_key,
+        base_url="https://api.deepseek.com/v1",
+        timeout=120,  # agentic 工具 loop，长于默认 60s
     )
 
 

@@ -66,3 +66,48 @@ async def call_with_billing[T](
         raise
 
     return result, txn
+
+
+async def dispatch_with_billing(
+    session: AsyncSession,
+    user_id: int,
+    source: str,
+    idem_key: str | None,
+    dispatch: Callable[[str], Awaitable[str | None]],
+) -> tuple[CreditTransaction, bool, str | None]:
+    """异步任务受理版计费编排 —— 预扣 → commit → 派发 TaskIQ → 返回回执。
+
+    与 :func:`call_with_billing` 的差异：``dispatch(biz_id)`` 只做任务派发
+    （快速返回，业务在 worker 内执行，业务失败的退款由任务侧承担，见
+    ``tasks/nomu_parse.py``），本函数只对**派发本身**的失败/取消退款。
+
+    纪律一（重放）：``created=False``（幂等键命中）时**不再派发也不退款**
+    ——首笔扣费已随首次派发交付，重放请求失败不得退掉它。返回的
+    ``job_id`` 为 None，调用方以 ``txn.biz_id`` 作为受理回执引用。
+
+    返回 ``(流水, created, job_id)``：``job_id`` 由 ``dispatch`` 返回
+    （如 TaskIQ task_id），重放时为 None。
+    """
+    biz_id = idem_key or uuid4().hex
+    txn, created = await preconsume(user_id, source, "", 1, biz_id, session=session)
+    # 扣费先落盘再派发：进程中途崩溃也不会白嫖模型；派发失败靠 refund 补平
+    await session.commit()
+
+    async def _refund_and_commit() -> None:
+        await refund(user_id, source, biz_id, session=session)
+        await session.commit()
+
+    job_id: str | None = None
+    try:
+        if created:
+            job_id = await dispatch(biz_id)
+    except asyncio.CancelledError:
+        if created:
+            await asyncio.shield(_refund_and_commit())
+        raise
+    except Exception:
+        if created:
+            await _refund_and_commit()
+        raise
+
+    return txn, created, job_id
