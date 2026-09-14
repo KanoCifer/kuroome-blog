@@ -117,10 +117,11 @@ class TestTraceId:
 
 
 class TestOutputSchema:
-    """输出 JSON 四键：trace_id / level / msg / timestamp。
+    """输出 JSON 四键：time / level / msg / trace_id + 顺序固定。
 
     ``msg`` 键名对齐 lnav 内置 ``pino_log`` / ``bunyan_log`` 格式识别的
     ``body-field``，与 Go 后端 slog 同构——lnav 无需自定义格式文件即可分列。
+    顶层键固定为 ``time`` / ``level`` / ``msg`` / ``trace_id`` / 其余。
     """
 
     def test_json_has_only_four_keys(self):
@@ -134,7 +135,23 @@ class TestOutputSchema:
         )
         rendered = _make_formatter(_json_renderer).format(record)
         parsed = json.loads(rendered)
-        assert set(parsed.keys()) == {"trace_id", "level", "msg", "timestamp"}
+        assert set(parsed.keys()) == {"time", "level", "msg", "trace_id"}
+
+    def test_top_level_key_order(self):
+        """顶层键顺序：time / level / msg / trace_id。
+
+        lnav 识别只看字段名、不看顺序；这里是为人类阅读对齐 Go 端 slog 输出。
+        """
+        record = logging.LogRecord(
+            "test", logging.WARNING, "f", 1, "schema check", (), None
+        )
+        rendered = _make_formatter(_json_renderer).format(record)
+        parsed = json.loads(rendered)
+        keys = list(parsed.keys())
+        # 前三键严格顺序
+        assert keys[:3] == ["time", "level", "msg"]
+        # trace_id 在三键之后
+        assert "trace_id" in keys[3:]
 
 
 class TestRouting:

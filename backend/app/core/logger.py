@@ -60,7 +60,8 @@ _DB_EXCLUDE = frozenset(
 # -----------------------------------------------------------------------------
 # 处理器：trace_id / timestamper
 # -----------------------------------------------------------------------------
-_timestamper = structlog.processors.TimeStamper(fmt="iso", utc=True)
+# key="time" 与 Go 后端 slog 输出同构，对齐 lnav 内置 pino_log timestamp-field。
+_timestamper = structlog.processors.TimeStamper(fmt="iso", utc=True, key="time")
 
 
 def _add_trace_id(logger, method_name, event_dict):
@@ -83,6 +84,23 @@ def _event_to_message(logger, method_name, event_dict):
     return event_dict
 
 
+# 顶层键顺序：time / level / msg / trace_id / 其余 bind 字段按原顺序展开。
+# 放在 _timestamper 之后确保三键全部就位；JSONRenderer 直接序列化 dict
+# （Py3.7+ 保证插入顺序），所以 processor 顺序即最终 JSON 键序。
+# 不在 shared_processors 列表里加 filter_by_level / 副作用（详见上方注释）。
+_REORDER_HEAD = ("time", "level", "msg")
+
+
+def _reorder_keys(logger, method_name, event_dict):
+    """固定顶层三键在前：time / level / msg，其余键保持原顺序。
+
+    lnav 识别只看字段名、不看顺序；这里是为人类阅读对齐 Go 端 slog 输出。
+    """
+    head = {k: event_dict[k] for k in _REORDER_HEAD if k in event_dict}
+    rest = {k: v for k, v in event_dict.items() if k not in _REORDER_HEAD}
+    return {**head, **rest}
+
+
 # 两端共享的前置链：业务记录与 foreign 记录都跑一遍，产出统一 event_dict。
 # 注意：此处**不得**放 ``filter_by_level`` 或任何副作用处理器——
 #   1. ``filter_by_level`` 在 ``foreign_pre_chain`` 里收到 ``logger=None`` 会抛
@@ -98,6 +116,7 @@ shared_processors = [
     _event_to_message,
     structlog.stdlib.add_log_level,
     _timestamper,
+    _reorder_keys,
     structlog.processors.StackInfoRenderer(),
     structlog.processors.format_exc_info,
     structlog.processors.UnicodeDecoder(),
@@ -239,12 +258,12 @@ def _db_enqueue(logger, method_name, event_dict):
 
     try:
         # extra 保留 trace_id 与业务 bind 字段（Log 模型无 trace_id 列，
-        # 故 trace_id 进 JSON extra，可供按链路查询）；level / msg /
-        # timestamp 已是顶层列，不进 extra 避免重复。msg → Log.message 列。
-        exclude = _DB_EXCLUDE | {"level", "msg", "timestamp"}
+        # 故 trace_id 进 JSON extra，可供按链路查询）；time / level / msg
+        # 已是顶层列，不进 extra 避免重复。msg → Log.message 列。
+        exclude = _DB_EXCLUDE | {"time", "level", "msg"}
         extra = {k: v for k, v in event_dict.items() if k not in exclude}
         payload = {
-            "timestamp": _coerce_timestamp(event_dict.get("timestamp")),
+            "timestamp": _coerce_timestamp(event_dict.get("time")),
             "level": event_dict.get("level", "info"),
             "message": event_dict.get("msg", ""),
             "extra": extra,
