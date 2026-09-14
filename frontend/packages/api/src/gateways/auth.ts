@@ -152,7 +152,7 @@ export const authGateway = {
   sendRegisterEmailCode(
     payload: { email: string; mode?: 'blog' | 'nomu' },
   ): Promise<AxiosResponse<unknown>> {
-    return apiClient.post('v1/auth/email/code', payload);
+    return apiClient.post('v3/email/code', payload);
   },
 
   register(payload: {
@@ -163,7 +163,7 @@ export const authGateway = {
     email_code: string;
     mode?: 'blog' | 'nomu';
   }): Promise<AxiosResponse<unknown>> {
-    return apiClient.post('v1/auth/register', payload);
+    return apiClient.post('v3/register', payload);
   },
 
   /**
