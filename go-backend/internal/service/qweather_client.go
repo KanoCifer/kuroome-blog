@@ -44,6 +44,9 @@ type qweatherClient struct {
 
 const maxRetry = 3
 
+// upstreamBodyLogLimit 非 2xx 时打进日志的响应体上限（QWeather 错误码在 body 里）。
+const upstreamBodyLogLimit = 512
+
 // newQWeatherClient 构造 qweatherClient。
 func newQWeatherClient(
 	http *httpclient.Client,
@@ -119,6 +122,16 @@ func (c *qweatherClient) Get(
 	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		// 上游非 2xx 是 ErrUpstream（handler → 502）的唯一来源，但 httpclient 的
+		// 出站日志只记状态码、不带响应体，线上分不清是配额 429 / 鉴权 403 还是
+		// 服务端 5xx。这里补一条带状态码与 body 片段的 ERROR：QWeather 的失败
+		// 原因（code/message）在 body 里。
+		snippet, _ := io.ReadAll(io.LimitReader(resp.Body, upstreamBodyLogLimit))
+		slog.ErrorContext(ctx, "qweather upstream non-2xx",
+			"status", resp.StatusCode,
+			"url", req.URL.Redacted(),
+			"body", strings.TrimSpace(string(snippet)),
+		)
 		return nil, fmt.Errorf("%w: status=%d", ErrUpstream, resp.StatusCode)
 	}
 
@@ -130,7 +143,10 @@ func (c *qweatherClient) Get(
 	// 6. cache write
 	if c.redis != nil {
 		go func() {
-			cacheCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
+			// 与请求 ctx 解绑：调用方超时断开、或同批并发中某个 endpoint 失败让
+			// handler 提前 return，都会取消请求 ctx；沿用它会令已经成功拿到的响应
+			// 写不进缓存，上游压力就卸不掉。WithoutCancel 保留 trace_id 等值。
+			cacheCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 2*time.Second)
 			defer cancel()
 			err := c.redis.Set(cacheCtx, cacheKey, body, ttl).Err()
 			if err != nil {
@@ -142,6 +158,14 @@ func (c *qweatherClient) Get(
 }
 
 // doWithRetry 带退避重试的 HTTP 请求。
+//
+// 调用方（Python 钓鱼指数端点，10s 超时）一旦断开，请求 ctx 立即取消，此后每次
+// 重试都必然立刻失败、退避 sleep 纯属空烧。因此 ctx 结束即收手，退避也改成可被
+// ctx 打断，避免 handler 已返回却还占着 goroutine。
+//
+// body 归属：调用方需读取上游错误详情，因此重试耗尽的最后一轮不关闭 body，
+// 由 Get 的非 2xx 分支读取后关闭（defer resp.Body.Close()）；被丢弃的中间轮
+// 与本函数判定放弃的轮次在此关闭。
 func doWithRetry(ctx context.Context, cli *httpclient.Client, req *http.Request) (*http.Response, error) {
 	var resp *http.Response
 	var err error
@@ -152,11 +176,24 @@ func doWithRetry(ctx context.Context, cli *httpclient.Client, req *http.Request)
 			return resp, nil
 		}
 
+		// 最后一轮或调用方已断开：不再重试
+		if i == maxRetry || ctx.Err() != nil {
+			if ctx.Err() != nil && resp != nil {
+				// 调用方已走，body 不会被读，就地关闭
+				resp.Body.Close()
+			}
+			return resp, err
+		}
+
 		if resp != nil {
 			resp.Body.Close()
 		}
 
-		time.Sleep(time.Duration(i+1) * time.Second)
+		select {
+		case <-time.After(time.Duration(i+1) * time.Second):
+		case <-ctx.Done():
+			return nil, ctx.Err()
+		}
 	}
 
 	return resp, err

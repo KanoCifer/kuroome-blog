@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"crypto/ed25519"
 	"crypto/x509"
@@ -9,8 +10,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -152,6 +155,12 @@ func TestQWeatherClient_Get_CacheMissFetches(t *testing.T) {
 }
 
 func TestQWeatherClient_Get_UpstreamError(t *testing.T) {
+	// 5xx 重试耗尽后 body 仍须可读：502 定位全靠这条 ERROR 的状态码 + body 片段
+	var buf bytes.Buffer
+	prev := slog.Default()
+	slog.SetDefault(logger.NewTestHandler(&buf, slog.LevelDebug))
+	t.Cleanup(func() { slog.SetDefault(prev) })
+
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, _ = w.Write([]byte(`{"code":"500"}`))
@@ -161,7 +170,8 @@ func TestQWeatherClient_Get_UpstreamError(t *testing.T) {
 	qwc, _, cleanup := newTestClient(t, srv.URL)
 	defer cleanup()
 
-	_, err := qwc.Get(context.Background(), "/v7/weather/now",
+	ctx := logger.WithTraceID(context.Background(), "trace-qw-500")
+	_, err := qwc.Get(ctx, "/v7/weather/now",
 		map[string]string{"location": "1"},
 		"qweather:test:500", time.Minute)
 	if err == nil {
@@ -169,6 +179,61 @@ func TestQWeatherClient_Get_UpstreamError(t *testing.T) {
 	}
 	if !errors.Is(err, ErrUpstream) {
 		t.Errorf("expected ErrUpstream, got %v", err)
+	}
+
+	logs := buf.String()
+	for _, want := range []string{
+		"qweather upstream non-2xx",
+		`"status":500`,
+		`{\"code\":\"500\"}`,
+		"trace-qw-500",
+	} {
+		if !strings.Contains(logs, want) {
+			t.Errorf("log missing %q; got: %s", want, logs)
+		}
+	}
+}
+
+func TestQWeatherClient_Get_NonRetryable4xxLogsBody(t *testing.T) {
+	// 配额 429 / 鉴权 403 这类不可重试的 4xx 是线上最可能的 502 来源，
+	// 必须留下状态码与 body（QWeather 的 code/message 在 body 里）
+	var buf bytes.Buffer
+	prev := slog.Default()
+	slog.SetDefault(logger.NewTestHandler(&buf, slog.LevelDebug))
+	t.Cleanup(func() { slog.SetDefault(prev) })
+
+	var hits int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		atomic.AddInt32(&hits, 1)
+		w.WriteHeader(http.StatusTooManyRequests)
+		_, _ = io.WriteString(w, `{"code":"429","message":"quota exceeded"}`)
+	}))
+	defer srv.Close()
+
+	qwc, _, cleanup := newTestClient(t, srv.URL)
+	defer cleanup()
+
+	ctx := logger.WithTraceID(context.Background(), "trace-qw-429")
+	_, err := qwc.Get(ctx, "/v7/weather/now",
+		map[string]string{"location": "1"},
+		"qweather:test:429", time.Minute)
+	if err == nil || !errors.Is(err, ErrUpstream) {
+		t.Fatalf("expected ErrUpstream, got %v", err)
+	}
+	if got := atomic.LoadInt32(&hits); got != 1 {
+		t.Errorf("HTTP hits = %d, want 1 (4xx 不应重试)", got)
+	}
+
+	logs := buf.String()
+	for _, want := range []string{
+		"qweather upstream non-2xx",
+		`"status":429`,
+		"quota exceeded",
+		"trace-qw-429",
+	} {
+		if !strings.Contains(logs, want) {
+			t.Errorf("log missing %q; got: %s", want, logs)
+		}
 	}
 }
 
@@ -198,6 +263,42 @@ func TestQWeatherClient_Get_NetworkError(t *testing.T) {
 	}
 	if !errors.Is(err, ErrUnavailable) {
 		t.Errorf("expected ErrUnavailable, got %v", err)
+	}
+}
+
+func TestQWeatherClient_Get_ContextCanceledStopsRetry(t *testing.T) {
+	// 调用方（Python 钓鱼指数端点，10s 超时）中途断开 → 请求 ctx 取消。
+	// 取消后重试必然同样失败，退避 sleep 纯属空烧，必须立刻收手。
+	var hits int32
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if atomic.AddInt32(&hits, 1) == 1 {
+			cancel()
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte(`{"code":"500"}`))
+	}))
+	defer srv.Close()
+
+	qwc, _, cleanup := newTestClient(t, srv.URL)
+	defer cleanup()
+
+	start := time.Now()
+	_, err := qwc.Get(ctx, "/v7/weather/now",
+		map[string]string{"location": "1"},
+		"qweather:test:cancel", time.Minute)
+	elapsed := time.Since(start)
+
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+	if got := atomic.LoadInt32(&hits); got != 1 {
+		t.Errorf("HTTP hits = %d, want 1 (ctx 取消后不应继续重试)", got)
+	}
+	if elapsed > time.Second {
+		t.Errorf("elapsed = %v, want < 1s (ctx 取消后不应继续退避)", elapsed)
 	}
 }
 
