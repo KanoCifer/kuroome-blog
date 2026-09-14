@@ -11,9 +11,9 @@
       @toggle="(p) => toggleFilter(p.key, p.value)"
     />
 
-    <!-- ── 四列看板 ── -->
+    <!-- ── 三列看板（待办 / 进行中 / 已搁置；已完成不进看板） ── -->
     <div
-      class="grid grid-cols-1 items-start gap-3 sm:grid-cols-2 xl:grid-cols-4"
+      class="grid grid-cols-1 items-start gap-3 sm:grid-cols-2 xl:grid-cols-3"
       role="list"
       aria-label="开发任务看板"
     >
@@ -21,10 +21,9 @@
         v-for="col in KANBAN_COLUMNS"
         :key="col.id"
         :column="col"
-        :lanes="lanesFor(col.id)"
+        :tasks="tasksFor(col.id)"
         :dragged-slug="draggedSlug"
         :drag-over="dragOverColumn === col.id"
-        :total-count="columnCount(col.id)"
         @open="$emit('open', $event)"
         @cycle="$emit('cycle', $event)"
         @delete="$emit('delete', $event)"
@@ -139,8 +138,7 @@ function toggleFilter(
 // 不要用 toRefs(store.derived) —— 见 FrontierPanel 那条注释。
 const liveTasks = computed(() => store.derived.live);
 const userTaskCounts = computed(() => store.derived.userTaskCounts);
-const derivedColumnCounts = computed(() => store.derived.columnCounts);
-const derivedSwimlanes = computed(() => store.derived.swimlanesByColumn);
+const derivedTasksByColumn = computed(() => store.derived.tasksByColumn);
 
 /** 成员 chip —— 直接复用 derived.userTaskCounts，不再自己 filter。 */
 const memberChips = computed<MemberChip[]>(() =>
@@ -154,7 +152,8 @@ const memberChips = computed<MemberChip[]>(() =>
 );
 
 /** 看板本地的可见任务 —— 只在 derived.live 之上套 panel 自己的筛选条件。
- *  is_deleted 已由 derived.live 滤过，这里不再重复 filter。 */
+ *  is_deleted 已由 derived.live 滤过；"已完成"不再进看板，这里同步排除，
+ *  否则筛选栏的"N 项"会把一批根本不会渲染的卡片算进去。 */
 const visibleTasks = computed<DevTask[]>(() => {
   const q = searchTerm.value.trim().toLowerCase();
   const ts = filterType.value;
@@ -163,6 +162,7 @@ const visibleTasks = computed<DevTask[]>(() => {
   const hasQ = q.length > 0;
   const out: DevTask[] = [];
   for (const t of liveTasks.value) {
+    if (t.status === '已完成') continue;
     if (ts.size && !ts.has(t.type)) continue;
     if (ps.size && !ps.has(t.priority)) continue;
     if (ms.size && !ms.has(t.user_id)) continue;
@@ -172,29 +172,12 @@ const visibleTasks = computed<DevTask[]>(() => {
   return out;
 });
 
-/** 各列泳道 —— 复用 derived.swimlanesByColumn，不在本 panel 套筛选。
- *  （原行为：筛选只影响 TodoFilterBar 的 count，泳道展示全量。）
+/** 各列任务 —— 复用 derived.tasksByColumn（列内已按 sort_order 升序）。
+ *  不在本 panel 套筛选：筛选只影响 TodoFilterBar 的 count，看板始终展示全量
+ *  （与改动前一致）。计数直接用 tasks.length，不再单独维护一份 count 表。
  */
-interface LaneVM {
-  userId: number;
-  label: string;
-  tasks: DevTask[];
-}
-
-const columnsById = computed<Map<KanbanColumnId, LaneVM[]>>(() => {
-  const out = new Map<KanbanColumnId, LaneVM[]>();
-  for (const col of KANBAN_COLUMNS) {
-    out.set(col.id, derivedSwimlanes.value.get(col.id) ?? []);
-  }
-  return out;
-});
-
-function columnCount(col: KanbanColumnId): number {
-  return derivedColumnCounts.value.get(col) ?? 0;
-}
-
-function lanesFor(col: KanbanColumnId): LaneVM[] {
-  return columnsById.value.get(col) ?? [];
+function tasksFor(col: KanbanColumnId): DevTask[] {
+  return derivedTasksByColumn.value.get(col) ?? [];
 }
 
 defineEmits<{

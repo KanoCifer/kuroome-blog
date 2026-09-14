@@ -1,74 +1,81 @@
 <template>
-  <div class="bg-page flex min-h-screen w-full flex-col">
-    <!-- ── page header ── -->
-    <TodoHeader @create="openCreate" @mcp-token="mcpTokenOpen = true" />
-
+  <div class="bg-page min-h-screen w-full">
     <!-- ── main content ── -->
-    <!-- shadcn 同款：sidebar 用「gap 占位 + fixed 容器」双胞胎结构，
-         width transition 只发生在空 gap 上 → main flex-1 永远不变形。 -->
-    <div class="flex flex-1">
-      <TodoSidebar v-model="activeTab" v-model:collapsed="sidebarCollapsed" />
+    <!-- 看板零重排契约：sidebar 是单个 fixed 不占位的可折叠侧边栏。
+         展开 = 240px / 折叠 = 56px，折叠只动 main 的左 padding，
+         max-w 钉死 → Kanban grid 列宽恒定，零 reflow。
+         lg 屏 tab 切换由 sidebar 内 tab 列表承担；窄屏回退到
+         <TodoMobileTabs>。 -->
+    <div class="relative flex">
+      <TodoSidebar
+        v-model="activeTab"
+        v-model:collapsed="sidebarCollapsed"
+        @create="openCreate"
+        @mcp-token="mcpTokenOpen = true"
+      />
 
-      <main
-        class="min-w-0 flex-1 overflow-y-auto px-5 py-5 contain-[layout_paint_scroll_style] sm:px-8"
-      >
-        <!-- mobile tab strip (in flow, below the page title row) -->
-        <TodoMobileTabs v-model="activeTab" />
-
-        <!-- 未登录空状态 -->
-        <div
-          v-if="!isAuthenticated"
-          class="flex h-full min-h-96 flex-col items-center justify-center gap-3 text-center"
+      <div class="flex h-full w-full items-center justify-center">
+        <main
+          class="flex h-full min-h-screen w-full max-w-6xl min-w-0 items-center justify-center overflow-y-auto px-8"
         >
-          <svg
-            class="text-muted/40 h-14 w-14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            aria-hidden="true"
+          <!-- 窄屏 tab strip：lg 由 sidebar 接管 -->
+          <TodoMobileTabs v-model="activeTab" />
+
+          <!-- 未登录空状态 -->
+          <div
+            v-if="!isAuthenticated"
+            class="h-h-screen flex flex-col items-center justify-center gap-3 text-center"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="1.5"
-              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-            />
-          </svg>
-          <p class="text-ink text-lg font-medium">请登录后使用开发任务</p>
-          <p class="text-muted max-w-xs text-sm">
-            开发任务看板用于管理个人的开发任务，需登录后启用。
-          </p>
-          <UiButton class="mt-1 px-5 py-2" @click="$router.push('/login')">
-            去登录
-          </UiButton>
-        </div>
-
-        <!-- 加载态 -->
-        <div v-else-if="store.loading" class="space-y-3">
-          <div class="bg-surface h-8 w-40 animate-pulse rounded-md" />
-          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <div
-              v-for="n in 3"
-              :key="n"
-              class="bg-surface h-28 animate-pulse rounded-xl"
-            />
+            <svg
+              class="text-muted/40 h-14 w-14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+              />
+            </svg>
+            <p class="text-ink text-lg font-medium">请登录后使用开发任务</p>
+            <p class="text-muted max-w-xs text-sm">
+              开发任务看板用于管理个人的开发任务，需登录后启用。
+            </p>
+            <UiButton class="mt-1 px-5 py-2" @click="$router.push('/login')">
+              去登录
+            </UiButton>
           </div>
-        </div>
 
-        <template v-else>
-          <!-- Tab 内容：单 keyed 元素 + mode="out-in"，确保每次切换是
+          <!-- 加载态 -->
+          <div v-else-if="store.loading" class="space-y-3">
+            <div class="bg-surface h-8 w-40 animate-pulse rounded-md" />
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div
+                v-for="n in 3"
+                :key="n"
+                class="bg-surface h-28 animate-pulse rounded-xl"
+              />
+            </div>
+          </div>
+
+          <template v-else>
+            <!-- Tab 内容：单 keyed 元素 + mode="out-in"，确保每次切换是
                一次干净的 enter/leave，不会多面板同时参与过渡。 -->
-          <SlideFadeTransition>
-            <component
-              :is="activePanel"
-              :key="activeTab"
-              @open="openDetail"
-              @cycle="store.cycleStatus"
-              @delete="handleDelete"
-            />
-          </SlideFadeTransition>
-        </template>
-      </main>
+            <SlideFadeTransition>
+              <component
+                :is="activePanel"
+                :key="activeTab"
+                @open="openDetail"
+                @cycle="store.cycleStatus"
+                @delete="handleDelete"
+              />
+            </SlideFadeTransition>
+          </template>
+        </main>
+      </div>
     </div>
 
     <!-- ── create / edit modal ── -->
@@ -126,7 +133,6 @@ import PlanningPanel from './components/PlanningPanel.vue';
 import ReviewPanel from './components/ReviewPanel.vue';
 import KanbanPanel from './components/KanbanPanel.vue';
 import TodoSidebar from './components/TodoSidebar.vue';
-import TodoHeader from './components/TodoHeader.vue';
 import TodoMobileTabs from './components/TodoMobileTabs.vue';
 import type { Component } from 'vue';
 

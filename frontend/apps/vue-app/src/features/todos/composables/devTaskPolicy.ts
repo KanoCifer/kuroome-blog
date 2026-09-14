@@ -71,14 +71,16 @@ export function todayString(now: Date = new Date()): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 }
 
-// ── 看板列定义（与后端 DevTaskStatus 一一对应，仅"待办"合并两个未启动状态） ──
+// ── 看板列定义（后端 DevTaskStatus 5 段 → 看板 3 列） ──
 //
-// 后端状态机 5 段，看板 4 列：
 //   待办    ← 待评估 ∪ 待排期  （两个"未启动"状态合并为一列，方便规划视图）
 //   进行中  ← 进行中           （直接对应后端）
 //   已搁置  ← 已搁置           （直接对应后端，列名沿用后端命名）
-//   已完成  ← 已完成           （直接对应后端）
-export type KanbanColumnId = 'todo' | 'doing' | 'paused' | 'done';
+//
+// **看板不再有"已完成"列**：已完成任务随使用只会单调累积，是看板里体量最大、
+// 又最不需要盯的一桶（回顾 tab 专门负责它）。留着它等于让看板越用越慢，
+// 并让 `已完成` 这个"终点"继续占一个拖拽落点。已完成的可见性全部由回顾 tab 承担。
+export type KanbanColumnId = 'todo' | 'doing' | 'paused';
 
 export interface KanbanColumn {
   id: KanbanColumnId;
@@ -113,14 +115,13 @@ export const KANBAN_COLUMNS: KanbanColumn[] = [
     targetStatus: '已搁置',
     dotClass: 'bg-warning',
   },
-  {
-    id: 'done',
-    label: '已完成',
-    statuses: ['已完成'],
-    targetStatus: '已完成',
-    dotClass: 'bg-success',
-  },
 ];
+
+/** status → 所属看板列。看板列定义是静态的，建一次表让每条任务 O(1) 落列。 */
+const COLUMN_BY_STATUS = new Map<DevTaskStatus, KanbanColumnId>();
+for (const col of KANBAN_COLUMNS) {
+  for (const status of col.statuses) COLUMN_BY_STATUS.set(status, col.id);
+}
 
 // ── 派生视图：一次性算出所有 panel 共用的数据 ────────────────────────────
 
@@ -158,13 +159,11 @@ export interface DevTaskView {
   typeDistribution: Record<DevTaskType, number>;
   /** userId → 未删除任务数，供 panel 做成员 chip 复用。 */
   userTaskCounts: Map<number, number>;
-  /** 每列卡片数；空列也存在（值为 0）。 */
-  columnCounts: Map<KanbanColumnId, number>;
-  /** 每列按 user_id 分组后的泳道；每条 lane 内按 sort_order 升序。 */
-  swimlanesByColumn: Map<
-    KanbanColumnId,
-    { userId: number; label: string; tasks: DevTask[] }[]
-  >;
+  /**
+   * 每列的扁平任务数组，列内按 sort_order 升序；空列也存在（空数组）。
+   * 卡片数直接读 `tasks.length` —— 不再单列一份 columnCounts 计数表。
+   */
+  tasksByColumn: Map<KanbanColumnId, DevTask[]>;
 }
 
 export function buildDevTaskView(
@@ -186,16 +185,11 @@ export function buildDevTaskView(
     DEFAULT_TYPES.map((t) => [t, 0]),
   ) as Record<DevTaskType, number>;
 
-  // column → user_id → lane tasks
-  const laneMaps = new Map<
-    KanbanColumnId,
-    Map<number, { userId: number; label: string; tasks: DevTask[] }>
-  >();
-  for (const col of KANBAN_COLUMNS) laneMaps.set(col.id, new Map());
+  // column → 扁平任务数组（不再按 user_id 分泳道）
+  const columnTasks = new Map<KanbanColumnId, DevTask[]>();
+  for (const col of KANBAN_COLUMNS) columnTasks.set(col.id, []);
 
   const userCounts = new Map<number, number>();
-  const columnCounts = new Map<KanbanColumnId, number>();
-  for (const col of KANBAN_COLUMNS) columnCounts.set(col.id, 0);
 
   // ── 时间口径：本周一 / 上周一 / 今日 YYYY-MM-DD ──
   const weekStart = startOfThisWeek(now);
@@ -261,19 +255,9 @@ export function buildDevTaskView(
     // userCounts
     userCounts.set(t.user_id, (userCounts.get(t.user_id) ?? 0) + 1);
 
-    // kanban 分桶：每条任务匹配第一个覆盖其 status 的列
-    for (const col of KANBAN_COLUMNS) {
-      if (!col.statuses.includes(t.status)) continue;
-      columnCounts.set(col.id, (columnCounts.get(col.id) ?? 0) + 1);
-      const laneMap = laneMaps.get(col.id)!;
-      let lane = laneMap.get(t.user_id);
-      if (!lane) {
-        lane = { userId: t.user_id, label: `用户 ${t.user_id}`, tasks: [] };
-        laneMap.set(t.user_id, lane);
-      }
-      lane.tasks.push(t);
-      break;
-    }
+    // kanban 落列：status → 列查表；未映射到任何列的 status（如"已完成"）不进看板
+    const colId = COLUMN_BY_STATUS.get(t.status);
+    if (colId) columnTasks.get(colId)!.push(t);
   }
 
   // ── 2) 排序（只对最后需要的数组排，常数时间增量） ──
@@ -304,17 +288,11 @@ export function buildDevTaskView(
     );
   }
 
-  // kanban 泳道：每条 lane 内按 sort_order 升序
-  const swimlanesByColumn = new Map<
-    KanbanColumnId,
-    { userId: number; label: string; tasks: DevTask[] }[]
-  >();
+  // kanban 各列：列内按 sort_order 升序（扁平数组，列与列之间互不影响）
   for (const col of KANBAN_COLUMNS) {
-    const lanes = Array.from(laneMaps.get(col.id)!.values());
-    for (const lane of lanes) {
-      lane.tasks.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
-    }
-    swimlanesByColumn.set(col.id, lanes);
+    columnTasks
+      .get(col.id)!
+      .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
   }
 
   return {
@@ -332,8 +310,7 @@ export function buildDevTaskView(
     byStatus: byStatusArr,
     typeDistribution: typeDist,
     userTaskCounts: userCounts,
-    columnCounts,
-    swimlanesByColumn,
+    tasksByColumn: columnTasks,
   };
 }
 

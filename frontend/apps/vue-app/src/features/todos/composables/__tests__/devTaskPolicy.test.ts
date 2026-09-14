@@ -506,19 +506,33 @@ describe('buildDevTaskView', () => {
       'p0-active',
     ]);
 
-    // columnCounts: 待评估/待排期→todo, 进行中→doing, 已搁置→paused, 已完成→done
-    expect(view.columnCounts.get('todo')).toBe(3);
-    expect(view.columnCounts.get('doing')).toBe(3);
-    expect(view.columnCounts.get('paused')).toBe(0);
-    expect(view.columnCounts.get('done')).toBe(3);
+    // tasksByColumn: 待评估/待排期→todo, 进行中→doing, 已搁置→paused；
+    // 列内扁平（不再按 user_id 分泳道），按 sort_order 升序。
+    expect(view.tasksByColumn.get('todo')?.map((t) => t.slug)).toEqual([
+      'created-this-week',
+      'overdue',
+      'p0-active',
+    ]);
+    expect(view.tasksByColumn.get('doing')?.map((t) => t.slug)).toEqual([
+      'frontier-p0',
+      'blocked',
+      'in-progress',
+    ]);
+    expect(view.tasksByColumn.get('paused')).toEqual([]);
+    expect(view.tasksByColumn.size).toBe(3);
 
-    // swimlanesByColumn: 每条 lane 内按 sort_order 升序
-    const todoLanes = view.swimlanesByColumn.get('todo')!;
-    expect(todoLanes.length).toBe(2);
-    for (const lane of todoLanes) {
-      const orders = lane.tasks.map((t) => t.sort_order ?? 0);
-      const sorted = [...orders].sort((a, b) => a - b);
-      expect(orders).toEqual(sorted);
+    // "已完成"没有对应看板列 —— 已完成任务不进任何列
+    const columnSlugs = [...view.tasksByColumn.values()]
+      .flat()
+      .map((t) => t.slug);
+    expect(columnSlugs).not.toContain('done-this-week');
+    expect(columnSlugs).not.toContain('p0-done');
+    expect(columnSlugs).toHaveLength(6);
+
+    // 每列内部按 sort_order 升序
+    for (const columnTasks of view.tasksByColumn.values()) {
+      const orders = columnTasks.map((t) => t.sort_order ?? 0);
+      expect(orders).toEqual([...orders].sort((a, b) => a - b));
     }
   });
 
@@ -534,8 +548,9 @@ describe('buildDevTaskView', () => {
     expect(view.activeCount).toBe(0);
     expect(view.blockedCount).toBe(0);
     expect(view.userTaskCounts.size).toBe(0);
-    expect(view.columnCounts.get('todo')).toBe(0);
-    expect(view.swimlanesByColumn.get('todo')).toEqual([]);
+    expect(view.tasksByColumn.get('todo')).toEqual([]);
+    expect(view.tasksByColumn.get('doing')).toEqual([]);
+    expect(view.tasksByColumn.get('paused')).toEqual([]);
   });
 
   it('200 条随机任务下不抛错、不退化', () => {

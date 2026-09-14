@@ -13,7 +13,7 @@
       <!-- LEFT: animal guardian. No ring, no halo — same C-ring style as FrontierCard. -->
       <div class="relative shrink-0 pt-0.5">
         <img
-          :src="animalSrc"
+          :src="cardMeta.animalSrc"
           :alt="''"
           class="animal-avatar h-[80px] w-[80px] object-cover select-none"
           draggable="false"
@@ -76,7 +76,7 @@
             <span
               v-if="task.due_date"
               class="flex items-center gap-1"
-              :class="overdue(task.due_date) && !done ? 'text-destructive' : ''"
+              :class="cardMeta.isOverdue && !done ? 'text-destructive' : ''"
             >
               <svg
                 class="h-[11px] w-[11px] shrink-0"
@@ -92,7 +92,7 @@
                 <path d="M2 6.5h12" />
                 <path d="M5.5 1.5v3M10.5 1.5v3" />
               </svg>
-              <span>{{ dueLabel }}</span>
+              <span>{{ cardMeta.dueText }}</span>
             </span>
           </div>
 
@@ -179,46 +179,53 @@ const emit = defineEmits<{
 
 const done = computed(() => props.task.status === '已完成');
 
-// ── Animal routing (same as FrontierCard, C-ring character-based) ────────────
-function pickAnimal(task: DevTask): string {
-  if (task.due_date) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const due = new Date(task.due_date);
-    if (!Number.isNaN(due.getTime())) {
-      if (due < today) return 'fox';
-      const days = (due.getTime() - today.getTime()) / 86400000;
-      if (days <= 3) return 'penguin';
-    }
-  } else {
-    return 'cat';
-  }
-  return task.kind === 'subtask' ? 'rabbit' : 'deer';
-}
-
-// ── Due-date label formatting (same as FrontierCard) ─────────────────────────
-function formatDue(due: string | null | undefined): {
-  text: string;
-  overdue: boolean;
-} {
-  if (!due) return { text: '—', overdue: false };
+/**
+ * 卡片展示所需的全部日期派生 —— 一次算完并缓存。
+ *
+ * 原先 pickAnimal / formatDue / overdue 各自 new 了两个 Date 再 setHours，
+ * 而 `overdue()` 还是模板里的方法调用，每次卡片重渲染都会重新分配一遍。
+ * 看板列里 ~200 张卡同时在场，父列 drag 状态一变就是几百次纯垃圾分配。
+ * 现在合成单个 computed：依赖只有 props.task，任务本身不变就不重算。
+ *
+ * 口径与原实现逐字对齐（含"今天到期算 penguin、不算 overdue"这类边界）。
+ */
+const cardMeta = computed(() => {
+  const task = props.task;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const dueDate = new Date(due);
-  if (Number.isNaN(dueDate.getTime())) return { text: due, overdue: false };
-  if (dueDate < today) {
-    const days = Math.floor((today.getTime() - dueDate.getTime()) / 86400000);
-    return { text: `overdue ${days}d`, overdue: true };
-  }
-  const m = dueDate.getMonth() + 1;
-  const d = String(dueDate.getDate()).padStart(2, '0');
-  return { text: `${m}月 ${d}`, overdue: false };
-}
+  const todayMs = today.getTime();
 
-const animalSrc = computed(
-  () => `/images/animal-badge/${pickAnimal(props.task)}.png`,
-);
-const dueLabel = computed(() => formatDue(props.task.due_date).text);
+  const dueMs = task.due_date ? new Date(task.due_date).getTime() : NaN;
+  const hasDue = Number.isFinite(dueMs);
+  const isOverdue = hasDue && dueMs < todayMs;
+
+  // ── Animal routing (same as FrontierCard, C-ring character-based) ──
+  let animal: string;
+  if (!task.due_date) {
+    animal = 'cat';
+  } else if (isOverdue) {
+    animal = 'fox';
+  } else if (hasDue && (dueMs - todayMs) / 86400000 <= 3) {
+    animal = 'penguin';
+  } else {
+    animal = task.kind === 'subtask' ? 'rabbit' : 'deer';
+  }
+
+  // ── Due-date label (same as FrontierCard) ──
+  let dueText: string;
+  if (!task.due_date) {
+    dueText = '—';
+  } else if (!hasDue) {
+    dueText = task.due_date;
+  } else if (isOverdue) {
+    dueText = `overdue ${Math.floor((todayMs - dueMs) / 86400000)}d`;
+  } else {
+    const due = new Date(dueMs);
+    dueText = `${due.getMonth() + 1}月 ${String(due.getDate()).padStart(2, '0')}`;
+  }
+
+  return { animalSrc: `/images/animal-badge/${animal}.png`, dueText, isOverdue };
+});
 
 function onDragStart(e: DragEvent) {
   if (e.dataTransfer) {
@@ -229,12 +236,6 @@ function onDragStart(e: DragEvent) {
 }
 function onDragEnd() {
   emit('dragend');
-}
-
-function overdue(dateStr: string): boolean {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return new Date(dateStr) < today;
 }
 </script>
 
