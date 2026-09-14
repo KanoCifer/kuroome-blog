@@ -3,11 +3,16 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
+	"io"
 	"log/slog"
+	"net/http"
+	"net/url"
 	"time"
 
 	"gorm.io/datatypes"
 
+	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 )
@@ -20,6 +25,7 @@ var (
 )
 
 const syncMaxBatch = 200
+const UserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36"
 
 // NomuRepository 定义 NomuService 依赖的数据能力（供 mock 测试）。
 type NomuRepository interface {
@@ -31,12 +37,8 @@ type NomuRepository interface {
 
 // NomuService 是 handler 依赖的接口。
 type NomuService interface {
-	// SyncNomuConfig 把本地配置全量同步到云端。
-	//
-	// 语义：以本地为基准——本地有/改的 upsert（version 乐观并发），
-	// 本地标 deleted 的软删云端。返回云端当前全量供前端对齐。
-	// lastSyncAt 用于增量拉取（仅同步该时间之后变更的行），nil 表示全量。
 	SyncNomuConfig(ctx context.Context, userId uint, local []NomuSyncItem, lastSyncAt *time.Time) ([]NomuSyncItem, error)
+	ProxyBlob(ctx context.Context, url *url.URL) (contentLength int64, contentType string, body io.ReadCloser, extraHeaders map[string]string, err error)
 }
 
 // NomuSyncItem 是单条配置在同步协议中的表示（对齐 Dexie configs 表一行）。
@@ -52,10 +54,11 @@ type NomuSyncItem struct {
 
 type NomuServiceStruct struct {
 	repo NomuRepository
+	client *httpclient.Client
 }
 
-func NewNomuService(repo *postgres.NomuRepository) *NomuServiceStruct {
-	return &NomuServiceStruct{repo: repo}
+func NewNomuService(repo *postgres.NomuRepository, client *httpclient.Client) *NomuServiceStruct {
+	return &NomuServiceStruct{repo: repo, client: client}
 }
 
 func (s *NomuServiceStruct) SyncNomuConfig(ctx context.Context, userId uint, local []NomuSyncItem, lastSyncAt *time.Time) ([]NomuSyncItem, error) {
@@ -130,4 +133,37 @@ func (s *NomuServiceStruct) SyncNomuConfig(ctx context.Context, userId uint, loc
 	slog.InfoContext(ctx, "nomu config synced",
 		"user_id", userId, "local_items", len(local), "cloud_items", len(cloud), "returned", len(out))
 	return out, nil
+}
+
+
+func (s *NomuServiceStruct) ProxyBlob(ctx context.Context, url *url.URL) (contentLength int64, contentType string, body io.ReadCloser, extraHeaders map[string]string, err error) {
+	rawURL := url.String()
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
+	if err != nil {
+		return 0, "", nil, nil, err
+	}
+
+	req.Header.Set("Referer", url.Scheme+"://"+url.Host+"/")
+	req.Header.Set("User-Agent", UserAgent)
+
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		return 0, "", nil, nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		return 0, "", nil, nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	}
+	defer resp.Body.Close()
+	contentLength = resp.ContentLength
+	contentType = resp.Header.Get("Content-Type")
+	if contentType == "" {
+		contentType = "application/octet-stream"
+	}
+	extraHeaders = map[string]string{
+		"Content-Disposition": "inline",
+		"Cache-Control":       "public, max-age=86400",
+	}
+
+	body = resp.Body
+	return contentLength, contentType, body, extraHeaders, nil
 }
