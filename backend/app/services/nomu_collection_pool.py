@@ -14,7 +14,7 @@ import re
 import time
 from uuid import uuid4
 
-from app.schemas.nomu import ProductDraft, ProductParseRequest
+from app.schemas.nomu import DraftLocalized, ProductDraft, ProductParseRequest
 
 # Noon 商品图集上限 —— 与扩展 snapshot-mapping 的 MAX_PRODUCT_IMAGES 对齐
 MAX_PRODUCT_IMAGES = 9
@@ -39,6 +39,29 @@ def _numeric_price(raw: str | None) -> str | None:
         return None
     match = re.search(r"\d+(?:\.\d+)?", raw.replace(",", ""))
     return match.group(0) if match else None
+
+
+# localized 文本上限 —— 标题防失控长串，描述对齐扩展端 description 量级
+_LOCALIZED_TITLE_MAX = 500
+_LOCALIZED_DESC_MAX = 8_000
+
+
+def _sanitize_localized(localized: DraftLocalized | None) -> dict | None:
+    """清洗 LLM 译文为扩展端 ``LocalizedContent`` 形状（缺字段省略，空语言丢弃）。"""
+    if localized is None:
+        return None
+    out: dict = {}
+    for lang, item in (("en", localized.en), ("ar", localized.ar)):
+        if item is None:
+            continue
+        entry: dict = {}
+        if item.title and item.title.strip():
+            entry["title"] = item.title.strip()[:_LOCALIZED_TITLE_MAX]
+        if item.description and item.description.strip():
+            entry["description"] = item.description.strip()[:_LOCALIZED_DESC_MAX]
+        if entry:
+            out[lang] = entry
+    return out or None
 
 
 def build_product_row(req: ProductParseRequest, draft: ProductDraft) -> dict:
@@ -93,6 +116,9 @@ def build_product_row(req: ProductParseRequest, draft: ProductDraft) -> dict:
     description = draft.description or req.description
     if description:
         row["description"] = description
+    localized = _sanitize_localized(draft.localized)
+    if localized:
+        row["localized"] = localized
     return row
 
 

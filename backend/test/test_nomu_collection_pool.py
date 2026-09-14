@@ -32,7 +32,6 @@ def test_product_row_matches_extension_shape():
     draft = ProductDraft(
         title="Silk Scarf",
         description="100% mulberry silk",
-        brand="AURAVE",
         price="$ 29.99",
         currency="USD",
         image_urls=["https://cdn.example.com/b.jpg", "https://cdn.example.com/a.jpg"],
@@ -68,6 +67,43 @@ def test_product_row_drops_hallucinated_urls():
     row = build_product_row(req, draft)
 
     assert [i["url"] for i in row["images"]] == ["https://cdn.example.com/a.jpg"]
+
+
+def test_product_row_localized_passthrough():
+    """LLM 译文清洗后写入 localized（LocalizedContent 形状，缺字段省略）。"""
+    from app.schemas.nomu import DraftLocalized, DraftLocalizedItem
+
+    req = _request()
+    draft = ProductDraft(
+        title="真丝丝巾",
+        localized=DraftLocalized(
+            en=DraftLocalizedItem(title="Silk Scarf", description="100% mulberry silk"),
+            ar=DraftLocalizedItem(title="وشاح حريري"),
+        ),
+    )
+
+    row = build_product_row(req, draft)
+
+    assert row["localized"] == {
+        "en": {"title": "Silk Scarf", "description": "100% mulberry silk"},
+        "ar": {"title": "وشاح حريري"},
+    }
+
+
+def test_product_row_omits_empty_localized():
+    """空译文与整段缺省都不产出 localized 键，行形状保持干净。"""
+    from app.schemas.nomu import DraftLocalized, DraftLocalizedItem
+
+    req = _request()
+    blank = build_product_row(req, ProductDraft(localized=DraftLocalized()))
+    assert "localized" not in blank
+    absent = build_product_row(req, ProductDraft())
+    assert "localized" not in absent
+    whitespace = build_product_row(
+        req,
+        ProductDraft(localized=DraftLocalized(en=DraftLocalizedItem(title="   "))),
+    )
+    assert "localized" not in whitespace
 
 
 def test_product_row_falls_back_to_snapshot_fields():

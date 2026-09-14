@@ -66,12 +66,29 @@ class ProductParseRequest(BaseModel):
     )
 
 
+class DraftLocalizedItem(BaseModel):
+    """单语言本地化草稿。"""
+
+    title: str | None = Field(None, description="该语言的商品标题")
+    description: str | None = Field(None, description="该语言的商品描述")
+
+
+class DraftLocalized(BaseModel):
+    """英文/阿拉伯语翻译，供扩展端 ``LocalizedContent``（localized.en/ar）。"""
+
+    en: DraftLocalizedItem | None = Field(None, description="英文标题/描述")
+    ar: DraftLocalizedItem | None = Field(None, description="阿拉伯语标题/描述")
+
+
 class ProductDraft(BaseModel):
     """LLM 结构化输出（``output_schema``）；非 API 响应，TaskIQ 内部消费。"""
 
     title: str | None = Field(None, description="商品标题（源语言，去除促销/物流噪声）")
     description: str | None = Field(None, description="商品描述/卖点，纯文本")
-    brand: str | None = Field(None, description="品牌名；素材与工具均无法确定则为 null")
+    # brand 不让 LLM 填：行上 brand 是 Noon 品牌 code 维度，自由文本会变假 code，由用户手动选
+    localized: DraftLocalized | None = Field(
+        None, description="en/ar 语言的标题与描述翻译；无法可靠翻译时置 null"
+    )
     price: str | None = Field(
         None, description="价格数字字符串（不含货币符号/千分位）；无法确定则为 null"
     )
