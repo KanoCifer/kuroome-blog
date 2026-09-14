@@ -12,9 +12,10 @@ import (
 
 	"gorm.io/datatypes"
 
-	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
+	"github.com/KanoCifer/kuroome-blog/internal/logger"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
+	"github.com/KanoCifer/kuroome-blog/internal/security"
 )
 
 var (
@@ -54,11 +55,10 @@ type NomuSyncItem struct {
 
 type NomuServiceStruct struct {
 	repo NomuRepository
-	client *httpclient.Client
 }
 
-func NewNomuService(repo *postgres.NomuRepository, client *httpclient.Client) *NomuServiceStruct {
-	return &NomuServiceStruct{repo: repo, client: client}
+func NewNomuService(repo *postgres.NomuRepository) *NomuServiceStruct {
+	return &NomuServiceStruct{repo: repo}
 }
 
 func (s *NomuServiceStruct) SyncNomuConfig(ctx context.Context, userId uint, local []NomuSyncItem, lastSyncAt *time.Time) ([]NomuSyncItem, error) {
@@ -136,7 +136,17 @@ func (s *NomuServiceStruct) SyncNomuConfig(ctx context.Context, userId uint, loc
 }
 
 
+// proxyClient 独立的 SSRF-safe HTTP 客户端；不走 s.client 是因为它
+// 共享的 *http.Client 没有 DialContext / CheckRedirect 钩子。
+//
+// ponytail: 进程内单例足够；ProxyBlob 并发量受前端图片加载驱动，
+// http.DefaultTransport 的连接池自然承载。
+var proxyClient = security.SafeClient()
+
 func (s *NomuServiceStruct) ProxyBlob(ctx context.Context, url *url.URL) (contentLength int64, contentType string, body io.ReadCloser, extraHeaders map[string]string, err error) {
+	if err := security.ValidateURL(ctx, url); err != nil {
+		return 0, "", nil, nil, err
+	}
 	rawURL := url.String()
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
 	if err != nil {
@@ -145,8 +155,12 @@ func (s *NomuServiceStruct) ProxyBlob(ctx context.Context, url *url.URL) (conten
 
 	req.Header.Set("Referer", url.Scheme+"://"+url.Host+"/")
 	req.Header.Set("User-Agent", UserAgent)
+	// proxyClient 绕过了 s.client.Do,手动注入 trace_id 以保持链路可观测。
+	if id, ok := logger.TraceIDFromContext(ctx); ok && id != "" {
+		req.Header.Set("X-Trace-Id", id)
+	}
 
-	resp, err := s.client.Do(ctx, req)
+	resp, err := proxyClient.Do(req)
 	if err != nil {
 		return 0, "", nil, nil, err
 	}
