@@ -1,6 +1,8 @@
 // Package emailtemplates 集中 user service 的注册验证码 + 魔法登录两套邮件模板。
 //
-// 两种 mode 共用同一调性（克制编辑式），仅通过品牌头部差异化：
+// 注册验证码邮件统一走 Nomu 样式（logo + "Nomu" 副标 + 代发页脚），
+// 不再按 mode 分流；mode 仅由调用方用于 Redis key 命名空间。
+// 魔法登录邮件仍按 mode 差异化：
 //   - blog: 纯文字 wordmark，无 logo，编辑式极简
 //   - nomu: logo + "Nomu" 副标，CTA / 页脚改为 Nomu 文案
 //
@@ -26,19 +28,14 @@ const NomuLogoURL = "https://kanocifer.chat/logo/logo.png"
 
 // VerificationEmail 构造注册验证码邮件内容与纯文本 fallback。
 //
-// mode 决定：
-//  1. 邮件标题 + HTML 模板（blog 走编辑式极简，nomu 走 logo + 品牌副标）
-//  2. 渲染走对应 HTML 函数；调用方按 mode 自行管理 Redis key 命名空间。
-func VerificationEmail(code, mode string) notification.Message {
-	title := "kanocifer.chat 注册验证码"
-	if mode == modeNomu {
-		title = "Nomu 注册验证码"
-	}
+// 标题与 HTML 统一为 Nomu 样式，与 mode 无关；
+// mode 仅由调用方用于 Redis key 命名空间。
+func VerificationEmail(code string) notification.Message {
 	plain := fmt.Sprintf("您的验证码：%s\n请在5分钟内使用。", code)
 	return notification.Message{
-		Title: title,
+		Title: "Nomu 注册验证码",
 		Body:  plain,
-		HTML:  RenderVerificationHTML(code, mode),
+		HTML:  RenderVerificationHTML(code),
 	}
 }
 
@@ -144,44 +141,9 @@ func renderMagicLoginHTMLNomu(link string) string {
 </html>`, NomuLogoURL, html.EscapeString(link))
 }
 
-// RenderVerificationHTML 渲染注册验证码邮件 HTML。
-func RenderVerificationHTML(code, mode string) string {
-	if mode == modeNomu {
-		return renderVerificationHTMLNomu(code)
-	}
-	return renderVerificationHTMLBlog(code)
-}
-
-func renderVerificationHTMLBlog(code string) string {
-	return fmt.Sprintf(`<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>kanocifer.chat 注册验证码</title>
-</head>
-<body style="margin:0;padding:32px 16px;background:#fafafa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#1a1a1a;">
-<table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:0 auto;">
-<tr><td style="padding:0 0 24px;text-align:left;">
-  <span style="font-size:14px;font-weight:600;letter-spacing:-0.2px;color:#1a1a1a;">kanocifer.chat</span>
-</td></tr>
-<tr><td style="background:#ffffff;border:1px solid #ececec;border-radius:14px;padding:36px 32px;">
-  <p style="margin:0 0 6px;font-size:13px;color:#888888;letter-spacing:0.2px;">注册验证码</p>
-  <h1 style="margin:0 0 28px;font-size:18px;font-weight:600;line-height:1.4;color:#1a1a1a;letter-spacing:-0.2px;">这是您的验证码</h1>
-  <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="background:#fafafa;border:1px solid #f0f0f0;border-radius:10px;">
-  <tr><td style="padding:24px 16px;text-align:center;">
-    <span style="font-family:'SF Mono','JetBrains Mono',Consolas,Menlo,monospace;font-size:36px;font-weight:600;letter-spacing:8px;color:#1a1a1a;">%s</span>
-  </td></tr>
-  </table>
-  <p style="margin:24px 0 0;font-size:14px;line-height:1.6;color:#6b6b6b;">请在 5 分钟内使用。验证码仅用于本次注册，不会以任何形式再次索取。</p>
-  <p style="margin:12px 0 0;font-size:13px;line-height:1.6;color:#999999;">若非本人操作，请忽略此邮件。</p>
-</td></tr>
-<tr><td style="padding:20px 4px 0;text-align:left;">
-  <p style="margin:0;font-size:12px;line-height:1.6;color:#aaaaaa;">kanocifer.chat · 注册验证码</p>
-</td></tr>
-</table>
-</body>
-</html>`, html.EscapeString(code))
+// RenderVerificationHTML 渲染注册验证码邮件 HTML，统一 Nomu 样式。
+func RenderVerificationHTML(code string) string {
+	return renderVerificationHTMLNomu(code)
 }
 
 func renderVerificationHTMLNomu(code string) string {

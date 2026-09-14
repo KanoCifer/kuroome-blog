@@ -176,7 +176,7 @@ func (s *userService) SendEmailCode(ctx context.Context, email, mode string) boo
 		slog.ErrorContext(ctx, "email code redis set failed", "err", err, "email", email, "mode", mode)
 	}
 
-	msg := emailtemplates.VerificationEmail(code, mode)
+	msg := emailtemplates.VerificationEmail(code)
 	return ch.Send(ctx, msg, notification.NotificationContext{Email: email})
 }
 

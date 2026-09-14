@@ -1053,42 +1053,27 @@ func TestPollNomuLogin_PendingWhenNilRedis(t *testing.T) {
 
 // ---------- HTML 模板：mode 路由 ----------
 
-// TestRenderVerificationHTML_BlogVsNomu 锁住两套 HTML 的关键差异：
-// nomu 必须带 logo URL + "Nomu" 副标 + "代发" 页脚；blog 都不带。
-// 这是品牌认知 + 防回归的最小断言，足够发现未来改坏一边的设计。
-func TestRenderVerificationHTML_BlogVsNomu(t *testing.T) {
+// TestRenderVerificationHTML_NomuStyle 注册验证码邮件已统一为 Nomu 样式：
+// 无论 mode 如何，都带 logo URL + "Nomu" 副标 + "代发" 页脚。
+// 这是品牌认知 + 防回归的最小断言，足够发现未来改坏模板的设计。
+func TestRenderVerificationHTML_NomuStyle(t *testing.T) {
 	code := "123456"
 
-	blog := emailtemplates.RenderVerificationHTML(code, modeBlog)
-	nomu := emailtemplates.RenderVerificationHTML(code, modeNomu)
+	for _, mode := range []string{modeBlog, modeNomu} {
+		got := emailtemplates.RenderVerificationHTML(code)
 
-	// blog 特征：含 "kanocifer.chat" wordmark + "注册验证码" 副标；
-	// 不应含 logo URL 也不应含 "Nomu" 品牌。
-	if !strings.Contains(blog, "kanocifer.chat") {
-		t.Error("blog html should mention kanocifer.chat wordmark")
-	}
-	if strings.Contains(blog, emailtemplates.NomuLogoURL) {
-		t.Error("blog html should NOT embed nomu logo")
-	}
-	if strings.Contains(blog, "Nomu") {
-		t.Error("blog html should NOT mention Nomu")
-	}
-	if !strings.Contains(blog, code) {
-		t.Error("blog html should embed the code")
-	}
-
-	// nomu 特征：含 logo URL + "Nomu" 副标 + "代发" 页脚。
-	if !strings.Contains(nomu, emailtemplates.NomuLogoURL) {
-		t.Error("nomu html should embed nomu logo")
-	}
-	if !strings.Contains(nomu, "Nomu") {
-		t.Error("nomu html should mention Nomu")
-	}
-	if !strings.Contains(nomu, "代 Nomu 发送") {
-		t.Error("nomu html should have '代 Nomu 发送' footer")
-	}
-	if !strings.Contains(nomu, code) {
-		t.Error("nomu html should embed the code")
+		if !strings.Contains(got, emailtemplates.NomuLogoURL) {
+			t.Errorf("mode %s: html should embed nomu logo", mode)
+		}
+		if !strings.Contains(got, "Nomu") {
+			t.Errorf("mode %s: html should mention Nomu", mode)
+		}
+		if !strings.Contains(got, "代 Nomu 发送") {
+			t.Errorf("mode %s: html should have '代 Nomu 发送' footer", mode)
+		}
+		if !strings.Contains(got, code) {
+			t.Errorf("mode %s: html should embed the code", mode)
+		}
 	}
 }
 
@@ -1143,15 +1128,11 @@ func TestNormalizeMode(t *testing.T) {
 	}
 }
 
-// TestBuildVerificationEmail_Title 锁住 mode 决定邮件标题。
+// TestBuildVerificationEmail_Title 注册验证码邮件标题已统一为 Nomu。
 func TestBuildVerificationEmail_Title(t *testing.T) {
-	blog := emailtemplates.VerificationEmail("123456", modeBlog)
-	nomu := emailtemplates.VerificationEmail("123456", modeNomu)
-	if blog.Title != "kanocifer.chat 注册验证码" {
-		t.Errorf("blog title = %q", blog.Title)
-	}
-	if nomu.Title != "Nomu 注册验证码" {
-		t.Errorf("nomu title = %q", nomu.Title)
+	got := emailtemplates.VerificationEmail("123456")
+	if got.Title != "Nomu 注册验证码" {
+		t.Errorf("title = %q", got.Title)
 	}
 }
 
