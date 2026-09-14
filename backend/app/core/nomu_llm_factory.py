@@ -11,7 +11,7 @@ def create_postgres_db() -> AsyncPostgresDb:
     try:
         return AsyncPostgresDb(db_url=get_settings().LEARNING_DATABASE_URL)
     except Exception as exc:
-        raise RuntimeError(f"Failed to create Redis DB: {exc!r}") from exc
+        raise RuntimeError(f"Failed to create Postgres DB: {exc!r}") from exc
 
 
 def create_nomu_model():

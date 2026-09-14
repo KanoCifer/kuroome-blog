@@ -1,4 +1,4 @@
-"""AiAgent 单元测试 — 验证外部契约，mock 掉 llm_factory 与 RedisDb。
+"""AiAgent 单元测试 — 验证外部契约，mock 掉 llm_factory 与 Postgres db。
 
 统一 SSE 信封（task-185 / task-186）：
     - agent 层 yield ``{"type": "reasoning"|"content", "content": str}``
@@ -70,7 +70,7 @@ def mock_factory(monkeypatch) -> dict[str, MagicMock]:
 @pytest.fixture
 def api_key_set(monkeypatch) -> None:
     """确保 get_settings().API_KEY 非空，避免 RuntimeError。"""
-    mock_settings = SimpleNamespace(API_KEY="test-key", REDIS_URL="redis://localhost:6379")
+    mock_settings = SimpleNamespace(API_KEY="test-key")
     monkeypatch.setattr("app.core.agent.get_settings", lambda: mock_settings)
 
 

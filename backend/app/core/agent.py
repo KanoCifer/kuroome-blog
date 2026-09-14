@@ -6,7 +6,7 @@ from collections.abc import AsyncIterator, Callable
 from typing import ClassVar, Literal
 
 from agno.agent import RunOutputEvent
-from agno.db.redis import RedisDb
+from agno.db.postgres import AsyncPostgresDb
 from agno.run.agent import ReasoningContentDeltaEvent
 
 from app.core.config import get_settings
@@ -178,7 +178,7 @@ class AiAgent:
 
     def __init__(
         self,
-        db: RedisDb | None = None,
+        db: AsyncPostgresDb | None = None,
         expert_weights: dict[str, float] | None = None,
     ) -> None:
         self._db = db or create_postgres_db()

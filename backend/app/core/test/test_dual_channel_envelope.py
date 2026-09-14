@@ -38,12 +38,12 @@ def _make_db(sessions: list | None = None) -> MagicMock:
 def mock_factory(monkeypatch):
     """Patch llm_factory 的三个工厂函数。"""
     mocks = {
-        "create_redis_db": MagicMock(return_value=_make_db()),
+        "create_postgres_db": MagicMock(return_value=_make_db()),
         "create_llm_model": MagicMock(return_value=MagicMock(name="FakeModel")),
         "create_agent": MagicMock(),
     }
     monkeypatch.setattr(
-        "app.core.agent.create_redis_db", mocks["create_redis_db"]
+        "app.core.agent.create_postgres_db", mocks["create_postgres_db"]
     )
     monkeypatch.setattr(
         "app.core.agent.create_llm_model", mocks["create_llm_model"]
@@ -57,9 +57,7 @@ def mock_factory(monkeypatch):
 @pytest.fixture
 def api_key_set(monkeypatch):
     """保证 get_settings().API_KEY 非空。"""
-    ms = SimpleNamespace(
-        API_KEY="test-key", REDIS_URL="redis://localhost:6379"
-    )
+    ms = SimpleNamespace(API_KEY="test-key")
     monkeypatch.setattr("app.core.agent.get_settings", lambda: ms)
 
 
