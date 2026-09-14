@@ -5,6 +5,10 @@
 - structlog 经 ``wrap_for_formatter`` 把事件交回 stdlib ``logging``，
   由 ``ProcessorFormatter`` 统一渲染：业务日志与 uvicorn/taskiq/sqlalchemy 等
   foreign 记录走**同一条**处理器链、同一套 JSON 长相。
+- 输出键名采用 ``time`` / ``level`` / ``msg`` 三键，对齐 lnav 内置 ``pino_log`` /
+  ``bunyan_log`` 格式识别——与 Go 后端 ``slog`` 同构，无需任何自定义格式文件即可
+  在 lnav 中按 timestamp / level / message 分列。其余 bind 字段（``trace_id`` 、
+  ``logger`` 、业务字段等）原样输出为顶层 JSON 键。
 - 输出目标：uvicorn.error / uvicorn.access 走 **stdout**（生命周期与请求轨迹
   在终端直接可见）；其余日志（app / taskiq / sqlalchemy）**只落盘**到
   app_info.log / app_error.log，不再向 stderr 输出。uvicorn.access 同时透传
@@ -66,14 +70,16 @@ def _add_trace_id(logger, method_name, event_dict):
 
 
 def _event_to_message(logger, method_name, event_dict):
-    """把 structlog 的 ``event`` 键重命名为 ``message``。
+    """把 structlog 的 ``event`` 键重命名为 ``msg``，对齐 lnav 内置 pino_log/bunyan_log
+    识别的 ``body-field``，与 Go 后端 slog 同构。msg 在 DB 写入时再回填到
+    ``Log.message`` 列（语义不变）。
 
     ``shared_processors`` 在 structlog.configure 与每个 handler 的
-    ``foreign_pre_chain`` 里各跑一遍；重命名只在首遍生效（后续 ``message`` 已存在、
+    ``foreign_pre_chain`` 里各跑一遍；重命名只在首遍生效（后续 ``msg`` 已存在、
     ``event`` 已不存在），天然幂等。
     """
-    if "event" in event_dict and "message" not in event_dict:
-        event_dict["message"] = event_dict.pop("event")
+    if "event" in event_dict and "msg" not in event_dict:
+        event_dict["msg"] = event_dict.pop("event")
     return event_dict
 
 
@@ -84,7 +90,7 @@ def _event_to_message(logger, method_name, event_dict):
 #      的级别过滤交给 stdlib handler 的 ``setLevel``。
 # 顺序依赖：PositionalArgumentsFormatter 必须先于 _event_to_message —— 它要对
 # event_dict["event"] 做 `%s` 占位符格式化（stdlib logging 风格），而
-# _event_to_message 会把 event 重命名为 message（此时 "event" 键已不存在，
+# _event_to_message 会把 event 重命名为 msg（此时 "event" 键已不存在，
 # 格式化会 KeyError）。
 shared_processors = [
     _add_trace_id,
@@ -233,14 +239,14 @@ def _db_enqueue(logger, method_name, event_dict):
 
     try:
         # extra 保留 trace_id 与业务 bind 字段（Log 模型无 trace_id 列，
-        # 故 trace_id 进 JSON extra，可供按链路查询）；level / message /
-        # timestamp 已是顶层列，不进 extra 避免重复。
-        exclude = _DB_EXCLUDE | {"level", "message", "timestamp"}
+        # 故 trace_id 进 JSON extra，可供按链路查询）；level / msg /
+        # timestamp 已是顶层列，不进 extra 避免重复。msg → Log.message 列。
+        exclude = _DB_EXCLUDE | {"level", "msg", "timestamp"}
         extra = {k: v for k, v in event_dict.items() if k not in exclude}
         payload = {
             "timestamp": _coerce_timestamp(event_dict.get("timestamp")),
             "level": event_dict.get("level", "info"),
-            "message": event_dict.get("message", ""),
+            "message": event_dict.get("msg", ""),
             "extra": extra,
         }
         loop.call_soon_threadsafe(_log_queue.put_nowait, payload)

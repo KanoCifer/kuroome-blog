@@ -28,9 +28,9 @@
 - 两个文件仅在 `SAVE_LOGS=True` 时启用（受 `LOG_DIR` 控制目录；默认 `backend/logs/`，文件名 `app.log`，logger 自动追加 `_info` / `_error` 后缀）；业务日志与 `taskiq` / `sqlalchemy` 等 foreign 记录**不再向 stderr 输出**，由文件承担持久化职责。
 - `uvicorn.access` 的自带 handler 被清掉后挂 stdout handler 并回传播到 root，进 `app_info.log`——不再单独剥离 access 轨迹。
 
-## 3. 结构化——message 给人，extra 给机器
+## 3. 结构化——msg 给人，extra 给机器
 
-- `message` 是**纯英文描述**，不含数值、不含前缀、不含 emoji。
+- `msg`（structlog `event`）是**纯英文描述**，不含数值、不含前缀、不含 emoji。
 - 数值、计数、耗时写进 `logger.bind(...)` 的 extra，**不要手拼字符串**。
 
 ```python
@@ -43,6 +43,7 @@ logger.bind(job="migration", duration=4.57, fetched=9, migrated=9).info("migrati
 
 - 格式模板里会带上 extra 字段，终端能看到、DB 持久化时整列写入 JSON。structlog 下 extra 即 event_dict 的键值，`JSONRenderer` 原样输出。
 - 内部日志**清掉 emoji**（✅❌⚠️📈）。level 本身就是信号，不靠图标。emoji 只在「发给人的外部通知文案」（飞书、Bark、邮件正文）里保留——那本来就是富文本。
+- JSON 顶层键固定为 `time` / `level` / `msg` 三键（外加 `trace_id`），与 Go 后端 slog 同构；任意 bind 字段输出为顶层 JSON 键。`msg` 键名对齐 lnav 内置 `pino_log` / `bunyan_log` 格式识别的 `body-field`，无需任何自定义格式文件即可在 lnav 中按时间戳 / 级别 / 消息分列。DB 写入时把 `msg` 回填到 `Log.message` 列，业务语义不变。
 
 ## 4. 前缀收口成 bind 字段
 
@@ -131,3 +132,9 @@ _log_worker()  [background task]             ← 单 consumer，async session �
 - 禁止按领域/模块分日志文件（违背单一轨迹原则）。
 - 禁止 repo 层打常规数据操作日志。
 - 禁止日志里硬编码密钥、token、完整凭据（脱敏后可记标识）。
+
+## 10. lnav 集成
+
+`app_info.log` / `app_error.log` 是 JSON-lines（`structlog.processors.JSONRenderer`），输出顶层键固定 `time` / `level` / `msg`（外加 `trace_id` 与任意 bind 字段）。这个键名结构与 Go 后端 slog 同构，lnav 内置 `pino_log` / `bunyan_log` 格式自动识别——**无需安装任何自定义格式文件**。
+
+`lnav backend/logs/app_info.log` 即可看到分列视图；`:filter-in trace_id = <id>` 按链路过滤。`level` 是 `info` / `warning` / `error` / `critical` 小写，落在 lnav 内置 case-insensitive 识别集合内。

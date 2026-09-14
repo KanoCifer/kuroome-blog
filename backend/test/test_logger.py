@@ -117,7 +117,11 @@ class TestTraceId:
 
 
 class TestOutputSchema:
-    """输出 JSON 仅含四键：trace_id / level / message / timestamp。"""
+    """输出 JSON 四键：trace_id / level / msg / timestamp。
+
+    ``msg`` 键名对齐 lnav 内置 ``pino_log`` / ``bunyan_log`` 格式识别的
+    ``body-field``，与 Go 后端 slog 同构——lnav 无需自定义格式文件即可分列。
+    """
 
     def test_json_has_only_four_keys(self):
         """对一条合成 WARNING 记录渲染 JSONRenderer，验证仅四键。
@@ -130,7 +134,7 @@ class TestOutputSchema:
         )
         rendered = _make_formatter(_json_renderer).format(record)
         parsed = json.loads(rendered)
-        assert set(parsed.keys()) == {"trace_id", "level", "message", "timestamp"}
+        assert set(parsed.keys()) == {"trace_id", "level", "msg", "timestamp"}
 
 
 class TestRouting:
