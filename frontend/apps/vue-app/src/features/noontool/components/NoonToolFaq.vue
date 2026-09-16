@@ -10,6 +10,7 @@ const items = [
   'regions',
   'sources',
   'data',
+  'ai',
   'translation',
   'failure',
 ] as const;

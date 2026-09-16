@@ -3,7 +3,7 @@ import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
-const claims = ['claim1', 'claim2', 'claim3'] as const;
+const claims = ['claim1', 'claim2', 'claim3', 'claim4'] as const;
 </script>
 
 <template>
@@ -27,7 +27,8 @@ const claims = ['claim1', 'claim2', 'claim3'] as const;
           v-if="i < claims.length - 1"
           aria-hidden="true"
           class="text-muted/40"
-        >·</span>
+          >·</span
+        >
       </li>
     </ul>
   </section>

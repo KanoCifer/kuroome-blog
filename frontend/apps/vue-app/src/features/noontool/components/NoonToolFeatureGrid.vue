@@ -3,30 +3,59 @@ import { useI18n } from 'vue-i18n';
 import * as LucideIcons from '@lucide/vue';
 import { icons, type IconKey } from '../icons';
 import NoonToolScreenshot from './NoonToolScreenshot.vue';
+import NoonToolPlaceholder from './NoonToolPlaceholder.vue';
 
 const { t } = useI18n();
 
 type FeatureKey = Extract<
   IconKey,
-  'pipeline' | 'multiAccount' | 'translate' | 'image' | 'serial' | 'ai'
+  | 'pipeline'
+  | 'sources'
+  | 'multiAccount'
+  | 'translate'
+  | 'image'
+  | 'category'
+  | 'serial'
+  | 'tasks'
+  | 'duplicate'
+  | 'engine'
+  | 'price'
+  | 'export'
+  | 'account'
+  | 'cloudPool'
+  | 'sync'
+  | 'assistant'
 >;
 
 const featureKeys: FeatureKey[] = [
   'pipeline',
+  'sources',
   'multiAccount',
   'translate',
   'image',
+  'category',
   'serial',
-  'ai',
+  'tasks',
+  'duplicate',
+  'engine',
+  'price',
+  'export',
+  'account',
+  'cloudPool',
+  'sync',
+  'assistant',
 ];
 
-const featureImages: Record<FeatureKey, string> = {
+// 只有旧六项有截图资产（/noontool-screens/）；其余走占位卡，出图后补上即可。
+const featureImages: Partial<Record<FeatureKey, string>> = {
   pipeline: '/noontool-screens/02-feature-pipeline.png',
   multiAccount: '/noontool-screens/03-feature-multiAccount.png',
   translate: '/noontool-screens/04-feature-translate.png',
   image: '/noontool-screens/05-feature-image.png',
   serial: '/noontool-screens/06-feature-serial.png',
-  ai: '/noontool-screens/07-feature-ai.png',
+  category: '/noontool-screens/07-feature-ai.png',
+  tasks: '/noontool-screens/08-feature-post.png',
+  duplicate: '/noontool-screens/09-feature-post-right.png',
 };
 </script>
 
@@ -80,10 +109,18 @@ const featureImages: Record<FeatureKey, string> = {
           {{ t(`noonTool.features.items.${key}.body`) }}
         </p>
         <NoonToolScreenshot
+          v-if="featureImages[key]"
           class="mt-auto"
           :src="featureImages[key]"
           :alt="t('noonTool.features.items.' + key + '.imageAlt')"
           aspect="3/2"
+        />
+        <NoonToolPlaceholder
+          v-else
+          class="mt-auto"
+          aspect="3/2"
+          :label="t('noonTool.features.items.' + key + '.title')"
+          :caption="t('noonTool.placeholder.caption')"
         />
       </li>
     </ul>

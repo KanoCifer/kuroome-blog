@@ -1,19 +1,40 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
+import * as LucideIcons from '@lucide/vue';
 import { Card } from '@/components/ui/card';
+import { icons, type IconKey } from '../icons';
 
 const { t } = useI18n();
 
-const topKeys = ['tabs', 'storage', 'sidePanel'] as const;
-const allPerms = ['tabs', 'storage', 'sidePanel'] as const;
+type PermKey = Extract<IconKey, `perm${string}`>;
+
+// 与 wxt.config.ts manifest.permissions 一一对应
+const topKeys = ['activeTab', 'scripting', 'storage'] as const;
+const allPerms = [
+  'storage',
+  'alarms',
+  'notifications',
+  'activeTab',
+  'scripting',
+  'contextMenus',
+] as const;
+
+const permIcon: Record<(typeof allPerms)[number], PermKey> = {
+  storage: 'permStorage',
+  alarms: 'permAlarms',
+  notifications: 'permNotifications',
+  activeTab: 'permActiveTab',
+  scripting: 'permScripting',
+  contextMenus: 'permContextMenus',
+};
+
+// 与 wxt.config.ts host_permissions 一一对应
 const hostKeys = [
-  'noon',
   'noonPartners',
   'noonCdn',
-  'cdn1688',
-  'alicom',
-  'alibabaCdn',
+  'alicdn',
+  'jdimg',
   'backend',
 ] as const;
 
@@ -40,9 +61,14 @@ const showFull = ref(false);
         :key="key"
         class="border-border/60 bg-card/70 gap-1 p-4"
       >
-        <span class="text-accent text-sm font-semibold">{{
-          t(`noonTool.permissions.top.${key}.name`)
-        }}</span>
+        <span class="text-accent flex items-center gap-2 text-sm font-semibold">
+          <component
+            :is="(LucideIcons as any)[icons[permIcon[key]]]"
+            :size="14"
+            :stroke-width="1.75"
+          />
+          {{ t(`noonTool.permissions.top.${key}.name`) }}
+        </span>
         <p class="text-muted text-xs leading-relaxed">
           {{ t(`noonTool.permissions.top.${key}.reason`) }}
         </p>

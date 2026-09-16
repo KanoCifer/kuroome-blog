@@ -3,13 +3,13 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useHead } from '@vueuse/head';
 import NoonToolHero from './components/NoonToolHero.vue';
+import NoonToolSplash from './components/NoonToolSplash.vue';
 import NoonToolPositioning from './components/NoonToolPositioning.vue';
 import NoonToolFeatureGrid from './components/NoonToolFeatureGrid.vue';
 import NoonToolPrivacy from './components/NoonToolPrivacy.vue';
 import NoonToolHowItWorks from './components/NoonToolHowItWorks.vue';
 import NoonToolSupport from './components/NoonToolSupport.vue';
 import NoonToolPermissions from './components/NoonToolPermissions.vue';
-import NoonToolRoadmap from './components/NoonToolRoadmap.vue';
 import NoonToolFaq from './components/NoonToolFaq.vue';
 import NoonToolFinalCta from './components/NoonToolFinalCta.vue';
 import NoonToolFooter from './components/NoonToolFooter.vue';
@@ -36,15 +36,17 @@ useHead({
 
 <template>
   <div class="bg-page">
-    <div class="mx-auto max-w-6xl space-y-20 px-4 py-12 md:space-y-28 md:px-8 md:py-20">
+    <div
+      class="mx-auto max-w-6xl space-y-20 px-4 py-12 md:space-y-28 md:px-8 md:py-20"
+    >
       <NoonToolHero />
+      <NoonToolSplash />
       <NoonToolPositioning />
       <NoonToolFeatureGrid id="features" />
       <NoonToolPrivacy />
       <NoonToolHowItWorks id="how-it-works" />
       <NoonToolSupport id="support" />
       <NoonToolPermissions />
-      <NoonToolRoadmap />
       <NoonToolFaq />
       <NoonToolFinalCta />
       <NoonToolFooter />
