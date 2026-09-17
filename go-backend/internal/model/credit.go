@@ -94,7 +94,7 @@ var creditPriceSeeds = []CreditPrice{
 	{Source: "translate", Variant: "", UnitPrice: 10},
 	{Source: "nomu_prompt_optimize", Variant: "", UnitPrice: 20},
 	// nomu 商品解析：DeepSeek 单 loop（工具轮）+ 池写入，token 量高于 translate/prompt-optimize
-	{Source: "nomu_product_parse", Variant: "", UnitPrice: 100},
+	{Source: "nomu_product_parse", Variant: "", UnitPrice: 300},
 	{Source: "design_generate", Variant: DesignVariantArkLite, UnitPrice: 3000},
 	{Source: "design_generate", Variant: DesignVariantArkPro, UnitPrice: 4000},
 	// gpt-image-2 系列：成本 $0.03/张 ≈ ¥0.22，零售价暂对齐 lite（¥0.30），

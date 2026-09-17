@@ -36,13 +36,22 @@ const props = defineProps<{
   updatedAt?: string;
 }>();
 
-// 检测字符串是否像 HTML
+// 检测字符串是否像 HTML —— 必须看起来像完整的 HTML 文档片段,
+/**
+ * 与其匹配任何 `<...>` 子串(会把用户的纯文本误判), 不如要求真正的
+ * HTML 结构锚点: 文档/容器型标签(doctype|html|body|article|div|p|span|h[1-6])
+ * 紧贴开头, 或实体转义包围了标签。这是误判最低的判定方式。
+ */
 const isHtmlLike = (str: string): boolean => {
   if (!str) return false;
+  const trimmed = str.trim();
+  // 文档型根标签或块级元素开头, 或被实体转义的标签 —— 真正的 HTML 文档结构
   return (
-    /<\/?[a-z][\s\S]*>/i.test(str) ||
-    str.includes('&lt;') ||
-    str.includes('&gt;')
+    /^<\s*(?:!doctype|html|body|article|main|section|div|p|span|h[1-6]|ul|ol|li|blockquote|pre|table)\b/i.test(
+      trimmed,
+    ) || /^&lt;\s*(?:!doctype|html|body|article|main|section|div|p|span|h[1-6])/i.test(
+      trimmed,
+    )
   );
 };
 
@@ -51,6 +60,7 @@ const markdownText = ref<string>(
     ? turndownService.turndown(props.modelValue || '')
     : props.modelValue || '',
 );
+const lastEmittedValue = ref<string>(markdownText.value);
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
 
 // Image management (extracted to composable)
@@ -140,21 +150,35 @@ const handleKeydown = (e: KeyboardEvent) => {
   }
 };
 
-// Watch for external changes (e.g., parent switches article being edited)
+// Watch for external changes (e.g., parent switches article being edited).
+//
+// 注意:`v-model` 在父级产生的回路会让我们的 emit 一路流回 `props.modelValue`,
+// 进而重新触发本 watcher。如果没有守卫, 用户键入/粘贴的任何带 HTML 标记的
+// 文本都会被 `isHtmlLike()` 误判, 然后被 `turndown` 转回 markdown —— 转义
+// 掉 `*` `_` 等字符。`lastEmittedValue` 用于识别"这就是我们刚发出的值",
+// 一旦识别, 直接跳过 —— 不再二次处理。
 watch(
   () => props.modelValue,
   (newValue) => {
-    const converted = isHtmlLike(newValue || '')
-      ? turndownService.turndown(newValue || '')
-      : newValue || '';
+    const incoming = newValue || '';
+    // 自己 emit 后的回流, 直接吃掉
+    if (incoming === lastEmittedValue.value) return;
+    const converted = isHtmlLike(incoming)
+      ? turndownService.turndown(incoming)
+      : incoming;
     if (converted !== markdownText.value) {
       markdownText.value = converted;
+      lastEmittedValue.value = converted;
+    } else {
+      // 内容已经是 markdown 形态, 但 props 来源是外部, 仍要更新缓存避免误判
+      lastEmittedValue.value = incoming;
     }
   },
 );
 
 // Update parent when content changes
 watch(markdownText, (newValue) => {
+  lastEmittedValue.value = newValue;
   emit('update:modelValue', newValue);
 });
 
