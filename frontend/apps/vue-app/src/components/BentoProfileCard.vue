@@ -15,7 +15,7 @@
           class="from-accent to-secondary absolute -inset-1 rounded-full bg-linear-to-br opacity-50 blur"
         ></div>
         <img
-          src="/images/about-thumb.webp"
+          src="/logo/logo.png"
           alt="Kuroome"
           class="relative h-32 w-32 transform transform-gpu rounded-full border-4 border-white object-cover shadow-xl transition duration-500 group-hover:scale-105"
         />

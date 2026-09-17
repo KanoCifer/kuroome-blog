@@ -5,7 +5,7 @@ import { SPRING } from '@/constants';
 import { useTypewriter } from '@/composables';
 import { IconExternalLink } from '@/components';
 
-const AboutIMG = '/images/about-thumb.webp';
+const AboutIMG = '/logo/logo.png';
 
 // Greeting typewriter
 const greeting = useTypewriter();
