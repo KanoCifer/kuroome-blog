@@ -51,7 +51,7 @@
     />
     <img
       v-else
-      src="/images/about-thumb.webp"
+      src="/logo/logo.png"
       alt="Default Avatar"
       class="h-14 w-14 rounded-full object-cover shadow-sm ring-4 ring-white/50 dark:ring-gray-700/50"
     />

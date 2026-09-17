@@ -13,7 +13,7 @@
           />
           <img
             v-else
-            src="/images/about-thumb.webp"
+            src="/logo/logo.png"
             alt="Default Avatar"
             class="h-10 w-10 rounded-full object-cover ring-2 ring-white/50 outline -outline-offset-1 outline-black/10 transition-[transform] duration-150 ease-out active:scale-[0.96] dark:ring-gray-700/50 dark:outline-white/10"
             decoding="async"
@@ -322,7 +322,7 @@ const avatarUrl = computed(() => {
   if (auth.user?.photo) {
     return `/v3/media/${auth.user.photo}`;
   }
-  return '/images/about-thumb.webp';
+  return '/logo/logo.png';
 });
 </script>
 
