@@ -47,33 +47,55 @@ func NewAuthFailLimiter(rdb *redis.Client, scope string) *AuthFailLimiter {
 	}
 }
 
-// Fail 记录一次认证失败,返回是否已超阈值(limited)与建议重试间隔。
+// Fail 记录一次认证失败,返回 (limited, firstHit, retryAfter):
+//   - limited: 是否已超阈值;
+//   - firstHit: 是否是该 IP 在本窗口内**首次**进入限流状态(用 SETNX 标记);
+//   - retryAfter: 超阈值时建议客户端等多久再试。
 //
-// 行为约定:
-//   - rdb 为 nil(单元测试 / 配置缺失): 一律放行,不阻断;
-//   - Redis 调用失败: warn 后放行,绝不把 Redis 故障放大成"用户全锁";
-//   - 计数 > threshold: 返 (true, retryAfter),handler 应直接 429 + Retry-After。
-func (l *AuthFailLimiter) Fail(c *gin.Context) (limited bool, retryAfter time.Duration) {
+// 日志策略(由 handler 据 firstHit 决定级别):
+//   - firstHit=true  → WARN,这是值得关注的边沿事件(某个 IP 进入限流了);
+//   - firstHit=false → 不打日志,稳态信号已经在首次打过,再打就是噪音;
+//   - rdb 为 nil 或 Redis 故障: 全部放行,绝不把 Redis 故障放大成"用户全锁"。
+//
+// 实现: 两阶段 pipeline,避免"前几次失败就误设 firstKey 标记"。
+//   - 第一次:INCR + EXPIRE,读出当前计数 n;
+//   - n <= threshold: 已结束,无需 SETNX(否则前 5 次也会把 firstKey 设上,
+//     导致第 6 次的"首次进入"语义失效);
+//   - n > threshold: 再单独 SETNX,标记"已进入限流"。
+func (l *AuthFailLimiter) Fail(c *gin.Context) (limited bool, firstHit bool, retryAfter time.Duration) {
 	if l == nil || l.rdb == nil {
-		return false, 0
+		return false, false, 0
 	}
-	key := fmt.Sprintf("rl:%s:%s", l.scope, ClientIP(c))
+	ip := ClientIP(c)
+	counterKey := fmt.Sprintf("rl:%s:%s", l.scope, ip)
+	firstKey := fmt.Sprintf("rl:%s:first:%s", l.scope, ip)
 	ctx := c.Request.Context()
 	if ctx == nil {
 		ctx = context.Background()
 	}
 
+	// 第一阶段: INCR + EXPIRE,拿当前计数。
 	pipe := l.rdb.Pipeline()
-	incr := pipe.Incr(ctx, key)
-	pipe.Expire(ctx, key, l.window)
+	incrCmd := pipe.Incr(ctx, counterKey)
+	pipe.Expire(ctx, counterKey, l.window)
 	if _, err := pipe.Exec(ctx); err != nil {
 		slog.WarnContext(ctx, "auth fail limiter redis error", "scope", l.scope, "error", err)
-		return false, 0
+		return false, false, 0
 	}
-	if incr.Val() > int64(l.threshold) {
-		return true, l.retryAfter
+	n := incrCmd.Val()
+	if n <= int64(l.threshold) {
+		return false, false, 0
 	}
-	return false, 0
+
+	// 第二阶段: 超阈值,SETNX 标记首次进入。SETNX 在 firstKey 已存在时返 false,
+	// 第一次进入时返 true(并自动设值 + 继承 TTL)。
+	set, err := l.rdb.SetNX(ctx, firstKey, "1", l.window).Result()
+	if err != nil {
+		slog.WarnContext(ctx, "auth fail limiter redis error", "scope", l.scope, "error", err)
+		// Redis 故障时保守: 限流判定仍生效(firstHit 拿不到就当 false,handler 走静默分支)。
+		return true, false, l.retryAfter
+	}
+	return true, set, l.retryAfter
 }
 
 // Scope 暴露 scope 用于响应头/日志标注。

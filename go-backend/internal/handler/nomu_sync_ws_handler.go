@@ -294,18 +294,23 @@ func (h *NomuSyncWSHandler) ListDevices(c *gin.Context) {
 // 客户端能据此分支处理(不再继续重试,转清 token 重登)。
 //
 // 阈值见 middleware.NewAuthFailLimiter(默认 5 次/小时),超限由该 limiter 拦。
+//
+// 日志:首次进入限流状态(firstHit)打 WARN,稳态中(follow-up)不打,避免坏前端
+// 在限流窗口内每秒一条 WARN 撑爆日志。
 func (h *NomuSyncWSHandler) rejectInvalidToken(c *gin.Context, message string) {
-	if limited, retry := h.authFailLimiter.Fail(c); limited {
+	if limited, firstHit, retry := h.authFailLimiter.Fail(c); limited {
 		retrySec := int(retry.Seconds())
 		if retrySec < 1 {
 			retrySec = 30
 		}
 		c.Header("Retry-After", strconv.Itoa(retrySec))
-		slog.WarnContext(c.Request.Context(),
-			"sync ws rejected: too many auth failures",
-			"scope", h.authFailLimiter.Scope(),
-			"client_ip", middleware.ClientIP(c),
-		)
+		if firstHit {
+			slog.WarnContext(c.Request.Context(),
+				"sync ws rejected: too many auth failures (entered limit)",
+				"scope", h.authFailLimiter.Scope(),
+				"client_ip", middleware.ClientIP(c),
+			)
+		}
 		response.APIErrorWithCode(c, "too_many_auth_failures",
 			"认证失败次数过多,请稍后再试或重新登录", 429)
 		return

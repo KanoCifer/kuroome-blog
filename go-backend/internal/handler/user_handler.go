@@ -226,18 +226,23 @@ func (h *UserHandler) RefreshToken(c *gin.Context) {
 // rejectRefreshInvalid /refresh-token 失败统一出口:失败计数 → 超阈值 429 → 否则
 // 401 + code=refresh_token_expired。与 ws 失败限流语义一致,但 scope 独立(同一坏
 // 客户端把循环挪到 /refresh-token 也照样被卡)。
+//
+// 日志:首次进入限流状态(firstHit)打 WARN,稳态中(follow-up)不打,避免坏前端
+// 在限流窗口内持续刷 WARN 撑爆日志。
 func (h *UserHandler) rejectRefreshInvalid(c *gin.Context, err error) {
-	if limited, retry := h.refreshAuthFailLimiter.Fail(c); limited {
+	if limited, firstHit, retry := h.refreshAuthFailLimiter.Fail(c); limited {
 		retrySec := int(retry.Seconds())
 		if retrySec < 1 {
 			retrySec = 30
 		}
 		c.Header("Retry-After", strconv.Itoa(retrySec))
-		slog.WarnContext(c.Request.Context(),
-			"refresh rejected: too many auth failures",
-			"scope", h.refreshAuthFailLimiter.Scope(),
-			"client_ip", middleware.ClientIP(c),
-		)
+		if firstHit {
+			slog.WarnContext(c.Request.Context(),
+				"refresh rejected: too many auth failures (entered limit)",
+				"scope", h.refreshAuthFailLimiter.Scope(),
+				"client_ip", middleware.ClientIP(c),
+			)
+		}
 		response.APIErrorWithCode(c, "too_many_auth_failures",
 			"刷新令牌校验失败次数过多,请稍后再试或重新登录", 429)
 		return
