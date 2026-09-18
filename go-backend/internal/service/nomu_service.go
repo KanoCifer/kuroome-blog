@@ -39,6 +39,8 @@ type NomuRepository interface {
 // NomuService 是 handler 依赖的接口。
 type NomuService interface {
 	SyncNomuConfig(ctx context.Context, userId uint, local []NomuSyncItem, lastSyncAt *time.Time) ([]NomuSyncItem, error)
+	// ProxyBlob 拉取上游 blob。返回的 body 未读，由调用方负责 Close；
+	// 不要在函数内 defer Close——那会在调用方读到数据前就掐断连接。
 	ProxyBlob(ctx context.Context, url *url.URL) (contentLength int64, contentType string, body io.ReadCloser, extraHeaders map[string]string, err error)
 }
 
@@ -164,10 +166,12 @@ func (s *NomuServiceStruct) ProxyBlob(ctx context.Context, url *url.URL) (conten
 	if err != nil {
 		return 0, "", nil, nil, err
 	}
+	// 非 200 的响应体由本函数就地关闭；200 时 body 交给调用方读完再关。
+	// 这里不能 defer Close：函数返回即触发，下游一个字都读不到。
 	if resp.StatusCode != http.StatusOK {
+		_ = resp.Body.Close()
 		return 0, "", nil, nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
-	defer resp.Body.Close()
 	contentLength = resp.ContentLength
 	contentType = resp.Header.Get("Content-Type")
 	if contentType == "" {

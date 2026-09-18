@@ -71,8 +71,9 @@ func (h *NomuHandler) ProxyBlob(c *gin.Context) {
 		h.respondError(c, err)
 		return
 	}
+	// body 归 handler 所有：DataFromReader 只负责读，不负责关。
+	defer body.Close()
 	c.DataFromReader(http.StatusOK, contentLength, contentType, body, extraHeaders)
-
 }
 
 func (h *NomuHandler) SyncNomuConfig(c *gin.Context) {
