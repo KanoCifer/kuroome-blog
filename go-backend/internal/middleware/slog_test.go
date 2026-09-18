@@ -162,3 +162,86 @@ var errBoom = &boomError{}
 type boomError struct{}
 
 func (*boomError) Error() string { return "boom" }
+
+// 429(限流命中)应被完全跳过,不写 access log。这是过渡期坏前端高频重试时
+// 避免日志爆炸的关键路径。
+func TestSlogMiddleware_Skips429(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	var buf bytes.Buffer
+	logger := slog.New(slog.NewJSONHandler(&buf, nil))
+
+	r := gin.New()
+	r.Use(SlogMiddleware(logger))
+	r.GET("/r", func(c *gin.Context) { c.Status(http.StatusTooManyRequests) })
+
+	for i := 0; i < 20; i++ {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/r", nil)
+		r.ServeHTTP(w, req)
+		if w.Code != http.StatusTooManyRequests {
+			t.Fatalf("status = %d, want 429", w.Code)
+		}
+	}
+
+	if buf.Len() != 0 {
+		t.Fatalf("429 should never log, got %d bytes: %s", buf.Len(), buf.String())
+	}
+}
+
+// 4xx(除 429)按 1/access4xxSampleRate 抽样:打 N 次 401,期望 ~N/10 条记录。
+// 用闭包内 atomic 计数,每个测试实例独立,所以这里走精确边界断言。
+func TestSlogMiddleware_Samples4xx(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	var buf bytes.Buffer
+	logger := slog.New(slog.NewJSONHandler(&buf, nil))
+
+	r := gin.New()
+	r.Use(SlogMiddleware(logger))
+	r.GET("/r", func(c *gin.Context) { c.Status(http.StatusUnauthorized) })
+
+	// 100 次 401,按 sample rate = 10 抽样,期望恰好 10 条 access log。
+	const total = 100
+	for i := 0; i < total; i++ {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/r", nil)
+		r.ServeHTTP(w, req)
+	}
+
+	gotLines := bytes.Count(bytes.TrimRight(buf.Bytes(), "\n"), []byte("\n")) + 1
+	if buf.Len() == 0 {
+		gotLines = 0
+	}
+	wantLines := total / access4xxSampleRate
+	if gotLines != wantLines {
+		t.Fatalf("4xx sample: got %d log lines for %d requests, want %d (1/%d sampling). buf:\n%s",
+			gotLines, total, wantLines, access4xxSampleRate, buf.String())
+	}
+}
+
+// 5xx(服务端真错误)必须全量保留 —— 排查关键。
+func TestSlogMiddleware_Keeps5xx(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	var buf bytes.Buffer
+	logger := slog.New(slog.NewJSONHandler(&buf, nil))
+
+	r := gin.New()
+	r.Use(SlogMiddleware(logger))
+	r.GET("/r", func(c *gin.Context) { c.Status(http.StatusInternalServerError) })
+
+	for i := 0; i < 5; i++ {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/r", nil)
+		r.ServeHTTP(w, req)
+	}
+
+	gotLines := bytes.Count(bytes.TrimRight(buf.Bytes(), "\n"), []byte("\n")) + 1
+	if buf.Len() == 0 {
+		t.Fatal("5xx should always log, got 0 bytes")
+	}
+	if gotLines != 5 {
+		t.Fatalf("5xx full log: got %d lines, want 5. buf:\n%s", gotLines, buf.String())
+	}
+}
