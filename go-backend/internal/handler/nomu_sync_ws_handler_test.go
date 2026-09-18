@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"io"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -16,6 +17,7 @@ import (
 
 	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/infra/pubsub"
+	"github.com/KanoCifer/kuroome-blog/internal/middleware"
 	"github.com/KanoCifer/kuroome-blog/internal/service/syncbus"
 	"github.com/KanoCifer/kuroome-blog/pkg/jwt"
 )
@@ -94,7 +96,7 @@ func TestSyncWS_ReplayAckClears(t *testing.T) {
 		t.Fatalf("Publish: %v", err)
 	}
 
-	h := NewNomuSyncWSHandler(bus)
+	h := NewNomuSyncWSHandlerForTest(bus)
 	engine := gin.New()
 	h.RegisterRoutes(engine.Group("/v3"))
 
@@ -144,7 +146,7 @@ func TestSyncWS_PushDeliversOnline(t *testing.T) {
 	withTestSecret(t)
 	bus, _ := newSyncTestBus(t)
 
-	h := NewNomuSyncWSHandler(bus)
+	h := NewNomuSyncWSHandlerForTest(bus)
 	engine := gin.New()
 	h.RegisterRoutes(engine.Group("/v3"))
 	srv := httptest.NewServer(engine)
@@ -194,7 +196,7 @@ func TestSyncWS_CollectionPoolFlow(t *testing.T) {
 	withTestSecret(t)
 	bus, _ := newSyncTestBus(t)
 
-	h := NewNomuSyncWSHandler(bus)
+	h := NewNomuSyncWSHandlerForTest(bus)
 	engine := gin.New()
 	h.RegisterRoutes(engine.Group("/v3"))
 	srv := httptest.NewServer(engine)
@@ -291,7 +293,7 @@ func readCollectionKind(t *testing.T, ctx context.Context, conn *websocket.Conn,
 func TestSyncWS_RequiresToken(t *testing.T) {
 	withTestSecret(t)
 	bus, _ := newSyncTestBus(t)
-	h := NewNomuSyncWSHandler(bus)
+	h := NewNomuSyncWSHandlerForTest(bus)
 	engine := gin.New()
 	h.RegisterRoutes(engine.Group("/v3"))
 	srv := httptest.NewServer(engine)
@@ -302,5 +304,98 @@ func TestSyncWS_RequiresToken(t *testing.T) {
 	wsURL := strings.Replace(srv.URL, "http", "ws", 1) + "/v3/nomu/sync/ws?device_id=B"
 	if _, _, err := websocket.Dial(ctx, wsURL, nil); err == nil {
 		t.Fatal("dial without token should fail")
+	}
+}
+
+// TestSyncWS_AuthFailRateLimit 模拟 Nomu 旧版 ws bug 场景:同一 IP 拿错误 token
+// 反复重连,期望前 5 次返回 401 + code=token_expired,第 6 次起 429 + code=
+// too_many_auth_failures + Retry-After 头。
+//
+// 用 miniredis 作为真实 Redis 替身,让 limiter 走完 INCR+TTL 全流程。bus 与
+// limiter 共用一个 miniredis(addr 一致)以模拟生产环境行为。
+func TestSyncWS_AuthFailRateLimit(t *testing.T) {
+	withTestSecret(t)
+
+	mr, err := miniredis.Run()
+	if err != nil {
+		t.Fatalf("miniredis.Run: %v", err)
+	}
+	t.Cleanup(mr.Close)
+
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+
+	dispatcher := pubsub.NewDispatcher(rdb)
+	t.Cleanup(func() { _ = dispatcher.Close() })
+	bus := syncbus.NewSyncBus(rdb, dispatcher)
+	bus.Register(syncbus.DuplicateSnapshotHandler{})
+
+	limiter := middleware.NewAuthFailLimiter(rdb, "nomu_ws_auth_fail_test")
+	h := NewNomuSyncWSHandler(bus, limiter)
+	engine := gin.New()
+	h.RegisterRoutes(engine.Group("/v3"))
+	srv := httptest.NewServer(engine)
+	defer srv.Close()
+
+	wsBase := strings.Replace(srv.URL, "http", "ws", 1) + "/v3/nomu/sync/ws?token=invalid&device_id=B"
+
+	for i := 1; i <= 5; i++ {
+		got := dialExpectStatus(t, wsBase)
+		if got.status != 401 {
+			t.Fatalf("attempt %d: status = %d, want 401", i, got.status)
+		}
+		if got.code != "token_expired" {
+			t.Fatalf("attempt %d: code = %q, want token_expired", i, got.code)
+		}
+	}
+
+	// 第 6 次: 已超阈值,期待 429。
+	got := dialExpectStatus(t, wsBase)
+	if got.status != 429 {
+		t.Fatalf("attempt 6: status = %d, want 429", got.status)
+	}
+	if got.code != "too_many_auth_failures" {
+		t.Fatalf("attempt 6: code = %q, want too_many_auth_failures", got.code)
+	}
+	if got.retryAfter == "" {
+		t.Fatal("attempt 6: missing Retry-After header")
+	}
+}
+
+// dialExpectStatus dial ws URL,服务端在 upgrade 前返 401/429 等普通 HTTP 响应,
+// 读取 status / body.code / Retry-After 便于断言。
+type dialResult struct {
+	status     int
+	code       string
+	retryAfter string
+}
+
+func dialExpectStatus(t *testing.T, wsURL string) dialResult {
+	t.Helper()
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	// coder/websocket.Dial 在握手失败时返回 (nil, resp, err),resp 携带 401/429。
+	_, resp, err := websocket.Dial(ctx, wsURL, nil)
+	if err == nil {
+		_ = resp.Body.Close()
+		t.Fatal("dial succeeded; expected handshake rejection")
+	}
+	if resp == nil {
+		t.Fatalf("dial err = %v, want non-nil resp", err)
+	}
+	defer resp.Body.Close()
+
+	body, _ := io.ReadAll(resp.Body)
+	var parsed struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+	}
+	_ = json.Unmarshal(body, &parsed)
+
+	return dialResult{
+		status:     resp.StatusCode,
+		code:       parsed.Code,
+		retryAfter: resp.Header.Get("Retry-After"),
 	}
 }

@@ -34,7 +34,16 @@ func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 	likeLimiter := middleware.NewRateLimiter(redis, "like", 25, 24*time.Hour)
 	currencyLimiter := middleware.NewRateLimiter(redis, "currency", 500, time.Hour)
 
-	userH := handler.NewUserHandler(state.UserSvc(), state.Cfg(), state.CreditSvc())
+	// 认证失败路径专用限流(在 handler 失败分支里调用,与前置 RateLimiter 不同):
+	//  - scope 独立:ws 走 nomu_ws_auth_fail,refresh 走 refresh_auth_fail,互不串;
+	//  - 时机:前置 RateLimiter 拦的是"请求总数",这里是"业务判定失败"才计数;
+	//  - 阈值 5 次/小时,见 middleware.NewAuthFailLimiter 注释。
+	//  - 解决 Nomu 旧版 ws bug:refresh 过期后旧 AT 仍反复重连 → 5 次后 429 顶回。
+	refreshAuthFailLimiter := middleware.NewAuthFailLimiter(redis, "refresh_auth_fail")
+
+	userH := handler.NewUserHandler(
+		state.UserSvc(), state.Cfg(), state.CreditSvc(), refreshAuthFailLimiter,
+	)
 	userH.RegisterRoutes(v3, middleware.AuthMiddleware(), loginLimiter.Middleware(), registerLimiter.Middleware())
 
 	adminH := handler.NewAdminHandler(state.AdminSvc(), state.Cfg())
@@ -102,7 +111,9 @@ func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 	nomuH.RegisterRoutes(v3, middleware.AuthMiddleware())
 
 	// nomu 多设备同步总线：/sync/ws 走 query token 自鉴权，/sync/devices 走 Bearer。
-	syncH := handler.NewNomuSyncWSHandler(state.SyncBus())
+	// 注入 ws 失败专用限流器(scope=nomu_ws_auth_fail),阈值 5/hour。
+	nomuWSAuthFailLimiter := middleware.NewAuthFailLimiter(redis, "nomu_ws_auth_fail")
+	syncH := handler.NewNomuSyncWSHandler(state.SyncBus(), nomuWSAuthFailLimiter)
 	syncH.RegisterRoutes(v3, middleware.AuthMiddleware())
 
 	// credits：余额/流水明细挂 Auth；admin grant 必先 Auth 再 Admin（docs/rules/auth.md）。

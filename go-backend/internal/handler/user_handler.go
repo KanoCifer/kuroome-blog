@@ -4,12 +4,14 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/KanoCifer/kuroome-blog/internal/config"
 	usererrs "github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
+	"github.com/KanoCifer/kuroome-blog/internal/middleware"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
@@ -36,10 +38,25 @@ type UserHandler struct {
 	userSvc   Userer
 	cfg       *config.Config
 	creditSvc service.Creditser // 注入 nil 则跳过注册赠送（test 默认）
+	// refreshAuthFailLimiter RefreshToken 失败路径专用, 与 ws 失败限流解耦(两个 scope,
+	// 即同一坏客户端把坏循环挪到 /refresh-token 也会被同一套机制挡)。
+	// nil-safe: 测试 / 未配置 Redis 场景下 Fail() 直接放行。
+	refreshAuthFailLimiter *middleware.AuthFailLimiter
 }
 
-func NewUserHandler(userSvc Userer, cfg *config.Config, creditSvc service.Creditser) *UserHandler {
-	return &UserHandler{userSvc: userSvc, cfg: cfg, creditSvc: creditSvc}
+// NewUserHandler 构造 user handler。refreshLimiter 可为 nil(nil-safe)。
+func NewUserHandler(
+	userSvc Userer,
+	cfg *config.Config,
+	creditSvc service.Creditser,
+	refreshLimiter *middleware.AuthFailLimiter,
+) *UserHandler {
+	return &UserHandler{
+		userSvc:                userSvc,
+		cfg:                    cfg,
+		creditSvc:              creditSvc,
+		refreshAuthFailLimiter: refreshLimiter,
+	}
 }
 
 func (h *UserHandler) Login(c *gin.Context) {
@@ -193,7 +210,7 @@ func (h *UserHandler) RefreshToken(c *gin.Context) {
 	tokens, err := h.userSvc.RefreshTokens(c.Request.Context(), refreshToken)
 	if err != nil {
 		slog.WarnContext(c.Request.Context(), "refresh token failed", "reason", "invalid_token")
-		response.APIError(c, err.Error(), 401)
+		h.rejectRefreshInvalid(c, err)
 		return
 	}
 
@@ -204,6 +221,30 @@ func (h *UserHandler) RefreshToken(c *gin.Context) {
 		"access_token":  tokens.AccessToken,
 		"refresh_token": tokens.RefreshToken,
 	}, "访问令牌已刷新")
+}
+
+// rejectRefreshInvalid /refresh-token 失败统一出口:失败计数 → 超阈值 429 → 否则
+// 401 + code=refresh_token_expired。与 ws 失败限流语义一致,但 scope 独立(同一坏
+// 客户端把循环挪到 /refresh-token 也照样被卡)。
+func (h *UserHandler) rejectRefreshInvalid(c *gin.Context, err error) {
+	if limited, retry := h.refreshAuthFailLimiter.Fail(c); limited {
+		retrySec := int(retry.Seconds())
+		if retrySec < 1 {
+			retrySec = 30
+		}
+		c.Header("Retry-After", strconv.Itoa(retrySec))
+		slog.WarnContext(c.Request.Context(),
+			"refresh rejected: too many auth failures",
+			"scope", h.refreshAuthFailLimiter.Scope(),
+			"client_ip", middleware.ClientIP(c),
+		)
+		response.APIErrorWithCode(c, "too_many_auth_failures",
+			"刷新令牌校验失败次数过多,请稍后再试或重新登录", 429)
+		return
+	}
+	c.Header("WWW-Authenticate", `Bearer error="invalid_token"`)
+	response.APIErrorWithCode(c, "refresh_token_expired",
+		"refresh_token 已失效,请清除本地 token 后重新登录", 401)
 }
 
 // EmailCode 申请注册验证码邮件。

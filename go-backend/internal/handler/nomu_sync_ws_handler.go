@@ -13,6 +13,7 @@ import (
 	"github.com/coder/websocket/wsjson"
 	"github.com/gin-gonic/gin"
 
+	"github.com/KanoCifer/kuroome-blog/internal/middleware"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 	"github.com/KanoCifer/kuroome-blog/internal/service/syncbus"
 	"github.com/KanoCifer/kuroome-blog/pkg/jwt"
@@ -35,10 +36,18 @@ type SyncBuser interface {
 
 type NomuSyncWSHandler struct {
 	bus SyncBuser
+	// authFailLimiter nil-safe: 测试 / 未配置 Redis 场景下构造时不传,Fail() 直接放行。
+	authFailLimiter *middleware.AuthFailLimiter
 }
 
-func NewNomuSyncWSHandler(bus SyncBuser) *NomuSyncWSHandler {
-	return &NomuSyncWSHandler{bus: bus}
+// NewNomuSyncWSHandler 构造 ws handler。limiter 可为 nil(nil-safe)。
+func NewNomuSyncWSHandler(bus SyncBuser, limiter *middleware.AuthFailLimiter) *NomuSyncWSHandler {
+	return &NomuSyncWSHandler{bus: bus, authFailLimiter: limiter}
+}
+
+// NewNomuSyncWSHandlerForTest 测试便捷入口,跳过 limiter。生产代码应传 limiter。
+func NewNomuSyncWSHandlerForTest(bus SyncBuser) *NomuSyncWSHandler {
+	return NewNomuSyncWSHandler(bus, nil)
 }
 
 func (h *NomuSyncWSHandler) RegisterRoutes(r *gin.RouterGroup, mw ...gin.HandlerFunc) {
@@ -77,12 +86,12 @@ func (h *NomuSyncWSHandler) HandleSyncWS(c *gin.Context) {
 
 	claims, err := jwt.ParseToken(token)
 	if err != nil {
-		response.APIError(c, "invalid token", 401)
+		h.rejectInvalidToken(c, "token 已失效,请清除本地 token 后重新登录")
 		return
 	}
 	uid, err := strconv.Atoi(claims.Subject)
 	if err != nil {
-		response.APIError(c, "invalid token", 401)
+		h.rejectInvalidToken(c, "token 已失效,请清除本地 token 后重新登录")
 		return
 	}
 	userID := uint(uid)
@@ -274,6 +283,35 @@ func (h *NomuSyncWSHandler) ListDevices(c *gin.Context) {
 		return
 	}
 	response.Success(c, devices, "ok")
+}
+
+// rejectInvalidToken ws 握手阶段的 token 校验失败统一出口。
+//
+// 流程: 失败计数 → 超阈值返 429 + Retry-After → 否则返 401 + 结构化 code。
+// 设计动机: Nomu 旧版本前端 ws bug 在 refresh_token 失效后仍拿旧 AT 无限重连,
+// 服务端必须主动掐断这个循环,否则坏前端 1 小时内可刷数百次同样的 401。
+// 结构化 code="token_expired" + message 内嵌"清除本地 token"提示,等前端修复后
+// 客户端能据此分支处理(不再继续重试,转清 token 重登)。
+//
+// 阈值见 middleware.NewAuthFailLimiter(默认 5 次/小时),超限由该 limiter 拦。
+func (h *NomuSyncWSHandler) rejectInvalidToken(c *gin.Context, message string) {
+	if limited, retry := h.authFailLimiter.Fail(c); limited {
+		retrySec := int(retry.Seconds())
+		if retrySec < 1 {
+			retrySec = 30
+		}
+		c.Header("Retry-After", strconv.Itoa(retrySec))
+		slog.WarnContext(c.Request.Context(),
+			"sync ws rejected: too many auth failures",
+			"scope", h.authFailLimiter.Scope(),
+			"client_ip", middleware.ClientIP(c),
+		)
+		response.APIErrorWithCode(c, "too_many_auth_failures",
+			"认证失败次数过多,请稍后再试或重新登录", 429)
+		return
+	}
+	c.Header("WWW-Authenticate", `Bearer error="invalid_token"`)
+	response.APIErrorWithCode(c, "token_expired", message, 401)
 }
 
 // syncWriter 串行化对同一连接的写（deliveryLoop 与 readLoop 都会写）。
