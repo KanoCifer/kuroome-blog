@@ -24,7 +24,8 @@ const (
 )
 
 // NomuLogoURL 是 nomu 邮件模板品牌头部的 logo 地址；test 用此常量做包含断言。
-const NomuLogoURL = "https://kanocifer.chat/logo/logo.png"
+// Nomu 有自己的落地页站点（nomu.kanocifer.chat），logo 从它自己的 icon 取。
+const NomuLogoURL = "https://nomu.kanocifer.chat/icon/128.png"
 
 // VerificationEmail 构造注册验证码邮件内容与纯文本 fallback。
 //

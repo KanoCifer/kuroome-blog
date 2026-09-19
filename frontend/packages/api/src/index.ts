@@ -34,7 +34,6 @@ export type {
   LoginResult,
   PasskeyLoginResult,
   MagicLinkRequestPayload,
-  NomuMagicLinkForwardPayload,
   NomuLoginState,
 } from './gateways/auth';
 

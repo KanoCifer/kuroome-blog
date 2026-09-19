@@ -101,9 +101,10 @@ type WebAuthnConfig struct {
 
 // FrontendConfig 前端相关。
 //
-// URLs 按 mode（blog / nomu 等）持有不同前端入口。blog 与 nomu 的魔法登录
-// 都落在同一个 web 前端（kanocifer.chat），仅路径不同（/auth/magic vs
-// /nomu/login），因此不再单列 nomu host。
+// URLs 按 mode（blog / nomu 等）持有不同前端入口：blog 落在 kanocifer.chat，
+// nomu 落在 nomu.kanocifer.chat（独立部署的 Nomu 落地页，含魔法登录回调页
+// /nomu/login）。两者是不同 origin，回调页要跨域 POST 回本后端，因此新 host
+// 必须同时加进 middleware.allowedOrigins 的 CORS 白名单。
 // 邮件链接必须是 http(s)，chrome-extension:// 会被多数邮件客户端拦截。
 //
 // 兼容旧部署：env FRONTEND_URL 在 Load() 阶段回退到 URLs.Blog。
@@ -112,10 +113,11 @@ type FrontendConfig struct {
 	ViteJSAPIToken string       `mapstructure:"VITE_JS_API_TOKEN"`
 }
 
-// FrontendURLs 前端入口。blog / nomu 同源共用 Blog host，
+// FrontendURLs 前端入口。每个 mode 一个 host，路径由 magicLoginLinkPathFor 决定；
 // 未来若有真正独立部署的新前端，在此追加字段并扩 magicLoginLinkPathFor 的 switch。
 type FrontendURLs struct {
 	Blog string `mapstructure:"BLOG"`
+	Nomu string `mapstructure:"NOMU"`
 }
 
 // AdminConfig 管理员与运维。
@@ -196,6 +198,7 @@ func defaultConfig() Config {
 		Frontend: FrontendConfig{
 			URLs: FrontendURLs{
 				Blog: "https://kanocifer.chat",
+				Nomu: "https://nomu.kanocifer.chat",
 			},
 		},
 		Admin: AdminConfig{
@@ -306,6 +309,16 @@ func Load(cfgFile ...string) (*Config, error) {
 		if v := viper.GetString("FRONTEND_URL"); v != "" {
 			cfg.Frontend.URLs.Blog = v
 		}
+	}
+
+	// frontend 是嵌套 section，viper AutomaticEnv 对嵌套 key 不生效
+	// （容器内 config.yaml 不打进镜像，只能从平铺 env 回填），与 DESIGN_* 同因。
+	//
+	// viper.Get 的优先级是 env > 文件 > 默认值，但 "FRONTEND_NOMU" 这个平铺
+	// key 在文件里不存在，env 未设置时它返回 ""。所以只在非空时回填：
+	// env 显式设置则覆盖，否则保留文件 / defaultConfig() 里的值。
+	if v := viper.GetString("FRONTEND_NOMU"); v != "" {
+		cfg.Frontend.URLs.Nomu = v
 	}
 
 	Cfg = &cfg

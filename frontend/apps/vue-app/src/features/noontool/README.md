@@ -2,12 +2,13 @@
 
 > 给 Nomu Chrome 扩展开发者看的对接文档。Nomu 扩展不在 frontend 仓库,本文档是它对接
 > kuroome-blog 后端魔法登录端点的对外契约,与 `frontend/packages/api/src/gateways/auth.ts`
-> 当前的 `forwardNomuMagicLink` / `pollNomuLogin` / `NomuLoginState` 字段对齐。
+> 当前的 `pollNomuLogin` / `NomuLoginState` 字段对齐。
 >
 > 关联 commit:
 > - backend:`go-backend` 仓库 `fe91a585`(合并 `MagicLoginConsume` handler)
 > - frontend(本文档同步时):`packages/api/src/gateways/auth.ts` 新增 `forwardNomuMagicLink` /
-> - `pollNomuLogin` / `NomuLoginState`,新增回调页 `apps/vue-app/src/features/noontool/NomuLoginView.vue`
+> - `pollNomuLogin` / `NomuLoginState`
+> - 回调页已迁出 frontend 仓库,落在独立的 Nomu 落地页项目(`NomuLanding`,`src/features/login/NomuLoginView.vue`)
 
 ---
 
@@ -63,7 +64,7 @@
 关键约束:
 
 - **邮件链接是普通 https 链接**,指向 web 前端确认页 `https://nomu.kanocifer.chat/nomu/login`,
-  由该页的 SPA(`NomuLoginView.vue`)发起 §2.2 的转发 POST。**不要**把链接指向
+  由落地页的 SPA(`NomuLoginView.vue`)发起 §2.2 的转发 POST。**不要**把链接指向
   `chrome-extension://<id>/...` —— 多数邮件客户端会拦截非 http(s) 协议。
   扩展侧不需要自建回调页,只负责 §2.1 申请邮件 + §2.3 轮询。
 - **扩展域没有浏览器域 cookie**。不要依赖 `Set-Cookie: refresh_token`,
@@ -101,7 +102,7 @@ Content-Type: application/json
 
 - `token` 形如 `<64-hex>:nomu`,hex 段是 64 位十六进制(32 字节),`mode` 段固定 `nomu`。
 - `mode` 必须为 `"nomu"`,后端用 `oneof=blog nomu` 拦截。
-- 该端点由 web 前端 SPA(`NomuLoginView.vue`,路由 `/nomu/login`)调用,**扩展侧无需自己
+- 该端点由落地页站点(`NomuLanding` 的 `src/features/login/NomuLoginView.vue`,路由 `/nomu/login`)调用,**扩展侧无需自己
   实现这个请求**。扩展只负责 ① 申请邮件、③ 轮询槽位。
 - 失败:token 格式非法 / 已过期 / 已消费 → 401 `invalid magic token`;
   用户被删除 → 404。
@@ -177,7 +178,7 @@ GET /v3/nomu/login/<device_id>
 }
 ```
 
-回调链接是**普通 https 链接**,指向 web 前端的确认页(与 blog 主站同源),扩展的
+回调链接是**普通 https 链接**,指向 Nomu 落地页站点上的确认页,扩展的
 options 页不再承担回调:
 
 ```
@@ -186,13 +187,13 @@ https://nomu.kanocifer.chat/nomu/login?token=<hex>:nomu
 
 其中 host 由后端配置的 nomu frontend host 决定(生产为 `https://nomu.kanocifer.chat`)。
 用户从邮件点开该链接,浏览器打开 web 页面,`NomuLoginView.vue` 自动读取
-`query.token` 并调 `forwardNomuMagicLink` 完成转发。
+`query.token` 并调 `/v3/nomu/magic-login` 完成转发。
 
 > 后端配置:早期版本把 nomu host 配成 `chrome-extension://<id>` 并指向
 > `options.html#/login/magic`,该方案依赖「Chrome 把 host 替换为扩展 ID」的
 > 未定义行为,且多数邮件客户端会拦截非 http(s) 协议,已废弃。现在 nomu 部署在
-> `nomu.kanocifer.chat` 子域,与 blog(`kanocifer.chat`)host 不同,仅路径
-> 不同(`/nomu/login` vs `/auth/magic`)。
+> 独立的 `nomu.kanocifer.chat` 落地页站点(仓库 `NomuLanding`),与 blog
+> (`kanocifer.chat`)是不同 origin、不同前端项目。
 
 扩展侧唯一要做的事:在 options 页触发「申请魔法登录邮件」(§2.1,带上本地生成的
 `device_id`),然后进入轮询(§2.3)直到 `status=="done"` 拿到 token。回调转发由
@@ -296,11 +297,13 @@ frontend 仓库里:
 
 - `packages/api/src/gateways/auth.ts`:`authGateway.requestMagicLink({email, mode:'nomu', device_id})`
   / `authGateway.pollNomuLogin(device_id)` / `NomuLoginState` 类型与本文档 §2 字段一致。
-- `apps/vue-app/src/features/noontool/NomuLoginView.vue`:SPA 回调页,只负责转发 token,
+- `NomuLanding/src/features/login/NomuLoginView.vue`:落地页回调页,只负责转发 token,
   不写会话态、不带 device_id、不轮询——扩展侧的轮询是扩展自己的事。
-- `apps/vue-app/src/router/index.ts`:`/nomu/login` 路由指向 `NomuLoginView.vue`。
+- `NomuLanding/src/router/index.ts`:`/nomu/login` 路由指向 `NomuLoginView.vue`。
+- 回调页跨域 POST 回本后端,`nomu.kanocifer.chat` 必须在后端 CORS 白名单里
+  (`go-backend/internal/middleware/cors.go` 的 `allowedOrigins`)。
 
-扩展侧唯一**直接对接后端**的端点是 §2.1 与 §2.3。`NomuLoginView` 已经在 SPA 里
+扩展侧唯一**直接对接后端**的端点是 §2.1 与 §2.3。`NomuLoginView` 已经在落地页里
 代发了 §2.2,扩展不要重复实现。
 
 ---

@@ -60,20 +60,6 @@ export interface MagicLinkRequestPayload {
   device_id?: string;
 }
 
-export interface NomuMagicLinkForwardPayload {
-  token: string;
-  /**
-   * 后端按 mode 决定 consume 端点的返回形态：
-   *   - "nomu"：Nomu 接法 B，service 内部把登录结果写到 device 槽位，
-   *     handler 返 200；扩展侧轮询 pollNomuLogin 取结果。
-   *   - "blog"（兜底）：handler 写 refresh cookie + 返 LoginResult。
-   *
-   * 必传且必须为 "nomu" — 路由 /nomu/magic-login 只为 nomu 用，
-   * 后端会用 oneof=blog|nomu 拦截。
-   */
-  mode: 'nomu';
-}
-
 /** Nomu 轮询槽位内容（与后端 service.NomuLoginState 的 JSON 字段对齐）。 */
 export interface NomuLoginState {
   status: 'pending' | 'done' | 'error';
@@ -197,20 +183,6 @@ export const authGateway = {
         if (!data) return null;
         return buildLoginResult(data as LoginResponseData);
       });
-  },
-
-  /**
-   * Nomu 无密码登录回调 — 把邮件回调收到的 token 转发给后端。
-   * 后端确认后把登录结果写回 device_id 槽位（nomulogin:device:<device_id>），
-   * Nomu 扩展侧轮询 pollNomuLogin 取最终登录结果。
-   *
-   * 路由 POST /v3/nomu/magic-login（与 /magic-login/consume 同 handler，
-   * 按 mode 字段分支）；payload.mode 必须为 "nomu"。
-   */
-  forwardNomuMagicLink(payload: NomuMagicLinkForwardPayload): Promise<ApiResponse<null>> {
-    return apiClient
-      .post<ApiResponse<null>>('v3/nomu/magic-login', payload)
-      .then((res) => res.data);
   },
 
   /**

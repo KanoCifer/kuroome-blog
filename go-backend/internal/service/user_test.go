@@ -862,7 +862,7 @@ func TestSplitMagicLoginToken(t *testing.T) {
 func TestMagicLoginLink_BlogHost(t *testing.T) {
 	svc := &userService{frontendURLs: map[string]string{
 		"blog": "https://kanocifer.chat",
-		"nomu": "https://kanocifer.chat",
+		"nomu": "https://nomu.kanocifer.chat",
 	}}
 	link := svc.magicLoginLink("deadbeef:blog", "blog")
 	want := "https://kanocifer.chat/auth/magic?token=deadbeef:blog"
@@ -872,14 +872,15 @@ func TestMagicLoginLink_BlogHost(t *testing.T) {
 }
 
 // TestMagicLoginLink_NomuHost 校验 nomu mode 拼出的链接：
-// <nomuHost>/nomu/login?token=<token>。nomu 回调页与 blog 同源（web SPA）。
+// <nomuHost>/nomu/login?token=<token>。nomu 回调页部署在独立的
+// nomu.kanocifer.chat 落地页站点上。
 func TestMagicLoginLink_NomuHost(t *testing.T) {
 	svc := &userService{frontendURLs: map[string]string{
 		"blog": "https://kanocifer.chat",
-		"nomu": "https://kanocifer.chat",
+		"nomu": "https://nomu.kanocifer.chat",
 	}}
 	link := svc.magicLoginLink("deadbeef:nomu", "nomu")
-	want := "https://kanocifer.chat/nomu/login?token=deadbeef:nomu"
+	want := "https://nomu.kanocifer.chat/nomu/login?token=deadbeef:nomu"
 	if link != want {
 		t.Errorf("nomu link = %q, want %q", link, want)
 	}
@@ -898,10 +899,10 @@ func TestMagicLoginLink_HostMissing(t *testing.T) {
 }
 
 // TestMagicLoginLink_HostTrailingSlash host 末尾的 "/" 应被 TrimRight 掉，
-// 避免 https://kanocifer.chat//nomu/login 这种双斜杠。
+// 避免 https://nomu.kanocifer.chat//nomu/login 这种双斜杠。
 func TestMagicLoginLink_HostTrailingSlash(t *testing.T) {
 	svc := NewUserService(&mockUserRepo{}, nil, nil, map[string]string{
-		"nomu": "https://kanocifer.chat/",
+		"nomu": "https://nomu.kanocifer.chat/",
 	}, 0)
 	link := svc.magicLoginLink("h:nomu", "nomu")
 	if strings.Contains(link, "//nomu/login") {

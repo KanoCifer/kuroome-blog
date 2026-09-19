@@ -525,7 +525,8 @@ flowchart LR
 | `SAVE_LOGS`             | 是否保存日志                                      | `True`                                            |
 | `ADMIN_USER_IDS`        | 管理员用户 ID 列表                                | `[1, 2]`                                          |
 | `GITEE_WEBHOOK_SECRET`  | Gitee 自动部署 Webhook 密钥                       | —                                                 |
-| `FRONTEND_URL`          | 前端地址（CORS/重定向）                           | `https://kanocifer.chat`                          |
+| `FRONTEND_URL`          | 前端地址（CORS/重定向），是 Go 侧 `frontend.BLOG` 的旧名 | `https://kanocifer.chat`                          |
+| `FRONTEND_NOMU`         | Nomu 落地页站点地址（魔法登录回调页 `/nomu/login`）| `https://nomu.kanocifer.chat`                     |
 | `DB_MIGRATE_URL`        | 数据库迁移用同步连接串（Alembic，**非 asyncpg**） | `postgresql+psycopg://user:pass@localhost/dbname` |
 | `LOG_RETENTION_DAYS`    | 日志保留天数                                      | `30`                                              |
 
