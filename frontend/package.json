@@ -8,6 +8,8 @@
   ],
   "scripts": {
     "deploy": "bash deploy.sh",
+    "deploy:vue": "bash deploy-vue.sh",
+    "deploy:react": "bash deploy-react.sh",
     "dev:vue": "pnpm --filter @readinglist/vue-app dev",
     "dev:react": "pnpm --filter @readinglist/react-app dev",
     "build:vue": "pnpm --filter @readinglist/vue-app build",

@@ -65,3 +65,5 @@ go-backend/logs/
 backend/deploy-go.sh
 go-backend/.zcode/plans/
 go-backend/deploy-go.sh
+frontend/deploy-vue.sh
+frontend/deploy-react.sh
