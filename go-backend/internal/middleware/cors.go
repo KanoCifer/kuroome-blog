@@ -11,6 +11,7 @@ func allowedOrigins() []string {
 	return []string{
 		"https://kanocifer.chat",
 		"https://m.kanocifer.chat",
+		"https://nomu.kanocifer.chat",
 		"https://api.kanocifer.chat",
 		"http://localhost:5173",
 		"http://localhost:5174",
