@@ -32,9 +32,24 @@ if (typeof document !== 'undefined') {
 const app = createApp(App);
 const pinia = createPinia();
 const head = createHead();
+
+/**
+ * Pick the i18n locale from `navigator.language`.
+ * - Anything starting with `zh` → 'zh-CN' (Simplified Chinese as the closest match
+ *   for the only Chinese variant currently shipped in @readinglist/brand/locales).
+ * - Everything else → 'en' (fallback).
+ * SSR-safe: defaults to 'en' when `navigator` is unavailable.
+ */
+function detectLocale(): 'zh-CN' | 'en' {
+  if (typeof navigator === 'undefined') return 'en';
+  const lang = (navigator.language || '').toLowerCase();
+  if (lang.startsWith('zh')) return 'zh-CN';
+  return 'en';
+}
+
 const i18n = createI18n({
   legacy: false,
-  locale: 'zh-CN',
+  locale: detectLocale(),
   fallbackLocale: 'en',
   messages,
 });
