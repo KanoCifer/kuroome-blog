@@ -60,6 +60,20 @@ onMounted(async () => {
     message.value = err instanceof Error && err.message ? err.message : '';
   }
 });
+
+/**
+ * 用户已经在 Nomu 扩展内走完流程,关掉这个确认 tab 即可。
+ * `window.close()` 在由脚本而非用户手势打开的窗口上会被浏览器拒绝,
+ * 这里只对扩展侧 `chrome.tabs` 打开的回调 tab 调用,确保行为一致。
+ */
+function closePage(): void {
+  window.close();
+}
+
+/** 失败时允许用户重试,直接刷新当前路由。 */
+function retry(): void {
+  location.reload();
+}
 </script>
 
 <template>
@@ -86,7 +100,7 @@ onMounted(async () => {
         v-if="status === 'success'"
         class="bloom-btn bloom-btn-secondary"
         type="button"
-        @click="window.close()"
+        @click="closePage"
       >
         {{ t('noonTool.nomuLogin.closePage') }}
       </button>
@@ -96,7 +110,7 @@ onMounted(async () => {
         v-else-if="status === 'error'"
         class="bloom-btn bloom-btn-primary"
         type="button"
-        @click="() => location.reload()"
+        @click="retry"
       >
         {{ t('noonTool.nomuLogin.retry') }}
       </button>
