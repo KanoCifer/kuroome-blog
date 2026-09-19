@@ -24,7 +24,8 @@ vi.mock('@/features/auth', () => ({
   useAuthStore: () => ({
     login: (...args: unknown[]) => loginMock(...args),
     loginWithPasskey: (...args: unknown[]) => loginWithPasskey(...args),
-    loginWithMagicLink: (...args: unknown[]) => loginWithMagicLinkStore(...args),
+    loginWithMagicLink: (...args: unknown[]) =>
+      loginWithMagicLinkStore(...args),
     getPasskeyAuthenticationOptions: (...args: unknown[]) =>
       getPasskeyAuthenticationOptions(...args),
   }),
@@ -52,7 +53,8 @@ describe('useAuthenticate — magic-link', () => {
 
   describe('handleRequestMagicLink', () => {
     it('空邮箱直接走客户端校验，不打后端', async () => {
-      const { handleRequestMagicLink, errors, magicLinkSentTo } = useAuthenticate();
+      const { handleRequestMagicLink, errors, magicLinkSentTo } =
+        useAuthenticate();
       await handleRequestMagicLink('');
       expect(errors.value.email).toMatch(/合法的邮箱/);
       expect(magicLinkSentTo.value).toBeNull();
@@ -68,7 +70,8 @@ describe('useAuthenticate — magic-link', () => {
 
     it('合法邮箱 → 调用网关 + 把脱敏后的邮箱写入 sentTo', async () => {
       requestMagicLink.mockResolvedValue({ code: 0, data: null });
-      const { handleRequestMagicLink, magicLinkSentTo, errors } = useAuthenticate();
+      const { handleRequestMagicLink, magicLinkSentTo, errors } =
+        useAuthenticate();
       await handleRequestMagicLink('alice@example.com');
       // 落地页固定 mode='blog'，让后端拼 kanocifer.chat SPA 链接。
       // 扩展（NoonToolv1）在自己 client.ts 里固定传 mode='nomu'。
@@ -106,21 +109,14 @@ describe('useAuthenticate — magic-link', () => {
       expect(loginWithMagicLinkStore).not.toHaveBeenCalled();
     });
 
-    it('成功 → 调 store.loginWithMagicLink 并 push 到 redirect 或 /', async () => {
+    it('成功 → 调 store.loginWithMagicLink，且不自动跳转', async () => {
       loginWithMagicLinkStore.mockResolvedValue({ id: 1 });
       const { consumeMagicLink } = useAuthenticate();
       const r = await consumeMagicLink('a'.repeat(64));
       expect(loginWithMagicLinkStore).toHaveBeenCalledWith('a'.repeat(64));
       expect(r.ok).toBe(true);
-      expect(pushMock).toHaveBeenCalledWith('/');
-    });
-
-    it('成功 → redirect query 优先', async () => {
-      loginWithMagicLinkStore.mockResolvedValue({ id: 1 });
-      routeQuery.redirect = '/settings';
-      const { consumeMagicLink } = useAuthenticate();
-      await consumeMagicLink('a'.repeat(64));
-      expect(pushMock).toHaveBeenCalledWith('/settings');
+      // 结果页由用户自己关掉，redirect query 不再生效
+      expect(pushMock).not.toHaveBeenCalled();
     });
 
     it('失败 → 不 push，把 message 写入 errors.magicLink', async () => {

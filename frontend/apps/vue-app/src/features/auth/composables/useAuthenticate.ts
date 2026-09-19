@@ -119,6 +119,9 @@ export function useAuthenticate() {
   /**
    * 邮箱魔法登录 — 消费 token（用户在邮件里点链接落到 /auth/magic 时调用）。
    * 401/404/500 由拦截器友好化，本函数只负责把成功路径走完。
+   *
+   * 成功后不跳转：调用方（MagicLinkView）停在结果页让用户自己关掉这个 tab，
+   * 与 NomuLanding 的 /nomu/login 回调页一致。所以这里不再依赖 route / router。
    */
   const consumeMagicLink = async (token: string) => {
     errors.value = {};
@@ -129,8 +132,6 @@ export function useAuthenticate() {
     isMagicLinkConsuming.value = true;
     try {
       await auth.loginWithMagicLink(token);
-      const redirect = (route.query.redirect as string) || '/';
-      router.push(redirect);
       return { ok: true as const };
     } catch (err) {
       errors.value.magicLink = magicLinkErrorMessage(err);
