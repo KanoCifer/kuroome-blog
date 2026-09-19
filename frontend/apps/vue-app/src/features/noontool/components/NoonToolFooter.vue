@@ -8,7 +8,7 @@ const { t } = useI18n();
 const year = new Date().getFullYear();
 
 // 线上文档站（VitePress），base 为 /docs/
-const DOCS_URL = 'https://kanocifer.chat/docs/';
+const DOCS_URL = 'https://nomu.kanocifer.chat/docs/';
 </script>
 
 <template>

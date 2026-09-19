@@ -62,7 +62,7 @@
 
 关键约束:
 
-- **邮件链接是普通 https 链接**,指向 web 前端确认页 `https://kanocifer.chat/nomu/login`,
+- **邮件链接是普通 https 链接**,指向 web 前端确认页 `https://nomu.kanocifer.chat/nomu/login`,
   由该页的 SPA(`NomuLoginView.vue`)发起 §2.2 的转发 POST。**不要**把链接指向
   `chrome-extension://<id>/...` —— 多数邮件客户端会拦截非 http(s) 协议。
   扩展侧不需要自建回调页,只负责 §2.1 申请邮件 + §2.3 轮询。
@@ -171,7 +171,7 @@ GET /v3/nomu/login/<device_id>
   },
   "permissions": ["storage", "identity"],
   "host_permissions": [
-    "https://kanocifer.chat/*",
+    "https://nomu.kanocifer.chat/*",
     "https://api.kanocifer.chat/*"
   ]
 }
@@ -181,17 +181,18 @@ GET /v3/nomu/login/<device_id>
 options 页不再承担回调:
 
 ```
-https://kanocifer.chat/nomu/login?token=<hex>:nomu
+https://nomu.kanocifer.chat/nomu/login?token=<hex>:nomu
 ```
 
-其中 host 由后端配置的 nomu frontend host 决定(生产为 `https://kanocifer.chat`)。
+其中 host 由后端配置的 nomu frontend host 决定(生产为 `https://nomu.kanocifer.chat`)。
 用户从邮件点开该链接,浏览器打开 web 页面,`NomuLoginView.vue` 自动读取
 `query.token` 并调 `forwardNomuMagicLink` 完成转发。
 
 > 后端配置:早期版本把 nomu host 配成 `chrome-extension://<id>` 并指向
 > `options.html#/login/magic`,该方案依赖「Chrome 把 host 替换为扩展 ID」的
-> 未定义行为,且多数邮件客户端会拦截非 http(s) 协议,已废弃。现在 nomu 与
-> blog 共用 kanocifer.chat host,仅路径不同(`/nomu/login` vs `/auth/magic`)。
+> 未定义行为,且多数邮件客户端会拦截非 http(s) 协议,已废弃。现在 nomu 部署在
+> `nomu.kanocifer.chat` 子域,与 blog(`kanocifer.chat`)host 不同,仅路径
+> 不同(`/nomu/login` vs `/auth/magic`)。
 
 扩展侧唯一要做的事:在 options 页触发「申请魔法登录邮件」(§2.1,带上本地生成的
 `device_id`),然后进入轮询(§2.3)直到 `status=="done"` 拿到 token。回调转发由

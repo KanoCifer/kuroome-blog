@@ -44,7 +44,7 @@ export interface PasskeyLoginResult {
  *
  * mode 决定邮件里链接落到哪个前端 + 后端 Redis 命名空间：
  *   - "blog" → kanocifer.chat 落地页（web 端魔法登录 /auth/magic）
- *   - "nomu" → kanocifer.chat 上的 Nomu 确认页（web SPA 路由 /nomu/login），
+ *   - "nomu" → nomu.kanocifer.chat 上的 Nomu 确认页（web SPA 路由 /nomu/login），
  *              扩展侧只轮询结果，邮件链接不再指向 chrome-extension://
  *
  * 落地页这一侧调用方不感知 mode，gateway 默认填 "blog"；扩展自己在 client.ts

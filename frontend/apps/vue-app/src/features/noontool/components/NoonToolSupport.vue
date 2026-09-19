@@ -6,7 +6,7 @@ import { icons } from '../icons';
 const { t } = useI18n();
 
 // 文档站（VitePress），base 为 /docs/
-const DOCS_URL = 'https://kanocifer.chat/docs/';
+const DOCS_URL = 'https://nomu.kanocifer.chat/docs/';
 
 const channelKeys = ['wechat', 'docs'] as const;
 </script>

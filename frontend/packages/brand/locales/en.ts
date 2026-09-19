@@ -305,7 +305,7 @@ export default {
         },
         docs: {
           title: 'Ask the assistant, then the docs',
-          body: 'Listing rules and field requirements can be asked straight to the in-extension AI assistant; install, updates and common questions live at kanocifer.chat/docs',
+          body: 'Listing rules and field requirements can be asked straight to the in-extension AI assistant; install, updates and common questions live at nomu.kanocifer.chat/docs',
         },
       },
     },

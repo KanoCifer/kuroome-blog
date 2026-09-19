@@ -101,7 +101,7 @@ const pipelineSteps = [
             {{ t('noonTool.hero.ctaSecondary') }}
           </a>
           <a
-            href="https://kanocifer.chat/docs/"
+            href="https://nomu.kanocifer.chat/docs/"
             target="_blank"
             rel="noopener"
             class="text-muted focus-visible:ring-ring motion-safe:hover:text-ink inline-flex items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"

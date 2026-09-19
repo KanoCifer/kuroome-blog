@@ -290,7 +290,7 @@ export default {
         },
         docs: {
           title: '先问助手，再查文档',
-          body: '上架规则、字段要求可以直接问扩展内的 AI 助手；安装、更新与常见问题见文档站 kanocifer.chat/docs',
+          body: '上架规则、字段要求可以直接问扩展内的 AI 助手；安装、更新与常见问题见文档站 nomu.kanocifer.chat/docs',
         },
       },
     },
