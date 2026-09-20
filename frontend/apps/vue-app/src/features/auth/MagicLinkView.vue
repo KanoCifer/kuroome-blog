@@ -79,7 +79,7 @@ const closePage = () => window.close();
 
 <template>
   <div
-    class="bg-page grid min-h-[calc(100dvh-8rem)] place-items-center px-6 py-12"
+    class="bg-page grid h-screen place-items-center px-6 py-12"
   >
     <div
       class="animate-in fade-in zoom-in-95 flex w-full max-w-sm flex-col items-center text-center duration-300 motion-reduce:animate-none"
