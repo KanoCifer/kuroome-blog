@@ -94,8 +94,15 @@ func newMailClient(cfg *config.Config) (*gomail.Client, error) {
 	return gomail.NewClient(cfg.Mail.Server, opts...)
 }
 
-// formatFrom 生成 "Display Name <user@host>" 形式的发件人地址。
+// formatFrom 生成 "Display Name <addr>" 形式的发件人地址。
+//
+// 优先用 cfg.Mail.FromAddress，缺省回退到 cfg.Mail.Username ——
+// 兼容 QQ / Gmail 这种 "Username==发件邮箱" 的服务，
+// 同时支持 Resend 这种 "Username=resend（固定）、FromAddress=已验证域邮箱"的拆分。
 func formatFrom(cfg *config.Config) string {
-	addr := mail.Address{Name: cfg.Mail.FromName, Address: cfg.Mail.Username}
-	return addr.String()
+	addr := cfg.Mail.FromAddress
+	if addr == "" {
+		addr = cfg.Mail.Username
+	}
+	return (&mail.Address{Name: cfg.Mail.FromName, Address: addr}).String()
 }

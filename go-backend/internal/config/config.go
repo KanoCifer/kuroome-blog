@@ -78,12 +78,18 @@ type DatabaseConfig struct {
 }
 
 // MailConfig SMTP 邮件服务。
+//
+// Username 是 SMTP 认证用户名（Resend 等第三方固定为 "resend"，
+// 传统邮箱则等于发件地址）。FromAddress 是邮件 From header 中的发件邮箱，
+// 必须是在服务商控制台验证过的域名的某地址；缺省回退到 Username，
+// 兼容 QQ/Gmail 等 Username==发件邮箱 的服务。
 type MailConfig struct {
-	Username string `mapstructure:"MAIL_USERNAME"`
-	Password string `mapstructure:"MAIL_PASSWORD"`
-	Server   string `mapstructure:"MAIL_SERVER"`
-	Port     int    `mapstructure:"MAIL_PORT"`
-	FromName string `mapstructure:"MAIL_FROM_NAME"`
+	Username    string `mapstructure:"MAIL_USERNAME"`
+	Password    string `mapstructure:"MAIL_PASSWORD"`
+	Server      string `mapstructure:"MAIL_SERVER"`
+	Port        int    `mapstructure:"MAIL_PORT"`
+	FromName    string `mapstructure:"MAIL_FROM_NAME"`
+	FromAddress string `mapstructure:"MAIL_FROM_ADDRESS"`
 }
 
 // GitHubConfig GitHub OAuth。
