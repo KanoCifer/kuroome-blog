@@ -1147,3 +1147,220 @@ func TestBuildMagicLoginEmail_Title(t *testing.T) {
 		t.Errorf("nomu title = %q", nomu.Title)
 	}
 }
+
+// ---------- Pillow Scenario 隔离 ----------
+
+// TestScenarios_KindAndTitle 三种场景的 Kind + Title 互不混淆：
+// 防止有人把"找回密码"误填了"注册"的文案，或者反过来。
+func TestScenarios_KindAndTitle(t *testing.T) {
+	cases := []struct {
+		build func(string) emailtemplates.Scenario
+		kind  emailtemplates.Kind
+		title string
+	}{
+		{emailtemplates.RegisterScenario, emailtemplates.KindRegister, "Nomu 注册验证码"},
+		{emailtemplates.PasswordResetScenario, emailtemplates.KindPasswordReset, "Nomu 找回密码"},
+		{emailtemplates.EmailCodeLoginScenario, emailtemplates.KindEmailCodeLogin, "Nomu 登录验证码"},
+	}
+	for _, c := range cases {
+		s := c.build("123456")
+		if s.Kind != c.kind {
+			t.Errorf("%s: kind = %q, want %q", c.title, s.Kind, c.kind)
+		}
+		if s.Title != c.title {
+			t.Errorf("title = %q, want %q", s.Title, c.title)
+		}
+		if s.Action.Label != "123456" {
+			t.Errorf("code not propagated: %q", s.Action.Label)
+		}
+	}
+}
+
+// TestScenarios_HeadingIsolation 每个场景的 H1 必须是自己的，
+// 不能因为 Pillow 模板共享而误用别家文案。
+func TestScenarios_HeadingIsolation(t *testing.T) {
+	reg := emailtemplates.RegisterScenario("000000")
+	pwd := emailtemplates.PasswordResetScenario("000000")
+	login := emailtemplates.EmailCodeLoginScenario("000000")
+
+	if reg.Heading == pwd.Heading || reg.Heading == login.Heading {
+		t.Errorf("register heading leaks into others: %q", reg.Heading)
+	}
+	if pwd.Heading == login.Heading {
+		t.Errorf("password_reset and email_code_login share heading: %q", pwd.Heading)
+	}
+}
+
+// TestRenderScenarioHTML_PillowBrand 任意 Scenario 走 Pillow 模板都带
+// 品牌元素（Nomu logo / "Nomu" wordmark / 代发页脚），同时渲染自己场景的标题。
+func TestRenderScenarioHTML_PillowBrand(t *testing.T) {
+	cases := []struct {
+		build func(string) emailtemplates.Scenario
+		title string
+	}{
+		{emailtemplates.RegisterScenario, "Nomu 注册验证码"},
+		{emailtemplates.PasswordResetScenario, "Nomu 找回密码"},
+		{emailtemplates.EmailCodeLoginScenario, "Nomu 登录验证码"},
+	}
+	for _, c := range cases {
+		got := emailtemplates.RenderScenarioHTML(c.build("482913"))
+
+		// Pillow 品牌元素：所有场景共享。
+		if !strings.Contains(got, emailtemplates.NomuLogoURL) {
+			t.Errorf("%s: should embed nomu logo", c.title)
+		}
+		if !strings.Contains(got, "Nomu") {
+			t.Errorf("%s: should mention Nomu brand", c.title)
+		}
+		if !strings.Contains(got, "代 Nomu 发送") {
+			t.Errorf("%s: should have '代 Nomu 发送' footer", c.title)
+		}
+		// Pillow 视觉标记：圆角 22 + 等宽字号 + 中性背景。
+		if !strings.Contains(got, "border-radius:22px") {
+			t.Errorf("%s: pillow card missing 22px rounded card", c.title)
+		}
+		if !strings.Contains(got, "background:#F5F5F7") {
+			t.Errorf("%s: pillow code pill missing #F5F5F7", c.title)
+		}
+		// 场景标题与验证码嵌入。
+		if !strings.Contains(got, c.title) {
+			t.Errorf("%s: should embed its own Title in <title>", c.title)
+		}
+		if !strings.Contains(got, "482913") {
+			t.Errorf("%s: should embed the code", c.title)
+		}
+	}
+}
+
+// TestBuildScenarioEmail_PlainTextFallback Body 必须是纯文本 fallback，
+// 兼容屏蔽 HTML 的客户端（mail 客户端默认 + 部分安全网关）。
+func TestBuildScenarioEmail_PlainTextFallback(t *testing.T) {
+	msg := emailtemplates.BuildScenarioEmail(emailtemplates.PasswordResetScenario("654321"))
+	if msg.Title != "Nomu 找回密码" {
+		t.Errorf("title = %q", msg.Title)
+	}
+	if !strings.Contains(msg.Body, "654321") {
+		t.Errorf("body should embed code as plain text, got %q", msg.Body)
+	}
+	if msg.Body == msg.HTML {
+		t.Error("body must be plain text fallback, not the HTML")
+	}
+	if !strings.Contains(msg.HTML, "654321") {
+		t.Error("html should embed code")
+	}
+}
+
+// TestRegisterScenario_HTMLEscapesCode 防御 XSS：code 含 <>&" 时必须 escape。
+func TestRegisterScenario_HTMLEscapesCode(t *testing.T) {
+	s := emailtemplates.RegisterScenario(`<img src=x onerror="1">`)
+	if strings.Contains(s.Action.Label, "<img") {
+		t.Errorf("code should be HTML-escaped, got %q", s.Action.Label)
+	}
+}
+
+// TestMagicLoginBlogScenario_Pillow 魔法登录 blog 走 Pillow：
+// 22px 大卡 + kanocifer 品牌 + BlogLogoURL + 蓝色 CTA + 单行页脚（无"代发"行）。
+func TestMagicLoginBlogScenario_Pillow(t *testing.T) {
+	link := "https://kanocifer.chat/auth/magic?token=deadbeef&exp=1737350400"
+	s := emailtemplates.MagicLoginBlogScenario(link)
+
+	if s.Kind != emailtemplates.KindMagicLoginBlog {
+		t.Errorf("kind = %q", s.Kind)
+	}
+	if s.Brand != "kanocifer.chat" {
+		t.Errorf("brand = %q", s.Brand)
+	}
+	if s.LogoURL == emailtemplates.NomuLogoURL {
+		t.Error("blog should not use Nomu logo")
+	}
+	if s.Action.Kind != emailtemplates.ActionButton {
+		t.Errorf("action kind = %q", s.Action.Kind)
+	}
+	if s.Action.Label != "登录 kanocifer.chat" {
+		t.Errorf("button label = %q", s.Action.Label)
+	}
+	if s.Action.URL == "" {
+		t.Error("button url empty")
+	}
+	if s.FooterBy != "" {
+		t.Errorf("blog should skip '代发' footer, got FooterBy=%q", s.FooterBy)
+	}
+
+	html := emailtemplates.RenderScenarioHTML(s)
+	for _, want := range []string{
+		"border-radius:22px",     // Pillow 大卡
+		"background:#007AFF",     // Pillow 蓝色 CTA
+		"登录 kanocifer.chat",     // 按钮文案
+		"token=deadbeef",          // URL 包含原 token
+		"kanocifer.chat · 魔法登录", // 单行页脚
+	} {
+		if !strings.Contains(html, want) {
+			t.Errorf("html missing %q", want)
+		}
+	}
+	if strings.Contains(html, "代 Nomu 发送") {
+		t.Error("blog magic-login should NOT have '代 Nomu 发送' footer")
+	}
+}
+
+// TestMagicLoginNomuScenario_Pillow 魔法登录 nomu 走 Pillow：
+// 22px 大卡 + Nomu 品牌 + NomuLogoURL + 蓝色 CTA + 代发页脚。
+func TestMagicLoginNomuScenario_Pillow(t *testing.T) {
+	link := "https://kanocifer.chat/nomu/login?token=deadbeef"
+	s := emailtemplates.MagicLoginNomuScenario(link)
+
+	if s.Kind != emailtemplates.KindMagicLoginNomu {
+		t.Errorf("kind = %q", s.Kind)
+	}
+	if s.Brand != "Nomu" {
+		t.Errorf("brand = %q", s.Brand)
+	}
+	if s.LogoURL != emailtemplates.NomuLogoURL {
+		t.Error("nomu should use Nomu logo")
+	}
+	if s.Action.Label != "完成 Nomu 登录" {
+		t.Errorf("button label = %q", s.Action.Label)
+	}
+	if s.FooterBy != "kanocifer.chat" {
+		t.Errorf("nomu FooterBy = %q, want kanocifer.chat", s.FooterBy)
+	}
+
+	html := emailtemplates.RenderScenarioHTML(s)
+	for _, want := range []string{
+		"border-radius:22px",     // Pillow 大卡
+		"background:#007AFF",     // Pillow 蓝色 CTA
+		"完成 Nomu 登录",          // 按钮文案
+		"token=deadbeef",         // URL 包含原 token
+		"代 Nomu 发送",            // 代发页脚
+		"Nomu · 魔法登录",         // FooterLine
+	} {
+		if !strings.Contains(html, want) {
+			t.Errorf("html missing %q", want)
+		}
+	}
+}
+
+// TestMagicLoginScenarios_URLHTMLEscaped 防御 XSS：link 含 <>&" 时必须 escape，
+// 防止恶意 link 注入 HTML。
+func TestMagicLoginScenarios_URLHTMLEscaped(t *testing.T) {
+	link := `https://x?x="><script>alert(1)</script>`
+	blog := emailtemplates.MagicLoginBlogScenario(link)
+	nomu := emailtemplates.MagicLoginNomuScenario(link)
+
+	if strings.Contains(blog.Action.URL, "<script>") {
+		t.Error("blog action URL should be HTML-escaped")
+	}
+	if strings.Contains(nomu.Action.URL, "<script>") {
+		t.Error("nomu action URL should be HTML-escaped")
+	}
+
+	// 渲染出来的 HTML 不应含未 escape 的 <script>。
+	for name, html := range map[string]string{
+		"blog": emailtemplates.RenderScenarioHTML(blog),
+		"nomu": emailtemplates.RenderScenarioHTML(nomu),
+	} {
+		if strings.Contains(html, "<script>alert(1)</script>") {
+			t.Errorf("%s html should not embed raw <script>", name)
+		}
+	}
+}
