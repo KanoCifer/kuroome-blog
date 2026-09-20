@@ -148,7 +148,7 @@ export default function TodoListView() {
   };
 
   return (
-    <div className="bg-page flex min-h-screen w-full flex-col">
+    <div className="bg-page flex h-screen w-full flex-col overflow-hidden">
       {/* ── page header ── */}
       <header className="bg-page/75 sticky top-0 z-10 flex flex-wrap items-end justify-between gap-3 border-b px-5 py-3 backdrop-blur-sm sm:px-8">
         <div>
@@ -230,7 +230,7 @@ export default function TodoListView() {
       </header>
 
       {/* ── main content ── */}
-      <div className="flex flex-1">
+      <div className="flex min-h-0 flex-1">
         {/* ── sidebar (desktop tab nav with sliding indicator) ── */}
         <aside className="top-16 hidden w-52 shrink-0 space-y-1 self-start overflow-y-auto border-r px-4 py-6 lg:sticky lg:block lg:h-[calc(100vh-4rem)] lg:w-60">
           <div className="px-3 pb-2">

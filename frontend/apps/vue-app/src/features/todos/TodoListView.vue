@@ -1,12 +1,12 @@
 <template>
-  <div class="bg-page min-h-screen w-full">
+  <div class="bg-page flex h-screen w-full flex-col overflow-hidden">
     <!-- ── main content ── -->
-    <!-- 看板零重排契约：sidebar 是单个 fixed 不占位的可折叠侧边栏。
+    <!-- 看板零重排契约：sidebar 是单个 sticky 的可折叠侧边栏，钉在视口左侧不参与外层滚动。
          展开 = 240px / 折叠 = 56px，折叠只动 main 的左 padding，
          max-w 钉死 → Kanban grid 列宽恒定，零 reflow。
          lg 屏 tab 切换由 sidebar 内 tab 列表承担；窄屏回退到
          <TodoMobileTabs>。 -->
-    <div class="relative flex">
+    <div class="flex min-h-0 flex-1">
       <TodoSidebar
         v-model="activeTab"
         v-model:collapsed="sidebarCollapsed"
@@ -14,9 +14,9 @@
         @mcp-token="mcpTokenOpen = true"
       />
 
-      <div class="flex h-full w-full items-center justify-center">
+      <div class="flex h-full w-full min-w-0 flex-1 items-center justify-center">
         <main
-          class="flex h-full min-h-screen w-full max-w-6xl min-w-0 items-center justify-center overflow-y-auto px-8"
+          class="flex h-full w-full max-w-6xl min-w-0 items-center justify-center overflow-y-auto px-8"
         >
           <!-- 窄屏 tab strip：lg 由 sidebar 接管 -->
           <TodoMobileTabs v-model="activeTab" />

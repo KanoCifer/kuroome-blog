@@ -2,11 +2,11 @@
   <!-- 单层 sidebar，可折叠：
        展开 = 240px 菜单条（工作台标题 + 折叠按钮 + tab 列表 + 底部按钮）
        折叠 = 56px 图标条（logo + tab 图标 + 操作按钮 + 头像）
-       fixed 全高不占位 → main 用 mx-auto + max-w 居中，
+       sticky top-0 + 自带 h-screen → 始终占视口整高，main 主区独立 overflow-y-auto 滚动。
        折叠只动 main 的左 padding → Kanban grid 列宽恒定，零 reflow。 -->
   <aside
     :class="[
-      'bg-secondary top-0 left-0 z-20 hidden h-screen overflow-hidden transition-[width] duration-200 ease-linear lg:flex lg:flex-col',
+      'bg-secondary sticky top-0 z-20 hidden h-screen self-start overflow-hidden transition-[width] duration-200 ease-linear lg:flex lg:flex-col',
       collapsed ? 'w-14' : 'w-60',
     ]"
     :aria-label="collapsed ? '工作台（折叠）' : '工作台'"
