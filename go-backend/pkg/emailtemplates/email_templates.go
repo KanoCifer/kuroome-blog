@@ -243,11 +243,18 @@ func RenderScenarioHTML(s Scenario) string {
 		actionHTML = fmt.Sprintf(pillowCodeAction, s.Action.Label)
 	}
 
-	var footerByHTML string
+	var footerHTML string
 	if s.FooterBy != "" {
-		footerByHTML = fmt.Sprintf(
-			`<p style="margin:0;font-size:12px;line-height:1.6;color:#8E8E93;">这封邮件由 <span style="color:#3C3C43;">%s</span> 代 %s 发送</p>`,
-			s.FooterBy, s.Brand,
+		footerHTML = fmt.Sprintf(
+			`<p style="margin:0;font-size:12px;line-height:1.6;color:#8E8E93;">这封邮件由 <span style="color:#3C3C43;">%s</span> 代 %s 发送</p>`+
+				`<p style="margin:2px 0 0;font-size:11px;line-height:1.6;color:#C7C7CC;">%s</p>`,
+			s.FooterBy, s.Brand, s.FooterLine,
+		)
+	} else {
+		// 自营产品：单行页脚，无"代发"行。
+		footerHTML = fmt.Sprintf(
+			`<p style="margin:0;font-size:12px;line-height:1.6;color:#8E8E93;">%s</p>`,
+			s.FooterLine,
 		)
 	}
 
@@ -261,8 +268,7 @@ func RenderScenarioHTML(s Scenario) string {
 		actionHTML,     // %[7]s  主元素（pill 或按钮 + fallback）
 		s.Expiry,       // %[8]s  有效期
 		s.SecurityNote, // %[9]s  安全提示
-		footerByHTML,   // %[10]s 代发行（可空）
-		s.FooterLine,   // %[11]s 页脚次行
+		footerHTML,     // %[10]s 页脚（已 pre-render，整段嵌入）
 	)
 }
 
@@ -299,7 +305,6 @@ const pillowTmpl = `<!DOCTYPE html>
 <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:20px auto 0;">
   <tr><td style="text-align:center;">
     %[10]s
-    <p style="margin:%[11]s; font-size:11px;line-height:1.6;color:#C7C7CC;">%[12]s</p>
   </td></tr>
 </table>
 </body>
@@ -331,7 +336,5 @@ const pillowButtonAction = `<tr><td align="center" style="padding:8px 32px 24px;
   <p style="margin:0;padding:14px 16px;background:#F5F5F7;border:1px solid #ECECEF;border-radius:10px;font-size:12px;line-height:1.6;word-break:break-all;color:#3C3C43;font-family:'SF Mono','JetBrains Mono',Menlo,Consolas,monospace;text-align:center;">%[2]s</p>
 </td></tr>`
 
-// Pillow 页脚参数说明（避免跟 pillowTmpl 里的参数编号混淆）：
-//   %[10]s 代发行 HTML 块（已 fmt 渲染；可空字符串）
-//   %[11]s FooterLine 与上方间距：代发存在时 "2px 0 0"，单独显示时 "0"
-//   %[12]s FooterLine 文本
+// Pillow 页脚：footerHTML 已在 RenderScenarioHTML 里按 FooterBy 是否为空
+// pre-render 为"双行代发 + FooterLine"或"单行 FooterLine"，这里只插一个 %[10]s。

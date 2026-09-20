@@ -1258,7 +1258,26 @@ func TestRegisterScenario_HTMLEscapesCode(t *testing.T) {
 	}
 }
 
-// TestMagicLoginBlogScenario_Pillow 魔法登录 blog 走 Pillow：
+// TestRenderScenarioHTML_NoFmtErrors Pillow 模板里没有任何 fmt.Sprintf
+// 失败标记（%!s(BADINDEX) / %!(EXTRA ...)）。防止将来占位符与 fmt 参数
+// 不一致时把错误内容直接渲染到用户邮箱里。
+func TestRenderScenarioHTML_NoFmtErrors(t *testing.T) {
+	scenarios := []emailtemplates.Scenario{
+		emailtemplates.RegisterScenario("123456"),
+		emailtemplates.PasswordResetScenario("123456"),
+		emailtemplates.EmailCodeLoginScenario("123456"),
+		emailtemplates.MagicLoginBlogScenario("https://x?token=t"),
+		emailtemplates.MagicLoginNomuScenario("https://x?token=t"),
+	}
+	for _, s := range scenarios {
+		got := emailtemplates.RenderScenarioHTML(s)
+		for _, marker := range []string{"%!s", "%!(", "%!("} {
+			if strings.Contains(got, marker) {
+				t.Errorf("%s: html contains fmt error marker %q\n---\n%s", s.Kind, marker, got)
+			}
+		}
+	}
+}
 // 22px 大卡 + kanocifer 品牌 + BlogLogoURL + 蓝色 CTA + 单行页脚（无"代发"行）。
 func TestMagicLoginBlogScenario_Pillow(t *testing.T) {
 	link := "https://kanocifer.chat/auth/magic?token=deadbeef&exp=1737350400"
