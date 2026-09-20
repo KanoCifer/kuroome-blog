@@ -83,13 +83,16 @@ type DatabaseConfig struct {
 // 传统邮箱则等于发件地址）。FromAddress 是邮件 From header 中的发件邮箱，
 // 必须是在服务商控制台验证过的域名的某地址；缺省回退到 Username，
 // 兼容 QQ/Gmail 等 Username==发件邮箱 的服务。
+// UnsubscribeMailto 是 List-Unsubscribe header 中的 mailto: 地址（Gmail/Outlook
+// inbox placement 关键头），缺省时跳过该 header 设置，避免发出无效退订路径。
 type MailConfig struct {
-	Username    string `mapstructure:"MAIL_USERNAME"`
-	Password    string `mapstructure:"MAIL_PASSWORD"`
-	Server      string `mapstructure:"MAIL_SERVER"`
-	Port        int    `mapstructure:"MAIL_PORT"`
-	FromName    string `mapstructure:"MAIL_FROM_NAME"`
-	FromAddress string `mapstructure:"MAIL_FROM_ADDRESS"`
+	Username          string `mapstructure:"MAIL_USERNAME"`
+	Password          string `mapstructure:"MAIL_PASSWORD"`
+	Server            string `mapstructure:"MAIL_SERVER"`
+	Port              int    `mapstructure:"MAIL_PORT"`
+	FromName          string `mapstructure:"MAIL_FROM_NAME"`
+	FromAddress       string `mapstructure:"MAIL_FROM_ADDRESS"`
+	UnsubscribeMailto string `mapstructure:"MAIL_UNSUBSCRIBE_MAILTO"`
 }
 
 // GitHubConfig GitHub OAuth。
