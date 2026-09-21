@@ -12,6 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	fisherrs "github.com/KanoCifer/kuroome-blog/internal/domain/fish/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/mongo/document"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
@@ -285,7 +286,7 @@ func TestFishHandler_UpdateFishingSpot_InvalidKind(t *testing.T) {
 		updateFn: func(ctx context.Context, id string, spot *dto.FishingSpotUpdate) error {
 			// service 层二次校验：若 binding 漏过，service 仍返 ErrInvalidKind
 			if spot == nil || spot.Kind == nil || !document.IsValidKind(*spot.Kind) {
-				return service.ErrInvalidKind
+				return fisherrs.ErrInvalidKind
 			}
 			return nil
 		},

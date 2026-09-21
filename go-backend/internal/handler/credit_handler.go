@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"log/slog"
@@ -10,22 +11,28 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	crediterrs "github.com/KanoCifer/kuroome-blog/internal/domain/credit/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
-	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
+
+// creditUserLocator 按 email 定位用户的读能力，由 *postgres.UserRepo 满足。
+// handler 不持有具体 repo 类型（分层约定见 docs/rules/go-backend.md）。
+type creditUserLocator interface {
+	GetByEmail(ctx context.Context, email string) (*model.User, *model.Profile, error)
+}
 
 // CreditHandler 积分 HTTP 接口（task-546）。只做协议翻译，
 // 厘→分换算与分页信封收口在本层；业务全部复用 service.Creditser。
 // userRepo 用于 grant 接口 email → user_id 解析（task-557）。
 type CreditHandler struct {
 	svc      service.Creditser
-	userRepo *postgres.UserRepo
+	userRepo creditUserLocator
 }
 
-func NewCreditHandler(svc service.Creditser, userRepo *postgres.UserRepo) *CreditHandler {
+func NewCreditHandler(svc service.Creditser, userRepo creditUserLocator) *CreditHandler {
 	return &CreditHandler{svc: svc, userRepo: userRepo}
 }
 
@@ -134,7 +141,7 @@ func (h *CreditHandler) Grant(c *gin.Context) {
 
 	tx, err := h.svc.Grant(c.Request.Context(), targetUserID, amountLi, req.BizID, nil)
 	if err != nil {
-		if errors.Is(err, service.ErrInvalidAmount) || errors.Is(err, service.ErrInvalidBizID) {
+		if errors.Is(err, crediterrs.ErrInvalidAmount) || errors.Is(err, crediterrs.ErrInvalidBizID) {
 			response.APIError(c, err.Error(), http.StatusBadRequest)
 			return
 		}

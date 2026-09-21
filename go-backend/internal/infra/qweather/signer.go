@@ -1,8 +1,3 @@
-// Package qweather 提供与和风天气 API 交互所需的工具，目前包含 EdDSA
-// (Ed25519) JWT 签名器，行为对齐 backend/app/utils/qweather_jwt.py。
-//
-// 和风天气要求请求头携带 EdDSA 签名 JWT。Signer 内部持有不可变私钥，
-// 线程安全，可在多个 goroutine 间共享。
 package qweather
 
 import (

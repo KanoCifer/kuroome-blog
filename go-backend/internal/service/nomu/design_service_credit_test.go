@@ -15,6 +15,7 @@ import (
 
 	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
+	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
@@ -238,7 +239,7 @@ func TestGenerate_SameIdempotencyKey_NoDoubleDeduct(t *testing.T) {
 	if err := model.SeedCreditPrices(db); err != nil {
 		t.Fatal(err)
 	}
-	credits := service.NewCreditService(db)
+	credits := service.NewCreditService(postgres.NewCreditRepository(db))
 	svc, _ := newCreditTestService(t, credits, 1, false)
 
 	ctx := context.Background()
@@ -279,7 +280,7 @@ func TestGenerate_Apiyi_DeductsViaCreditPrice(t *testing.T) {
 	if err := model.SeedCreditPrices(db); err != nil {
 		t.Fatal(err)
 	}
-	credits := service.NewCreditService(db)
+	credits := service.NewCreditService(postgres.NewCreditRepository(db))
 
 	// 伪 apiyi 上游：文生图端点返回 b64。
 	mux := http.NewServeMux()

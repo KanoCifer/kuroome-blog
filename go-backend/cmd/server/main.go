@@ -4,6 +4,10 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net/http"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -44,6 +48,10 @@ func sendBootNotification() {
 
 func main() {
 	logger.Init(config.Cfg)
+
+	// Create context that listens for the interrupt signal from the OS.
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
 	if err := db.InitDB(); err != nil {
 		slog.Error("init db", "error", err)
@@ -92,5 +100,29 @@ func main() {
 	sendBootNotification()
 
 	addr := fmt.Sprintf("127.0.0.1:%d", config.Cfg.Server.Port)
-	r.Run(addr)
+
+	srv := &http.Server{
+		Addr:              addr,
+		Handler:           r,
+		ReadHeaderTimeout: 5 * time.Second,
+	}
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			slog.Error("listen: %s\n", "error",err.Error())
+		}
+	}()
+
+	<-ctx.Done()
+
+	stop()
+	slog.Info("shutting down gracefully, press Ctrl+C again to force")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		slog.Error("Server forced to shutdown: ", "error",err.Error())
+	}
+
+	slog.Warn("Server exiting")
 }

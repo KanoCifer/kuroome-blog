@@ -20,6 +20,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/logger"
 	"github.com/KanoCifer/kuroome-blog/internal/middleware"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
+	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 	"github.com/KanoCifer/kuroome-blog/pkg/jwt"
 )
@@ -289,7 +290,7 @@ func TestRegister_Success(t *testing.T) {
 // 复用 newCreditHandlerTestDB（同 handler 测试已有 sqlite harness），不另起 DB。
 func TestRegister_Success_GrantsRegisterBonus(t *testing.T) {
 	db := newCreditHandlerTestDB(t)
-	creditSvc := service.NewCreditService(db)
+	creditSvc := service.NewCreditService(postgres.NewCreditRepository(db))
 
 	svc := &mockUserService{
 		createUserFn: func(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error) {
@@ -328,7 +329,7 @@ func TestRegister_Success_GrantsRegisterBonus(t *testing.T) {
 // 守护"失败不送"的契约：bonus 是 CreateUser 成功路径的副作用，不是注册前置检查。
 func TestRegister_RegisterBonus_NotGrantedOnCreateError(t *testing.T) {
 	db := newCreditHandlerTestDB(t)
-	creditSvc := service.NewCreditService(db)
+	creditSvc := service.NewCreditService(postgres.NewCreditRepository(db))
 
 	svc := &mockUserService{
 		createUserFn: func(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error) {

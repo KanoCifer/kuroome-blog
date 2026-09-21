@@ -1,4 +1,11 @@
-package service
+// Package qweather 是和风天气（QWeather）的接入层：EdDSA(Ed25519) JWT 签名器
+// （signer.go）与「鉴权 + 缓存 + HTTP」三合一的客户端（本文件）。
+//
+// 两者都对齐 Python 端 backend/app/utils/qweather_jwt.py / _QWeatherClient
+// 的行为；均无状态、可并发共享，由 appstate 构造并注入。
+//
+// 放置于 infra 而非 service：本包不持有业务状态，只做外部依赖的协议适配。
+package qweather
 
 import (
 	"context"
@@ -14,7 +21,6 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
-	"github.com/KanoCifer/kuroome-blog/pkg/qweather"
 )
 
 var (
@@ -26,44 +32,58 @@ var (
 	ErrUnavailable = errors.New("weather: QWeather unavailable")
 )
 
-// qweatherClient 封装"鉴权 + 缓存 + HTTP"三合一，对外只暴露
-// Get / ResolveLocation。file-private，handler 只看到 Weatherer interface。
+// upstreamBodyLogLimit 非 2xx 时打进日志的响应体上限（QWeather 错误码在 body 里）。
+const upstreamBodyLogLimit = 512
+
+// Client 封装"鉴权 + 缓存 + HTTP"三合一，对外只暴露 Get / ResolveLocation。
 //
 // 复用 internal/infra/httpclient.Client 的 trace_id 注入与出站日志，
 // 不另起 *http.Client。
 //
 // 日志直接走 slog.InfoContext 等顶层函数（logger.Init 已 SetDefault，
 // trace_id 由 routerHandler 从 ctx 提取并注入记录）。
-type qweatherClient struct {
+type Client struct {
 	http   *httpclient.Client
 	redis  *redis.Client
 	base   string
-	signer *qweather.Signer
+	signer *Signer
 	now    func() time.Time // 注入时钟，便于测试 JWT iat/exp
 }
 
-const maxRetry = 3
+// Option 配置 Client。
+type Option func(*Client)
 
-// upstreamBodyLogLimit 非 2xx 时打进日志的响应体上限（QWeather 错误码在 body 里）。
-const upstreamBodyLogLimit = 512
+// WithClock 注入时钟，便于测试断言 JWT iat/exp。
+func WithClock(now func() time.Time) Option {
+	return func(c *Client) { c.now = now }
+}
 
-// newQWeatherClient 构造 qweatherClient。
-func newQWeatherClient(
+// NewClient 构造 Client。signer 为 nil 时所有请求返回 ErrUnavailable
+// （JWT 私钥未配置的部署形态，不 panic）。
+func NewClient(
 	http *httpclient.Client,
 	redis *redis.Client,
 	base string,
-	signer *qweather.Signer,
-) *qweatherClient {
+	signer *Signer,
+	opts ...Option,
+) *Client {
 	// 去掉尾部斜杠，避免与 path 首斜杠拼接出 "//geo/..." 导致上游 404。
-	base = strings.TrimRight(base, "/")
-	return &qweatherClient{
+	c := &Client{
 		http:   http,
 		redis:  redis,
-		base:   base,
+		base:   strings.TrimRight(base, "/"),
 		signer: signer,
 		now:    time.Now,
 	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
+
+// Redis 暴露底层 redis 客户端，供上层旁路读取缓存（如潮汐端点需返回
+// from_cache 标记）。redis 未配置时为 nil，调用方须自查。
+func (c *Client) Redis() *redis.Client { return c.redis }
 
 // Get 发起鉴权 + 缓存的 GET 请求，行为对齐 Python 端
 // _QWeatherClient.get(...)：
@@ -74,7 +94,7 @@ func newQWeatherClient(
 //  5. 成功后 SET cacheKey 写回 redis。
 //
 // 返回的 json.RawMessage 是上游原始 payload，handler 可直接转发或继续解析。
-func (c *qweatherClient) Get(
+func (c *Client) Get(
 	ctx context.Context,
 	path string,
 	params map[string]string,
@@ -115,7 +135,7 @@ func (c *qweatherClient) Get(
 	req.Header.Set("Authorization", "Bearer "+token)
 
 	// 5. send
-	resp, err := doWithRetry(ctx, c.http, req)
+	resp, err := httpclient.DoWithRetry(ctx, c.http, req)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", ErrUnavailable, err)
 	}
@@ -157,53 +177,11 @@ func (c *qweatherClient) Get(
 	return body, nil
 }
 
-// doWithRetry 带退避重试的 HTTP 请求。
-//
-// 调用方（Python 钓鱼指数端点，10s 超时）一旦断开，请求 ctx 立即取消，此后每次
-// 重试都必然立刻失败、退避 sleep 纯属空烧。因此 ctx 结束即收手，退避也改成可被
-// ctx 打断，避免 handler 已返回却还占着 goroutine。
-//
-// body 归属：调用方需读取上游错误详情，因此重试耗尽的最后一轮不关闭 body，
-// 由 Get 的非 2xx 分支读取后关闭（defer resp.Body.Close()）；被丢弃的中间轮
-// 与本函数判定放弃的轮次在此关闭。
-func doWithRetry(ctx context.Context, cli *httpclient.Client, req *http.Request) (*http.Response, error) {
-	var resp *http.Response
-	var err error
-
-	for i := 0; i <= maxRetry; i++ {
-		resp, err = cli.Do(ctx, req)
-		if err == nil && resp.StatusCode < 500 {
-			return resp, nil
-		}
-
-		// 最后一轮或调用方已断开：不再重试
-		if i == maxRetry || ctx.Err() != nil {
-			if ctx.Err() != nil && resp != nil {
-				// 调用方已走，body 不会被读，就地关闭
-				resp.Body.Close()
-			}
-			return resp, err
-		}
-
-		if resp != nil {
-			resp.Body.Close()
-		}
-
-		select {
-		case <-time.After(time.Duration(i+1) * time.Second):
-		case <-ctx.Done():
-			return nil, ctx.Err()
-		}
-	}
-
-	return resp, err
-}
-
 // ResolveLocation 校验位置输入并返回 (effective value, params)：
 //   - locID 非空优先；
 //   - 其次 loc；
 //   - 两者都为空 → ErrInvalidLocation（handler 映射 400）。
-func (c *qweatherClient) ResolveLocation(loc, locID *string) (string, map[string]string, error) {
+func (c *Client) ResolveLocation(loc, locID *string) (string, map[string]string, error) {
 	if locID != nil && *locID != "" {
 		return *locID, map[string]string{"location": *locID}, nil
 	}

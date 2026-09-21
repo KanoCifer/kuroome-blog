@@ -16,7 +16,9 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
+	crediterrs "github.com/KanoCifer/kuroome-blog/internal/domain/credit/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
+	pgrepo "github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 )
 
 // newCreditSvcTestDB 对齐 internal/model/credit_test.go 的 newCreditTestDB：
@@ -46,7 +48,14 @@ func newCreditSvcTestDB(t *testing.T, name string) *gorm.DB {
 
 func newCreditSvc(t *testing.T, name string) *CreditService {
 	t.Helper()
-	return NewCreditService(newCreditSvcTestDB(t, name))
+	return NewCreditService(pgrepo.NewCreditRepository(newCreditSvcTestDB(t, name)))
+}
+
+// creditSvcFixture 供需要直接查库断言的用例使用：返回 service 与其底层 *gorm.DB。
+func creditSvcFixture(t *testing.T, name string) (*CreditService, *gorm.DB) {
+	t.Helper()
+	db := newCreditSvcTestDB(t, name)
+	return NewCreditService(pgrepo.NewCreditRepository(db)), db
 }
 
 // isTransientLock sqlite 共享缓存的表级锁竞争（SQLITE_LOCKED/busy）是瞬时错误，
@@ -73,19 +82,19 @@ func creditTxCount(t *testing.T, db *gorm.DB, userID uint, txType string) int64 
 // -- AC: 并发扣减不超卖 ------------------------------------------------ //
 
 func TestCreditPreconsume_ConcurrentNoOversell(t *testing.T) {
-	svc := newCreditSvc(t, "svc_conc")
+	svc, db := creditSvcFixture(t, "svc_conc")
 	ctx := context.Background()
 	// 余额 1000 厘，translate 单价 10 厘 → 成功上限 floor(1000/10)=100
 	if _, err := svc.Grant(ctx, 7, 1000, "seed-7", nil); err != nil {
 		t.Fatal(err)
 	}
-	checkConcurrentNoOversell(t, svc, 7, 140, 100, 1000)
+	checkConcurrentNoOversell(t, svc, db, 7, 140, 100, 1000)
 }
 
 // checkConcurrentNoOversell 并发发起 n 次 Preconsume（各自唯一 bizID），
 // 断言成功次数恰为 wantSuccess、余额不被扣成负数、流水数与成功数一致。
 // 单价固定 translate=10 厘。
-func checkConcurrentNoOversell(t *testing.T, svc *CreditService, userID uint, n, wantSuccess int, initial int64) {
+func checkConcurrentNoOversell(t *testing.T, svc *CreditService, db *gorm.DB, userID uint, n, wantSuccess int, initial int64) {
 	t.Helper()
 	ctx := context.Background()
 	var wg sync.WaitGroup
@@ -116,7 +125,7 @@ func checkConcurrentNoOversell(t *testing.T, svc *CreditService, userID uint, n,
 		switch {
 		case err == nil:
 			ok++
-		case errors.Is(err, ErrInsufficientBalance):
+		case errors.Is(err, crediterrs.ErrInsufficientBalance):
 			insufficient++
 		default:
 			t.Fatalf("unexpected error: %v", err)
@@ -141,7 +150,7 @@ func checkConcurrentNoOversell(t *testing.T, svc *CreditService, userID uint, n,
 	if totalSpent != int64(wantSuccess)*10 {
 		t.Errorf("total_spent = %d, want %d", totalSpent, wantSuccess*10)
 	}
-	if got := creditTxCount(t, svc.db, userID, "consume"); got != int64(wantSuccess) {
+	if got := creditTxCount(t, db, userID, "consume"); got != int64(wantSuccess) {
 		t.Errorf("consume 流水数 = %d, want %d", got, wantSuccess)
 	}
 }
@@ -149,7 +158,7 @@ func checkConcurrentNoOversell(t *testing.T, svc *CreditService, userID uint, n,
 // -- AC: 同 biz_id 重复 Preconsume 不双扣、返回首次结果 ------------------ //
 
 func TestCreditPreconsume_IdempotentSameBizID(t *testing.T) {
-	svc := newCreditSvc(t, "svc_idem")
+	svc, db := creditSvcFixture(t, "svc_idem")
 	ctx := context.Background()
 	if _, err := svc.Grant(ctx, 1, 10000, "seed-1", nil); err != nil {
 		t.Fatal(err)
@@ -178,7 +187,7 @@ func TestCreditPreconsume_IdempotentSameBizID(t *testing.T) {
 	if balance != 6000 { // 只扣一次 4000
 		t.Errorf("双扣：balance = %d, want 6000", balance)
 	}
-	if got := creditTxCount(t, svc.db, 1, "consume"); got != 1 {
+	if got := creditTxCount(t, db, 1, "consume"); got != 1 {
 		t.Errorf("consume 流水数 = %d, want 1", got)
 	}
 }
@@ -220,18 +229,18 @@ func TestCreditPreconsume_MetaRecordsVariantQty(t *testing.T) {
 	}
 }
 
-// -- AC: 余额不足返回 ErrInsufficientBalance 且无扣费流水 ---------------- //
+// -- AC: 余额不足返回 crediterrs.ErrInsufficientBalance 且无扣费流水 ---------------- //
 
 func TestCreditPreconsume_InsufficientNoCharge(t *testing.T) {
-	svc := newCreditSvc(t, "svc_lack")
+	svc, db := creditSvcFixture(t, "svc_lack")
 	ctx := context.Background()
 	if _, err := svc.Grant(ctx, 4, 5, "seed-4", nil); err != nil { // 5 厘 < translate 10 厘
 		t.Fatal(err)
 	}
-	if _, _, err := svc.Preconsume(ctx, 4, "translate", "", 1, "x1", nil); !errors.Is(err, ErrInsufficientBalance) {
-		t.Errorf("err = %v, want ErrInsufficientBalance", err)
+	if _, _, err := svc.Preconsume(ctx, 4, "translate", "", 1, "x1", nil); !errors.Is(err, crediterrs.ErrInsufficientBalance) {
+		t.Errorf("err = %v, want crediterrs.ErrInsufficientBalance", err)
 	}
-	if got := creditTxCount(t, svc.db, 4, "consume"); got != 0 {
+	if got := creditTxCount(t, db, 4, "consume"); got != 0 {
 		t.Errorf("余额不足仍写入流水: %d 条", got)
 	}
 	balance, totalSpent, err := svc.GetBalance(ctx, 4)
@@ -245,11 +254,11 @@ func TestCreditPreconsume_InsufficientNoCharge(t *testing.T) {
 
 func TestCreditPreconsume_PriceNotFound(t *testing.T) {
 	svc := newCreditSvc(t, "svc_price")
-	if _, _, err := svc.Preconsume(context.Background(), 1, "nope", "", 1, "b1", nil); !errors.Is(err, ErrPriceNotFound) {
-		t.Errorf("err = %v, want ErrPriceNotFound", err)
+	if _, _, err := svc.Preconsume(context.Background(), 1, "nope", "", 1, "b1", nil); !errors.Is(err, crediterrs.ErrPriceNotFound) {
+		t.Errorf("err = %v, want crediterrs.ErrPriceNotFound", err)
 	}
-	if _, _, err := svc.Preconsume(context.Background(), 1, "translate", "", 0, "b2", nil); !errors.Is(err, ErrInvalidAmount) {
-		t.Errorf("err = %v, want ErrInvalidAmount", err)
+	if _, _, err := svc.Preconsume(context.Background(), 1, "translate", "", 0, "b2", nil); !errors.Is(err, crediterrs.ErrInvalidAmount) {
+		t.Errorf("err = %v, want crediterrs.ErrInvalidAmount", err)
 	}
 }
 
@@ -303,32 +312,32 @@ func TestCreditRefund_OtherUserConsume_NotFound(t *testing.T) {
 	if _, _, err := svc.Preconsume(ctx, 33, "translate", "", 1, "vict", nil); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := svc.Refund(ctx, 34, "translate", "vict", 0, nil); !errors.Is(err, ErrTransactionNotFound) {
-		t.Errorf("err = %v, want ErrTransactionNotFound（不得退他人 consume）", err)
+	if _, err := svc.Refund(ctx, 34, "translate", "vict", 0, nil); !errors.Is(err, crediterrs.ErrTransactionNotFound) {
+		t.Errorf("err = %v, want crediterrs.ErrTransactionNotFound（不得退他人 consume）", err)
 	}
 }
 
-// 保留前缀 / 超长 biz_id → ErrInvalidBizID，零扣费；Grant 同样校验。
+// 保留前缀 / 超长 biz_id → crediterrs.ErrInvalidBizID，零扣费；Grant 同样校验。
 func TestCreditBizID_Validation(t *testing.T) {
-	svc := newCreditSvc(t, "svc_bizid")
+	svc, db := creditSvcFixture(t, "svc_bizid")
 	ctx := context.Background()
 	if _, err := svc.Grant(ctx, 35, 100000, "fund-35", nil); err != nil {
 		t.Fatal(err)
 	}
 	tooLong := strings.Repeat("a", MaxBizIDLen+1)
 	for _, biz := range []string{"refund:evil", "settle:evil", tooLong} {
-		if _, _, err := svc.Preconsume(ctx, 35, "translate", "", 1, biz, nil); !errors.Is(err, ErrInvalidBizID) {
-			t.Errorf("Preconsume(%q) err = %v, want ErrInvalidBizID", biz, err)
+		if _, _, err := svc.Preconsume(ctx, 35, "translate", "", 1, biz, nil); !errors.Is(err, crediterrs.ErrInvalidBizID) {
+			t.Errorf("Preconsume(%q) err = %v, want crediterrs.ErrInvalidBizID", biz, err)
 		}
-		if _, err := svc.Grant(ctx, 35, 10, biz, nil); !errors.Is(err, ErrInvalidBizID) {
-			t.Errorf("Grant(%q) err = %v, want ErrInvalidBizID", biz, err)
+		if _, err := svc.Grant(ctx, 35, 10, biz, nil); !errors.Is(err, crediterrs.ErrInvalidBizID) {
+			t.Errorf("Grant(%q) err = %v, want crediterrs.ErrInvalidBizID", biz, err)
 		}
 	}
 	// 零扣费：只有 seed grant 一行流水
-	if got := creditTxCount(t, svc.db, 35, "consume"); got != 0 {
+	if got := creditTxCount(t, db, 35, "consume"); got != 0 {
 		t.Errorf("非法键仍产生 consume: %d 条", got)
 	}
-	if got := creditTxCount(t, svc.db, 35, "grant"); got != 1 {
+	if got := creditTxCount(t, db, 35, "grant"); got != 1 {
 		t.Errorf("非法键仍产生 grant: %d 条, want 1 (仅 seed)", got)
 	}
 	// 边界：恰好 MaxBizIDLen 合法
@@ -339,7 +348,7 @@ func TestCreditBizID_Validation(t *testing.T) {
 
 // OnConflict 声明式幂等回归：并发重复键最终只留一条流水、只扣一次。
 func TestCreditPreconsume_ConcurrentSameKey(t *testing.T) {
-	svc := newCreditSvc(t, "svc_conc_key")
+	svc, db := creditSvcFixture(t, "svc_conc_key")
 	ctx := context.Background()
 	if _, err := svc.Grant(ctx, 36, 1000, "f36", nil); err != nil {
 		t.Fatal(err)
@@ -381,7 +390,7 @@ func TestCreditPreconsume_ConcurrentSameKey(t *testing.T) {
 	if created != 1 {
 		t.Errorf("created=true 次数 = %d, want 1（OnConflict 回滚不双扣）", created)
 	}
-	if got := creditTxCount(t, svc.db, 36, "consume"); got != 1 {
+	if got := creditTxCount(t, db, 36, "consume"); got != 1 {
 		t.Errorf("consume 流水数 = %d, want 1", got)
 	}
 	if bal, spent, _ := svc.GetBalance(ctx, 36); bal != 990 || spent != 10 {
@@ -392,7 +401,7 @@ func TestCreditPreconsume_ConcurrentSameKey(t *testing.T) {
 // -- AC: 退款后 balance / total_spent 复原，流水 balance_after 链连续 ---- //
 
 func TestCreditRefund_RestoresBalanceAndChain(t *testing.T) {
-	svc := newCreditSvc(t, "svc_refund")
+	svc, db := creditSvcFixture(t, "svc_refund")
 	ctx := context.Background()
 	if _, err := svc.Grant(ctx, 5, 10000, "seed-5", nil); err != nil {
 		t.Fatal(err)
@@ -413,7 +422,7 @@ func TestCreditRefund_RestoresBalanceAndChain(t *testing.T) {
 		t.Errorf("balance_after 链断裂: consume=%d refund=%d", consume.BalanceAfter, refund.BalanceAfter)
 	}
 	var txs []model.CreditTransaction
-	svc.db.Where("user_id = ?", 5).Order("id").Find(&txs)
+	db.Where("user_id = ?", 5).Order("id").Find(&txs)
 	// balance_after 链：每条流水的快照 = 前序所有 Amount 累加
 	var running int64
 	for _, tx := range txs {
@@ -432,7 +441,7 @@ func TestCreditRefund_RestoresBalanceAndChain(t *testing.T) {
 }
 
 func TestCreditRefund_IdempotentOnce(t *testing.T) {
-	svc := newCreditSvc(t, "svc_refund_once")
+	svc, db := creditSvcFixture(t, "svc_refund_once")
 	ctx := context.Background()
 	if _, err := svc.Grant(ctx, 6, 10000, "seed-6", nil); err != nil {
 		t.Fatal(err)
@@ -458,7 +467,7 @@ func TestCreditRefund_IdempotentOnce(t *testing.T) {
 	if balance != 10000 { // 只回补一次
 		t.Errorf("重复退款双补: balance = %d", balance)
 	}
-	if got := creditTxCount(t, svc.db, 6, "refund"); got != 1 {
+	if got := creditTxCount(t, db, 6, "refund"); got != 1 {
 		t.Errorf("refund 流水数 = %d, want 1", got)
 	}
 }
@@ -487,16 +496,16 @@ func TestCreditRefund_PartialAndGuards(t *testing.T) {
 		t.Errorf("balance=%d total_spent=%d, want 7000/3000", balance, totalSpent)
 	}
 	// 超出原 consume 成本的退款被拒绝
-	if _, err := svc.Refund(ctx, 8, "design_generate", "img-8", 99999, nil); !errors.Is(err, ErrInvalidAmount) {
-		t.Errorf("err = %v, want ErrInvalidAmount", err)
+	if _, err := svc.Refund(ctx, 8, "design_generate", "img-8", 99999, nil); !errors.Is(err, crediterrs.ErrInvalidAmount) {
+		t.Errorf("err = %v, want crediterrs.ErrInvalidAmount", err)
 	}
 	// consume 不存在
-	if _, err := svc.Refund(ctx, 8, "design_generate", "no-such", 1, nil); !errors.Is(err, ErrTransactionNotFound) {
-		t.Errorf("err = %v, want ErrTransactionNotFound", err)
+	if _, err := svc.Refund(ctx, 8, "design_generate", "no-such", 1, nil); !errors.Is(err, crediterrs.ErrTransactionNotFound) {
+		t.Errorf("err = %v, want crediterrs.ErrTransactionNotFound", err)
 	}
 	// 对 grant 流水退款 → 拒绝
-	if _, err := svc.Refund(ctx, 8, "admin_grant", "seed-8", 1, nil); !errors.Is(err, ErrTransactionNotFound) {
-		t.Errorf("err = %v, want ErrTransactionNotFound（不得退 grant）", err)
+	if _, err := svc.Refund(ctx, 8, "admin_grant", "seed-8", 1, nil); !errors.Is(err, crediterrs.ErrTransactionNotFound) {
+		t.Errorf("err = %v, want crediterrs.ErrTransactionNotFound（不得退 grant）", err)
 	}
 }
 
@@ -531,8 +540,8 @@ func TestCreditSettle_MoreImages_ChargesDelta(t *testing.T) {
 	}
 
 	// 负余额挡住下一次预扣 → 402 语义（先欠后还）
-	if _, _, err := svc.Preconsume(ctx, 21, "translate", "", 1, "s2", nil); !errors.Is(err, ErrInsufficientBalance) {
-		t.Errorf("err = %v, want ErrInsufficientBalance", err)
+	if _, _, err := svc.Preconsume(ctx, 21, "translate", "", 1, "s2", nil); !errors.Is(err, crediterrs.ErrInsufficientBalance) {
+		t.Errorf("err = %v, want crediterrs.ErrInsufficientBalance", err)
 	}
 }
 
@@ -564,9 +573,9 @@ func TestCreditSettle_FewerAndEqual(t *testing.T) {
 	if err != nil || got.ID != consume.ID {
 		t.Errorf("相等结算应 no-op: err=%v got=%+v", err, got)
 	}
-	// 原流水不存在 → ErrTransactionNotFound
-	if _, err := svc.Settle(ctx, 22, "translate", "nope", 2); !errors.Is(err, ErrTransactionNotFound) {
-		t.Errorf("err = %v, want ErrTransactionNotFound", err)
+	// 原流水不存在 → crediterrs.ErrTransactionNotFound
+	if _, err := svc.Settle(ctx, 22, "translate", "nope", 2); !errors.Is(err, crediterrs.ErrTransactionNotFound) {
+		t.Errorf("err = %v, want crediterrs.ErrTransactionNotFound", err)
 	}
 }
 
@@ -596,8 +605,8 @@ func TestCreditGrant_Basic(t *testing.T) {
 	if balance != 5000 {
 		t.Errorf("重复 Grant 双发: balance = %d", balance)
 	}
-	if _, err := svc.Grant(ctx, 9, 0, "manual-2", nil); !errors.Is(err, ErrInvalidAmount) {
-		t.Errorf("err = %v, want ErrInvalidAmount", err)
+	if _, err := svc.Grant(ctx, 9, 0, "manual-2", nil); !errors.Is(err, crediterrs.ErrInvalidAmount) {
+		t.Errorf("err = %v, want crediterrs.ErrInvalidAmount", err)
 	}
 }
 
@@ -650,12 +659,12 @@ func TestCreditListTransactions_PagingOrder(t *testing.T) {
 // 真正的行级并发。连不上则 skip。
 func TestCreditPreconsume_ConcurrentNoOversell_Postgres(t *testing.T) {
 	db := openCreditPostgresTestDB(t)
-	svc := NewCreditService(db)
+	svc := NewCreditService(pgrepo.NewCreditRepository(db))
 	ctx := context.Background()
 	if _, err := svc.Grant(ctx, 77, 1000, "seed-77", nil); err != nil {
 		t.Fatal(err)
 	}
-	checkConcurrentNoOversell(t, svc, 77, 100, 100, 1000)
+	checkConcurrentNoOversell(t, svc, db, 77, 100, 100, 1000)
 	// 每次成功扣减的 balance_after 快照互不重复（无丢失更新）
 	var after []int64
 	db.Model(&model.CreditTransaction{}).
@@ -672,7 +681,8 @@ func TestCreditPreconsume_ConcurrentNoOversell_Postgres(t *testing.T) {
 // PG 专项：三维唯一索引 + OnConflict(DoNothing) 幂等在真实驱动下与 sqlite 行为一致
 // （RowsAffected==0 命中回查、跨用户同键互不命中）。连不上则 skip。
 func TestCreditIdempotency_Postgres(t *testing.T) {
-	svc := NewCreditService(openCreditPostgresTestDB(t))
+	db := openCreditPostgresTestDB(t)
+	svc := NewCreditService(pgrepo.NewCreditRepository(db))
 	ctx := context.Background()
 	if _, err := svc.Grant(ctx, 81, 100, "f81", nil); err != nil {
 		t.Fatal(err)
@@ -691,7 +701,7 @@ func TestCreditIdempotency_Postgres(t *testing.T) {
 	if err != nil || created || tx.UserID != 81 {
 		t.Errorf("replay: err=%v created=%v user=%d, want nil/false/81", err, created, tx.UserID)
 	}
-	if got := creditTxCount(t, svc.db, 81, "consume"); got != 1 {
+	if got := creditTxCount(t, db, 81, "consume"); got != 1 {
 		t.Errorf("u81 consume 流水数 = %d, want 1", got)
 	}
 }
@@ -737,7 +747,7 @@ func openCreditPostgresTestDB(t *testing.T) *gorm.DB {
 // (user_id, source=register_bonus, biz_id="register:<id>") 唯一索引，返回首次流水。
 // 保护注册失败重试场景不双发。
 func TestCreditGrantRegisterBonus_Idempotent(t *testing.T) {
-	svc := NewCreditService(newCreditSvcTestDB(t, "register_bonus_idempotent"))
+	svc := NewCreditService(pgrepo.NewCreditRepository(newCreditSvcTestDB(t, "register_bonus_idempotent")))
 
 	tx1, err := svc.GrantRegisterBonus(context.Background(), 7, nil)
 	if err != nil {
@@ -762,7 +772,8 @@ func TestCreditGrantRegisterBonus_Idempotent(t *testing.T) {
 // TestCreditGrantRegisterBonus_ChannelIsolatedFromAdminGrant register_bonus 与
 // admin_grant 是两个独立 source：同一 user 各发一次都该各自落账，余额相加。
 func TestCreditGrantRegisterBonus_ChannelIsolatedFromAdminGrant(t *testing.T) {
-	svc := NewCreditService(newCreditSvcTestDB(t, "register_bonus_isolation"))
+	db := newCreditSvcTestDB(t, "register_bonus_isolation")
+	svc := NewCreditService(pgrepo.NewCreditRepository(db))
 
 	if _, err := svc.GrantRegisterBonus(context.Background(), 8, nil); err != nil {
 		t.Fatal(err)
@@ -778,7 +789,7 @@ func TestCreditGrantRegisterBonus_ChannelIsolatedFromAdminGrant(t *testing.T) {
 		t.Errorf("balance = %d, want 15000 (10000 register_bonus + 5000 admin_grant)", bal)
 	}
 	var count int64
-	if err := svc.db.Model(&model.CreditTransaction{}).
+	if err := db.Model(&model.CreditTransaction{}).
 		Where("user_id = ? AND source IN ?", 8, []string{"register_bonus", "admin_grant"}).
 		Count(&count).Error; err != nil {
 		t.Fatal(err)

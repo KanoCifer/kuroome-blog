@@ -12,7 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/KanoCifer/kuroome-blog/internal/service"
+	crediterrs "github.com/KanoCifer/kuroome-blog/internal/domain/credit/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/service/nomu"
 )
 
@@ -152,11 +152,11 @@ func TestDesignGenerateServiceErrors(t *testing.T) {
 		{"upstream", nomu.ErrUpstream, 502},
 		{"unexpected", errors.New("boom"), 500},
 		// 余额不足：service 层双 %w 包装（ErrCredit + ErrInsufficientBalance）→ 402
-		{"insufficient balance", fmt.Errorf("%w: %w", nomu.ErrCredit, service.ErrInsufficientBalance), 402},
+		{"insufficient balance", fmt.Errorf("%w: %w", nomu.ErrCredit, crediterrs.ErrInsufficientBalance), 402},
 		// 非法幂等键（超长/保留前缀）→ 400 客户端错误，不落 500
-		{"invalid biz id", fmt.Errorf("%w: %w", nomu.ErrCredit, service.ErrInvalidBizID), 400},
+		{"invalid biz id", fmt.Errorf("%w: %w", nomu.ErrCredit, crediterrs.ErrInvalidBizID), 400},
 		// 其它计费错误（无定价/DB 故障）→ 500，不落 402
-		{"credit config error", fmt.Errorf("%w: %w", nomu.ErrCredit, service.ErrPriceNotFound), 500},
+		{"credit config error", fmt.Errorf("%w: %w", nomu.ErrCredit, crediterrs.ErrPriceNotFound), 500},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

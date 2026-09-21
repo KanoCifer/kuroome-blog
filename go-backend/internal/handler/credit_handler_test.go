@@ -113,7 +113,7 @@ func doCreditRequest(t *testing.T, r *gin.Engine, method, path, body, auth strin
 
 func TestCreditHandler_Balance_NoWallet_ReturnsZero(t *testing.T) {
 	db := newCreditHandlerTestDB(t)
-	svc := service.NewCreditService(db)
+	svc := service.NewCreditService(postgres.NewCreditRepository(db))
 	r := newCreditTestRouter(t, svc, db)
 
 	w := doCreditRequest(t, r, http.MethodGet, "/v3/credits/balance", "", authHeader(t, 42))
@@ -135,7 +135,7 @@ func TestCreditHandler_Balance_NoWallet_ReturnsZero(t *testing.T) {
 
 func TestCreditHandler_Balance_Unauthenticated_401(t *testing.T) {
 	db := newCreditHandlerTestDB(t)
-	svc := service.NewCreditService(db)
+	svc := service.NewCreditService(postgres.NewCreditRepository(db))
 	r := newCreditTestRouter(t, svc, db)
 
 	w := doCreditRequest(t, r, http.MethodGet, "/v3/credits/balance", "", "")
@@ -148,7 +148,7 @@ func TestCreditHandler_Balance_Unauthenticated_401(t *testing.T) {
 
 func TestCreditHandler_Grant_IncreasesBalanceAndLogsTx(t *testing.T) {
 	db := newCreditHandlerTestDB(t)
-	svc := service.NewCreditService(db)
+	svc := service.NewCreditService(postgres.NewCreditRepository(db))
 	r := newCreditTestRouter(t, svc, db)
 
 	// 100.55 分 → 10055 厘（两位小数不截断）
@@ -185,7 +185,7 @@ func TestCreditHandler_Grant_IncreasesBalanceAndLogsTx(t *testing.T) {
 
 func TestCreditHandler_Grant_NonAdmin_403(t *testing.T) {
 	db := newCreditHandlerTestDB(t)
-	svc := service.NewCreditService(db)
+	svc := service.NewCreditService(postgres.NewCreditRepository(db))
 	r := newCreditTestRouter(t, svc, db)
 
 	w := doCreditRequest(t, r, http.MethodPost, "/v3/admin/credits/grant",
@@ -204,13 +204,13 @@ func TestCreditHandler_Grant_NonAdmin_403(t *testing.T) {
 
 func TestCreditHandler_Grant_InvalidAmount_400(t *testing.T) {
 	db := newCreditHandlerTestDB(t)
-	svc := service.NewCreditService(db)
+	svc := service.NewCreditService(postgres.NewCreditRepository(db))
 	r := newCreditTestRouter(t, svc, db)
 
 	for _, body := range []string{
-		`{"user_id":42}`,             // amount 缺失/为 0
-		`{"user_id":42,"amount":-5}`, // binding required 放行负数，handler 兜底
-		`{"amount":10}`,              // user_id 缺失
+		`{"user_id":42}`,               // amount 缺失/为 0
+		`{"user_id":42,"amount":-5}`,   // binding required 放行负数，handler 兜底
+		`{"amount":10}`,                // user_id 缺失
 		`{"user_id":42,"amount":1e16}`, // 超 1e15 分上限（float→int64 溢出回绕守卫）
 	} {
 		w := doCreditRequest(t, r, http.MethodPost, "/v3/admin/credits/grant", body, authHeader(t, 1))
@@ -229,7 +229,7 @@ func TestCreditHandler_Grant_InvalidAmount_400(t *testing.T) {
 // biz_id 透传：保留前缀/超长键 → service ErrInvalidBizID → 400，零发放。
 func TestCreditHandler_Grant_InvalidBizID_400(t *testing.T) {
 	db := newCreditHandlerTestDB(t)
-	svc := service.NewCreditService(db)
+	svc := service.NewCreditService(postgres.NewCreditRepository(db))
 	r := newCreditTestRouter(t, svc, db)
 
 	for _, biz := range []string{"refund:x", "settle:x", strings.Repeat("k", 58)} {
@@ -248,7 +248,7 @@ func TestCreditHandler_Grant_InvalidBizID_400(t *testing.T) {
 
 func TestCreditHandler_Transactions_PagedDescending(t *testing.T) {
 	db := newCreditHandlerTestDB(t)
-	svc := service.NewCreditService(db)
+	svc := service.NewCreditService(postgres.NewCreditRepository(db))
 	ctx := context.Background()
 	// 5 笔不同 biz_id 的 grant，created_at 相同也靠 id desc 兜底倒序
 	for i := range 5 {
@@ -295,7 +295,7 @@ func TestCreditHandler_Transactions_PagedDescending(t *testing.T) {
 
 func TestCreditHandler_Transactions_InvalidPaging_400(t *testing.T) {
 	db := newCreditHandlerTestDB(t)
-	svc := service.NewCreditService(db)
+	svc := service.NewCreditService(postgres.NewCreditRepository(db))
 	r := newCreditTestRouter(t, svc, db)
 
 	w := doCreditRequest(t, r, http.MethodGet, "/v3/credits/transactions?page=0", "", authHeader(t, 1))
@@ -313,7 +313,7 @@ func TestCreditHandler_Transactions_InvalidPaging_400(t *testing.T) {
 // 通过 email 命中 → 解析到 user.ID 后正常发放到该账户。
 func TestCreditHandler_Grant_ByEmail_Success(t *testing.T) {
 	db := newCreditHandlerTestDB(t)
-	svc := service.NewCreditService(db)
+	svc := service.NewCreditService(postgres.NewCreditRepository(db))
 	uid := seedUserAndProfile(t, db, "alice@example.com")
 	r := newCreditTestRouter(t, svc, db)
 
@@ -343,7 +343,7 @@ func TestCreditHandler_Grant_ByEmail_Success(t *testing.T) {
 // 同时给 user_id 与 email → user_id 优先（email 不必命中）。
 func TestCreditHandler_Grant_UserIDPriorityOverEmail(t *testing.T) {
 	db := newCreditHandlerTestDB(t)
-	svc := service.NewCreditService(db)
+	svc := service.NewCreditService(postgres.NewCreditRepository(db))
 	uid := seedUserAndProfile(t, db, "bob@example.com")
 	_ = uid
 	r := newCreditTestRouter(t, svc, db)
@@ -361,7 +361,7 @@ func TestCreditHandler_Grant_UserIDPriorityOverEmail(t *testing.T) {
 // user_id 与 email 都没给 → 400，且响应消息明确指出缺失字段。
 func TestCreditHandler_Grant_NeitherUserIDNorEmail_400(t *testing.T) {
 	db := newCreditHandlerTestDB(t)
-	svc := service.NewCreditService(db)
+	svc := service.NewCreditService(postgres.NewCreditRepository(db))
 	r := newCreditTestRouter(t, svc, db)
 
 	w := doCreditRequest(t, r, http.MethodPost, "/v3/admin/credits/grant",
@@ -380,7 +380,7 @@ func TestCreditHandler_Grant_NeitherUserIDNorEmail_400(t *testing.T) {
 // email 未命中 → 400 email not found，不误发陌生人。
 func TestCreditHandler_Grant_EmailNotFound_400(t *testing.T) {
 	db := newCreditHandlerTestDB(t)
-	svc := service.NewCreditService(db)
+	svc := service.NewCreditService(postgres.NewCreditRepository(db))
 	r := newCreditTestRouter(t, svc, db)
 
 	w := doCreditRequest(t, r, http.MethodPost, "/v3/admin/credits/grant",
@@ -401,7 +401,7 @@ func TestCreditHandler_Grant_EmailNotFound_400(t *testing.T) {
 // balance：email 命中 → 200，返回该用户余额。
 func TestCreditHandler_AdminBalance_ByEmail_Success(t *testing.T) {
 	db := newCreditHandlerTestDB(t)
-	svc := service.NewCreditService(db)
+	svc := service.NewCreditService(postgres.NewCreditRepository(db))
 	uid := seedUserAndProfile(t, db, "carol@example.com")
 	if _, err := svc.Grant(context.Background(), uid, 7777, "seed-admin-balance", nil); err != nil {
 		t.Fatal(err)
@@ -429,7 +429,7 @@ func TestCreditHandler_AdminBalance_ByEmail_Success(t *testing.T) {
 // balance：user_id 命中 → 200。
 func TestCreditHandler_AdminBalance_ByUserID_Success(t *testing.T) {
 	db := newCreditHandlerTestDB(t)
-	svc := service.NewCreditService(db)
+	svc := service.NewCreditService(postgres.NewCreditRepository(db))
 	uid := seedUserAndProfile(t, db, "dave@example.com")
 	if _, err := svc.Grant(context.Background(), uid, 500, "seed-admin-balance-uid", nil); err != nil {
 		t.Fatal(err)
@@ -449,7 +449,7 @@ func TestCreditHandler_AdminBalance_ByUserID_Success(t *testing.T) {
 // balance：email 未命中 → 404。
 func TestCreditHandler_AdminBalance_EmailNotFound_404(t *testing.T) {
 	db := newCreditHandlerTestDB(t)
-	svc := service.NewCreditService(db)
+	svc := service.NewCreditService(postgres.NewCreditRepository(db))
 	r := newCreditTestRouter(t, svc, db)
 
 	w := doCreditRequest(t, r, http.MethodGet, "/v3/admin/credits/balance?email=ghost@example.com", "", authHeader(t, 1))
@@ -464,7 +464,7 @@ func TestCreditHandler_AdminBalance_EmailNotFound_404(t *testing.T) {
 // balance：定位符都没给 → 400。
 func TestCreditHandler_AdminBalance_NeitherTarget_400(t *testing.T) {
 	db := newCreditHandlerTestDB(t)
-	svc := service.NewCreditService(db)
+	svc := service.NewCreditService(postgres.NewCreditRepository(db))
 	r := newCreditTestRouter(t, svc, db)
 
 	w := doCreditRequest(t, r, http.MethodGet, "/v3/admin/credits/balance", "", authHeader(t, 1))
@@ -479,7 +479,7 @@ func TestCreditHandler_AdminBalance_NeitherTarget_400(t *testing.T) {
 // transactions：email 命中 → 200，流水属于该用户；非管理员 → 403。
 func TestCreditHandler_AdminTransactions_ByEmail_And_403(t *testing.T) {
 	db := newCreditHandlerTestDB(t)
-	svc := service.NewCreditService(db)
+	svc := service.NewCreditService(postgres.NewCreditRepository(db))
 	uid := seedUserAndProfile(t, db, "erin@example.com")
 	ctx := context.Background()
 	for i := range 3 {
@@ -503,7 +503,7 @@ func TestCreditHandler_AdminTransactions_ByEmail_And_403(t *testing.T) {
 	}
 	var resp struct {
 		Data struct {
-			Items []map[string]any `json:"items"`
+			Items      []map[string]any `json:"items"`
 			Pagination struct {
 				Total   int  `json:"total"`
 				HasNext bool `json:"has_next"`
@@ -521,7 +521,7 @@ func TestCreditHandler_AdminTransactions_ByEmail_And_403(t *testing.T) {
 // transactions：非法分页 → 400（与 /v3/credits/transactions 同规则）。
 func TestCreditHandler_AdminTransactions_InvalidPaging_400(t *testing.T) {
 	db := newCreditHandlerTestDB(t)
-	svc := service.NewCreditService(db)
+	svc := service.NewCreditService(postgres.NewCreditRepository(db))
 	uid := seedUserAndProfile(t, db, "frank@example.com")
 	_ = uid
 	r := newCreditTestRouter(t, svc, db)

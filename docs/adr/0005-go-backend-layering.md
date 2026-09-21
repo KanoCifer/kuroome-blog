@@ -179,6 +179,10 @@ internal/
   dto/                         — DTO 定义（全平铺）
   domain/<domain>/errs/        — 领域错误
   handler/<domain>_handler.go  — handler（全平铺，snake_case）
+  infra/                       — 外部依赖的协议适配（无业务状态）
+    httpclient/                — 出站 HTTP 客户端 + DoWithRetry
+    qweather/                  — 和风天气接入（JWT 签名器 + 客户端）
+    pubsub/                    — Redis pubsub 分发器
   logger/logger.go             — slog 初始化 + 路由 + trace_id
   middleware/                  — Gin 中间件（auth, ratelimit, cors, trace 等）
   mongo/document/              — MongoDB document struct（全平铺）
@@ -187,7 +191,9 @@ internal/
     postgres/<domain>.go       — PostgreSQL repo
   response/                    — 统一响应信封（Success/APIError）
   router/router.go             — Gin 路由总成
+  security/                    — SSRF 防护等安全原语
   service/<domain>_service.go  — service（全平铺，snake_case）
+  util/                        — 跨层复用的纯函数与无状态并发原语（图片、cookie、FanOut）
 
 pkg/
   jwt/                         — JWT 工具（HS256, GenerateServiceToken）
@@ -197,6 +203,8 @@ pkg/
 要求：
 - 所有 handler/service 文件名用全小写 snake_case，禁止 flat 命名
 - 禁止 `internal` 内嵌子领域包（如 `service/devtask/`）—— 所有 service 平铺在 `internal/service/` 下
+- 例外（2026-09 补充）：**文件数 ≥4 的独立子系统**可建同名子包，现存 `service/nomu/`、`service/weread/`、`service/syncbus/` 三个；单文件域不得拆包
+- handler 禁止 import `repository/*` 具体类型；需要读数据时在 handler 文件定义最小读接口（`creditUserLocator`）
 
 ### 8. DevTask 特有模式
 
@@ -219,6 +227,27 @@ response.Success(c, data, "Task created successfully")
 response.APIError(c, err.Error())                // 默认 400
 response.APIError(c, err.Error(), http.StatusNotFound) // 自定义
 ```
+
+### 10. 分层边界口径（2026-09-21 补充）
+
+原 ADR 未回答三个边界问题，实践中出现口径与代码不符，现明确：
+
+**事务属 repo，service 只编排**：`*gorm.DB` 不得出现在 service 字段或方法签名中。
+所有 `.Transaction(...)`、条件 UPDATE、`clause.OnConflict` 等持久化原语收在 repo，
+service 只能调用 repo 的领域动作（`DebitIfSufficient` / `AppendLedger` / `AdjustBalance`），
+跨表原子性由 repo 的**单个** Transaction 保证——service 不许自己开事务再拼两个 repo 调用。
+
+现存唯一违例是 `service/credit_service.go`（持有 `db *gorm.DB`，4 处 Transaction），
+目标态见「遗留」。
+
+**域文件数 ≥4 建同名子包**：平铺域一律单文件 × `*_service.go`；当某域的生产
+Go 文件数达到 4（不含测试）时，建 `service/<域>/` 子包。现存 `nomu`(4)、`weread`(3)、
+`syncbus`(3) 三个子包——后两者按新阈值应在**扩容时**才拆，已拆的不回退（迁移成本
+大于收益）。
+
+**errs 包每域必备**：`internal/domain/<域>/errs/` 对所有业务域强制存在，即使当前
+只有一个哨兵错误。理由：新增错误时无需再建包改 import 路径；handler 层 `errors.Is`
+分流的契约统一。
 
 ## Consequences
 

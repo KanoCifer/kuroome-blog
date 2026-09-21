@@ -12,7 +12,8 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
-	"github.com/KanoCifer/kuroome-blog/pkg/qweather"
+	"github.com/KanoCifer/kuroome-blog/internal/infra/qweather"
+	"github.com/KanoCifer/kuroome-blog/internal/util"
 )
 
 type Weatherer interface {
@@ -36,7 +37,7 @@ type weatherPart struct {
 }
 
 type WeatherService struct {
-	qw *qweatherClient
+	qw *qweather.Client
 }
 
 func NewWeatherService(
@@ -46,17 +47,17 @@ func NewWeatherService(
 	signer *qweather.Signer,
 ) *WeatherService {
 	return &WeatherService{
-		qw: newQWeatherClient(http, redis, cfg.QweatherBaseURL, signer),
+		qw: qweather.NewClient(http, redis, cfg.QweatherBaseURL, signer),
 	}
 }
 
-// GetTide 复用 qweatherClient 的缓存层，并在外层独立 peek redis 以
+// GetTide 复用 qweather.Client 的缓存层，并在外层独立 peek redis 以
 // 返回 (data, from_cache) 元组，与 Python 端行为一致。
 func (s *WeatherService) GetTide(ctx context.Context, harbor, date string) (json.RawMessage, bool, error) {
 	cacheKey := fmt.Sprintf("qweather:tide:%s:%s", harbor, date)
 
-	if s.qw.redis != nil {
-		cached, err := s.qw.redis.Get(ctx, cacheKey).Bytes()
+	if rdb := s.qw.Redis(); rdb != nil {
+		cached, err := rdb.Get(ctx, cacheKey).Bytes()
 		if err == nil && len(cached) > 0 {
 			return cached, true, nil
 		}
@@ -135,7 +136,7 @@ func (s *WeatherService) GetNearbyTSTA(ctx context.Context, location string) (ma
 
 func (s *WeatherService) GetFullWeatherData(ctx context.Context, location string) (*dto.FullWeatherData, error) {
 	// 阶段 1：POI + TSTA 并发；POI 失败 fatal，TSTA 失败容错。
-	ch1 := FanOut(ctx,
+	ch1 := util.FanOut(ctx,
 		func(ctx context.Context) (weatherPart, error) {
 			d, err := s.GetPOI(ctx, location)
 			return weatherPart{Kind: "poi", Data: d}, err
@@ -149,7 +150,7 @@ func (s *WeatherService) GetFullWeatherData(ctx context.Context, location string
 	var poiData json.RawMessage
 	var tstaID string
 	for range 2 {
-		var r Result[weatherPart]
+		var r util.Result[weatherPart]
 		select {
 		case r = <-ch1:
 		case <-ctx.Done():
@@ -194,7 +195,7 @@ func (s *WeatherService) GetFullWeatherData(ctx context.Context, location string
 		"location", location, "name", poiName, "id", poiID)
 
 	if poiName == "" && poiID == "" {
-		return nil, fmt.Errorf("%w: no POI for %s", ErrUpstream, location)
+		return nil, fmt.Errorf("%w: no POI for %s", qweather.ErrUpstream, location)
 	}
 
 	dateStr := time.Now().UTC().Format("20060102")
@@ -204,7 +205,7 @@ func (s *WeatherService) GetFullWeatherData(ctx context.Context, location string
 	}
 
 	// 阶段 2：5 个 weather endpoint 并发；channel 按完成顺序到达，靠 Kind 标签归位。
-	ch2 := FanOut(ctx,
+	ch2 := util.FanOut(ctx,
 		func(ctx context.Context) (weatherPart, error) {
 			d, err := s.GetCurrent(ctx, &location, nil)
 			return weatherPart{Kind: "current", Data: d}, err
@@ -230,7 +231,7 @@ func (s *WeatherService) GetFullWeatherData(ctx context.Context, location string
 
 	var current, hourly, daily, tide, indices json.RawMessage
 	for range 5 {
-		var r Result[weatherPart]
+		var r util.Result[weatherPart]
 		select {
 		case r = <-ch2:
 		case <-ctx.Done():

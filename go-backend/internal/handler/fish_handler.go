@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 
+	fisherrs "github.com/KanoCifer/kuroome-blog/internal/domain/fish/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/middleware"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
@@ -26,7 +27,7 @@ func isInvalidKindError(err error) bool {
 	if err == nil {
 		return false
 	}
-	if errors.Is(err, service.ErrInvalidKind) {
+	if errors.Is(err, fisherrs.ErrInvalidKind) {
 		return true
 	}
 	var verr validator.ValidationErrors

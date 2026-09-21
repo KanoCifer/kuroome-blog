@@ -311,7 +311,7 @@ func TestClient_ShelfPayloadShape(t *testing.T) {
 		Archives []struct {
 			ArchiveId string `json:"archiveId"`
 			Name      string `json:"name"`
-		} `json:"archives"`
+		} `json:"archive"`
 	}
 	if err := json.Unmarshal([]byte(sampleShelfPayload), &resp); err != nil {
 		t.Fatalf("Unmarshal: %v", err)

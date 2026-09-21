@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	nomuerrs "github.com/KanoCifer/kuroome-blog/internal/domain/nomu/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
@@ -97,7 +98,7 @@ func (h *NomuHandler) SyncNomuConfig(c *gin.Context) {
 
 func (h *NomuHandler) respondError(c *gin.Context, err error) {
 	switch {
-	case errors.Is(err, service.ErrSyncTooMany):
+	case errors.Is(err, nomuerrs.ErrSyncTooMany):
 		response.APIError(c, err.Error(), 400)
 	default:
 		slog.ErrorContext(c.Request.Context(), "nomu sync error",

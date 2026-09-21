@@ -10,13 +10,13 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
 	"github.com/KanoCifer/kuroome-blog/internal/infra/pubsub"
+	"github.com/KanoCifer/kuroome-blog/internal/infra/qweather"
 	"github.com/KanoCifer/kuroome-blog/internal/repository/mongodb"
 	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 	nomuSvc "github.com/KanoCifer/kuroome-blog/internal/service/nomu"
 	"github.com/KanoCifer/kuroome-blog/internal/service/syncbus"
 	wereadSvc "github.com/KanoCifer/kuroome-blog/internal/service/weread"
-	"github.com/KanoCifer/kuroome-blog/pkg/qweather"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -100,7 +100,7 @@ func NewAppState(
 	// nomu → nomu.kanocifer.chat（/nomu/login），两个独立 origin。
 	// creditSvc 在 userHandler.Register 收尾处调 GrantRegisterBonus 赠送 100 积分；
 	// 只走密码注册 handler 这一条路径，GitHub 自动建号 / magic-login 不发。
-	creditSvc := service.NewCreditService(db)
+	creditSvc := service.NewCreditService(postgres.NewCreditRepository(db))
 	userSvc := service.NewUserService(userRepo, redis, cfg.Admin.UserIDs, map[string]string{
 		"blog": cfg.Frontend.URLs.Blog,
 		"nomu": cfg.Frontend.URLs.Nomu,
