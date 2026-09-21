@@ -11,7 +11,9 @@ Python `backend/` 的 Go 重构（核心功能已实现，持续完善中）。�
 - **框架**：Gin + SQL 直连(PostgreSQL) + MongoDB driver(v2) + go-redis(v9)；JWT HS256 + bcrypt；配置用 Viper + 环境变量
 - **分层**：`handler → service → repository → model`，响应统一包 `internal/response/`（`Success` / `APIError` 封装 `{data, message}` 信封）
 - **解耦**：handler 通过接口（`UserService` / `AdminService`）依赖 service，便于 mock 测试
-- **包布局**：`internal/{app,config,db,dto,errs,handler,logger,middleware,model,mongo,repository,response,router,service}`；`pkg/jwt`（JWT 工具）；`pkg/notification/`（通知通道）
+- **包布局**：`internal/{app,config,db,domain,dto,handler,infra,logger,middleware,model,mongo,repository,response,router,security,service,util}`；`pkg/jwt`（JWT 工具）；`pkg/notification/`（通知通道）
+- **infra 归属**：`internal/infra/` 收纳对外部依赖的协议适配（`httpclient` 出站客户端 + 重试、`qweather` 和风天气接入、`pubsub` 分发器）。判据：不持有业务状态、只做协议/传输转换的包放 infra，不放 service。
+- **util 归属**：`internal/util/` 收纳跨层复用的纯函数与无状态并发原语（图片处理、cookie、`FanOut`）。
 - **命名对齐**：复用 Python 后端的 `.env`（`DATABASE_URL / SECRET_KEY / REDIS_URL / MONGO_URI / PORT` 等）
 - **配置注入**：所有 service/handler 通过构造函数接收配置，禁止直接读取全局 `config.Cfg`
 - **日志**：`internal/logger/` 基于 `log/slog`，双文件路由（app_info / app_error）+ trace_id 注入 + lumberjack 轮转
@@ -26,6 +28,7 @@ Python `backend/` 的 Go 重构（核心功能已实现，持续完善中）。�
 
 - **service 文件**：定义 `XRepository interface`（同文件），供 service struct 持有；定义 `XService interface`（供 handler 依赖）
 - **handler 文件**：定义 `XService interface`（handler 拥有），持有该接口而非 concrete struct
+- **handler 依赖 repo 时**：在 handler 文件定义最小读接口（如 `creditUserLocator`），**禁止** import `repository/*` 具体类型——那是唯一例外，会被判定规则 11 打回
 - 便于独立 mock 测试
 
 ```go
@@ -56,7 +59,7 @@ type UserHandler struct { svc UserService }
 - handler: `*_handler.go`、service: `*_service.go` — 全小写 snake_case
 - 无 flat 命名（如旧 `admin.go`、`user.go`）
 
-### 十条判定规则
+### 判定规则
 
 | #   | 规则                | 判定                                                                                        |
 | --- | ------------------- | ------------------------------------------------------------------------------------------- |
@@ -70,6 +73,11 @@ type UserHandler struct { svc UserService }
 | 8   | DTO 命名统一        | 入参 `XRequest`/出参 `XResponse`（目标态；当前仍残留 `PostIn`/`PostOut`/`XOut` 等，待清理） |
 | 9   | 重复代码清除        | 无 `PaginationOut`；cookie helpers 仅 github_handler.go 一份                                |
 | 10  | repo 包归属正确     | Mongo repo 在 `package mongodb`                                                             |
+| 11  | handler 不碰 repo   | `rg "internal/repository/" internal/handler --glob '!*_test.go'` → 0                        |
+| 12  | 上游客户端在 infra  | 外部依赖的协议适配包（qweather 等）在 `internal/infra/`，不在 `internal/service/`            |
+| 13  | 事务属 repo         | service 无 `*gorm.DB` 字段/参数、无 `.Transaction(` — 只有 repo 开事务                       |
+| 14  | 域错误包齐备        | `ls -d internal/domain/*/` 覆盖所有业务域，每域有 `errs/`                                     |
+| 15  | 子包阈值            | 平铺域单文件；生产文件 ≥4 才建 `service/<域>/`，现存 nomu/weread/syncbus 不回退               |
 
 ## 鉴权
 

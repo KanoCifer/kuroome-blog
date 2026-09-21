@@ -7,9 +7,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	crediterrs "github.com/KanoCifer/kuroome-blog/internal/domain/credit/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
-	"github.com/KanoCifer/kuroome-blog/internal/service"
+
 	"github.com/KanoCifer/kuroome-blog/internal/service/nomu"
 )
 
@@ -71,11 +72,11 @@ func (h *DesignHandler) Generate(c *gin.Context) {
 
 func (h *DesignHandler) respondError(c *gin.Context, err error) {
 	switch {
-	case errors.Is(err, service.ErrInsufficientBalance):
+	case errors.Is(err, crediterrs.ErrInsufficientBalance):
 		// 402 对齐 Python 端 InsufficientBalanceError(code=402)；信封沿用
 		// response.APIError 惯例：HTTP status + message，不带自定义 code 字段。
 		response.APIError(c, "insufficient credits", 402)
-	case errors.Is(err, service.ErrInvalidBizID):
+	case errors.Is(err, crediterrs.ErrInvalidBizID):
 		// 幂等键非法（超长/保留前缀，被 Preconsume 包进 ErrCredit）→ 客户端错误。
 		response.APIError(c, err.Error(), 400)
 	case errors.Is(err, nomu.ErrEmptyPrompt),

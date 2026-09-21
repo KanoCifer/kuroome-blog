@@ -15,7 +15,7 @@ import (
 	"github.com/alicebob/miniredis/v2"
 	"github.com/redis/go-redis/v9"
 
-	"github.com/KanoCifer/kuroome-blog/internal/domain/weread/errs"
+	wereaderrs "github.com/KanoCifer/kuroome-blog/internal/domain/weread/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
 	"github.com/KanoCifer/kuroome-blog/internal/service/weread"
@@ -121,8 +121,8 @@ func TestService_FetchBookInfo_Roundtrip(t *testing.T) {
 	if resp.NewRatingCount != 1000 {
 		t.Errorf("newRatingCount = %d, want 1000", resp.NewRatingCount)
 	}
-	if resp.NewRatingDetails["5"] != 800 {
-		t.Errorf("newRatingDetails[5] = %d, want 800", resp.NewRatingDetails["5"])
+	if got := resp.NewRatingDetails["5"]; got != float64(800) {
+		t.Errorf("newRatingDetails[5] = %v (%T), want 800", got, got)
 	}
 	if resp.FetchedAt.IsZero() {
 		t.Error("fetchedAt should be set")
@@ -365,7 +365,7 @@ func TestService_CreateUserToken_InvalidToken(t *testing.T) {
 
 	// 非法 token（非 wrk- 开头）应返回 ErrInvaildWereadToken
 	err := svc.CreateUserToken(context.Background(), "user-1", "invalid-token")
-	if !errors.Is(err, errs.ErrInvaildWereadToken) {
+	if !errors.Is(err, wereaderrs.ErrInvaildWereadToken) {
 		t.Errorf("expected ErrInvaildWereadToken, got %v", err)
 	}
 }
@@ -375,7 +375,7 @@ func TestService_CreateUserToken_EmptyToken(t *testing.T) {
 	defer cleanup()
 
 	err := svc.CreateUserToken(context.Background(), "user-1", "")
-	if !errors.Is(err, errs.ErrInvaildWereadToken) {
+	if !errors.Is(err, wereaderrs.ErrInvaildWereadToken) {
 		t.Errorf("expected ErrInvaildWereadToken for empty token, got %v", err)
 	}
 }
@@ -1086,10 +1086,12 @@ func TestService_FetchBookProgress_CacheHitOnSecondCall(t *testing.T) {
 	svc := buildProgressService(t, mr, srv)
 	ctx := context.Background()
 
-	// 第一次:缓存未命中,请求上游并写缓存。
+	// 第一次:缓存未命中,请求上游并写缓存。写回是异步的（SendRequest 起 goroutine），
+	// 必须等它落盘再发第二次请求,否则第二次仍会走上游。
 	if _, err := svc.FetchBookProgress(ctx, "user-1", "book-1", false); err != nil {
 		t.Fatalf("FetchBookProgress (1st): %v", err)
 	}
+	requireCacheWrite(t, mr, "weread:book-progress:user-1:book-1", sampleBookProgressNested)
 	// 第二次:应直接命中缓存。
 	if _, err := svc.FetchBookProgress(ctx, "user-1", "book-1", false); err != nil {
 		t.Fatalf("FetchBookProgress (2nd): %v", err)
@@ -1123,10 +1125,11 @@ func TestService_FetchBookProgress_RefreshBypassesCache(t *testing.T) {
 	svc := buildProgressService(t, mr, srv)
 	ctx := context.Background()
 
-	// 第一次:写缓存。
+	// 第一次:写缓存（异步，需等落盘）。
 	if _, err := svc.FetchBookProgress(ctx, "user-1", "book-1", false); err != nil {
 		t.Fatalf("FetchBookProgress (1st): %v", err)
 	}
+	requireCacheWrite(t, mr, "weread:book-progress:user-1:book-1", sampleBookProgressNested)
 	// 第二次 (refresh=true):绕过旧缓存,重新请求上游。
 	if _, err := svc.FetchBookProgress(ctx, "user-1", "book-1", true); err != nil {
 		t.Fatalf("FetchBookProgress (refresh): %v", err)
@@ -1134,10 +1137,8 @@ func TestService_FetchBookProgress_RefreshBypassesCache(t *testing.T) {
 	if got := reqCount.Load(); got != 2 {
 		t.Errorf("expected 2 upstream requests (refresh bypasses cache), got %d", got)
 	}
-	// refresh 后缓存应存在新值
-	if !mr.Exists("weread:book-progress:user-1:book-1") {
-		t.Errorf("cache should be repopulated after refresh")
-	}
+	// refresh 后缓存应存在新值（同样等异步写回落盘）
+	requireCacheWrite(t, mr, "weread:book-progress:user-1:book-1", sampleBookProgressNested)
 }
 
 func TestService_FetchBookProgress_Unauthorized(t *testing.T) {

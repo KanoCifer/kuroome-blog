@@ -1,11 +1,10 @@
-package service
+package qweather
 
 import (
 	"bytes"
 	"context"
 	"crypto/ed25519"
 	"crypto/x509"
-	"encoding/json"
 	"encoding/pem"
 	"errors"
 	"fmt"
@@ -21,10 +20,8 @@ import (
 	"github.com/alicebob/miniredis/v2"
 	"github.com/redis/go-redis/v9"
 
-	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
 	"github.com/KanoCifer/kuroome-blog/internal/logger"
-	"github.com/KanoCifer/kuroome-blog/pkg/qweather"
 )
 
 const testBaseURL = "http://qweather.test"
@@ -46,11 +43,23 @@ func genTestEd25519(t *testing.T) string {
 	return string(pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: pkcs8}))
 }
 
-func weatherConfigForTest(baseURL string) config.WeatherConfig {
-	return config.WeatherConfig{QweatherBaseURL: baseURL}
+// waitForCache 轮询等待异步写回的缓存落盘（miniredis），超时则 t.Fatal。
+// 生产代码以 goroutine 写回缓存，响应返回时写回未必完成，直接断言会竞态。
+func waitForCache(t *testing.T, mr *miniredis.Miniredis, key, want string) {
+	t.Helper()
+	deadline := time.Now().Add(2 * time.Second)
+	for {
+		if cached, err := mr.Get(key); err == nil && cached == want {
+			return
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("cache key %q not written back to %q within 2s", key, want)
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
 }
 
-func newTestClient(t *testing.T, srvURL string) (*qweatherClient, *miniredis.Miniredis, func()) {
+func newTestClient(t *testing.T, srvURL string) (*Client, *miniredis.Miniredis, func()) {
 	t.Helper()
 
 	mr, err := miniredis.Run()
@@ -59,22 +68,20 @@ func newTestClient(t *testing.T, srvURL string) (*qweatherClient, *miniredis.Min
 	}
 	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
 
-	pemStr := genTestEd25519(t)
-	signer, err := qweather.NewSigner(pemStr)
+	signer, err := NewSigner(genTestEd25519(t))
 	if err != nil {
 		t.Fatalf("NewSigner: %v", err)
 	}
 
-	httpCli := httpclient.New()
-	qwc := newQWeatherClient(httpCli, rdb, srvURL, signer)
 	// 固定时钟 → JWT iat/exp 可预期
-	qwc.now = func() time.Time { return time.Unix(1_700_000_000, 0) }
+	cli := NewClient(httpclient.New(), rdb, srvURL, signer,
+		WithClock(func() time.Time { return time.Unix(1_700_000_000, 0) }))
 
 	cleanup := func() {
 		_ = rdb.Close()
 		mr.Close()
 	}
-	return qwc, mr, cleanup
+	return cli, mr, cleanup
 }
 
 // ── Get ──────────────────────────────────────────────────────────────
@@ -402,47 +409,39 @@ func TestQWeatherClient_ResolveLocation(t *testing.T) {
 	})
 }
 
-// ── Weatherer integration smoke test ─────────────────────────────────
+// ── Client 字段接线 smoke test ───────────────────────────────────────
 
-func TestWeatherService_GetPOI_Roundtrip(t *testing.T) {
+// TestQWeatherClient_Get_PathAndQuery 断言 base 尾斜杠被裁剪、path 与 params
+// 正确拼接（NewClient 的 strings.TrimRight 是唯一的路径拼接守卫）。
+func TestQWeatherClient_Get_PathAndQuery(t *testing.T) {
+	var gotPath, gotQuery string
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// 验证 URL query 含 type=scenic
-		if r.URL.Query().Get("type") != "scenic" {
-			t.Errorf("expected type=scenic, got %q", r.URL.Query().Get("type"))
-		}
-		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(`{"poi":[{"id":"P2352","name":"测试港"}]}`))
+		gotPath, gotQuery = r.URL.Path, r.URL.Query().Get("type")
+		w.WriteHeader(200)
+		_, _ = io.WriteString(w, samplePayload)
 	}))
 	defer srv.Close()
 
 	mr, err := miniredis.Run()
 	if err != nil {
-		t.Fatalf("miniredis: %v", err)
+		t.Fatalf("miniredis.Run: %v", err)
 	}
 	defer mr.Close()
 	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
 	defer rdb.Close()
 
-	signer, _ := qweather.NewSigner(genTestEd25519(t))
-	svc := NewWeatherService(httpclient.New(), rdb,
-		weatherConfigForTest(srv.URL),
-		signer)
+	signer, _ := NewSigner(genTestEd25519(t))
+	// 刻意带尾斜杠，验证裁剪
+	cli := NewClient(httpclient.New(), rdb, srv.URL+"/", signer)
 
-	data, err := svc.GetPOI(context.Background(), "116.40,39.90")
-	if err != nil {
-		t.Fatalf("GetPOI: %v", err)
+	if _, err := cli.Get(context.Background(), "/geo/v2/poi/lookup",
+		map[string]string{"type": "scenic"}, "k", time.Minute); err != nil {
+		t.Fatalf("Get: %v", err)
 	}
-
-	var got struct {
-		POI []struct {
-			ID   string `json:"id"`
-			Name string `json:"name"`
-		} `json:"poi"`
+	if gotPath != "/geo/v2/poi/lookup" {
+		t.Errorf("path = %q, want /geo/v2/poi/lookup", gotPath)
 	}
-	if err := json.Unmarshal(data, &got); err != nil {
-		t.Fatalf("Unmarshal: %v", err)
-	}
-	if len(got.POI) != 1 || got.POI[0].Name != "测试港" {
-		t.Errorf("unexpected payload: %+v", got)
+	if gotQuery != "scenic" {
+		t.Errorf("query type = %q, want scenic", gotQuery)
 	}
 }

@@ -2,10 +2,10 @@ package service
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 	"time"
 
+	fisherrs "github.com/KanoCifer/kuroome-blog/internal/domain/fish/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/mongo/document"
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -27,9 +27,9 @@ type Fisher interface {
 	Delete(ctx context.Context, id string, hardDelete ...bool) error
 }
 
-// ErrInvalidKind 是 service 抛出的领域错误 —— handler 据此映射 400 + invalid_kind 标记。
-// 不混进 bson / 网络错误，方便定位。
-var ErrInvalidKind = errors.New("invalid_kind")
+// ErrInvalidKind 是领域错误 —— handler 据此映射 400 + invalid_kind 标记。
+// 定义在 internal/domain/fish/errs，此处转出以保持既有引用不变。
+var ErrInvalidKind = fisherrs.ErrInvalidKind
 
 type FishService struct {
 	repo FishRepoer
@@ -86,7 +86,7 @@ func (s *FishService) GetFishingSpotByID(ctx context.Context, id string) (*dto.F
 // （gin 版本漂移/中间件顺序错位时兜底）。
 func (s *FishService) UpdateFishingSpot(ctx context.Context, id string, spot *dto.FishingSpotUpdate) error {
 	if !spot.IsValidKind() {
-		return ErrInvalidKind
+		return fisherrs.ErrInvalidKind
 	}
 	data := bson.M{}
 	if spot.Name != nil {
@@ -124,7 +124,7 @@ func (s *FishService) UpdateFishingSpot(ctx context.Context, id string, spot *dt
 func (s *FishService) CreateFishingSpot(ctx context.Context, spot *dto.FishingSpotRequest) error {
 	// 二次校验：binding 已验，但当 gin 版本/中间件顺序导致 binding 漏执行时，service 兜底。
 	if !spot.IsValidKind() {
-		return ErrInvalidKind
+		return fisherrs.ErrInvalidKind
 	}
 	doc := &document.FishingSpot{
 		Name:        spot.Name,

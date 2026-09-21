@@ -12,8 +12,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
+	"github.com/KanoCifer/kuroome-blog/internal/infra/qweather"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
-	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
 func init() {
@@ -226,7 +226,7 @@ func TestWeatherHandler_GetFullWeather_MissingLocation(t *testing.T) {
 func TestWeatherHandler_GetFullWeather_ErrInvalidLocation_400(t *testing.T) {
 	svc := &mockWeatherService{
 		fullFn: func(_ context.Context, _ string) (*dto.FullWeatherData, error) {
-			return nil, service.ErrInvalidLocation
+			return nil, qweather.ErrInvalidLocation
 		},
 	}
 	w := doGET(newWeatherRouter(svc), "/v3/weather/full?location=0,0")
@@ -241,7 +241,7 @@ func TestWeatherHandler_GetFullWeather_ErrInvalidLocation_400(t *testing.T) {
 func TestWeatherHandler_GetFullWeather_ErrUpstream_502(t *testing.T) {
 	svc := &mockWeatherService{
 		fullFn: func(_ context.Context, _ string) (*dto.FullWeatherData, error) {
-			return nil, service.ErrUpstream
+			return nil, qweather.ErrUpstream
 		},
 	}
 	w := doGET(newWeatherRouter(svc), "/v3/weather/full?location=0,0")
@@ -256,7 +256,7 @@ func TestWeatherHandler_GetFullWeather_ErrUpstream_502(t *testing.T) {
 func TestWeatherHandler_GetFullWeather_ErrUnavailable_503(t *testing.T) {
 	svc := &mockWeatherService{
 		fullFn: func(_ context.Context, _ string) (*dto.FullWeatherData, error) {
-			return nil, service.ErrUnavailable
+			return nil, qweather.ErrUnavailable
 		},
 	}
 	w := doGET(newWeatherRouter(svc), "/v3/weather/full?location=0,0")

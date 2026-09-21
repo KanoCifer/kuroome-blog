@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/KanoCifer/kuroome-blog/internal/domain/weread/errs"
+	wereaderrs "github.com/KanoCifer/kuroome-blog/internal/domain/weread/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
 	"github.com/redis/go-redis/v9"
@@ -60,7 +60,7 @@ func New(httpCli *httpclient.Client, redisCli *redis.Client, repo Repositoryer, 
 func (s *Service) CreateUserToken(ctx context.Context, userID string, token string) error {
 	pattern := regexp.MustCompile(`^wrk\-`)
 	if !pattern.MatchString(token) {
-		return errs.ErrInvaildWereadToken
+		return wereaderrs.ErrInvaildWereadToken
 	}
 
 	return s.repo.CreateUserToken(ctx, userID, token)

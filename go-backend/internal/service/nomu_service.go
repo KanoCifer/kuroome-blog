@@ -12,17 +12,19 @@ import (
 
 	"gorm.io/datatypes"
 
+	nomuerrs "github.com/KanoCifer/kuroome-blog/internal/domain/nomu/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/logger"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 	"github.com/KanoCifer/kuroome-blog/internal/security"
 )
 
+// 哨兵错误定义在 internal/domain/nomu/errs，此处转出以保持既有引用不变。
 var (
 	// ErrSyncConflict 云端与本地 version 不一致，需用户决定以哪端为准。
-	ErrSyncConflict = errors.New("nomu: config version conflict")
+	ErrSyncConflict = nomuerrs.ErrSyncConflict
 	// ErrSyncTooMany 单次同步携带的配置条数超过上限。
-	ErrSyncTooMany = errors.New("nomu: sync batch too large")
+	ErrSyncTooMany = nomuerrs.ErrSyncTooMany
 )
 
 const syncMaxBatch = 200
@@ -65,7 +67,7 @@ func NewNomuService(repo *postgres.NomuRepository) *NomuServiceStruct {
 
 func (s *NomuServiceStruct) SyncNomuConfig(ctx context.Context, userId uint, local []NomuSyncItem, lastSyncAt *time.Time) ([]NomuSyncItem, error) {
 	if len(local) > syncMaxBatch {
-		return nil, ErrSyncTooMany
+		return nil, nomuerrs.ErrSyncTooMany
 	}
 
 	now := time.Now().UTC()

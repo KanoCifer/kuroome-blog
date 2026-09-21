@@ -12,15 +12,18 @@ import (
 	"net/http"
 	"time"
 
+	wereaderrs "github.com/KanoCifer/kuroome-blog/internal/domain/weread/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
 	"github.com/redis/go-redis/v9"
 )
 
+// 哨兵错误定义在 internal/domain/weread/errs，此处转出保持包内既有引用
+// （ErrUpstream / ErrUnauthorized）与 handler 的 weread.ErrUnauthorized 不变。
 var (
 	// ErrUpstream 微信读书上游返回错误。
-	ErrUpstream = fmt.Errorf("[weread] upstream failed")
+	ErrUpstream = wereaderrs.ErrUpstream
 	// ErrUnauthorized 用户微信读书授权已过期或无效。
-	ErrUnauthorized = fmt.Errorf("[weread] unauthorized or token expired")
+	ErrUnauthorized = wereaderrs.ErrUnauthorized
 )
 
 const (
@@ -153,7 +156,10 @@ func (c *Client) SendRequest(ctx context.Context, cacheKey string, ttl time.Dura
 		return nil, fmt.Errorf("%w: read body: %w", ErrUpstream, err)
 	}
 
-	// 并发写回缓存:确保响应返回前缓存已落定,避免 ctx 取消 / 测试 rdb.Close() 导致丢写。
+	// 异步写回缓存：不阻塞响应返回（见 6ec1f1a7）。
+	// 代价是调用方拿到响应时缓存未必已落盘——依赖「写回后再读」的场景
+	// （refresh 后立刻复查、连续两次调用期待第二次命中）须自行等待。
+	// ctx 用 Background 而非请求 ctx：调用方返回会取消请求 ctx，沿用它会丢写。
 	if c.redis != nil {
 		go func() {
 			cacheCtx, cancel := context.WithTimeout(context.Background(), 2*time.Second)

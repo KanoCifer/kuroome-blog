@@ -20,7 +20,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
-	"github.com/KanoCifer/kuroome-blog/pkg/qweather"
+	"github.com/KanoCifer/kuroome-blog/internal/infra/qweather"
 )
 
 // ── shared fixtures ─────────────────────────────────────────────────
@@ -54,8 +54,6 @@ func newTestWeatherService(t *testing.T, srvURL string) (*WeatherService, *minir
 		config.WeatherConfig{QweatherBaseURL: srvURL},
 		signer,
 	)
-	// 固定时钟便于断言 JWT iat/exp
-	svc.qw.now = func() time.Time { return time.Unix(1_700_000_000, 0) }
 
 	return svc, mr
 }
@@ -368,7 +366,7 @@ func TestWeatherService_GetFullWeatherData_NoPOI_ErrUpstream(t *testing.T) {
 	defer mr.Close()
 
 	_, err := svc.GetFullWeatherData(context.Background(), "0,0")
-	if !errors.Is(err, ErrUpstream) {
+	if !errors.Is(err, qweather.ErrUpstream) {
 		t.Errorf("expected ErrUpstream, got %v", err)
 	}
 }

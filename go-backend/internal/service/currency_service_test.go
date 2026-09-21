@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -17,10 +18,10 @@ import (
 
 // ── shared fixtures ─────────────────────────────────────────────────
 
-// newTestCurrencyClient 构造一个指向 srvURL 的 CurrencyClient（redis 可 nil）。
-func newTestCurrencyClient(t *testing.T, srvURL string, rdb *redis.Client) *CurrencyClient {
+// newTestCurrencyService 构造一个指向 srvURL 的 CurrencyService（redis 可 nil）。
+func newTestCurrencyService(t *testing.T, srvURL string, rdb *redis.Client) *CurrencyService {
 	t.Helper()
-	return NewCurrencyClient(httpclient.New(), rdb, WithBaseURL(srvURL))
+	return NewCurrencyService(httpclient.New(), rdb, WithBaseURL(srvURL))
 }
 
 func newMiniredis(t *testing.T) (*redis.Client, *miniredis.Miniredis) {
@@ -46,18 +47,24 @@ func currencyStatusServer(t *testing.T, status int) *httptest.Server {
 
 const currencySample = `{"timestamp":1700000000,"base":"USD","rates":{"CNY":7.2}}`
 
-// ── CurrencyService.GetExchange（缓存 + 反序列化）────────────────────
+// currencyCacheKey 复刻 CurrencyService.GetExchange 的 key 推导
+// （currency:{base}:{YYYY/MM/DD}）。写死日期会让测试在次日必红 —— 生产代码按
+// 当天日期分桶，隔天 key 就换了。
+func currencyCacheKey(base string) string {
+	return fmt.Sprintf("currency:%s:%s", base, time.Now().Format("2006/01/02"))
+}
+
+// ── GetExchange（缓存 + 反序列化）────────────────────────────────────
 
 func TestCurrencyService_GetExchange_CacheHit_NoUpstream(t *testing.T) {
 	rdb, mr := newMiniredis(t)
 	srvHits := atomic.Int32{}
 	srv := newCapturingServer(t, &srvHits, currencySample)
 
-	cli := newTestCurrencyClient(t, srv.URL, rdb)
-	svc := &CurrencyService{cli: cli}
+	svc := newTestCurrencyService(t, srv.URL, rdb)
 
 	// 预置缓存：key 为 currency:{base}:{YYYY/MM/DD}
-	if err := mr.Set("currency:USD:2026/08/07", currencySample); err != nil {
+	if err := mr.Set(currencyCacheKey("USD"), currencySample); err != nil {
 		t.Fatalf("miniredis.Set: %v", err)
 	}
 
@@ -78,8 +85,7 @@ func TestCurrencyService_GetExchange_CacheMiss_FetchesAndWritesBack(t *testing.T
 	srvHits := atomic.Int32{}
 	srv := newCapturingServer(t, &srvHits, currencySample)
 
-	cli := newTestCurrencyClient(t, srv.URL, rdb)
-	svc := &CurrencyService{cli: cli}
+	svc := newTestCurrencyService(t, srv.URL, rdb)
 
 	res, err := svc.GetExchange(context.Background(), "USD")
 	if err != nil {
@@ -93,7 +99,7 @@ func TestCurrencyService_GetExchange_CacheMiss_FetchesAndWritesBack(t *testing.T
 	}
 
 	// 异步写回缓存：轮询等待落盘
-	waitForCache(t, mr, "currency:USD:2026/08/07", currencySample)
+	waitForCache(t, mr, currencyCacheKey("USD"), currencySample)
 }
 
 func TestCurrencyService_GetExchange_InvalidJSON(t *testing.T) {
@@ -101,8 +107,7 @@ func TestCurrencyService_GetExchange_InvalidJSON(t *testing.T) {
 	srvHits := atomic.Int32{}
 	srv := newCapturingServer(t, &srvHits, `not-json`)
 
-	cli := newTestCurrencyClient(t, srv.URL, rdb)
-	svc := &CurrencyService{cli: cli}
+	svc := newTestCurrencyService(t, srv.URL, rdb)
 
 	_, err := svc.GetExchange(context.Background(), "USD")
 	if err == nil {
@@ -113,21 +118,21 @@ func TestCurrencyService_GetExchange_InvalidJSON(t *testing.T) {
 	}
 }
 
-// ── CurrencyClient.GetExchange（HTTP 层）─────────────────────────────
+// ── getExchangeRaw（HTTP 层）─────────────────────────────────────────
 
-func TestCurrencyClient_GetExchange_CacheHit_NoUpstream(t *testing.T) {
+func TestCurrencyService_GetExchangeRaw_CacheHit_NoUpstream(t *testing.T) {
 	rdb, mr := newMiniredis(t)
 	srvHits := atomic.Int32{}
 	srv := newCapturingServer(t, &srvHits, currencySample)
 
-	cli := newTestCurrencyClient(t, srv.URL, rdb)
-	if err := mr.Set("currency:USD:2026/08/07", currencySample); err != nil {
+	svc := newTestCurrencyService(t, srv.URL, rdb)
+	if err := mr.Set(currencyCacheKey("USD"), currencySample); err != nil {
 		t.Fatalf("miniredis.Set: %v", err)
 	}
 
-	raw, err := cli.GetExchange(context.Background(), "USD", "currency:USD:2026/08/07", time.Hour)
+	raw, err := svc.getExchangeRaw(context.Background(), "USD", currencyCacheKey("USD"), time.Hour)
 	if err != nil {
-		t.Fatalf("GetExchange: %v", err)
+		t.Fatalf("getExchangeRaw: %v", err)
 	}
 	if string(raw) != currencySample {
 		t.Errorf("raw = %q, want %q", raw, currencySample)
@@ -137,13 +142,13 @@ func TestCurrencyClient_GetExchange_CacheHit_NoUpstream(t *testing.T) {
 	}
 }
 
-func TestCurrencyClient_GetExchange_UpstreamError(t *testing.T) {
+func TestCurrencyService_GetExchangeRaw_UpstreamError(t *testing.T) {
 	rdb, _ := newMiniredis(t)
 	srv := currencyStatusServer(t, 404)
 
-	cli := newTestCurrencyClient(t, srv.URL, rdb)
+	svc := newTestCurrencyService(t, srv.URL, rdb)
 
-	_, err := cli.GetExchange(context.Background(), "USD", "currency:USD:2026/08/07", time.Hour)
+	_, err := svc.getExchangeRaw(context.Background(), "USD", currencyCacheKey("USD"), time.Hour)
 	if err == nil {
 		t.Fatal("expected error, got nil")
 	}
@@ -152,15 +157,15 @@ func TestCurrencyClient_GetExchange_UpstreamError(t *testing.T) {
 	}
 }
 
-func TestCurrencyClient_GetExchange_NoRedis_SkipsCache(t *testing.T) {
+func TestCurrencyService_GetExchangeRaw_NoRedis_SkipsCache(t *testing.T) {
 	srvHits := atomic.Int32{}
 	srv := newCapturingServer(t, &srvHits, currencySample)
 
-	cli := newTestCurrencyClient(t, srv.URL, nil)
+	svc := newTestCurrencyService(t, srv.URL, nil)
 
-	raw, err := cli.GetExchange(context.Background(), "USD", "currency:USD:2026/08/07", time.Hour)
+	raw, err := svc.getExchangeRaw(context.Background(), "USD", currencyCacheKey("USD"), time.Hour)
 	if err != nil {
-		t.Fatalf("GetExchange: %v", err)
+		t.Fatalf("getExchangeRaw: %v", err)
 	}
 	if string(raw) != currencySample {
 		t.Errorf("raw = %q, want %q", raw, currencySample)
@@ -170,10 +175,10 @@ func TestCurrencyClient_GetExchange_NoRedis_SkipsCache(t *testing.T) {
 	}
 }
 
-// TestCurrencyClient_GetExchange_SendsBaseQuery 回归：base 必须作为 query 参数
-// 发到上游。此前只改 req.URL.Query() 的副本未写回 RawQuery，请求恒为无参，
+// TestCurrencyService_GetExchangeRaw_SendsBaseQuery 回归：base 必须作为 query
+// 参数发到上游。此前只改 req.URL.Query() 的副本未写回 RawQuery，请求恒为无参，
 // 上游默认按 USD 返回，导致任意 base 都拿到 USD 汇率。
-func TestCurrencyClient_GetExchange_SendsBaseQuery(t *testing.T) {
+func TestCurrencyService_GetExchangeRaw_SendsBaseQuery(t *testing.T) {
 	gotBase := make(chan string, 1)
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gotBase <- r.URL.Query().Get("base")
@@ -182,10 +187,10 @@ func TestCurrencyClient_GetExchange_SendsBaseQuery(t *testing.T) {
 	}))
 	t.Cleanup(srv.Close)
 
-	cli := newTestCurrencyClient(t, srv.URL, nil)
+	svc := newTestCurrencyService(t, srv.URL, nil)
 
-	if _, err := cli.GetExchange(context.Background(), "CNY", "currency:CNY:2026/08/07", time.Hour); err != nil {
-		t.Fatalf("GetExchange: %v", err)
+	if _, err := svc.getExchangeRaw(context.Background(), "CNY", currencyCacheKey("CNY"), time.Hour); err != nil {
+		t.Fatalf("getExchangeRaw: %v", err)
 	}
 
 	select {

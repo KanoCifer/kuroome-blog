@@ -10,8 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
+	"github.com/KanoCifer/kuroome-blog/internal/infra/qweather"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
-	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
 type Weatherer interface {
@@ -79,11 +79,11 @@ func (h *WeatherHandler) GetFullWeather(c *gin.Context) {
 
 func (h *WeatherHandler) respondError(c *gin.Context, err error) {
 	switch {
-	case errors.Is(err, service.ErrInvalidLocation):
+	case errors.Is(err, qweather.ErrInvalidLocation):
 		response.APIError(c, "missing location or location_id", 400)
-	case errors.Is(err, service.ErrUpstream):
+	case errors.Is(err, qweather.ErrUpstream):
 		response.APIError(c, "qweather upstream error", 502)
-	case errors.Is(err, service.ErrUnavailable):
+	case errors.Is(err, qweather.ErrUnavailable):
 		response.APIError(c, "qweather unavailable", 503)
 	default:
 		slog.ErrorContext(c.Request.Context(), "weather handler unexpected error",
