@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/netip"
+	"slices"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -92,8 +93,8 @@ func resolveClientIP(c *gin.Context, trusted trustedProxies) string {
 
 	if xff := c.GetHeader("X-Forwarded-For"); xff != "" {
 		parts := strings.Split(xff, ",")
-		for i := len(parts) - 1; i >= 0; i-- {
-			if ip := strings.TrimSpace(parts[i]); ip != "" {
+		for _, part := range slices.Backward(parts) {
+			if ip := strings.TrimSpace(part); ip != "" {
 				return ip
 			}
 		}

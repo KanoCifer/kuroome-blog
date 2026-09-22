@@ -175,7 +175,7 @@ func TestSlogMiddleware_Skips429(t *testing.T) {
 	r.Use(SlogMiddleware(logger))
 	r.GET("/r", func(c *gin.Context) { c.Status(http.StatusTooManyRequests) })
 
-	for i := 0; i < 20; i++ {
+	for range 20 {
 		w := httptest.NewRecorder()
 		req, _ := http.NewRequest("GET", "/r", nil)
 		r.ServeHTTP(w, req)
@@ -203,7 +203,7 @@ func TestSlogMiddleware_Samples4xx(t *testing.T) {
 
 	// 100 次 401,按 sample rate = 10 抽样,期望恰好 10 条 access log。
 	const total = 100
-	for i := 0; i < total; i++ {
+	for range total {
 		w := httptest.NewRecorder()
 		req, _ := http.NewRequest("GET", "/r", nil)
 		r.ServeHTTP(w, req)
@@ -231,7 +231,7 @@ func TestSlogMiddleware_Keeps5xx(t *testing.T) {
 	r.Use(SlogMiddleware(logger))
 	r.GET("/r", func(c *gin.Context) { c.Status(http.StatusInternalServerError) })
 
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		w := httptest.NewRecorder()
 		req, _ := http.NewRequest("GET", "/r", nil)
 		r.ServeHTTP(w, req)

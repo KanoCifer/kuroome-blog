@@ -300,7 +300,7 @@ func uniqueUsername(base string, exists func(string) bool) string {
 	if !exists(base) {
 		return base
 	}
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		suffix := "_" + randomSuffix(4)
 		candidate := base + suffix
 		if !exists(candidate) {

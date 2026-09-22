@@ -153,7 +153,7 @@ func TestReplay_DropsExpired(t *testing.T) {
 func TestQueueCap(t *testing.T) {
 	bus, mr := newTestBus(t)
 	ctx := context.Background()
-	for i := 0; i < queueCap+10; i++ {
+	for i := range queueCap + 10 {
 		env := Envelope{Service: DuplicateSnapshotService, ID: "e", From: "A", To: "B", Payload: samplePayload(t)}
 		if err := bus.Publish(ctx, 7, env); err != nil {
 			t.Fatalf("Publish %d: %v", i, err)

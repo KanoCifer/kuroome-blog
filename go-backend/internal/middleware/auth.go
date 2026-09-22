@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"slices"
 	"strconv"
 	"strings"
 
@@ -49,11 +50,9 @@ func AdminMiddleware(adminUserIDs []int) gin.HandlerFunc {
 			c.AbortWithStatusJSON(403, gin.H{"error": "Admin access required"})
 			return
 		}
-		for _, id := range adminUserIDs {
-			if userID == id {
-				c.Next()
-				return
-			}
+		if slices.Contains(adminUserIDs, userID) {
+			c.Next()
+			return
 		}
 		c.AbortWithStatusJSON(403, gin.H{"error": "Admin access required"})
 	}

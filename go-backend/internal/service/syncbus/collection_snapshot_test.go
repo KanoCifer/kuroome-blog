@@ -94,8 +94,7 @@ func TestCollection_ClaimClearIsAtomic(t *testing.T) {
 // TestCollection_SubscribeNotifies put/claim_clear 池变更广播到订阅方。
 func TestCollection_SubscribeNotifies(t *testing.T) {
 	bus, _ := newTestBus(t)
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	ch, cancelSub, err := bus.SubscribeCollection(ctx, 7)
 	if err != nil {

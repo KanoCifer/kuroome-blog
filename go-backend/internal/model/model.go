@@ -29,10 +29,8 @@ type namer struct {
 // NewNamer 返回按 Python 命名约定配置好的 schema.Namer。
 func NewNamer() schema.Namer {
 	return &namer{
-		NamingStrategy: schema.NamingStrategy{
-			NoLowerCase:         false,
-			IdentifierMaxLength: 63,
-		},
+		NoLowerCase:         false,
+		IdentifierMaxLength: 63,
 	}
 }
 

@@ -76,14 +76,16 @@ func putJSON(t *testing.T, path string, body any) (*httptest.ResponseRecorder, *
 }
 
 // ptr 返回值变量的指针，用于构造指针字段 DTO 字面量。
-func ptr[T any](v T) *T { return &v }
+//
+//go:fix inline
+func ptr[T any](v T) *T { return new(v) }
 
 // postUpdate 是 handler 测试用的 PostUpdate 构造辅助 —— 只填 Title / Body / ID 即可，
 // 避免每个测试都写一堆 `Title: ptr("t")`。
 func postUpdate(id, title, body string) dto.PostUpdate {
 	return dto.PostUpdate{
-		Title: ptr(title),
-		Body:  ptr(body),
+		Title: new(title),
+		Body:  new(body),
 		ID:    id,
 	}
 }
@@ -181,8 +183,8 @@ func TestAdmin_UpdatePost_MissingID(t *testing.T) {
 	_, r := newAdminHandler(svc)
 	// _id 缺失 → binding 失败
 	w, req := putJSON(t, "/v3/post/update", dto.PostUpdate{
-		Title: ptr("t"),
-		Body:  ptr("b"),
+		Title: new("t"),
+		Body:  new("b"),
 	})
 	r.ServeHTTP(w, req)
 

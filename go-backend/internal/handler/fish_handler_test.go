@@ -129,7 +129,7 @@ func TestFishHandler_GetFishingSpotsList_Success(t *testing.T) {
 		t.Fatalf("status = %d, want 200; body=%s", w.Code, w.Body.String())
 	}
 	resp := fishDecode(t, w)
-	data, ok := resp.Data.([]interface{})
+	data, ok := resp.Data.([]any)
 	if !ok {
 		t.Fatalf("data is not array: %T", resp.Data)
 	}
@@ -188,7 +188,7 @@ func TestFishHandler_GetFishingSpot_Success(t *testing.T) {
 		t.Fatalf("status = %d, want 200; body=%s", w.Code, w.Body.String())
 	}
 	resp := fishDecode(t, w)
-	data, ok := resp.Data.(map[string]interface{})
+	data, ok := resp.Data.(map[string]any)
 	if !ok {
 		t.Fatalf("data is not object: %T", resp.Data)
 	}
@@ -335,7 +335,7 @@ func TestFishHandler_UpdateFishingSpot_Partial(t *testing.T) {
 	_, r := newFishHandler(svc)
 
 	// 只传 name —— 其余字段不动
-	body := dto.FishingSpotUpdate{Name: ptr("新名字")}
+	body := dto.FishingSpotUpdate{Name: new("新名字")}
 	w := fishDo(t, r, http.MethodPatch, "/v3/fish/spots/507f1f77bcf86cd799439011", body)
 	if w.Code != http.StatusOK {
 		t.Fatalf("status = %d, want 200; body=%s", w.Code, w.Body.String())
@@ -362,7 +362,7 @@ func TestFishHandler_UpdateFishingSpot_ExplicitZeroValue(t *testing.T) {
 	_, r := newFishHandler(svc)
 
 	// 显式传 rating: 0 应该被保留（非 nil → 覆盖）
-	body := dto.FishingSpotUpdate{Rating: ptr(0.0)}
+	body := dto.FishingSpotUpdate{Rating: new(0.0)}
 	w := fishDo(t, r, http.MethodPatch, "/v3/fish/spots/abc", body)
 	if w.Code != http.StatusOK {
 		t.Fatalf("status = %d, want 200", w.Code)
@@ -397,7 +397,7 @@ func TestFishHandler_UpdateFishingSpot_ServiceError(t *testing.T) {
 	}
 	_, r := newFishHandler(svc)
 
-	body := dto.FishingSpotUpdate{Name: ptr("x")}
+	body := dto.FishingSpotUpdate{Name: new("x")}
 	w := fishDo(t, r, http.MethodPatch, "/v3/fish/spots/abc", body)
 	if w.Code != http.StatusInternalServerError {
 		t.Errorf("status = %d, want 500", w.Code)

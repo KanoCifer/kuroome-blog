@@ -209,9 +209,9 @@ func TestQWeatherClient_Get_NonRetryable4xxLogsBody(t *testing.T) {
 	slog.SetDefault(logger.NewTestHandler(&buf, slog.LevelDebug))
 	t.Cleanup(func() { slog.SetDefault(prev) })
 
-	var hits int32
+	var hits atomic.Int32
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		atomic.AddInt32(&hits, 1)
+		hits.Add(1)
 		w.WriteHeader(http.StatusTooManyRequests)
 		_, _ = io.WriteString(w, `{"code":"429","message":"quota exceeded"}`)
 	}))
@@ -227,7 +227,7 @@ func TestQWeatherClient_Get_NonRetryable4xxLogsBody(t *testing.T) {
 	if err == nil || !errors.Is(err, ErrUpstream) {
 		t.Fatalf("expected ErrUpstream, got %v", err)
 	}
-	if got := atomic.LoadInt32(&hits); got != 1 {
+	if got := hits.Load(); got != 1 {
 		t.Errorf("HTTP hits = %d, want 1 (4xx 不应重试)", got)
 	}
 
@@ -276,12 +276,12 @@ func TestQWeatherClient_Get_NetworkError(t *testing.T) {
 func TestQWeatherClient_Get_ContextCanceledStopsRetry(t *testing.T) {
 	// 调用方（Python 钓鱼指数端点，10s 超时）中途断开 → 请求 ctx 取消。
 	// 取消后重试必然同样失败，退避 sleep 纯属空烧，必须立刻收手。
-	var hits int32
+	var hits atomic.Int32
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if atomic.AddInt32(&hits, 1) == 1 {
+		if hits.Add(1) == 1 {
 			cancel()
 		}
 		w.WriteHeader(http.StatusInternalServerError)
@@ -301,7 +301,7 @@ func TestQWeatherClient_Get_ContextCanceledStopsRetry(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected error, got nil")
 	}
-	if got := atomic.LoadInt32(&hits); got != 1 {
+	if got := hits.Load(); got != 1 {
 		t.Errorf("HTTP hits = %d, want 1 (ctx 取消后不应继续重试)", got)
 	}
 	if elapsed > time.Second {
@@ -328,7 +328,7 @@ func TestQWeatherClient_Get_JWTCached(t *testing.T) {
 	defer cleanup()
 
 	ctx := context.Background()
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		_, err := qwc.Get(ctx, "/v7/weather/now",
 			map[string]string{"location": "1"},
 			fmt.Sprintf("qweather:test:jwt:%d", i), time.Minute)

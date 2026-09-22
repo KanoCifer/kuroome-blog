@@ -25,8 +25,8 @@ func noisyJPEG(t *testing.T, w, h int) []byte {
 	t.Helper()
 	img := image.NewRGBA(image.Rect(0, 0, w, h))
 	rng := rand.New(rand.NewSource(1))
-	for y := 0; y < h; y++ {
-		for x := 0; x < w; x++ {
+	for y := range h {
+		for x := range w {
 			img.Set(x, y, color.RGBA{uint8(rng.Intn(256)), uint8(rng.Intn(256)), uint8(rng.Intn(256)), 255})
 		}
 	}
@@ -250,7 +250,7 @@ func TestApiyi_EditFieldName_Documented(t *testing.T) {
 	// 断言我们写出的字段名就是文档里的 "image"（重复多张）。
 	var buf bytes.Buffer
 	mw := multipart.NewWriter(&buf)
-	for i := 0; i < 2; i++ {
+	for range 2 {
 		fw, _ := mw.CreateFormFile("image", "image.png")
 		fw.Write([]byte("x"))
 	}

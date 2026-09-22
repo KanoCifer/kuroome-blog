@@ -36,7 +36,7 @@ func (h *WSHandler) HandleWS(c *gin.Context) {
 	readCtx, readCancel := context.WithTimeout(reqCtx, 10*time.Second)
 	defer readCancel()
 
-	var msg map[string]interface{}
+	var msg map[string]any
 	if err := h.Svc.ReadMsg(readCtx, conn, &msg); err != nil {
 		if websocket.CloseStatus(err) == websocket.StatusNormalClosure {
 			slog.DebugContext(reqCtx, "client closed before first message")

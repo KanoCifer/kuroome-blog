@@ -504,7 +504,7 @@ func TestParseShelfRaw_FromUpstream(t *testing.T) {
 		Books: []dto.WereadShelfBookRaw{
 			{
 				BookId: "b1", Title: "书", Author: "作者", Cover: "https://x.com/c.jpg",
-				Category: strPtr("科幻"), ReadUpdateTime: 100, UpdateTime: 200,
+				Category: new("科幻"), ReadUpdateTime: 100, UpdateTime: 200,
 				FinishReading: 1, Secret: 0,
 			},
 			{
@@ -547,7 +547,8 @@ func TestParseShelfRaw_FromUpstream(t *testing.T) {
 	}
 }
 
-func strPtr(s string) *string { return &s }
+//go:fix inline
+func strPtr(s string) *string { return new(s) }
 
 // ── FetchReadDetail ──────────────────────────────────────────────────
 

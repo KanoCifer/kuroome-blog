@@ -35,7 +35,7 @@ func TestVisitorRepo_Insert_NullableStrings(t *testing.T) {
 		VisitorID:   "visitor-1",
 		PageURL:     "https://example.com/",
 		PagePath:    "/",
-		BrowserName: stringPtr("Chrome"),
+		BrowserName: new("Chrome"),
 		// Referrer / Browser / ScreenResolution / Language 留 nil → 期望入库 NULL
 	}
 	if err := repo.Insert(ctx, in); err != nil {
@@ -67,4 +67,5 @@ func TestVisitorRepo_Insert_NullableStrings(t *testing.T) {
 	}
 }
 
-func stringPtr(s string) *string { return &s }
+//go:fix inline
+func stringPtr(s string) *string { return new(s) }

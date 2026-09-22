@@ -235,7 +235,7 @@ func TestMomentService_Update_AlreadyPublished_DoesNotOverwritePublishedAt(t *te
 	svc := NewMomentService(repo)
 
 	err := svc.Update(context.Background(), "507f1f77bcf86cd799439011", dto.MomentUpdate{
-		Content: ptr("edit"),
+		Content: new("edit"),
 		Status:  ptr(dto.MomentPublished),
 	})
 	if err != nil {

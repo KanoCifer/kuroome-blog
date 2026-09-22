@@ -428,7 +428,7 @@ func TestCreateTokens_MultiDeviceHash_EvictOldest(t *testing.T) {
 	// 记录第 1 个 jti（最早）
 	tokens := make([]string, 0, 4)
 	// 错开 1s 确保 iat 递增
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		if i > 0 {
 			time.Sleep(1100 * time.Millisecond)
 		}
@@ -480,7 +480,7 @@ func TestCreateTokens_NoLimitWhenMaxDevicesZero(t *testing.T) {
 	svc := &userService{redis: rdb, maxDevices: 0}
 	u := &model.User{Model: gormModel(20)}
 
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		if _, err := svc.CreateTokens(context.Background(), u); err != nil {
 			t.Fatalf("CreateTokens #%d: %v", i, err)
 		}

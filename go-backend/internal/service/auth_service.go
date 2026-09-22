@@ -9,7 +9,6 @@ import (
 
 	"github.com/redis/go-redis/v9"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 
 	usererrs "github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
@@ -147,7 +146,7 @@ func (s *userService) RefreshTokens(ctx context.Context, refreshToken string) (*
 	}
 
 	// 轮换：CreateTokens 写入新 jti field，再删旧 jti field。
-	tokens, err := s.CreateTokens(ctx, &model.User{Model: gorm.Model{ID: userIDU}})
+	tokens, err := s.CreateTokens(ctx, &model.User{ID: userIDU})
 	if err != nil {
 		return nil, err
 	}

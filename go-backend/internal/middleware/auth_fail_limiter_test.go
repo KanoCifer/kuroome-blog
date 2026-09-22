@@ -36,14 +36,14 @@ func TestAuthFailLimiter_FirstHitSemantics(t *testing.T) {
 		limited  bool
 		firstHit bool
 	}, 8)
-	for i := 0; i < 8; i++ {
+	for i := range 8 {
 		limited, firstHit, _ := limiter.Fail(ctx)
 		results[i].limited = limited
 		results[i].firstHit = firstHit
 	}
 
 	// 前 5 次:limited=false
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		if results[i].limited {
 			t.Errorf("attempt %d: limited = true, want false", i+1)
 		}
@@ -83,7 +83,7 @@ func TestAuthFailLimiter_WindowExpiry(t *testing.T) {
 	ctx := buildCtx("198.51.100.42")
 
 	// 第一个窗口:触发 6 次,第 6 次首次进入限流
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		_, _, _ = limiter.Fail(ctx)
 	}
 	limited6, firstHit6, _ := limiter.Fail(ctx)
@@ -95,7 +95,7 @@ func TestAuthFailLimiter_WindowExpiry(t *testing.T) {
 	mr.FastForward(2 * time.Hour)
 
 	// 新窗口:再 6 次,第 6 次 firstHit 应再次为 true(标记已过期被新设置)。
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		_, _, _ = limiter.Fail(ctx)
 	}
 	limitedAgain, firstHitAgain, _ := limiter.Fail(ctx)

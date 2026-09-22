@@ -29,7 +29,7 @@ func newCreditTestDB(t *testing.T, name string) *gorm.DB {
 
 func TestSeedCreditPrices_Idempotent(t *testing.T) {
 	db := newCreditTestDB(t, "credit_seed")
-	for i := 0; i < 3; i++ { // 重复"启动"三次
+	for i := range 3 { // 重复"启动"三次
 		if err := SeedCreditPrices(db); err != nil {
 			t.Fatalf("seed round %d: %v", i, err)
 		}

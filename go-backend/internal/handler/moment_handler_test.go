@@ -346,7 +346,7 @@ func TestMoment_UpdateMoment_Success(t *testing.T) {
 	r := newMomentHandler(svc)
 
 	w := momentDo(t, r, http.MethodPatch, "/v3/moments/507f1f77bcf86cd799439011",
-		dto.MomentUpdate{Content: ptr("updated"), IsPinned: ptr(true)})
+		dto.MomentUpdate{Content: new("updated"), IsPinned: new(true)})
 	if w.Code != http.StatusOK {
 		t.Fatalf("status = %d, want 200; body=%s", w.Code, w.Body.String())
 	}
@@ -367,7 +367,7 @@ func TestMoment_UpdateMoment_NotFound(t *testing.T) {
 	r := newMomentHandler(svc)
 
 	w := momentDo(t, r, http.MethodPatch, "/v3/moments/missing",
-		dto.MomentUpdate{Content: ptr("x")})
+		dto.MomentUpdate{Content: new("x")})
 	if w.Code != http.StatusNotFound {
 		t.Errorf("status = %d, want 404", w.Code)
 	}
@@ -382,7 +382,7 @@ func TestMoment_UpdateMoment_InvalidID(t *testing.T) {
 	r := newMomentHandler(svc)
 
 	w := momentDo(t, r, http.MethodPatch, "/v3/moments/not-an-objectid",
-		dto.MomentUpdate{Content: ptr("x")})
+		dto.MomentUpdate{Content: new("x")})
 	if w.Code != http.StatusBadRequest {
 		t.Errorf("status = %d, want 400", w.Code)
 	}

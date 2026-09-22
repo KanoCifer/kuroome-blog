@@ -29,8 +29,7 @@ func isInvalidKindError(err error) bool {
 	if errors.Is(err, fisherrs.ErrInvalidKind) {
 		return true
 	}
-	var verr validator.ValidationErrors
-	if errors.As(err, &verr) {
+	if verr, ok := errors.AsType[validator.ValidationErrors](err); ok {
 		for _, fe := range verr {
 			if fe.Field() == "Kind" && fe.Tag() == "oneof" {
 				return true

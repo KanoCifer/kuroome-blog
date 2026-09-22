@@ -293,7 +293,7 @@ func TestDevTask_UpdateTask_Success(t *testing.T) {
 	}
 	r := newDevTaskHandler(svc)
 	w := httptest.NewRecorder()
-	body, _ := json.Marshal(dto.DevTaskUpdate{Title: ptr("updated")})
+	body, _ := json.Marshal(dto.DevTaskUpdate{Title: new("updated")})
 	req, _ := http.NewRequest(http.MethodPatch, "/v3/dev-tasks/task-1", bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
 	r.ServeHTTP(w, req)

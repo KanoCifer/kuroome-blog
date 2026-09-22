@@ -271,10 +271,7 @@ func (s *MonitorService) GetUserLogins(ctx context.Context, days, page, pageSize
 
 	total := len(logins)
 	offset := (page - 1) * pageSize
-	end := offset + pageSize
-	if end > total {
-		end = total
-	}
+	end := min(offset+pageSize, total)
 	if offset > total {
 		offset = total
 	}

@@ -73,12 +73,10 @@ type serviceClaims struct {
 // 用于 MCP server ↔ go-backend 的服务间鉴权。
 func GenerateServiceToken(expiresAt time.Time, secret string) (string, error) {
 	claims := serviceClaims{
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(expiresAt),
-			IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
-			Subject:   "devtask-service",
-		},
-		Role: "service",
+		ExpiresAt: jwt.NewNumericDate(expiresAt),
+		IssuedAt:  jwt.NewNumericDate(time.Now().UTC()),
+		Subject:   "devtask-service",
+		Role:      "service",
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(secret))

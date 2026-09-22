@@ -1,7 +1,6 @@
 package syncbus
 
 import (
-	"context"
 	"testing"
 	"time"
 )
@@ -25,8 +24,7 @@ func waitSub(t *testing.T, mr interface {
 // 只应新增一条 Redis pubsub 连接（进程级共享 Dispatcher）。
 func TestSubscriptionsShareOneConnection(t *testing.T) {
 	bus, mr := newTestBus(t)
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	// 预热命令池，使后续连接数增量只来自订阅。
 	_ = bus.redis.Ping(ctx).Err()

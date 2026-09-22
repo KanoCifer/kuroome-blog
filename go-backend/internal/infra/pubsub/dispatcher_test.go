@@ -163,7 +163,7 @@ func TestDropDoesNotBlockOthers(t *testing.T) {
 
 	// 灌满 full 的缓冲（64）再多发 20 条；不读取该 channel。
 	const overflow = 20
-	for i := 0; i < subBuffer+overflow; i++ {
+	for range subBuffer + overflow {
 		mr.Publish("full", "x")
 	}
 	// full 之后发 other。消息按序处理：other 到达时 full 的溢出已被丢弃。
@@ -251,10 +251,10 @@ func TestConcurrentSubscribeCancelPublish(t *testing.T) {
 	}()
 
 	done := make(chan struct{}, workers)
-	for i := 0; i < workers; i++ {
+	for range workers {
 		go func() {
 			defer func() { done <- struct{}{} }()
-			for j := 0; j < 50; j++ {
+			for range 50 {
 				ch, cancel, err := d.Subscribe(ctx, "race")
 				if err != nil {
 					return
@@ -268,7 +268,7 @@ func TestConcurrentSubscribeCancelPublish(t *testing.T) {
 			}
 		}()
 	}
-	for i := 0; i < workers; i++ {
+	for range workers {
 		<-done
 	}
 	close(stop)
