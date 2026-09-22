@@ -59,12 +59,20 @@ type UserRepositoryer interface {
 // Userer 是 handler 层注入面。方法实现散落在 auth_service.go /
 // magic_login_service.go / user_service.go（CRUD+Register+Response）。
 
+// registerBonuser 是 UserService.RegisterFlow 依赖的注册赠送积分能力
+// （*CreditService 满足）。本地窄接口，避免 user_service ← service 的包方向反转。
+type registerBonuser interface {
+	GrantRegisterBonus(ctx context.Context, userID uint, meta map[string]any) (*model.CreditTransaction, error)
+}
+
 type UserService struct {
 	repo         UserRepositoryer
 	redis        *redis.Client
 	adminUserIDs []int
 	frontendURLs map[string]string
 	maxDevices   int
+	// bonusSvc RegisterFlow 调的注册赠送积分（可选，nil 时跳过赠送，测试/未装配兜底）。
+	bonusSvc registerBonuser
 }
 
 func NewUserService(
@@ -73,6 +81,7 @@ func NewUserService(
 	adminUserIDs []int,
 	frontendURLs map[string]string,
 	maxDevices int,
+	bonusSvc registerBonuser,
 ) *UserService {
 	trimmed := make(map[string]string, len(frontendURLs))
 	for k, v := range frontendURLs {
@@ -84,6 +93,7 @@ func NewUserService(
 		adminUserIDs: adminUserIDs,
 		frontendURLs: trimmed,
 		maxDevices:   maxDevices,
+		bonusSvc:     bonusSvc,
 	}
 }
 
@@ -148,6 +158,28 @@ func (s *UserService) CreateUser(ctx context.Context, username, password, email,
 	}
 
 	slog.InfoContext(ctx, "user register", "user_id", u.ID, "username", u.Username)
+	return u, p, nil
+}
+
+// RegisterFlow 是 register handler 的编排入口：建账号 + （可选）注册赠送积分。
+//
+// 仅密码注册 handler 这一条路径触发；GitHub 自动建号 / magic-login 不走。赠送
+// 失败仅记日志、不阻断 200——积分是增值服务，注册必须落。
+// GrantRegisterBonus 内部 bizID 由 userID 推导、命中唯一键、幂等不双发。
+func (s *UserService) RegisterFlow(
+	ctx context.Context,
+	username, password, email, emailCode, mode string,
+) (*model.User, *model.Profile, error) {
+	u, p, err := s.CreateUser(ctx, username, password, email, emailCode, "", mode)
+	if err != nil {
+		return nil, nil, err
+	}
+	if s.bonusSvc != nil {
+		if _, gerr := s.bonusSvc.GrantRegisterBonus(ctx, u.ID, nil); gerr != nil {
+			slog.ErrorContext(ctx, "register bonus grant failed",
+				"user_id", u.ID, "error", gerr)
+		}
+	}
 	return u, p, nil
 }
 

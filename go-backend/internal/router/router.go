@@ -42,14 +42,14 @@ func Setup(r *gin.Engine, state *app.AppState, redis *redis.Client) {
 	refreshAuthFailLimiter := middleware.NewAuthFailLimiter(redis, "refresh_auth_fail")
 
 	userH := handler.NewUserHandler(
-		state.UserSvc(), state.Cfg(), state.CreditSvc(), refreshAuthFailLimiter,
+		state.UserSvc(), state.Cfg(), refreshAuthFailLimiter,
 	)
 	userH.RegisterRoutes(v3, middleware.AuthMiddleware(), loginLimiter.Middleware(), registerLimiter.Middleware())
 
 	adminH := handler.NewAdminHandler(state.AdminSvc(), state.Cfg())
 	adminH.RegisterRoutes(v3, middleware.AuthMiddleware(), middleware.AdminMiddleware(state.Cfg().Admin.UserIDs))
 
-	passkeyH := handler.NewPasskeyHandler(state.PasskeySvc(), state.UserSvc(), state.Cfg())
+	passkeyH := handler.NewPasskeyHandler(state.PasskeySvc(), state.Cfg())
 	passkeyH.RegisterRoutes(v3, middleware.AuthMiddleware())
 
 	githubH := handler.NewGitHubHandler(state.GitHubOAuth(), state.Cfg())

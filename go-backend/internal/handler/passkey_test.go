@@ -30,7 +30,12 @@ type mockPasskeyService struct {
 	finishLoginFn        func(ctx context.Context, response map[string]any) (*model.User, error)
 	deletePasskeyFn      func(ctx context.Context, userID uint) error
 	hasPasskeyFn         func(ctx context.Context, userID uint) bool
+	// loginFlowFn 可选：nil 时 LoginFlow 默认走 FinishLogin + 构造固定 tokens/空 userData。
+	// 端到端测试可注入真实 tokenSvc（*service.UserService）验证完整路径。
+	loginFlowFn func(ctx context.Context, assertion map[string]any) (*dto.TokensResponse, map[string]any, error)
 }
+
+var _ Passkeyer = (*mockPasskeyService)(nil)
 
 func (m *mockPasskeyService) BeginRegistration(ctx context.Context, userID uint) (map[string]any, error) {
 	if m.beginRegistrationFn != nil {
@@ -72,6 +77,24 @@ func (m *mockPasskeyService) HasPasskey(ctx context.Context, userID uint) bool {
 		return m.hasPasskeyFn(ctx, userID)
 	}
 	return false
+}
+
+// LoginFlow 默认实现 = FinishLogin + 固定 tokens + 简版 userData（覆盖 has_passkey/github_bound）。
+// 与真实 PasskeyService.LoginFlow 行为一致（userData 来自 tokenSvc.UserToDict）。
+func (m *mockPasskeyService) LoginFlow(ctx context.Context, assertion map[string]any) (*dto.TokensResponse, map[string]any, error) {
+	if m.loginFlowFn != nil {
+		return m.loginFlowFn(ctx, assertion)
+	}
+	user, err := m.FinishLogin(ctx, assertion)
+	if err != nil {
+		return nil, nil, err
+	}
+	return &dto.TokensResponse{AccessToken: "access", RefreshToken: "refresh"}, map[string]any{
+		"id":           user.ID,
+		"username":     user.Username,
+		"has_passkey":  user.PasskeyCredential != nil,
+		"github_bound": user.GithubID != nil,
+	}, nil
 }
 
 // ---------- helpers ----------
@@ -120,7 +143,7 @@ func TestRegistrationOptions_Success(t *testing.T) {
 			return map[string]any{"challenge": "abc", "rp": "test"}, nil
 		},
 	}
-	h := NewPasskeyHandler(svc, nil, config.Cfg)
+	h := NewPasskeyHandler(svc, config.Cfg)
 
 	w := doPasskeyRequest(h.RegistrationOptions, http.MethodGet, "/passkey/registration-options", nil)
 	if w.Code != http.StatusOK {
@@ -138,7 +161,7 @@ func TestRegistrationOptions_AlreadyExists(t *testing.T) {
 			return nil, passkeyerrs.ErrPasskeyExists
 		},
 	}
-	h := NewPasskeyHandler(svc, nil, config.Cfg)
+	h := NewPasskeyHandler(svc, config.Cfg)
 
 	w := doPasskeyRequest(h.RegistrationOptions, http.MethodGet, "/passkey/registration-options", nil)
 	if w.Code != 400 {
@@ -154,7 +177,7 @@ func TestPasskeyRegister_Success(t *testing.T) {
 			return nil
 		},
 	}
-	h := NewPasskeyHandler(svc, nil, config.Cfg)
+	h := NewPasskeyHandler(svc, config.Cfg)
 
 	body, _ := json.Marshal(dto.PasskeyRegistrationRequest{
 		Response: map[string]any{"id": "cred123"},
@@ -171,7 +194,7 @@ func TestPasskeyRegister_InvalidResponse(t *testing.T) {
 			return passkeyerrs.ErrInvalidPasskey
 		},
 	}
-	h := NewPasskeyHandler(svc, nil, config.Cfg)
+	h := NewPasskeyHandler(svc, config.Cfg)
 
 	body, _ := json.Marshal(dto.PasskeyRegistrationRequest{
 		Response: map[string]any{"id": "bad"},
@@ -190,7 +213,7 @@ func TestAuthenticationOptions_Success(t *testing.T) {
 			return map[string]any{"challenge": "xyz"}, nil
 		},
 	}
-	h := NewPasskeyHandler(svc, nil, config.Cfg)
+	h := NewPasskeyHandler(svc, config.Cfg)
 
 	w := doPasskeyRequest(h.AuthenticationOptions, http.MethodGet, "/passkey/authentication-options", nil)
 	if w.Code != http.StatusOK {
@@ -211,12 +234,7 @@ func TestAuthenticate_Success(t *testing.T) {
 			return &model.User{Model: passkeyGormModel(1), Username: "alice", PasskeyCredential: &model.PasskeyCredential{}}, nil
 		},
 	}
-	mockUserSvc := &mockUserService{
-		createTokensFn: func(ctx context.Context, u *model.User) (*dto.TokensResponse, error) {
-			return &dto.TokensResponse{AccessToken: "access", RefreshToken: "refresh"}, nil
-		},
-	}
-	h := NewPasskeyHandler(svc, mockUserSvc, config.Cfg)
+	h := NewPasskeyHandler(svc, config.Cfg)
 
 	body, _ := json.Marshal(dto.PasskeyAuthRequest{
 		Assertion: map[string]any{"id": "cred123"},
@@ -243,7 +261,7 @@ func TestAuthenticate_InvalidPasskey(t *testing.T) {
 			return nil, passkeyerrs.ErrInvalidPasskey
 		},
 	}
-	h := NewPasskeyHandler(svc, nil, config.Cfg)
+	h := NewPasskeyHandler(svc, config.Cfg)
 
 	body, _ := json.Marshal(dto.PasskeyAuthRequest{
 		Assertion: map[string]any{"id": "bad"},
@@ -262,7 +280,7 @@ func TestDeletePasskey_Success(t *testing.T) {
 			return nil
 		},
 	}
-	h := NewPasskeyHandler(svc, nil, config.Cfg)
+	h := NewPasskeyHandler(svc, config.Cfg)
 
 	w := doPasskeyRequest(h.DeletePasskey, http.MethodDelete, "/passkey/delete", nil)
 	if w.Code != http.StatusOK {
@@ -276,7 +294,7 @@ func TestDeletePasskey_NotFound(t *testing.T) {
 			return passkeyerrs.ErrPasskeyNotFound
 		},
 	}
-	h := NewPasskeyHandler(svc, nil, config.Cfg)
+	h := NewPasskeyHandler(svc, config.Cfg)
 
 	w := doPasskeyRequest(h.DeletePasskey, http.MethodDelete, "/passkey/delete", nil)
 	if w.Code != 400 {

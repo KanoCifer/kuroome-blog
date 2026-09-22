@@ -1,7 +1,6 @@
 package handler
 
 import (
-
 	"context"
 	"log/slog"
 	"strconv"
@@ -34,6 +33,8 @@ type Userer interface {
 	Logout(ctx context.Context, userID uint, jti string)
 	UserToDict(u *model.User, p *model.Profile) map[string]any
 	PollNomuLogin(ctx context.Context, deviceID string) (*service.NomuLoginState, error)
+	// RegisterFlow 是 register handler 的编排入口：建账号 + 注册赠送积分。
+	RegisterFlow(ctx context.Context, username, password, email, emailCode, mode string) (*model.User, *model.Profile, error)
 }
 
 var _ Userer = (*service.UserService)(nil)
@@ -41,9 +42,8 @@ var _ Userer = (*service.UserService)(nil)
 
 // UserHandler 持有业务服务，gin 路由方法挂在其上。
 type UserHandler struct {
-	userSvc   Userer
-	cfg       *config.Config
-	creditSvc service.Creditser // 注入 nil 则跳过注册赠送（test 默认）
+	userSvc Userer
+	cfg     *config.Config
 	// refreshAuthFailLimiter RefreshToken 失败路径专用, 与 ws 失败限流解耦(两个 scope,
 	// 即同一坏客户端把坏循环挪到 /refresh-token 也会被同一套机制挡)。
 	// nil-safe: 测试 / 未配置 Redis 场景下 Fail() 直接放行。
@@ -54,13 +54,11 @@ type UserHandler struct {
 func NewUserHandler(
 	userSvc Userer,
 	cfg *config.Config,
-	creditSvc service.Creditser,
 	refreshLimiter *middleware.AuthFailLimiter,
 ) *UserHandler {
 	return &UserHandler{
 		userSvc:                userSvc,
 		cfg:                    cfg,
-		creditSvc:              creditSvc,
 		refreshAuthFailLimiter: refreshLimiter,
 	}
 }
@@ -98,19 +96,10 @@ func (h *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
-	u, _, err := h.userSvc.CreateUser(c.Request.Context(), req.Username, req.Password, req.Email, req.EmailCode, "", req.Mode)
+	u, _, err := h.userSvc.RegisterFlow(c.Request.Context(),
+		req.Username, req.Password, req.Email, req.EmailCode, req.Mode)
 	if respondErr(c, err, "register failed", "username", req.Username, "email", req.Email) {
 		return
-	}
-
-	// 注册赠送积分：仅本路径触发（密码注册）；GitHub 自动建号 /
-	// magic-login 不走 handler，不发。失败仅记日志、不阻断 200——积分是增值服务，
-	// 注册必须落。GrantRegisterBonus 内部 bizID 由 userID 推导、命中唯一键、幂等不双发。
-	if h.creditSvc != nil {
-		if _, gerr := h.creditSvc.GrantRegisterBonus(c.Request.Context(), u.ID, nil); gerr != nil {
-			slog.ErrorContext(c.Request.Context(), "register bonus grant failed",
-				"user_id", u.ID, "error", gerr)
-		}
 	}
 
 	response.Success(c, dto.FromUser(u, false), "注册成功")
@@ -203,7 +192,7 @@ func (h *UserHandler) RefreshToken(c *gin.Context) {
 //
 // 日志:首次进入限流状态(firstHit)打 WARN,稳态中(follow-up)不打,避免坏前端
 // 在限流窗口内持续刷 WARN 撑爆日志。
-func (h *UserHandler) rejectRefreshInvalid(c *gin.Context, err error) {
+func (h *UserHandler) rejectRefreshInvalid(c *gin.Context, _ error) {
 	if limited, firstHit, retry := h.refreshAuthFailLimiter.Fail(c); limited {
 		retrySec := int(retry.Seconds())
 		if retrySec < 1 {

@@ -15,6 +15,7 @@ import (
 
 	"github.com/KanoCifer/kuroome-blog/internal/domain/passkey/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
+	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 )
 
@@ -58,12 +59,21 @@ type PasskeyRepositoryer interface {
 
 // Passkeyer 定义 passkey handler 依赖的业务能力。
 
+// tokenIssuer 是 PasskeyService.LoginFlow 依赖的 token 签发与字段铺平能力
+// （*UserService 满足）。本地窄接口，避免 passkey ← user 的包方向反转。
+type tokenIssuer interface {
+	CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
+	UserToDict(u *model.User, p *model.Profile) map[string]any
+}
+
 // PasskeyServiceer 编排 WebAuthn 注册 / 认证流程，challenge 存 Redis。
 type PasskeyService struct {
 	webauthn    *webauthn.WebAuthn
 	redis       *redis.Client
 	passkeyRepo PasskeyRepositoryer
 	userRepo    UserRepositoryer
+	// tokenSvc LoginFlow 调的 token 签发与字段铺平（必填：构造后立即用，无 nil-safe）。
+	tokenSvc tokenIssuer
 }
 
 func NewPasskeyService(
@@ -71,12 +81,14 @@ func NewPasskeyService(
 	redis *redis.Client,
 	passkeyRepo PasskeyRepositoryer,
 	userRepo UserRepositoryer,
+	tokenSvc tokenIssuer,
 ) *PasskeyService {
 	return &PasskeyService{
 		webauthn:    wa,
 		redis:       redis,
 		passkeyRepo: passkeyRepo,
 		userRepo:    userRepo,
+		tokenSvc:    tokenSvc,
 	}
 }
 
@@ -234,6 +246,24 @@ func (s *PasskeyService) FinishLogin(ctx context.Context, response map[string]an
 	}
 	slog.InfoContext(ctx, "passkey login", "user_id", cred.User.ID, "credential_id", cred.CredentialID)
 	return cred.User, nil
+}
+
+// LoginFlow 是 /passkey/authenticate 的编排入口：WebAuthn 验签 → 签 token → 铺平字段。
+// cookie 设置仍归 handler（HTTP 关注点，不下沉到 service）。返回 userData 已
+// 含 is_admin / has_passkey / github_bound 等字段，handler 只需再贴 access/refresh。
+func (s *PasskeyService) LoginFlow(
+	ctx context.Context,
+	assertion map[string]any,
+) (*dto.TokensResponse, map[string]any, error) {
+	user, err := s.FinishLogin(ctx, assertion)
+	if err != nil {
+		return nil, nil, err
+	}
+	tokens, err := s.tokenSvc.CreateTokens(ctx, user)
+	if err != nil {
+		return nil, nil, err
+	}
+	return tokens, s.tokenSvc.UserToDict(user, user.Profile), nil
 }
 
 // DeletePasskey 删除用户 Passkey 凭证。

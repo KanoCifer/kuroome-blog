@@ -26,27 +26,22 @@ type Passkeyer interface {
 	BeginLogin(ctx context.Context) (map[string]any, error)
 	FinishLogin(ctx context.Context, response map[string]any) (*model.User, error)
 	DeletePasskey(ctx context.Context, userID uint) error
+	// LoginFlow 是 /passkey/authenticate 的编排入口：WebAuthn 验签 + 签 token + 铺平字段。
+	// 返回 userData 已含 is_admin / has_passkey / github_bound，handler 只贴 access/refresh。
+	LoginFlow(ctx context.Context, assertion map[string]any) (*dto.TokensResponse, map[string]any, error)
 }
 
 var _ Passkeyer = (*service.PasskeyService)(nil)
 
 
-// passkeyTokenCreator 是 PasskeyHandler 为签发 token 所需的窄接口。
-// 比 service.Userer 小，只用 CreateTokens / UserToDict 两方法；mock 测试更轻。
-type passkeyTokenCreator interface {
-	CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
-	UserToDict(u *model.User, p *model.Profile) map[string]any
-}
-
-// PasskeyHandler 持有 passkeySvc 和 passkeyTokenCreator（登录后构造 token）。
+// PasskeyHandler 持有 passkeySvc（cookie 设置等 HTTP 关注点留在 handler）。
 type PasskeyHandler struct {
 	passkeySvc Passkeyer
-	userSvc    passkeyTokenCreator
 	cfg        *config.Config
 }
 
-func NewPasskeyHandler(passkeySvc Passkeyer, userSvc passkeyTokenCreator, cfg *config.Config) *PasskeyHandler {
-	return &PasskeyHandler{passkeySvc: passkeySvc, userSvc: userSvc, cfg: cfg}
+func NewPasskeyHandler(passkeySvc Passkeyer, cfg *config.Config) *PasskeyHandler {
+	return &PasskeyHandler{passkeySvc: passkeySvc, cfg: cfg}
 }
 
 // RegistrationOptions GET /passkey/registration-options (auth required)
@@ -91,21 +86,14 @@ func (h *PasskeyHandler) Authenticate(c *gin.Context) {
 		return
 	}
 
-	user, err := h.passkeySvc.FinishLogin(c.Request.Context(), req.Assertion)
+	tokens, userData, err := h.passkeySvc.LoginFlow(c.Request.Context(), req.Assertion)
 	if respondErr(c, err, "passkey login failed") {
 		return
 	}
 
-	tokens, err := h.userSvc.CreateTokens(c.Request.Context(), user)
-	if respondErr(c, err, "create tokens error", "user_id", user.ID) {
-		return
-	}
-
-	// 写入 refresh_token cookie（与 Python 端一致）。
+	// 写入 refresh_token cookie（与 Python 端一致，HTTP 关注点留 handler）。
 	util.SetRefreshCookie(c, h.cfg, tokens.RefreshToken)
 
-	// 用户字段铺平到 data 顶层（与 Python 端 user_to_dict 形状一致）。
-	userData := h.userSvc.UserToDict(user, user.Profile)
 	userData["access_token"] = tokens.AccessToken
 	userData["refresh_token"] = tokens.RefreshToken
 	response.Success(c, userData, "Passkey 登录成功")

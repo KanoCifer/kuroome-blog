@@ -262,7 +262,7 @@ func TestGetByID_NotFound(t *testing.T) {
 	repo := &mockUserRepo{
 		getByIDFn: func(ctx context.Context, id uint) (*model.User, error) { return nil, nil },
 	}
-	svc := NewUserService(repo, nil, nil, nil, 0)
+	svc := NewUserService(repo, nil, nil, nil, 0, nil)
 
 	_, _, err := svc.GetByID(context.Background(), 999)
 	if !errors.Is(err, usererrs.ErrUserNotFound) {
@@ -276,7 +276,7 @@ func TestGetByID_RepoError(t *testing.T) {
 			return nil, errors.New("db error")
 		},
 	}
-	svc := NewUserService(repo, nil, nil, nil, 0)
+	svc := NewUserService(repo, nil, nil, nil, 0, nil)
 
 	_, _, err := svc.GetByID(context.Background(), 1)
 	if err == nil {
@@ -290,7 +290,7 @@ func TestGetByID_Success(t *testing.T) {
 			return &model.User{Model: gormModel(id), Username: "alice"}, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil, nil, 0)
+	svc := NewUserService(repo, nil, nil, nil, 0, nil)
 
 	u, p, err := svc.GetByID(context.Background(), uint(1))
 	if err != nil {
@@ -312,7 +312,7 @@ func TestAuthenticate_UserNotFound(t *testing.T) {
 			return nil, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil, nil, 0)
+	svc := NewUserService(repo, nil, nil, nil, 0, nil)
 
 	_, err := svc.Authenticate(context.Background(), "ghost", "pass")
 	if !errors.Is(err, usererrs.ErrInvalidCredentials) {
@@ -327,7 +327,7 @@ func TestAuthenticate_WrongPassword(t *testing.T) {
 			return &model.User{Model: gormModel(1), PasswordHash: string(hash)}, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil, nil, 0)
+	svc := NewUserService(repo, nil, nil, nil, 0, nil)
 
 	_, err := svc.Authenticate(context.Background(), "alice", "wrong")
 	if !errors.Is(err, usererrs.ErrInvalidCredentials) {
@@ -342,7 +342,7 @@ func TestAuthenticate_Success(t *testing.T) {
 			return &model.User{Model: gormModel(1), Username: "alice", PasswordHash: string(hash)}, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil, nil, 0)
+	svc := NewUserService(repo, nil, nil, nil, 0, nil)
 
 	u, err := svc.Authenticate(context.Background(), "alice", "secret")
 	if err != nil {
@@ -369,7 +369,7 @@ func TestAuthenticate_LogPropagatesTraceID(t *testing.T) {
 			return &model.User{Model: gormModel(1), Username: "alice", PasswordHash: string(hash)}, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil, nil, 0)
+	svc := NewUserService(repo, nil, nil, nil, 0, nil)
 
 	ctx := logger.WithTraceID(context.Background(), "trace-xyz")
 	if _, err := svc.Authenticate(ctx, "alice", "secret"); err != nil {
@@ -759,7 +759,7 @@ func TestEmailCode_CrossModeIsolation(t *testing.T) {
 // 防止枚举；不调用 redis。
 func TestSendMagicLoginEmail_EmailNotRegistered(t *testing.T) {
 	repo := &mockUserRepo{emailExists: false}
-	svc := NewUserService(repo, nil, nil, nil, 0)
+	svc := NewUserService(repo, nil, nil, nil, 0, nil)
 
 	if !svc.SendMagicLoginEmail(context.Background(), "ghost@example.com", "blog", "") {
 		t.Error("SendMagicLoginEmail should return true (silent success) for unregistered email")
@@ -768,7 +768,7 @@ func TestSendMagicLoginEmail_EmailNotRegistered(t *testing.T) {
 
 // TestAuthenticateMagicLogin_NilRedis 无 redis 直接 401 等价。
 func TestAuthenticateMagicLogin_NilRedis(t *testing.T) {
-	svc := NewUserService(&mockUserRepo{}, nil, nil, nil, 0)
+	svc := NewUserService(&mockUserRepo{}, nil, nil, nil, 0, nil)
 	_, _, err := svc.AuthenticateMagicLogin(context.Background(), "any-token:blog")
 	if !errors.Is(err, usererrs.ErrInvalidMagicToken) {
 		t.Errorf("err = %v, want ErrInvalidMagicToken", err)
@@ -778,7 +778,7 @@ func TestAuthenticateMagicLogin_NilRedis(t *testing.T) {
 // TestAuthenticateMagicLogin_BadLengthToken 长度不符直接拒绝，避免污染 key。
 // 缺冒号、缺 mode 段、hex 长度不对都视为非法 token。
 func TestAuthenticateMagicLogin_BadLengthToken(t *testing.T) {
-	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil, nil, 0)
+	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil, nil, 0, nil)
 	bad := []string{
 		"short",                           // 无冒号、无 mode
 		"short:blog",                      // hex 段太短
@@ -798,7 +798,7 @@ func TestAuthenticateMagicLogin_BadLengthToken(t *testing.T) {
 
 // TestAuthenticateMagicLogin_EmptyToken 空 token 立即拒绝。
 func TestAuthenticateMagicLogin_EmptyToken(t *testing.T) {
-	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil, nil, 0)
+	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil, nil, 0, nil)
 	_, _, err := svc.AuthenticateMagicLogin(context.Background(), "")
 	if !errors.Is(err, usererrs.ErrInvalidMagicToken) {
 		t.Errorf("err = %v, want ErrInvalidMagicToken", err)
@@ -902,7 +902,7 @@ func TestMagicLoginLink_HostMissing(t *testing.T) {
 func TestMagicLoginLink_HostTrailingSlash(t *testing.T) {
 	svc := NewUserService(&mockUserRepo{}, nil, nil, map[string]string{
 		"nomu": "https://nomu.kanocifer.chat/",
-	}, 0)
+	}, 0, nil)
 	link := svc.magicLoginLink("h:nomu", "nomu")
 	if strings.Contains(link, "//nomu/login") {
 		t.Errorf("double slash detected: %q", link)
@@ -926,7 +926,7 @@ func TestAuthenticateMagicLogin_CrossModeIsolation(t *testing.T) {
 			return &model.User{Model: gormModel(1), Username: "alice"}, nil, nil
 		},
 	}
-	svc := NewUserService(repo, rdb, nil, nil, 0)
+	svc := NewUserService(repo, rdb, nil, nil, 0, nil)
 
 	const hex = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 	emailKey := "magiclogintoken:" + hex + ":blog"
@@ -980,7 +980,7 @@ func TestPollNomuLogin_DoneAfterConfirm(t *testing.T) {
 			return &model.User{Model: gormModel(1), Username: "alice"}, nil, nil
 		},
 	}
-	svc := NewUserService(repo, rdb, nil, nil, 0)
+	svc := NewUserService(repo, rdb, nil, nil, 0, nil)
 
 	const hex = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 	const deviceID = "nomu-device-abc"
@@ -1029,7 +1029,7 @@ func TestPollNomuLogin_PendingWhenMissing(t *testing.T) {
 	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
 	t.Cleanup(func() { _ = rdb.Close() })
 
-	svc := NewUserService(&mockUserRepo{}, rdb, nil, nil, 0)
+	svc := NewUserService(&mockUserRepo{}, rdb, nil, nil, 0, nil)
 	st, err := svc.PollNomuLogin(context.Background(), "no-such-device")
 	if err != nil {
 		t.Fatalf("PollNomuLogin: %v", err)
@@ -1041,7 +1041,7 @@ func TestPollNomuLogin_PendingWhenMissing(t *testing.T) {
 
 // TestPollNomuLogin_PendingWhenNilRedis redis 未配置同样回 pending，禁止 500。
 func TestPollNomuLogin_PendingWhenNilRedis(t *testing.T) {
-	svc := NewUserService(&mockUserRepo{}, nil, nil, nil, 0)
+	svc := NewUserService(&mockUserRepo{}, nil, nil, nil, 0, nil)
 	st, err := svc.PollNomuLogin(context.Background(), "dev")
 	if err != nil {
 		t.Fatalf("PollNomuLogin: %v", err)

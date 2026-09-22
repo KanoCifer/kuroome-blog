@@ -98,13 +98,13 @@ func NewAppState(
 	// -- services ---------------------------------------------------- //
 	// frontendURLs 按 mode 索引：blog → kanocifer.chat（/auth/magic），
 	// nomu → nomu.kanocifer.chat（/nomu/login），两个独立 origin。
-	// creditSvc 在 userHandler.Register 收尾处调 GrantRegisterBonus 赠送 100 积分；
+	// creditSvc 在 userService.RegisterFlow 收尾处调 GrantRegisterBonus 赠送 100 积分；
 	// 只走密码注册 handler 这一条路径，GitHub 自动建号 / magic-login 不发。
 	creditSvc := service.NewCreditService(postgres.NewCreditRepository(db))
 	userSvc := service.NewUserService(userRepo, redis, cfg.Admin.UserIDs, map[string]string{
 		"blog": cfg.Frontend.URLs.Blog,
 		"nomu": cfg.Frontend.URLs.Nomu,
-	}, cfg.Security.MaxRefreshDevices)
+	}, cfg.Security.MaxRefreshDevices, creditSvc)
 	uploadSvc := service.NewUploadService(userRepo, cfg)
 	nomuRepo := postgres.NewNomuRepository(db)
 
@@ -118,7 +118,7 @@ func NewAppState(
 		adminSvc:   service.NewAdminService(adminRepo, visitorRepo, redis),
 		blogSvc:    service.NewBlogService(blogRepo),
 		devTaskSvc: service.NewDevTaskService(devTaskRepo),
-		passkeySvc: service.NewPasskeyService(wa, redis, passkeyRepo, userRepo),
+		passkeySvc: service.NewPasskeyService(wa, redis, passkeyRepo, userRepo, userSvc),
 		monitorSvc: service.NewMonitorService(visitorRepo, userRepo, cfg.API.Version),
 		systemSvc:  service.NewSystemService(eventRepo),
 		wsSvc:      service.NewWSService(redis, dispatcher),
