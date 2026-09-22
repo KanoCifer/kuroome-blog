@@ -48,14 +48,7 @@ func (h *PasskeyHandler) RegistrationOptions(c *gin.Context) {
 	userID := c.GetInt("user_id")
 
 	options, err := h.passkeySvc.BeginRegistration(c.Request.Context(), uint(userID))
-	if err != nil {
-		if errors.Is(err, passkeyerrs.ErrPasskeyExists) {
-			slog.WarnContext(c.Request.Context(), "passkey registration begin failed", "reason", "passkey_exists", "user_id", userID)
-			response.APIError(c, err.Error(), 400)
-			return
-		}
-		slog.ErrorContext(c.Request.Context(), "passkey registration begin error", "error", err, "user_id", userID)
-		response.APIError(c, err.Error(), 500)
+	if respondErr(c, err, "passkey registration begin failed", "user_id", userID) {
 		return
 	}
 	response.Success(c, options, "Passkey 注册选项生成成功")
@@ -66,19 +59,11 @@ func (h *PasskeyHandler) Register(c *gin.Context) {
 	userID := c.GetInt("user_id")
 
 	var req dto.PasskeyRegistrationRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.APIError(c, "invalid request body")
+	if !bindJSON(c, &req) {
 		return
 	}
 
-	if err := h.passkeySvc.FinishRegistration(c.Request.Context(), uint(userID), req.Response); err != nil {
-		if errors.Is(err, passkeyerrs.ErrInvalidPasskey) {
-			slog.WarnContext(c.Request.Context(), "passkey registration finish failed", "reason", "invalid_passkey", "user_id", userID)
-			response.APIError(c, err.Error(), 400)
-			return
-		}
-		slog.ErrorContext(c.Request.Context(), "passkey registration finish error", "error", err, "user_id", userID)
-		response.APIError(c, err.Error(), 500)
+	if err := h.passkeySvc.FinishRegistration(c.Request.Context(), uint(userID), req.Response); respondErr(c, err, "passkey registration finish failed", "user_id", userID) {
 		return
 	}
 	response.Success(c, nil, "Passkey 注册成功")
@@ -87,8 +72,7 @@ func (h *PasskeyHandler) Register(c *gin.Context) {
 // AuthenticationOptions GET /passkey/authentication-options (public)
 func (h *PasskeyHandler) AuthenticationOptions(c *gin.Context) {
 	options, err := h.passkeySvc.BeginLogin(c.Request.Context())
-	if err != nil {
-		response.APIError(c, err.Error(), 500)
+	if respondErr(c, err, "passkey authentication options failed") {
 		return
 	}
 	response.Success(c, options, "Passkey 认证选项生成成功")
@@ -97,27 +81,17 @@ func (h *PasskeyHandler) AuthenticationOptions(c *gin.Context) {
 // Authenticate POST /passkey/authenticate (public → returns tokens)
 func (h *PasskeyHandler) Authenticate(c *gin.Context) {
 	var req dto.PasskeyAuthRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.APIError(c, "invalid request body")
+	if !bindJSON(c, &req) {
 		return
 	}
 
 	user, err := h.passkeySvc.FinishLogin(c.Request.Context(), req.Assertion)
-	if err != nil {
-		if errors.Is(err, passkeyerrs.ErrInvalidPasskey) || errors.Is(err, passkeyerrs.ErrPasskeyNotFound) {
-			slog.WarnContext(c.Request.Context(), "passkey login failed", "reason", "invalid_passkey")
-			response.APIError(c, err.Error(), 400)
-			return
-		}
-		slog.ErrorContext(c.Request.Context(), "passkey login error", "error", err)
-		response.APIError(c, err.Error(), 500)
+	if respondErr(c, err, "passkey login failed") {
 		return
 	}
 
 	tokens, err := h.userSvc.CreateTokens(c.Request.Context(), user)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "create tokens error", "error", err, "user_id", user.ID)
-		response.APIError(c, "server error", 500)
+	if respondErr(c, err, "create tokens error", "user_id", user.ID) {
 		return
 	}
 
@@ -136,14 +110,15 @@ func (h *PasskeyHandler) DeletePasskey(c *gin.Context) {
 	userID := c.GetInt("user_id")
 
 	if err := h.passkeySvc.DeletePasskey(c.Request.Context(), uint(userID)); err != nil {
+		// 删除场景文案与通用 err.Error() 不同，保留专属 400 文案。
 		if errors.Is(err, passkeyerrs.ErrPasskeyNotFound) {
-			slog.WarnContext(c.Request.Context(), "passkey delete failed", "reason", "passkey_not_found", "user_id", userID)
+			slog.WarnContext(c.Request.Context(), "passkey delete failed", "user_id", userID, "error", err)
 			response.APIError(c, "您的账户尚未绑定Passkey", 400)
 			return
 		}
-		slog.ErrorContext(c.Request.Context(), "passkey delete error", "error", err, "user_id", userID)
-		response.APIError(c, err.Error(), 500)
-		return
+		if respondErr(c, err, "passkey delete failed", "user_id", userID) {
+			return
+		}
 	}
 	response.Success(c, nil, "Passkey 删除成功")
 }

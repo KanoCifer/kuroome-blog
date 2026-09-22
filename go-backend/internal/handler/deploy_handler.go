@@ -30,7 +30,7 @@ func NewDeployHandler(cfg *config.Config) *DeployHandler {
 func (h *DeployHandler) WebhookDeploy(c *gin.Context) {
 	secret := h.cfg.Gitee.WebhookSecret
 	if secret == nil || *secret == "" {
-		response.APIError(c, "Webhook secret not configured", 500)
+		response.APIError(c, internalErrMsg, 500)
 		return
 	}
 

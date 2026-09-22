@@ -1070,7 +1070,11 @@ func TestLogin_LogPropagatesTraceID(t *testing.T) {
 	if rec["level"] != "WARN" {
 		t.Errorf("level = %v, want WARN", rec["level"])
 	}
-	if rec["reason"] != "invalid_credentials" {
-		t.Errorf("reason = %v, want invalid_credentials", rec["reason"])
+	// 统一错误出口后 reason 字段并入 error（哨兵文案即失败原因）。
+	if rec["error"] != "用户名或密码错误" {
+		t.Errorf("error = %v, want 用户名或密码错误", rec["error"])
+	}
+	if rec["msg"] != "login failed" {
+		t.Errorf("msg = %v, want login failed", rec["msg"])
 	}
 }

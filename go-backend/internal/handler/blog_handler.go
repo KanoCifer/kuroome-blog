@@ -38,9 +38,7 @@ func (h *BlogHandler) GetBlogs(c *gin.Context) {
 	search := c.Query("search")
 
 	data, err := h.blogSvc.ListPosts(c.Request.Context(), page, search)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "get blogs", "error", err)
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, err, "get blogs") {
 		return
 	}
 	response.Success(c, data, "Blogs retrieved successfully")
@@ -53,16 +51,7 @@ func (h *BlogHandler) GetBlogPost(c *gin.Context) {
 	}
 
 	data, err := h.blogSvc.GetPost(c.Request.Context(), _id)
-	if err != nil {
-		switch {
-		case errors.Is(err, blogerrs.ErrInvalidPostID):
-			response.APIError(c, err.Error(), http.StatusBadRequest)
-		case errors.Is(err, blogerrs.ErrPostNotFound):
-			response.APIError(c, err.Error(), http.StatusNotFound)
-		default:
-			slog.ErrorContext(c.Request.Context(), "get blog post", "error", err)
-			response.APIError(c, err.Error(), http.StatusInternalServerError)
-		}
+	if respondErr(c, err, "get blog post", "id", _id) {
 		return
 	}
 	// Fire-and-forget view increment —— 阅读量计数，不阻塞返回响应。
@@ -76,9 +65,7 @@ func (h *BlogHandler) GetBlogPost(c *gin.Context) {
 
 func (h *BlogHandler) GetTags(c *gin.Context) {
 	tags, err := h.blogSvc.ListTags(c.Request.Context())
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "get tags", "error", err)
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, err, "get tags") {
 		return
 	}
 	response.Success(c, gin.H{"tags": tags}, "Tags retrieved successfully")
@@ -95,9 +82,9 @@ func (h *BlogHandler) GetPostsByTag(c *gin.Context) {
 			response.APIError(c, "Tag is required", http.StatusBadRequest)
 			return
 		}
-		slog.ErrorContext(c.Request.Context(), "get posts by tag", "error", err)
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
-		return
+		if respondErr(c, err, "get posts by tag", "tag", tag) {
+			return
+		}
 	}
 	response.Success(c, data, "Posts retrieved successfully")
 }
@@ -107,16 +94,7 @@ func (h *BlogHandler) LikePost(c *gin.Context) {
 	id := c.Param("id")
 
 	likes, err := h.blogSvc.LikePost(c.Request.Context(), id)
-	if err != nil {
-		switch {
-		case errors.Is(err, blogerrs.ErrInvalidPostID):
-			response.APIError(c, err.Error(), http.StatusBadRequest)
-		case errors.Is(err, blogerrs.ErrPostNotFound):
-			response.APIError(c, err.Error(), http.StatusNotFound)
-		default:
-			slog.ErrorContext(c.Request.Context(), "like post", "error", err, "id", id)
-			response.APIError(c, err.Error(), http.StatusInternalServerError)
-		}
+	if respondErr(c, err, "like post", "id", id) {
 		return
 	}
 	response.Success(c, dto.LikeResponse{Likes: likes}, "Liked successfully")

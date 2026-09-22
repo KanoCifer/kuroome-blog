@@ -2,7 +2,6 @@ package handler
 
 import (
 	"context"
-	"errors"
 	"io"
 	"log/slog"
 	"net/http"
@@ -11,7 +10,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	nomuerrs "github.com/KanoCifer/kuroome-blog/internal/domain/nomu/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
@@ -68,8 +66,7 @@ func (h *NomuHandler) ProxyBlob(c *gin.Context) {
 	}
 
 	contentLength, contentType, body, extraHeaders, err := h.svc.ProxyBlob(c.Request.Context(), u)
-	if err != nil {
-		h.respondError(c, err)
+	if respondErr(c, err, "nomu proxy error") {
 		return
 	}
 	// body 归 handler 所有：DataFromReader 只负责读，不负责关。
@@ -79,30 +76,17 @@ func (h *NomuHandler) ProxyBlob(c *gin.Context) {
 
 func (h *NomuHandler) SyncNomuConfig(c *gin.Context) {
 	var req SyncNomuRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.APIError(c, "invalid request body", 400)
+	if !bindJSON(c, &req) {
 		return
 	}
 
 	userID := c.GetInt("user_id")
 	cloud, err := h.svc.SyncNomuConfig(c.Request.Context(), uint(userID), req.Local, req.LastSyncAt)
-	if err != nil {
-		h.respondError(c, err)
+	if respondErr(c, err, "nomu config sync failed", "user_id", userID) {
 		return
 	}
 
 	slog.InfoContext(c.Request.Context(), "nomu config synced",
 		"user_id", userID, "local_items", len(req.Local), "returned", len(cloud))
 	response.Success(c, cloud, "synced")
-}
-
-func (h *NomuHandler) respondError(c *gin.Context, err error) {
-	switch {
-	case errors.Is(err, nomuerrs.ErrSyncTooMany):
-		response.APIError(c, err.Error(), 400)
-	default:
-		slog.ErrorContext(c.Request.Context(), "nomu sync error",
-			"user_id", c.GetInt("user_id"), "error", err.Error())
-		response.APIError(c, "internal error", 500)
-	}
 }

@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"errors"
-	"log/slog"
 	"net/http"
 	"strconv"
 	"time"
@@ -10,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/KanoCifer/kuroome-blog/internal/config"
-	"github.com/KanoCifer/kuroome-blog/internal/domain/devtask/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
@@ -37,15 +34,12 @@ func userID(c *gin.Context) int {
 // CreateTask 创建任务  POST /api/v3/dev-tasks
 func (h *DevTaskHandler) CreateTask(c *gin.Context) {
 	var req dto.DevTaskCreate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.APIError(c, err.Error())
+	if !bindJSON(c, &req) {
 		return
 	}
 
 	data, err := h.svc.Create(c.Request.Context(), userID(c), req)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "create dev task", "error", err)
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, err, "create dev task") {
 		return
 	}
 	response.Success(c, data, "Task created successfully")
@@ -58,14 +52,7 @@ func (h *DevTaskHandler) GetTaskBySlug(c *gin.Context) {
 	withParent := c.Query("with_parent") == "true"
 
 	data, err := h.svc.GetBySlug(c.Request.Context(), slug, withParent)
-	if err != nil {
-		switch {
-		case errors.Is(err, devtaskerrs.ErrTaskNotFound):
-			response.APIError(c, err.Error(), http.StatusNotFound)
-		default:
-			slog.ErrorContext(c.Request.Context(), "get dev task by slug", "error", err, "slug", slug)
-			response.APIError(c, err.Error(), http.StatusInternalServerError)
-		}
+	if respondErr(c, err, "get dev task by slug", "slug", slug) {
 		return
 	}
 	response.Success(c, data, "Task retrieved successfully")
@@ -100,9 +87,7 @@ func (h *DevTaskHandler) ListTasks(c *gin.Context) {
 	}
 
 	data, err := h.svc.List(c.Request.Context(), filter, page, perPage)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "list dev tasks", "error", err)
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, err, "list dev tasks") {
 		return
 	}
 	response.Success(c, data, "Tasks retrieved successfully")
@@ -114,9 +99,7 @@ func (h *DevTaskHandler) FrontierTasks(c *gin.Context) {
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
 
 	data, err := h.svc.FindFrontier(c.Request.Context(), limit)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "frontier dev tasks", "error", err)
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, err, "frontier dev tasks") {
 		return
 	}
 	// 直接返回数组（无分页 envelope），因为 frontier 语义是"接下来干什么的简短清单"。
@@ -128,14 +111,11 @@ func (h *DevTaskHandler) UpdateTask(c *gin.Context) {
 	slug := c.Param("slug")
 
 	var req dto.DevTaskUpdate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.APIError(c, err.Error())
+	if !bindJSON(c, &req) {
 		return
 	}
 
-	if err := h.svc.Update(c.Request.Context(), slug, req); err != nil {
-		slog.ErrorContext(c.Request.Context(), "update dev task", "error", err, "slug", slug)
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, h.svc.Update(c.Request.Context(), slug, req), "update dev task", "slug", slug) {
 		return
 	}
 	response.Success(c, nil, "Task updated successfully")
@@ -145,9 +125,7 @@ func (h *DevTaskHandler) UpdateTask(c *gin.Context) {
 func (h *DevTaskHandler) SoftDeleteTask(c *gin.Context) {
 	slug := c.Param("slug")
 
-	if err := h.svc.SoftDelete(c.Request.Context(), slug); err != nil {
-		slog.ErrorContext(c.Request.Context(), "soft delete dev task", "error", err, "slug", slug)
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, h.svc.SoftDelete(c.Request.Context(), slug), "soft delete dev task", "slug", slug) {
 		return
 	}
 	response.Success(c, nil, "Task soft-deleted successfully")
@@ -157,9 +135,7 @@ func (h *DevTaskHandler) SoftDeleteTask(c *gin.Context) {
 func (h *DevTaskHandler) HardDeleteTask(c *gin.Context) {
 	slug := c.Param("slug")
 
-	if err := h.svc.HardDelete(c.Request.Context(), slug); err != nil {
-		slog.ErrorContext(c.Request.Context(), "hard delete dev task", "error", err, "slug", slug)
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, h.svc.HardDelete(c.Request.Context(), slug), "hard delete dev task", "slug", slug) {
 		return
 	}
 	response.Success(c, nil, "Task permanently deleted")
@@ -169,15 +145,12 @@ func (h *DevTaskHandler) HardDeleteTask(c *gin.Context) {
 // 一次把多个 slug（含 spec 父任务）翻到同一状态。
 func (h *DevTaskHandler) BatchStatus(c *gin.Context) {
 	var req dto.BatchStatusRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.APIError(c, err.Error())
+	if !bindJSON(c, &req) {
 		return
 	}
 
 	result, err := h.svc.BatchUpdateStatus(c.Request.Context(), req.Slugs, req.Status)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "batch status update", "error", err)
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, err, "batch status update") {
 		return
 	}
 	response.Success(c, dto.BatchStatusResponse{
@@ -208,9 +181,7 @@ func (h *DevTaskHandler) DevTaskToken(c *gin.Context) {
 	}
 
 	token, err := jwt.GenerateServiceToken(expiresAt, h.cfg.Security.DevTaskSecret)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "generate devtask service token", "error", err)
-		response.APIError(c, "failed to generate token", http.StatusInternalServerError)
+	if respondErr(c, err, "generate devtask service token") {
 		return
 	}
 

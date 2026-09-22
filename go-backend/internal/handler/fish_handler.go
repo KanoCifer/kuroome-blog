@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"log/slog"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -53,9 +52,7 @@ func NewFishHandler(svc service.Fisher) *FishHandler {
 // GetFishingSpotsList 列出所有钓点  GET /fish/spots
 func (h *FishHandler) GetFishingSpotsList(c *gin.Context) {
 	spots, err := h.svc.GetFishingSpots(c.Request.Context())
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "list fishing spots", "error", err)
-		response.APIError(c, err.Error())
+	if respondErr(c, err, "list fishing spots") {
 		return
 	}
 	response.Success(c, spots)
@@ -65,9 +62,7 @@ func (h *FishHandler) GetFishingSpotsList(c *gin.Context) {
 func (h *FishHandler) GetFishingSpot(c *gin.Context) {
 	id := c.Param("id")
 	spot, err := h.svc.GetFishingSpotByID(c.Request.Context(), id)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "get fishing spot", "error", err, "id", id)
-		response.APIError(c, err.Error())
+	if respondErr(c, err, "get fishing spot", "id", id) {
 		return
 	}
 	response.Success(c, spot)
@@ -78,19 +73,13 @@ func (h *FishHandler) CreateFishingSpot(c *gin.Context) {
 	var req dto.FishingSpotRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		if isInvalidKindError(err) {
-			response.APIError(c, "invalid_kind: kind 必须在 lake/river/reservoir 之一", 400)
+			respondErr(c, fisherrs.ErrInvalidKind, "fishing spot invalid kind")
 			return
 		}
-		response.APIError(c, err.Error())
+		response.APIError(c, "invalid request body")
 		return
 	}
-	if err := h.svc.CreateFishingSpot(c.Request.Context(), &req); err != nil {
-		if isInvalidKindError(err) {
-			response.APIError(c, "invalid_kind: kind 必须在 lake/river/reservoir 之一", 400)
-			return
-		}
-		slog.ErrorContext(c.Request.Context(), "create fishing spot", "error", err)
-		response.APIError(c, err.Error())
+	if respondErr(c, h.svc.CreateFishingSpot(c.Request.Context(), &req), "create fishing spot") {
 		return
 	}
 	response.Success(c, nil)
@@ -103,19 +92,13 @@ func (h *FishHandler) UpdateFishingSpot(c *gin.Context) {
 	var req dto.FishingSpotUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		if isInvalidKindError(err) {
-			response.APIError(c, "invalid_kind: kind 必须在 lake/river/reservoir 之一", 400)
+			respondErr(c, fisherrs.ErrInvalidKind, "fishing spot invalid kind")
 			return
 		}
-		response.APIError(c, err.Error())
+		response.APIError(c, "invalid request body")
 		return
 	}
-	if err := h.svc.UpdateFishingSpot(c.Request.Context(), id, &req); err != nil {
-		if isInvalidKindError(err) {
-			response.APIError(c, "invalid_kind: kind 必须在 lake/river/reservoir 之一", 400)
-			return
-		}
-		slog.ErrorContext(c.Request.Context(), "update fishing spot", "error", err, "id", id)
-		response.APIError(c, err.Error())
+	if respondErr(c, h.svc.UpdateFishingSpot(c.Request.Context(), id, &req), "update fishing spot", "id", id) {
 		return
 	}
 	response.Success(c, nil)
@@ -126,9 +109,7 @@ func (h *FishHandler) UpdateFishingSpot(c *gin.Context) {
 func (h *FishHandler) DeleteFishingSpot(c *gin.Context) {
 	id := c.Param("id")
 	hard := c.Query("hard") == "true"
-	if err := h.svc.Delete(c.Request.Context(), id, hard); err != nil {
-		slog.ErrorContext(c.Request.Context(), "delete fishing spot", "error", err, "id", id)
-		response.APIError(c, err.Error())
+	if respondErr(c, h.svc.Delete(c.Request.Context(), id, hard), "delete fishing spot", "id", id) {
 		return
 	}
 	response.Success(c, nil)

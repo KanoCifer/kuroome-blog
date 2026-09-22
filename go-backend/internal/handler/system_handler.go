@@ -75,8 +75,7 @@ func (h *SystemHandler) Events(c *gin.Context) {
 	}
 
 	data, err := h.svc.ListEvents(c.Request.Context(), page, perPage, eventType, start, end)
-	if err != nil {
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, err, "list system events") {
 		return
 	}
 

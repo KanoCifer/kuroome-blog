@@ -118,8 +118,7 @@ func (h *GitHubHandler) Unbind(c *gin.Context) {
 		response.APIError(c, "未授权", 401)
 		return
 	}
-	if err := h.githubSvc.UnbindGitHub(c.Request.Context(), uint(userID)); err != nil {
-		response.APIError(c, "server error", 500)
+	if err := h.githubSvc.UnbindGitHub(c.Request.Context(), uint(userID)); respondErr(c, err, "github unbind failed", "user_id", userID) {
 		return
 	}
 	response.Success(c, nil, "GitHub 绑定已解除")

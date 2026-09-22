@@ -3,9 +3,9 @@
 // 见 service/nomu/design_service.go。
 package nomuerrs
 
-import "errors"
+import "github.com/KanoCifer/kuroome-blog/internal/apierr"
 
 var (
-	ErrSyncConflict = errors.New("nomu: config version conflict")
-	ErrSyncTooMany  = errors.New("nomu: sync batch too large")
+	ErrSyncConflict = apierr.New(409, "nomu: config version conflict")
+	ErrSyncTooMany  = apierr.New(400, "nomu: sync batch too large")
 )

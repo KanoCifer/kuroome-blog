@@ -10,7 +10,6 @@ package qweather
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -20,16 +19,17 @@ import (
 
 	"github.com/redis/go-redis/v9"
 
+	"github.com/KanoCifer/kuroome-blog/internal/apierr"
 	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
 )
 
 var (
 	// ErrInvalidLocation 请求未提供 location 或 location_id。
-	ErrInvalidLocation = errors.New("weather: must provide location or location_id")
+	ErrInvalidLocation = apierr.New(400, "missing location or location_id")
 	// ErrUpstream QWeather 上游返回非 2xx 状态码（封装 status）。
-	ErrUpstream = errors.New("weather: upstream QWeather returned error")
+	ErrUpstream = apierr.New(502, "qweather upstream error")
 	// ErrUnavailable 网络错误、超时或读取 body 失败（封装底层原因）。
-	ErrUnavailable = errors.New("weather: QWeather unavailable")
+	ErrUnavailable = apierr.New(503, "qweather unavailable")
 )
 
 // upstreamBodyLogLimit 非 2xx 时打进日志的响应体上限（QWeather 错误码在 body 里）。

@@ -147,8 +147,8 @@ func TestFishHandler_GetFishingSpotsList_Error(t *testing.T) {
 	_, r := newFishHandler(svc)
 
 	w := fishDo(t, r, http.MethodGet, "/v3/fish/spots", nil)
-	if w.Code != http.StatusBadRequest {
-		t.Errorf("status = %d, want 400; body=%s", w.Code, w.Body.String())
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("status = %d, want 500; body=%s", w.Code, w.Body.String())
 	}
 }
 
@@ -206,8 +206,8 @@ func TestFishHandler_GetFishingSpot_Error(t *testing.T) {
 	_, r := newFishHandler(svc)
 
 	w := fishDo(t, r, http.MethodGet, "/v3/fish/spots/not-found", nil)
-	if w.Code != http.StatusBadRequest {
-		t.Errorf("status = %d, want 400", w.Code)
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("status = %d, want 500", w.Code)
 	}
 }
 
@@ -315,8 +315,8 @@ func TestFishHandler_CreateFishingSpot_ServiceError(t *testing.T) {
 
 	body := dto.FishingSpotRequest{Name: "t", Location: []float64{1, 2}, Kind: "lake"}
 	w := fishDo(t, r, http.MethodPost, "/v3/fish/spots", body)
-	if w.Code != http.StatusBadRequest {
-		t.Errorf("status = %d, want 400", w.Code)
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("status = %d, want 500", w.Code)
 	}
 }
 
@@ -399,8 +399,8 @@ func TestFishHandler_UpdateFishingSpot_ServiceError(t *testing.T) {
 
 	body := dto.FishingSpotUpdate{Name: ptr("x")}
 	w := fishDo(t, r, http.MethodPatch, "/v3/fish/spots/abc", body)
-	if w.Code != http.StatusBadRequest {
-		t.Errorf("status = %d, want 400", w.Code)
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("status = %d, want 500", w.Code)
 	}
 }
 
@@ -455,7 +455,7 @@ func TestFishHandler_DeleteFishingSpot_Error(t *testing.T) {
 	_, r := newFishHandler(svc)
 
 	w := fishDo(t, r, http.MethodDelete, "/v3/fish/spots/abc", nil)
-	if w.Code != http.StatusBadRequest {
-		t.Errorf("status = %d, want 400", w.Code)
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("status = %d, want 500", w.Code)
 	}
 }

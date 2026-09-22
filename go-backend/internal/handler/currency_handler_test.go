@@ -121,7 +121,7 @@ func TestCurrencyHandler_GetExchangeRate_ServiceError_500(t *testing.T) {
 	if w.Code != http.StatusInternalServerError {
 		t.Fatalf("status = %d, want 500; body=%s", w.Code, w.Body.String())
 	}
-	if !strings.Contains(w.Body.String(), "upstream boom") {
+	if !strings.Contains(w.Body.String(), "internal error") {
 		t.Errorf("body = %s", w.Body.String())
 	}
 }
