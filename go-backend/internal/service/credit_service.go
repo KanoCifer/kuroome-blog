@@ -46,7 +46,6 @@ type CreditRepository interface {
 
 // Creditser 定义 credit handler依赖的能力集合。
 type Creditser interface {
-
 	Preconsume(ctx context.Context, userID uint, source, variant string, qty int, bizID string, meta map[string]any) (*model.CreditTransaction, bool, error)
 	Refund(ctx context.Context, userID uint, source, bizID string, amount int64, meta map[string]any) (*model.CreditTransaction, error)
 	Settle(ctx context.Context, userID uint, source, bizID string, actualQty int) (*model.CreditTransaction, error)

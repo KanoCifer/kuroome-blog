@@ -78,9 +78,9 @@ func SafeTransport() *http.Transport {
 // 5（http.DefaultClient 是 10），避免重定向链滥用连接池。
 func SafeClient() *http.Client {
 	return &http.Client{
-		Transport:  SafeTransport(),
+		Transport:     SafeTransport(),
 		CheckRedirect: safeCheckRedirect,
-		Timeout:    30 * time.Second,
+		Timeout:       30 * time.Second,
 	}
 }
 

@@ -139,7 +139,6 @@ func (s *NomuServiceStruct) SyncNomuConfig(ctx context.Context, userId uint, loc
 	return out, nil
 }
 
-
 // proxyClient 独立的 SSRF-safe HTTP 客户端；不走 s.client 是因为它
 // 共享的 *http.Client 没有 DialContext / CheckRedirect 钩子。
 //

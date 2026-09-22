@@ -665,7 +665,6 @@ func TestLogout_OnlyDeletesOwnDevice(t *testing.T) {
 	}
 }
 
-
 // ---------- VerifyEmailCode ----------
 
 func TestVerifyEmailCode_NilRedis(t *testing.T) {
@@ -1278,6 +1277,7 @@ func TestRenderScenarioHTML_NoFmtErrors(t *testing.T) {
 		}
 	}
 }
+
 // 22px 大卡 + kanocifer 品牌 + BlogLogoURL + 蓝色 CTA + 单行页脚（无"代发"行）。
 func TestMagicLoginBlogScenario_Pillow(t *testing.T) {
 	link := "https://kanocifer.chat/auth/magic?token=deadbeef&exp=1737350400"
@@ -1307,10 +1307,10 @@ func TestMagicLoginBlogScenario_Pillow(t *testing.T) {
 
 	html := emailtemplates.RenderScenarioHTML(s)
 	for _, want := range []string{
-		"border-radius:22px",     // Pillow 大卡
-		"background:#007AFF",     // Pillow 蓝色 CTA
+		"border-radius:22px",    // Pillow 大卡
+		"background:#007AFF",    // Pillow 蓝色 CTA
 		"登录 kanocifer.chat",     // 按钮文案
-		"token=deadbeef",          // URL 包含原 token
+		"token=deadbeef",        // URL 包含原 token
 		"kanocifer.chat · 魔法登录", // 单行页脚
 	} {
 		if !strings.Contains(html, want) {
@@ -1346,12 +1346,12 @@ func TestMagicLoginNomuScenario_Pillow(t *testing.T) {
 
 	html := emailtemplates.RenderScenarioHTML(s)
 	for _, want := range []string{
-		"border-radius:22px",     // Pillow 大卡
-		"background:#007AFF",     // Pillow 蓝色 CTA
-		"完成 Nomu 登录",          // 按钮文案
-		"token=deadbeef",         // URL 包含原 token
-		"代 Nomu 发送",            // 代发页脚
-		"Nomu · 魔法登录",         // FooterLine
+		"border-radius:22px", // Pillow 大卡
+		"background:#007AFF", // Pillow 蓝色 CTA
+		"完成 Nomu 登录",         // 按钮文案
+		"token=deadbeef",     // URL 包含原 token
+		"代 Nomu 发送",          // 代发页脚
+		"Nomu · 魔法登录",        // FooterLine
 	} {
 		if !strings.Contains(html, want) {
 			t.Errorf("html missing %q", want)
