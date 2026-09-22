@@ -28,19 +28,22 @@ import (
 	"strings"
 	"time"
 
+	"github.com/KanoCifer/kuroome-blog/internal/apierr"
 	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 )
 
 var (
 	// ErrEmptyPrompt 入参校验失败：prompt 为空。
-	ErrEmptyPrompt = errors.New("design: prompt is required")
+	ErrEmptyPrompt = apierr.New(400, "design: prompt is required")
 	// ErrUnknownModel 模型别名/ID 不在 models 支持范围内。
-	ErrUnknownModel = errors.New("design: unknown model")
+	ErrUnknownModel = apierr.New(400, "design: unknown model")
 	// ErrUpstream 上游（方舟）请求失败、响应异常或图片拉取失败。
-	ErrUpstream = errors.New("design: upstream generate failed")
-	// ErrCredit 积分预扣失败（余额不足 / 无定价 / DB 故障）。错误链保留
-	// service.CreditService 的哨兵（ErrInsufficientBalance）供 handler 映射 402。
+	ErrUpstream = apierr.New(502, "design upstream error")
+	// ErrCredit 积分预扣失败的粗粒度分流哨兵，故意不带状态码（保持纯
+	// errors.New）：双 %w 链（ErrCredit + 具体 credit 哨兵）里 errors.As 跳过
+	// 它命中内层具体状态码；裸 ErrCredit 未命中 → 500 internal error。
+	// 具体哨兵（ErrInsufficientBalance → 402 等）见 crediterrs。
 	ErrCredit = errors.New("design: credit preconsume failed")
 )
 

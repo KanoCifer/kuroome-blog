@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log/slog"
 	"net/http"
 
 	"github.com/KanoCifer/kuroome-blog/internal/response"
@@ -27,9 +26,7 @@ func (h *CurrencyHandler) GetExchangeRate(c *gin.Context) {
 	}
 	res, err := h.svc.GetExchange(c.Request.Context(), base)
 
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "GetExchangeRate failed", "error", err)
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, err, "GetExchangeRate failed") {
 		return
 	}
 

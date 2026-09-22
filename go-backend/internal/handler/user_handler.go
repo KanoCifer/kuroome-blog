@@ -2,14 +2,12 @@ package handler
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/KanoCifer/kuroome-blog/internal/config"
-	usererrs "github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/middleware"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
@@ -61,27 +59,17 @@ func NewUserHandler(
 
 func (h *UserHandler) Login(c *gin.Context) {
 	var req dto.LoginRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.APIError(c, "invalid request body")
+	if !bindJSON(c, &req) {
 		return
 	}
 
 	user, err := h.userSvc.Authenticate(c.Request.Context(), req.Username, req.Password)
-	if err != nil {
-		if errors.Is(err, usererrs.ErrInvalidCredentials) {
-			slog.WarnContext(c.Request.Context(), "login failed", "reason", "invalid_credentials", "username", req.Username)
-			response.APIError(c, err.Error(), 401)
-			return
-		}
-		slog.ErrorContext(c.Request.Context(), "login error", "error", err, "username", req.Username)
-		response.APIError(c, "server error", 500)
+	if respondErr(c, err, "login failed", "username", req.Username) {
 		return
 	}
 
 	tokens, err := h.userSvc.CreateTokens(c.Request.Context(), user)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "create tokens error", "error", err, "user_id", user.ID)
-		response.APIError(c, "server error", 500)
+	if respondErr(c, err, "create tokens error", "user_id", user.ID) {
 		return
 	}
 
@@ -98,27 +86,12 @@ func (h *UserHandler) Login(c *gin.Context) {
 func (h *UserHandler) Register(c *gin.Context) {
 	// "/register"
 	var req dto.RegisterRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.APIError(c, "invalid request body")
+	if !bindJSON(c, &req) {
 		return
 	}
 
 	u, _, err := h.userSvc.CreateUser(c.Request.Context(), req.Username, req.Password, req.Email, req.EmailCode, "", req.Mode)
-	if err != nil {
-		switch {
-		case errors.Is(err, usererrs.ErrUserExists):
-			slog.WarnContext(c.Request.Context(), "register failed", "reason", "user_exists", "username", req.Username)
-			response.APIError(c, err.Error(), 409)
-		case errors.Is(err, usererrs.ErrEmailExists):
-			slog.WarnContext(c.Request.Context(), "register failed", "reason", "email_exists", "email", req.Email)
-			response.APIError(c, err.Error(), 409)
-		case errors.Is(err, usererrs.ErrInvalidEmailCode):
-			slog.WarnContext(c.Request.Context(), "register failed", "reason", "invalid_email_code", "email", req.Email)
-			response.APIError(c, err.Error(), 400)
-		default:
-			slog.ErrorContext(c.Request.Context(), "register error", "error", err, "username", req.Username)
-			response.APIError(c, "server error", 500)
-		}
+	if respondErr(c, err, "register failed", "username", req.Username, "email", req.Email) {
 		return
 	}
 
@@ -144,14 +117,7 @@ func (h *UserHandler) Me(c *gin.Context) {
 	}
 
 	u, p, err := h.userSvc.GetByID(c.Request.Context(), uint(c.GetInt("user_id")))
-	if err != nil {
-		if errors.Is(err, usererrs.ErrUserNotFound) {
-			slog.WarnContext(c.Request.Context(), "get user failed", "reason", "user_not_found", "user_id", c.GetInt("user_id"))
-			response.APIError(c, "用户不存在", 404)
-			return
-		}
-		slog.ErrorContext(c.Request.Context(), "get user error", "error", err, "user_id", c.GetInt("user_id"))
-		response.APIError(c, "server error", 500)
+	if respondErr(c, err, "get user failed", "user_id", c.GetInt("user_id")) {
 		return
 	}
 
@@ -259,8 +225,7 @@ func (h *UserHandler) rejectRefreshInvalid(c *gin.Context, err error) {
 // DTO 用 binding:"omitempty,oneof=blog nomu" 拦截非法值。
 func (h *UserHandler) EmailCode(c *gin.Context) {
 	var req dto.EmailCodeRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.APIError(c, err.Error(), 400)
+	if !bindJSON(c, &req) {
 		return
 	}
 	if req.Email == "" {
@@ -278,8 +243,7 @@ func (h *UserHandler) EmailCode(c *gin.Context) {
 // DTO 用 binding:"required,oneof=blog nomu" 拦截非法值。
 func (h *UserHandler) MagicLoginEmail(c *gin.Context) {
 	var req dto.MagicLoginEmailRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.APIError(c, err.Error(), 400)
+	if !bindJSON(c, &req) {
 		return
 	}
 
@@ -295,9 +259,7 @@ func (h *UserHandler) PollNomuLogin(c *gin.Context) {
 		return
 	}
 	state, err := h.userSvc.PollNomuLogin(c.Request.Context(), deviceID)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "nomu poll error", "error", err)
-		response.APIError(c, "server error", 500)
+	if respondErr(c, err, "nomu poll error") {
 		return
 	}
 	response.Success(c, state, "ok")
@@ -312,24 +274,12 @@ func (h *UserHandler) PollNomuLogin(c *gin.Context) {
 // 回调页职责单一：发请求 + 不跳转；登录态由响应体或扩展轮询各自消费。
 func (h *UserHandler) MagicLoginConsume(c *gin.Context) {
 	var req dto.MagicLoginConsumeRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.APIError(c, err.Error(), 400)
+	if !bindJSON(c, &req) {
 		return
 	}
 
 	u, p, err := h.userSvc.AuthenticateMagicLogin(c.Request.Context(), req.Token)
-	if err != nil {
-		switch {
-		case errors.Is(err, usererrs.ErrInvalidMagicToken):
-			slog.WarnContext(c.Request.Context(), "magic login failed", "reason", "invalid_token")
-			response.APIError(c, err.Error(), 401)
-		case errors.Is(err, usererrs.ErrUserNotFound):
-			slog.WarnContext(c.Request.Context(), "magic login failed", "reason", "user_not_found")
-			response.APIError(c, "用户不存在", 404)
-		default:
-			slog.ErrorContext(c.Request.Context(), "magic login error", "error", err)
-			response.APIError(c, "server error", 500)
-		}
+	if respondErr(c, err, "magic login failed") {
 		return
 	}
 
@@ -341,9 +291,7 @@ func (h *UserHandler) MagicLoginConsume(c *gin.Context) {
 
 	// blog：浏览器域下，写 refresh cookie + 返完整登录数据。
 	tokens, err := h.userSvc.CreateTokens(c.Request.Context(), u)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "magic login create tokens error", "error", err, "user_id", u.ID)
-		response.APIError(c, "server error", 500)
+	if respondErr(c, err, "magic login create tokens error", "user_id", u.ID) {
 		return
 	}
 	util.SetRefreshCookie(c, h.cfg, tokens.RefreshToken)

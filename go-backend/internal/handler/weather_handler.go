@@ -3,14 +3,12 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"log/slog"
 	"time"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
-	"github.com/KanoCifer/kuroome-blog/internal/infra/qweather"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 )
 
@@ -44,8 +42,7 @@ func (h *WeatherHandler) GetTide(c *gin.Context) {
 	harbor := c.DefaultQuery("harbor", "P2352")
 
 	data, fromCache, err := h.svc.GetTide(c.Request.Context(), harbor, date)
-	if err != nil {
-		h.respondError(c, err)
+	if respondErr(c, err, "get tide failed", "path", c.FullPath()) {
 		return
 	}
 
@@ -66,8 +63,7 @@ func (h *WeatherHandler) GetFullWeather(c *gin.Context) {
 	start := time.Now()
 
 	data, err := h.svc.GetFullWeatherData(c.Request.Context(), location)
-	if err != nil {
-		h.respondError(c, err)
+	if respondErr(c, err, "get full weather failed", "path", c.FullPath()) {
 		return
 	}
 	lag := time.Since(start)
@@ -75,21 +71,6 @@ func (h *WeatherHandler) GetFullWeather(c *gin.Context) {
 	slog.Debug("FullWeather", "indices", string(data.Indices), "lag", lag)
 	response.Success(c, data,
 		"Full weather data retrieved successfully")
-}
-
-func (h *WeatherHandler) respondError(c *gin.Context, err error) {
-	switch {
-	case errors.Is(err, qweather.ErrInvalidLocation):
-		response.APIError(c, "missing location or location_id", 400)
-	case errors.Is(err, qweather.ErrUpstream):
-		response.APIError(c, "qweather upstream error", 502)
-	case errors.Is(err, qweather.ErrUnavailable):
-		response.APIError(c, "qweather unavailable", 503)
-	default:
-		slog.ErrorContext(c.Request.Context(), "weather handler unexpected error",
-			"path", c.FullPath(), "error", err.Error())
-		response.APIError(c, "internal error", 500)
-	}
 }
 
 func (h *WeatherHandler) RegisterRoutes(r *gin.RouterGroup) {

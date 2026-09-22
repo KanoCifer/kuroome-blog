@@ -1,14 +1,10 @@
 package handler
 
 import (
-	"errors"
-	"log/slog"
-	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 
-	momenterrs "github.com/KanoCifer/kuroome-blog/internal/domain/moment/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
@@ -16,10 +12,10 @@ import (
 
 // MomentHandler 处理 moment 资源的 HTTP 请求。
 //
-// 错误处理契约：
+// 错误处理契约（哨兵在 errs 包声明状态码，respondErr 经 errors.As 取用）：
 //   - momenterrs.ErrMomentNotFound   → 404
 //   - momenterrs.ErrInvalidObjectID  → 400
-//   - 其他                     → 500
+//   - 其他                           → 500
 type MomentHandler struct {
 	svc service.Momenter
 }
@@ -38,9 +34,7 @@ func (h *MomentHandler) ListPublicMoments(c *gin.Context) {
 	filter := dto.MomentFilter{Tag: c.Query("tag")}
 
 	data, err := h.svc.ListPublic(c.Request.Context(), filter, page, pageSize)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "list public moments", "error", err)
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, err, "list public moments") {
 		return
 	}
 	response.Success(c, data, "Moments retrieved successfully")
@@ -51,24 +45,10 @@ func (h *MomentHandler) GetPublicMoment(c *gin.Context) {
 	id := c.Param("id")
 
 	data, err := h.svc.GetByID(c.Request.Context(), id)
-	if err != nil {
-		h.respondGetErr(c, err, id, "get public moment")
+	if respondErr(c, err, "get public moment", "id", id) {
 		return
 	}
 	response.Success(c, data, "Moment retrieved successfully")
-}
-
-// respondGetErr 统一处理 Get / Update / Delete 路径的错误翻译 —— 避免重复写 4-case switch。
-func (h *MomentHandler) respondGetErr(c *gin.Context, err error, id, op string) {
-	switch {
-	case errors.Is(err, momenterrs.ErrMomentNotFound):
-		response.APIError(c, err.Error(), http.StatusNotFound)
-	case errors.Is(err, momenterrs.ErrInvalidObjectID):
-		response.APIError(c, err.Error(), http.StatusBadRequest)
-	default:
-		slog.ErrorContext(c.Request.Context(), op, "error", err, "id", id)
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
-	}
 }
 
 // ---------- 鉴权写 ----------
@@ -76,15 +56,12 @@ func (h *MomentHandler) respondGetErr(c *gin.Context, err error, id, op string) 
 // CreateMoment  POST /v3/moments
 func (h *MomentHandler) CreateMoment(c *gin.Context) {
 	var req dto.MomentRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.APIError(c, err.Error())
+	if !bindJSON(c, &req) {
 		return
 	}
 
 	data, err := h.svc.Create(c.Request.Context(), userID(c), req)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "create moment", "error", err)
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, err, "create moment") {
 		return
 	}
 	response.Success(c, data, "Moment created successfully")
@@ -97,13 +74,11 @@ func (h *MomentHandler) UpdateMoment(c *gin.Context) {
 	id := c.Param("id")
 
 	var req dto.MomentUpdate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.APIError(c, err.Error())
+	if !bindJSON(c, &req) {
 		return
 	}
 
-	if err := h.svc.Update(c.Request.Context(), id, req); err != nil {
-		h.respondGetErr(c, err, id, "update moment")
+	if err := h.svc.Update(c.Request.Context(), id, req); respondErr(c, err, "update moment", "id", id) {
 		return
 	}
 	response.Success(c, nil, "Moment updated successfully")
@@ -113,8 +88,7 @@ func (h *MomentHandler) UpdateMoment(c *gin.Context) {
 func (h *MomentHandler) DeleteMoment(c *gin.Context) {
 	id := c.Param("id")
 
-	if err := h.svc.SoftDelete(c.Request.Context(), id); err != nil {
-		h.respondGetErr(c, err, id, "soft delete moment")
+	if err := h.svc.SoftDelete(c.Request.Context(), id); respondErr(c, err, "soft delete moment", "id", id) {
 		return
 	}
 	response.Success(c, nil, "Moment deleted successfully")
@@ -137,9 +111,7 @@ func (h *MomentHandler) ListAdminMoments(c *gin.Context) {
 	}
 
 	data, err := h.svc.ListAdmin(c.Request.Context(), filter, page, pageSize)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "list admin moments", "error", err)
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, err, "list admin moments") {
 		return
 	}
 	response.Success(c, data, "Moments retrieved successfully")
@@ -150,8 +122,7 @@ func (h *MomentHandler) GetAdminMoment(c *gin.Context) {
 	id := c.Param("id")
 
 	data, err := h.svc.GetByIDAdmin(c.Request.Context(), id)
-	if err != nil {
-		h.respondGetErr(c, err, id, "get admin moment")
+	if respondErr(c, err, "get admin moment", "id", id) {
 		return
 	}
 	response.Success(c, data, "Moment retrieved successfully")
@@ -161,8 +132,7 @@ func (h *MomentHandler) GetAdminMoment(c *gin.Context) {
 func (h *MomentHandler) HardDeleteMoment(c *gin.Context) {
 	id := c.Param("id")
 
-	if err := h.svc.HardDelete(c.Request.Context(), id); err != nil {
-		h.respondGetErr(c, err, id, "hard delete moment")
+	if err := h.svc.HardDelete(c.Request.Context(), id); respondErr(c, err, "hard delete moment", "id", id) {
 		return
 	}
 	response.Success(c, nil, "Moment permanently deleted")

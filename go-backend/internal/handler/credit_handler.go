@@ -3,15 +3,12 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"errors"
-	"log/slog"
 	"math"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 
-	crediterrs "github.com/KanoCifer/kuroome-blog/internal/domain/credit/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
@@ -54,10 +51,7 @@ func (h *CreditHandler) RegisterRoutes(r *gin.RouterGroup, authMW, adminMW gin.H
 func (h *CreditHandler) GetBalance(c *gin.Context) {
 	userID := uint(c.GetInt("user_id"))
 	balance, totalSpent, err := h.svc.GetBalance(c.Request.Context(), userID)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "credit balance query failed",
-			"user_id", userID, "error", err.Error())
-		response.APIError(c, "internal error", http.StatusInternalServerError)
+	if respondErr(c, err, "credit balance query failed", "user_id", userID) {
 		return
 	}
 	response.Success(c, dto.CreditBalanceResponse{
@@ -77,10 +71,7 @@ func (h *CreditHandler) ListTransactions(c *gin.Context) {
 
 	userID := uint(c.GetInt("user_id"))
 	items, total, err := h.svc.ListTransactions(c.Request.Context(), userID, page, perPage)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "credit transactions query failed",
-			"user_id", userID, "error", err.Error())
-		response.APIError(c, "internal error", http.StatusInternalServerError)
+	if respondErr(c, err, "credit transactions query failed", "user_id", userID) {
 		return
 	}
 
@@ -102,8 +93,7 @@ func (h *CreditHandler) ListTransactions(c *gin.Context) {
 // user_id 与 email 二选一；都给时 user_id 优先；都不给 / email 未命中 → 400。
 func (h *CreditHandler) Grant(c *gin.Context) {
 	var req dto.GrantCreditRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.APIError(c, "invalid request body", http.StatusBadRequest)
+	if !bindJSON(c, &req) {
 		return
 	}
 	// float→int64 溢出在 Go 里是实现定义的回绕（NaN/Inf/超大值可能变成极小甚至
@@ -126,10 +116,7 @@ func (h *CreditHandler) Grant(c *gin.Context) {
 			return
 		}
 		u, _, err := h.userRepo.GetByEmail(c.Request.Context(), req.Email)
-		if err != nil {
-			slog.ErrorContext(c.Request.Context(), "credit grant email lookup failed",
-				"email", req.Email, "error", err.Error())
-			response.APIError(c, "internal error", http.StatusInternalServerError)
+		if respondErr(c, err, "credit grant email lookup failed", "email", req.Email) {
 			return
 		}
 		if u == nil {
@@ -140,14 +127,7 @@ func (h *CreditHandler) Grant(c *gin.Context) {
 	}
 
 	tx, err := h.svc.Grant(c.Request.Context(), targetUserID, amountLi, req.BizID, nil)
-	if err != nil {
-		if errors.Is(err, crediterrs.ErrInvalidAmount) || errors.Is(err, crediterrs.ErrInvalidBizID) {
-			response.APIError(c, err.Error(), http.StatusBadRequest)
-			return
-		}
-		slog.ErrorContext(c.Request.Context(), "credit grant failed",
-			"target_user", targetUserID, "error", err.Error())
-		response.APIError(c, "internal error", http.StatusInternalServerError)
+	if respondErr(c, err, "credit grant failed", "target_user", targetUserID) {
 		return
 	}
 	response.Success(c, creditTxView(tx), "granted successfully")
@@ -162,10 +142,7 @@ func (h *CreditHandler) GetAdminBalance(c *gin.Context) {
 		return
 	}
 	balance, totalSpent, err := h.svc.GetBalance(c.Request.Context(), targetUserID)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "credit admin balance query failed",
-			"target_user", targetUserID, "error", err.Error())
-		response.APIError(c, "internal error", http.StatusInternalServerError)
+	if respondErr(c, err, "credit admin balance query failed", "target_user", targetUserID) {
 		return
 	}
 	response.Success(c, dto.CreditBalanceResponse{
@@ -187,10 +164,7 @@ func (h *CreditHandler) ListAdminTransactions(c *gin.Context) {
 	}
 
 	items, total, err := h.svc.ListTransactions(c.Request.Context(), targetUserID, page, perPage)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "credit admin transactions query failed",
-			"target_user", targetUserID, "error", err.Error())
-		response.APIError(c, "internal error", http.StatusInternalServerError)
+	if respondErr(c, err, "credit admin transactions query failed", "target_user", targetUserID) {
 		return
 	}
 
@@ -248,10 +222,7 @@ func (h *CreditHandler) resolveTargetUserID(c *gin.Context) (uint, bool) {
 		id = uint(parsed)
 	} else if emailQ != "" {
 		u, _, err := h.userRepo.GetByEmail(c.Request.Context(), emailQ)
-		if err != nil {
-			slog.ErrorContext(c.Request.Context(), "credit admin email lookup failed",
-				"email", emailQ, "error", err.Error())
-			response.APIError(c, "internal error", http.StatusInternalServerError)
+		if respondErr(c, err, "credit admin email lookup failed", "email", emailQ) {
 			return 0, false
 		}
 		if u == nil {

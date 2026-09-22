@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"errors"
-	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -25,8 +23,7 @@ func NewWereadHandler(svc weread.Reader) *WereadHandler {
 
 func (h *WereadHandler) ImportUserToken(c *gin.Context) {
 	var req dto.WereadTokenRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.APIError(c, "无效的请求", http.StatusBadRequest)
+	if !bindJSON(c, &req) {
 		return
 	}
 	userID := strconv.Itoa(c.GetInt("user_id"))
@@ -34,9 +31,7 @@ func (h *WereadHandler) ImportUserToken(c *gin.Context) {
 		response.APIError(c, "未授权", http.StatusUnauthorized)
 		return
 	}
-	if err := h.svc.CreateUserToken(c.Request.Context(), userID, req.Data); err != nil {
-		slog.ErrorContext(c.Request.Context(), "weread import token", "error", err)
-		response.APIError(c, "导入失败", http.StatusInternalServerError)
+	if respondErr(c, h.svc.CreateUserToken(c.Request.Context(), userID, req.Data), "weread import token") {
 		return
 	}
 	response.Success(c, nil, "导入成功")
@@ -51,13 +46,7 @@ func (h *WereadHandler) GetShelf(c *gin.Context) {
 	}
 
 	data, err := h.svc.FetchUserShelf(c.Request.Context(), userID)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "weread fetch shelf", "error", err)
-		if errors.Is(err, weread.ErrUnauthorized) {
-			response.APIError(c, "微信读书授权已过期", http.StatusUnauthorized)
-			return
-		}
-		response.APIError(c, "获取书架失败", http.StatusInternalServerError)
+	if respondErr(c, err, "weread fetch shelf") {
 		return
 	}
 
@@ -78,13 +67,7 @@ func (h *WereadHandler) GetBookInfo(c *gin.Context) {
 	}
 
 	data, err := h.svc.FetchBookInfo(c.Request.Context(), userID, bookID)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "weread fetch book info", "error", err)
-		if errors.Is(err, weread.ErrUnauthorized) {
-			response.APIError(c, "微信读书授权已过期", http.StatusUnauthorized)
-			return
-		}
-		response.APIError(c, "获取书籍详情失败", http.StatusInternalServerError)
+	if respondErr(c, err, "weread fetch book info") {
 		return
 	}
 
@@ -108,13 +91,7 @@ func (h *WereadHandler) GetBookProgress(c *gin.Context) {
 	refresh := c.Query("refresh") == "true"
 
 	data, err := h.svc.FetchBookProgress(c.Request.Context(), userID, bookID, refresh)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "weread fetch book progress", "error", err)
-		if errors.Is(err, weread.ErrUnauthorized) {
-			response.APIError(c, "微信读书授权已过期", http.StatusUnauthorized)
-			return
-		}
-		response.APIError(c, "获取阅读进度失败", http.StatusInternalServerError)
+	if respondErr(c, err, "weread fetch book progress") {
 		return
 	}
 
@@ -149,13 +126,7 @@ func (h *WereadHandler) GetReadProgress(c *gin.Context) {
 		}
 
 		readTimes, err := h.svc.FetchYearlyHeatmap(c.Request.Context(), userID, yearPtr)
-		if err != nil {
-			slog.ErrorContext(c.Request.Context(), "weread fetch yearly heatmap", "error", err)
-			if errors.Is(err, weread.ErrUnauthorized) {
-				response.APIError(c, "微信读书授权已过期", http.StatusUnauthorized)
-				return
-			}
-			response.APIError(c, "获取阅读热力图失败", http.StatusInternalServerError)
+		if respondErr(c, err, "weread fetch yearly heatmap") {
 			return
 		}
 		response.Success(c, dto.WereadYearlyHeatmap{ReadTimes: readTimes}, "阅读热力图获取成功")
@@ -174,13 +145,7 @@ func (h *WereadHandler) GetReadProgress(c *gin.Context) {
 	}
 
 	snapshot, err := h.svc.FetchReadDetail(c.Request.Context(), userID, mode, baseTimePtr)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "weread fetch read detail", "error", err)
-		if errors.Is(err, weread.ErrUnauthorized) {
-			response.APIError(c, "微信读书授权已过期", http.StatusUnauthorized)
-			return
-		}
-		response.APIError(c, "获取阅读统计失败", http.StatusInternalServerError)
+	if respondErr(c, err, "weread fetch read detail") {
 		return
 	}
 	response.Success(c, snapshot, "阅读统计获取成功")
@@ -215,13 +180,7 @@ func (h *WereadHandler) GetBooksRecommend(c *gin.Context) {
 	}
 
 	books, err := h.svc.FetchBooksRecommend(c.Request.Context(), userID, count, maxIdx)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "weread fetch books recommend", "error", err)
-		if errors.Is(err, weread.ErrUnauthorized) {
-			response.APIError(c, "微信读书授权已过期", http.StatusUnauthorized)
-			return
-		}
-		response.APIError(c, "获取推荐书籍失败", http.StatusInternalServerError)
+	if respondErr(c, err, "weread fetch books recommend") {
 		return
 	}
 	response.Success(c, books, "推荐书籍获取成功")

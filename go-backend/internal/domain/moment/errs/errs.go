@@ -2,9 +2,9 @@
 // moment 集合（mongodb/moment + helper），后续如多集合需要再抽 common。
 package momenterrs
 
-import "errors"
+import "github.com/KanoCifer/kuroome-blog/internal/apierr"
 
 var (
-	ErrMomentNotFound  = errors.New("moment not found")
-	ErrInvalidObjectID = errors.New("Invalid ObjectID")
+	ErrMomentNotFound  = apierr.New(404, "moment not found")
+	ErrInvalidObjectID = apierr.New(400, "Invalid ObjectID")
 )

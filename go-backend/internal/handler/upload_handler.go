@@ -2,8 +2,6 @@ package handler
 
 import (
 	"context"
-	"errors"
-	"log/slog"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -13,19 +11,6 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
-
-// uploadStatus 把上传领域错误映射到 HTTP 状态码：校验类 400，其余 500。
-func uploadStatus(err error) int {
-	switch {
-	case errors.Is(err, uploaderrs.ErrInvalidUploadType),
-		errors.Is(err, uploaderrs.ErrUnsupportedImageType),
-		errors.Is(err, uploaderrs.ErrImageTooLarge),
-		errors.Is(err, uploaderrs.ErrInvalidImageData):
-		return http.StatusBadRequest
-	default:
-		return http.StatusInternalServerError
-	}
-}
 
 // avatarViewer 是 UploadPic 成功后回读用户字典所需的最小接口。
 // service.Userer 满足此接口；handler 以窄接口注入，便于 mock 测试。
@@ -76,7 +61,7 @@ func (h *UploadHandler) Upload(c *gin.Context) {
 	// 拒绝未知的非空上传类型：空串（无 type 字段）保持向后兼容走 generic，
 	// 仅 "blog" / "gallery" 被显式放行，其余（含 "avatar"、拼写错误、脏数据）返回 400。
 	if uploadType != "" && uploadType != "blog" && uploadType != "gallery" {
-		response.APIError(c, uploaderrs.ErrInvalidUploadType.Error(), uploadStatus(uploaderrs.ErrInvalidUploadType))
+		respondErr(c, uploaderrs.ErrInvalidUploadType, "upload rejected", "type", uploadType)
 		return
 	}
 
@@ -90,9 +75,7 @@ func (h *UploadHandler) Upload(c *gin.Context) {
 		rel, err = h.uploadSvc.UploadFile(c.Request.Context(), userID, filename, f)
 	}
 
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "upload", "type", uploadType, "error", err)
-		response.APIError(c, err.Error(), uploadStatus(err))
+	if respondErr(c, err, "upload", "type", uploadType) {
 		return
 	}
 
@@ -120,16 +103,12 @@ func (h *UploadHandler) UploadPic(c *gin.Context) {
 
 	userID := uint(c.GetInt("user_id"))
 	_, err = h.uploadSvc.UploadAvatar(c.Request.Context(), userID, fileHeader.Filename, fileHeader.Header.Get("Content-Type"), f)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "upload avatar", "error", err)
-		response.APIError(c, err.Error(), uploadStatus(err))
+	if respondErr(c, err, "upload avatar") {
 		return
 	}
 
 	u, p, err := h.avatarView.GetByID(c.Request.Context(), userID)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "get user after avatar upload", "error", err)
-		response.APIError(c, "上传成功但获取用户信息失败", http.StatusInternalServerError)
+	if respondErr(c, err, "get user after avatar upload", "user_id", userID) {
 		return
 	}
 

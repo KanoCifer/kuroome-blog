@@ -3,7 +3,6 @@ package handler
 import (
 	"errors"
 	"io"
-	"log/slog"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -87,8 +86,7 @@ func (h *MonitorHandler) GetOverview(c *gin.Context) {
 		return
 	}
 	data, err := h.svc.GetOverview(c.Request.Context(), days)
-	if err != nil {
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, err, "monitor query failed") {
 		return
 	}
 	response.Success(c, data, "Visitor overview data retrieved successfully")
@@ -105,8 +103,7 @@ func (h *MonitorHandler) GetVisitors(c *gin.Context) {
 		return
 	}
 	data, err := h.svc.GetVisitors(c.Request.Context(), days, page, pageSize)
-	if err != nil {
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, err, "monitor query failed") {
 		return
 	}
 	response.Success(c, data, "Visitor list retrieved successfully")
@@ -123,8 +120,7 @@ func (h *MonitorHandler) GetUserLogins(c *gin.Context) {
 		return
 	}
 	data, err := h.svc.GetUserLogins(c.Request.Context(), days, page, pageSize)
-	if err != nil {
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, err, "monitor query failed") {
 		return
 	}
 	response.Success(c, data, "User login logs retrieved successfully")
@@ -133,8 +129,7 @@ func (h *MonitorHandler) GetUserLogins(c *gin.Context) {
 // ServerStatus 处理 GET /status/server/status，返回实时 CPU/内存/磁盘指标。
 func (h *MonitorHandler) ServerStatus(c *gin.Context) {
 	data, err := h.svc.GetServerStatus()
-	if err != nil {
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, err, "monitor query failed") {
 		return
 	}
 	response.Success(c, data, "Server status retrieved successfully")
@@ -148,8 +143,7 @@ func (h *MonitorHandler) ServerStatusStream(c *gin.Context) {
 	c.Header("Connection", "keep-alive")
 
 	ch, err := h.svc.StreamServerStatus(c.Request.Context())
-	if err != nil {
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, err, "monitor query failed") {
 		return
 	}
 
@@ -174,14 +168,11 @@ func (h *MonitorHandler) TrackVisitor(c *gin.Context) {
 		return
 	}
 	var req dto.VisitorTrackRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.APIError(c, err.Error())
+	if !bindJSON(c, &req) {
 		return
 	}
 	req.IpAddress = middleware.ClientIP(c)
-	if err := h.svc.TrackVisitor(c.Request.Context(), req); err != nil {
-		slog.ErrorContext(c.Request.Context(), "track visitor", "error", err)
-		response.APIError(c, err.Error(), 500)
+	if err := h.svc.TrackVisitor(c.Request.Context(), req); respondErr(c, err, "track visitor") {
 		return
 	}
 	c.Status(204)
@@ -190,8 +181,7 @@ func (h *MonitorHandler) TrackVisitor(c *gin.Context) {
 // GetStatusDetail 处理 GET /status/detail —— 返回版本、服务、系统状态概览（公开）。
 func (h *MonitorHandler) GetStatusDetail(c *gin.Context) {
 	data, err := h.svc.GetStatusDetail(c.Request.Context())
-	if err != nil {
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, err, "monitor query failed") {
 		return
 	}
 	response.Success(c, data, "Status detail retrieved successfully")

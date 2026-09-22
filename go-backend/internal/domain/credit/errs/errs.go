@@ -2,14 +2,20 @@
 // 跨域使用（如 nomu/design 会判 ErrInsufficientBalance）正常 import 此包。
 package crediterrs
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/KanoCifer/kuroome-blog/internal/apierr"
+)
 
 var (
-	ErrInsufficientBalance = errors.New("insufficient_balance")
+	ErrInsufficientBalance = apierr.New(402, "insufficient credits")
+	ErrInvalidAmount       = apierr.New(400, "invalid_credit_amount")
+	ErrInvalidBizID        = apierr.New(400, "invalid_biz_id")
+
+	// 下列哨兵不对 HTTP 层暴露状态码（未命中 → 500 internal error）。
 	ErrPriceNotFound       = errors.New("credit_price_not_found")
 	ErrTransactionNotFound = errors.New("credit_transaction_not_found")
-	ErrInvalidAmount       = errors.New("invalid_credit_amount")
-	ErrInvalidBizID        = errors.New("invalid_biz_id")
 )
 
 // ErrIdempotentHit 不是对外错误，而是 repo → service 的内部控制流信号：

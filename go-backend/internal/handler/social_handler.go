@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -27,21 +26,18 @@ func (h *SocialHandler) AddLike(c *gin.Context) {
 	var req struct {
 		LikesCount int `json:"likes_count" binding:"required,gt=0"`
 	}
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.APIError(c, "invalid request body", http.StatusBadRequest)
+	if !bindJSON(c, &req) {
 		return
 	}
 
 	if h.redis == nil {
-		response.APIError(c, "server error", http.StatusInternalServerError)
+		response.APIError(c, internalErrMsg, http.StatusInternalServerError)
 		return
 	}
 
 	ctx := c.Request.Context()
 	total, err := h.redis.IncrBy(ctx, likeKey, int64(req.LikesCount)).Result()
-	if err != nil {
-		slog.ErrorContext(ctx, "incrby likes failed", "error", err)
-		response.APIError(c, "server error", http.StatusInternalServerError)
+	if respondErr(c, err, "incrby likes failed") {
 		return
 	}
 
@@ -51,7 +47,7 @@ func (h *SocialHandler) AddLike(c *gin.Context) {
 // GetLikes 获取当前总点赞数。
 func (h *SocialHandler) GetLikes(c *gin.Context) {
 	if h.redis == nil {
-		response.APIError(c, "server error", http.StatusInternalServerError)
+		response.APIError(c, internalErrMsg, http.StatusInternalServerError)
 		return
 	}
 
@@ -61,9 +57,7 @@ func (h *SocialHandler) GetLikes(c *gin.Context) {
 		response.Success(c, gin.H{"likes_count": 0}, "Likes count retrieved successfully")
 		return
 	}
-	if err != nil {
-		slog.ErrorContext(ctx, "get likes failed", "error", err)
-		response.APIError(c, "server error", http.StatusInternalServerError)
+	if respondErr(c, err, "get likes failed") {
 		return
 	}
 

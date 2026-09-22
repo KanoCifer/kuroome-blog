@@ -2,14 +2,11 @@ package handler
 
 import (
 	"context"
-	"errors"
 	"log/slog"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/KanoCifer/kuroome-blog/internal/config"
-	"github.com/KanoCifer/kuroome-blog/internal/domain/blog/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 )
@@ -32,14 +29,11 @@ func NewAdminHandler(adminSvc AdminServiceer, cfg *config.Config) *AdminHandler 
 
 func (h *AdminHandler) AddPost(c *gin.Context) {
 	var req dto.PostRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.APIError(c, err.Error())
+	if !bindJSON(c, &req) {
 		return
 	}
 	id, err := h.adminSvc.AddPost(c.Request.Context(), req)
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "add post error", "error", err)
-		response.APIError(c, err.Error(), 500)
+	if respondErr(c, err, "add post failed") {
 		return
 	}
 	slog.InfoContext(c.Request.Context(), "post created", "post_id", id)
@@ -48,26 +42,14 @@ func (h *AdminHandler) AddPost(c *gin.Context) {
 
 func (h *AdminHandler) UpdatePost(c *gin.Context) {
 	var req dto.PostUpdate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		response.APIError(c, err.Error())
+	if !bindJSON(c, &req) {
 		return
 	}
 	if req.ID == "" {
 		response.APIError(c, "_id is required")
 		return
 	}
-	if err := h.adminSvc.UpdatePost(c.Request.Context(), req.ID, req); err != nil {
-		switch {
-		case errors.Is(err, blogerrs.ErrPostNotFound):
-			slog.WarnContext(c.Request.Context(), "update post failed", "reason", "post_not_found", "post_id", req.ID)
-			response.APIError(c, err.Error(), 404)
-		case errors.Is(err, blogerrs.ErrInvalidPostID):
-			slog.WarnContext(c.Request.Context(), "update post failed", "reason", "invalid_post_id", "post_id", req.ID)
-			response.APIError(c, err.Error(), 400)
-		default:
-			slog.ErrorContext(c.Request.Context(), "update post error", "error", err, "post_id", req.ID)
-			response.APIError(c, err.Error(), 500)
-		}
+	if err := h.adminSvc.UpdatePost(c.Request.Context(), req.ID, req); respondErr(c, err, "update post failed", "post_id", req.ID) {
 		return
 	}
 	response.Success(c, gin.H{"_id": req.ID}, "Blog post updated successfully")
@@ -75,18 +57,7 @@ func (h *AdminHandler) UpdatePost(c *gin.Context) {
 
 func (h *AdminHandler) DeletePost(c *gin.Context) {
 	postID := c.Param("post_id")
-	if err := h.adminSvc.DeletePost(c.Request.Context(), postID); err != nil {
-		switch {
-		case errors.Is(err, blogerrs.ErrPostNotFound):
-			slog.WarnContext(c.Request.Context(), "delete post failed", "reason", "post_not_found", "post_id", postID)
-			response.APIError(c, err.Error(), 404)
-		case errors.Is(err, blogerrs.ErrInvalidPostID):
-			slog.WarnContext(c.Request.Context(), "delete post failed", "reason", "invalid_post_id", "post_id", postID)
-			response.APIError(c, err.Error(), 400)
-		default:
-			slog.ErrorContext(c.Request.Context(), "delete post error", "error", err, "post_id", postID)
-			response.APIError(c, err.Error(), 500)
-		}
+	if err := h.adminSvc.DeletePost(c.Request.Context(), postID); respondErr(c, err, "delete post failed", "post_id", postID) {
 		return
 	}
 	response.Success(c, gin.H{"_id": postID}, "Blog post deleted successfully")
@@ -94,9 +65,7 @@ func (h *AdminHandler) DeletePost(c *gin.Context) {
 
 func (h *AdminHandler) ListPostViewsData(c *gin.Context) {
 	data, err := h.adminSvc.ListPostViewsData(c.Request.Context())
-	if err != nil {
-		slog.ErrorContext(c.Request.Context(), "list post views data", "error", err)
-		response.APIError(c, err.Error(), http.StatusInternalServerError)
+	if respondErr(c, err, "list post views data") {
 		return
 	}
 	response.Success(c, data, "Post views data retrieved successfully")
