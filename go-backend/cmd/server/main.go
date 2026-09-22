@@ -20,36 +20,11 @@ import (
 	"github.com/KanoCifer/kuroome-blog/pkg/notification"
 )
 
-func init() {
-	config.Load()
-}
-
-func sendBootNotification() {
-	if !config.Cfg.Admin.SendBootEmail || config.Cfg.Feishu.WebhookURL == "" {
-
-		reason := "send_boot_email_disabled"
-		if config.Cfg.Feishu.WebhookURL == "" {
-			reason = "feishu_webhook_unset"
-		}
-		slog.Debug("boot notification disabled", "reason", reason)
-		return
-	}
-	nc := notification.NewFeishuChannel()
-	var msg notification.Message = notification.Message{
-		Title: "Go Backend Booted",
-		Body:  "Go Backend Booted successfully",
-		Color: "green",
-	}
-	if !nc.Send(context.Background(), msg, notification.NotificationContext{}) {
-
-		slog.Error("send boot notification", "reason", "send_returned_false")
-	}
-}
-
 func main() {
+	config.Load()
 	logger.Init(config.Cfg)
 
-	// Create context that listens for the interrupt signal from the OS.
+	// 监听 SIGINT / SIGTERM；第一次信号触发 graceful shutdown，没有二次强制。
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
@@ -96,7 +71,6 @@ func main() {
 	defer func() { _ = state.PubSub().Close() }()
 
 	router.Setup(r, state, db.GetRedis())
-
 	sendBootNotification()
 
 	addr := fmt.Sprintf("127.0.0.1:%d", config.Cfg.Server.Port)
@@ -109,20 +83,38 @@ func main() {
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			slog.Error("listen: %s\n", "error", err.Error())
+			slog.Error("http server failed", "error", err.Error())
 		}
 	}()
 
 	<-ctx.Done()
+	slog.Info("shutting down")
 
-	stop()
-	slog.Info("shutting down gracefully, press Ctrl+C again to force")
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	if err := srv.Shutdown(ctx); err != nil {
-		slog.Error("Server forced to shutdown: ", "error", err.Error())
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		slog.Error("server forced to shutdown", "error", err.Error())
 	}
 
-	slog.Warn("Server exiting")
+	slog.Warn("server exiting")
+}
+
+// sendBootEmail → Feishu webhook 启动通知。配置缺失或开关关闭时 Debug 跳过。
+func sendBootNotification() {
+	if !config.Cfg.Admin.SendBootEmail || config.Cfg.Feishu.WebhookURL == "" {
+		reason := "send_boot_email_disabled"
+		if config.Cfg.Feishu.WebhookURL == "" {
+			reason = "feishu_webhook_unset"
+		}
+		slog.Debug("boot notification disabled", "reason", reason)
+		return
+	}
+	nc := notification.NewFeishuChannel()
+	if !nc.Send(context.Background(), notification.Message{
+		Title: "Go Backend Booted",
+		Body:  "Go Backend Booted successfully",
+		Color: "green",
+	}, notification.NotificationContext{}) {
+		slog.Error("send boot notification", "reason", "send_returned_false")
+	}
 }
