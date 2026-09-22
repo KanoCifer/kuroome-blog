@@ -15,8 +15,6 @@ import (
 
 	usererrs "github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
-	"github.com/KanoCifer/kuroome-blog/pkg/emailtemplates"
-	"github.com/KanoCifer/kuroome-blog/pkg/notification"
 )
 
 const (
@@ -78,8 +76,11 @@ func (s *UserService) SendMagicLoginEmail(ctx context.Context, email, mode, devi
 	// 邮件里给出的 token 包含 mode 段，consume 端据此反查正确的 redis key。
 	token := hex + ":" + mode
 	link := s.magicLoginLink(token, mode)
-	msg := emailtemplates.MagicLoginEmail(link, mode)
-	ok := (&notification.EmailChannel{}).Send(ctx, msg, notification.NotificationContext{Email: email})
+	if s.mailer == nil {
+		s.redis.Del(ctx, cacheKey)
+		return false
+	}
+	ok := s.mailer.SendMagicLogin(ctx, email, mode, link)
 	if !ok {
 		s.redis.Del(ctx, cacheKey)
 		return false

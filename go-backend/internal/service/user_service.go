@@ -17,7 +17,6 @@ import (
 	usererrs "github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/pkg/emailtemplates"
-	"github.com/KanoCifer/kuroome-blog/pkg/notification"
 )
 
 const (
@@ -73,6 +72,9 @@ type UserService struct {
 	maxDevices   int
 	// bonusSvc RegisterFlow 调的注册赠送积分（可选，nil 时跳过赠送，测试/未装配兜底）。
 	bonusSvc registerBonuser
+	// mailer 邮件发送器（SendEmailCode / SendMagicLoginEmail 都走它）。
+	// nil 时静默跳过发送，行为对齐"mailer 未装配 / SMTP 未配置"。
+	mailer *emailtemplates.Mailer
 }
 
 func NewUserService(
@@ -82,6 +84,7 @@ func NewUserService(
 	frontendURLs map[string]string,
 	maxDevices int,
 	bonusSvc registerBonuser,
+	mailer *emailtemplates.Mailer,
 ) *UserService {
 	trimmed := make(map[string]string, len(frontendURLs))
 	for k, v := range frontendURLs {
@@ -94,6 +97,7 @@ func NewUserService(
 		frontendURLs: trimmed,
 		maxDevices:   maxDevices,
 		bonusSvc:     bonusSvc,
+		mailer:       mailer,
 	}
 }
 
@@ -185,7 +189,9 @@ func (s *UserService) RegisterFlow(
 
 func (s *UserService) SendEmailCode(ctx context.Context, email, mode string) bool {
 	mode = normalizeMode(mode)
-	var ch notification.Channel = &notification.EmailChannel{}
+	if s.mailer == nil {
+		return false
+	}
 	code := generateCode()
 
 	key := emailCodeKey(email, mode)
@@ -193,8 +199,7 @@ func (s *UserService) SendEmailCode(ctx context.Context, email, mode string) boo
 		slog.ErrorContext(ctx, "email code redis set failed", "err", err, "email", email, "mode", mode)
 	}
 
-	msg := emailtemplates.VerificationEmail(code)
-	return ch.Send(ctx, msg, notification.NotificationContext{Email: email})
+	return s.mailer.SendVerificationCode(ctx, email, mode, code)
 }
 
 // ---------- 响应构造 ----------

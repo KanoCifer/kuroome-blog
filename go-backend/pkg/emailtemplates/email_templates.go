@@ -313,7 +313,7 @@ const pillowTmpl = `<!DOCTYPE html>
 // pillowCodeAction Pillow 验证码 pill（ActionCode 时使用）。
 // %[1]s = Label（已 escape）
 const pillowCodeAction = `<tr><td style="padding:0 32px 24px;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F5F5F7;border-radius:14px;">
+  <table role="presentation" width="100%%" cellpadding="0" cellspacing="0" style="background:#F5F5F7;border-radius:14px;">
     <tr><td style="padding:22px 16px;text-align:center;">
       <span style="font-family:'SF Mono','JetBrains Mono',Menlo,Consolas,monospace;font-size:34px;font-weight:700;letter-spacing:8px;color:#1C1C1E;">%[1]s</span>
     </td></tr>

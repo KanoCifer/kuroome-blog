@@ -14,6 +14,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/config"
 	usererrs "github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
+	"github.com/KanoCifer/kuroome-blog/pkg/emailtemplates"
 )
 
 // 真实 SMTP 端到端回归测试 —— 通过 configs/config.yaml 里的 QQ SMTP 真发
@@ -76,7 +77,7 @@ func TestEmailCode_RealSend_ToOutlook(t *testing.T) {
 			return nil, nil, nil
 		},
 	}
-	svc := NewUserService(repo, rdb, nil, nil, 0, nil)
+	svc := NewUserService(repo, rdb, nil, nil, 0, nil, nil)
 
 	t.Logf(">>> 真发邮件到 %s 通过 %s:%d（QQ SMTP），请查收",
 		target, cfg.Mail.Server, cfg.Mail.Port)
@@ -217,7 +218,7 @@ func TestMagicLogin_RealSend_BlogMode(t *testing.T) {
 	}
 	svc := NewUserService(repo, rdb, nil, map[string]string{
 		"blog": "https://kanocifer.chat",
-	}, 0, nil)
+	}, 0, nil, emailtemplates.NewMailer())
 
 	t.Logf(">>> 真发魔法登录邮件（blog 模式）到 %s，请查收", target)
 	if !svc.SendMagicLoginEmail(context.Background(), target, "blog", "") {
