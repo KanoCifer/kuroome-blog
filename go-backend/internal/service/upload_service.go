@@ -52,23 +52,6 @@ var mimeToExt = map[string]string{
 }
 
 // Uploader 定义 handler 依赖的上传能力集合。
-type Uploader interface {
-	// UploadFile 保存通用文件，返回相对存储根的路径（如 uploads/1/xxx.png）。
-	UploadFile(ctx context.Context, userID uint, filename string, src io.Reader) (string, error)
-
-	// UploadBlogImage 保存博客文章图片，校验类型后保存到 posts/{userID}/ 并返回相对路径。
-	UploadBlogImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
-
-	// UploadGalleryImage 保存图片墙图片，校验类型后保存到 gallery/{userID}/ 并返回相对路径。
-	UploadGalleryImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
-
-	// UploadAvatar 保存头像图片，回写 profile.photo 后返回相对路径。
-	UploadAvatar(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
-
-	// UploadDesignImage 保存 AI 出图结果（上游固定 output_format=jpeg），
-	// 保存到 design/{userID}/ 并返回相对路径。
-	UploadDesignImage(ctx context.Context, userID uint, src io.Reader) (string, error)
-}
 
 // profileStorage 是 UploadAvatar 需要的持久层能力。
 // *postgres.UserRepo 通过 GetByID / GetProfile / CreateProfile / UpdateProfile 满足。
@@ -79,19 +62,19 @@ type profileStorage interface {
 	UpdateProfile(ctx context.Context, profile *model.Profile) error
 }
 
-type uploadService struct {
+type UploadService struct {
 	profiles profileStorage
 	cfg      *config.UploadConfig
 }
 
-// NewUploadService 构造 *uploadService。
-func NewUploadService(profiles profileStorage, cfg *config.Config) *uploadService {
-	return &uploadService{profiles: profiles, cfg: &cfg.Upload}
+// NewUploadService 构造 *UploadService。
+func NewUploadService(profiles profileStorage, cfg *config.Config) *UploadService {
+	return &UploadService{profiles: profiles, cfg: &cfg.Upload}
 }
 
 // UploadFile 把通用文件保存到 {UploadDir}/uploads/{userID}/{uuid}{ext}。
 // 不校验类型，仅限制大小（MaxUploadMB）。
-func (s *uploadService) UploadFile(ctx context.Context, userID uint, filename string, src io.Reader) (string, error) {
+func (s *UploadService) UploadFile(ctx context.Context, userID uint, filename string, src io.Reader) (string, error) {
 	ext := strings.ToLower(filepath.Ext(filename))
 	name := uuid.New().String() + ext
 	rel := filepath.Join("uploads", fmt.Sprint(userID), name)
@@ -106,7 +89,7 @@ func (s *uploadService) UploadFile(ctx context.Context, userID uint, filename st
 
 // UploadBlogImage 校验图片类型后保存到 {UploadDir}/posts/{userID}/{uuid}{ext}。
 // 与 Python 端 save_upload_image 行为一致：校验 content-type + 大小限制，不缩略。
-func (s *uploadService) UploadBlogImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
+func (s *UploadService) UploadBlogImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
 	if !slices.Contains(allowedImageTypes, contentType) {
 		return "", uploaderrs.ErrUnsupportedImageType
 	}
@@ -126,7 +109,7 @@ func (s *uploadService) UploadBlogImage(ctx context.Context, userID uint, filena
 
 // UploadGalleryImage 校验图片类型后保存到 {UploadDir}/gallery/{userID}/{uuid}{ext}。
 // 与 Python 端 save_upload_image 行为一致：校验 content-type + 大小限制，不缩略。
-func (s *uploadService) UploadGalleryImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
+func (s *UploadService) UploadGalleryImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
 	if !slices.Contains(allowedImageTypes, contentType) {
 		return "", uploaderrs.ErrUnsupportedImageType
 	}
@@ -146,7 +129,7 @@ func (s *uploadService) UploadGalleryImage(ctx context.Context, userID uint, fil
 
 // UploadAvatar 校验图片 -> 保存原图 -> 生成 256px 缩略图 -> 回写 profile.photo。
 // 返回缩略图相对路径（如 pics/1/xxx-256.jpg）。
-func (s *uploadService) UploadAvatar(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
+func (s *UploadService) UploadAvatar(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
 	if !slices.Contains(allowedImageTypes, contentType) {
 		return "", uploaderrs.ErrUnsupportedImageType
 	}
@@ -187,7 +170,7 @@ func (s *uploadService) UploadAvatar(ctx context.Context, userID uint, filename,
 // UploadDesignImage 把 AI 出图结果保存到 {UploadDir}/design/{userID}/{uuid}.jpg。
 // 上游 output_format 固定 jpeg，无需类型校验；单图上限放宽到 64MB
 // （大尺寸输出可超过常规上传的 MaxUploadMB）。
-func (s *uploadService) UploadDesignImage(ctx context.Context, userID uint, src io.Reader) (string, error) {
+func (s *UploadService) UploadDesignImage(ctx context.Context, userID uint, src io.Reader) (string, error) {
 	name := uuid.New().String() + ".jpg"
 	rel := filepath.Join("design", fmt.Sprint(userID), name)
 
@@ -200,7 +183,7 @@ func (s *uploadService) UploadDesignImage(ctx context.Context, userID uint, src 
 }
 
 // updatePhoto 把 profile.photo 设为 photoRel，不存在则先建 profile。
-func (s *uploadService) updatePhoto(ctx context.Context, userID uint, photoRel string) error {
+func (s *UploadService) updatePhoto(ctx context.Context, userID uint, photoRel string) error {
 	u, err := s.profiles.GetByID(ctx, userID)
 	if err != nil {
 		return err
@@ -226,6 +209,6 @@ func (s *uploadService) updatePhoto(ctx context.Context, userID uint, photoRel s
 	return s.profiles.UpdateProfile(ctx, p)
 }
 
-func (s *uploadService) maxBytes() int64 {
+func (s *UploadService) maxBytes() int64 {
 	return int64(s.cfg.MaxUploadMB) * 1024 * 1024
 }

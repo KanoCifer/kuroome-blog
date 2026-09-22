@@ -41,7 +41,7 @@ func magicLoginLinkPathFor(mode string) string {
 	return "/auth/magic?token=%s"
 }
 
-func (s *userService) SendMagicLoginEmail(ctx context.Context, email, mode, deviceID string) bool {
+func (s *UserService) SendMagicLoginEmail(ctx context.Context, email, mode, deviceID string) bool {
 	// 一次查询同时承担"邮箱是否存在"判断和后续 user 解析，
 	// 避免 EmailExists + GetByEmail 之间被并发注册/删除留下不一致窗口。
 	u, _, err := s.repo.GetByEmail(ctx, email)
@@ -92,7 +92,7 @@ func (s *userService) SendMagicLoginEmail(ctx context.Context, email, mode, devi
 //
 // 缺省回退到纯相对路径（<path>?token=<token>）：对应 mode 的 host 未注入时
 // 仍能给出可用的相对链接，便于 dev / 配置漂移时排查。
-func (s *userService) magicLoginLink(token, mode string) string {
+func (s *UserService) magicLoginLink(token, mode string) string {
 	rel := fmt.Sprintf(magicLoginLinkPathFor(mode), token)
 	host := s.frontendURLs[mode]
 	if host == "" {
@@ -121,7 +121,7 @@ func splitMagicLoginToken(token string) (hex, mode string, ok bool) {
 // AuthenticateMagicLogin 用一次性 token 换取登录态；token 校验后立即消费。
 //
 // token 形态: "<64-hex>:<mode>"，hex 段进 redis key，mode 段决定走哪个命名空间。
-func (s *userService) AuthenticateMagicLogin(ctx context.Context, token string) (*model.User, *model.Profile, error) {
+func (s *UserService) AuthenticateMagicLogin(ctx context.Context, token string) (*model.User, *model.Profile, error) {
 	if s.redis == nil || token == "" {
 		return nil, nil, usererrs.ErrInvalidMagicToken
 	}
@@ -165,7 +165,7 @@ type NomuLoginState struct {
 }
 
 // finishNomuLogin 回调端确认登录后，把登录结果写回 device 槽位。
-func (s *userService) finishNomuLogin(ctx context.Context, hex string, u *model.User, p *model.Profile) {
+func (s *UserService) finishNomuLogin(ctx context.Context, hex string, u *model.User, p *model.Profile) {
 	if s.redis == nil {
 		return
 	}
@@ -196,7 +196,7 @@ func (s *userService) finishNomuLogin(ctx context.Context, hex string, u *model.
 // 槽位不存在 / 尚未确认 / redis 未配置都返回 pending（无 error），扩展侧
 // 只需看 state.Status == "done" 即可收 tail；为避免扩展在"申请邮件"与"回调
 // 落地"之间抢跑，pending 对缺失槽位也成立（fire-and-forget 竞态安全）。
-func (s *userService) PollNomuLogin(ctx context.Context, deviceID string) (*NomuLoginState, error) {
+func (s *UserService) PollNomuLogin(ctx context.Context, deviceID string) (*NomuLoginState, error) {
 	if s.redis == nil || deviceID == "" {
 		return &NomuLoginState{Status: nomuLoginPendingState}, nil
 	}

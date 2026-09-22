@@ -27,7 +27,11 @@ type mockAdminService struct {
 	updatePostFn    func(ctx context.Context, id string, post dto.PostUpdate) error
 	deletePostFn    func(ctx context.Context, id string) error
 	listViewsDataFn func(ctx context.Context) ([]dto.PostViewResponse, error)
+	// trackVisitorFn handler 不调，但 Adminer 要求实现；保留占位。
+	trackVisitorFn func(ctx context.Context, data dto.VisitorTrackRequest) error
 }
+
+var _ Adminer = (*mockAdminService)(nil)
 
 func (m *mockAdminService) AddPost(ctx context.Context, post dto.PostRequest) (string, error) {
 	return m.addPostFn(ctx, post)
@@ -45,9 +49,16 @@ func (m *mockAdminService) ListPostViewsData(ctx context.Context) ([]dto.PostVie
 	return m.listViewsDataFn(ctx)
 }
 
+func (m *mockAdminService) TrackVisitor(ctx context.Context, data dto.VisitorTrackRequest) error {
+	if m.trackVisitorFn != nil {
+		return m.trackVisitorFn(ctx, data)
+	}
+	return nil
+}
+
 // ---------- helpers ----------
 
-func newAdminHandler(svc AdminServiceer) (*AdminHandler, *gin.Engine) {
+func newAdminHandler(svc Adminer) (*AdminHandler, *gin.Engine) {
 	h := NewAdminHandler(svc, config.Cfg)
 	r := gin.New()
 	g := r.Group("/v3")

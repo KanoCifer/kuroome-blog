@@ -18,11 +18,11 @@ import (
 
 // ---------- 密码校验 ----------
 
-func (s *userService) CheckPassword(u *model.User, password string) bool {
+func (s *UserService) CheckPassword(u *model.User, password string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(u.PasswordHash), []byte(password)) == nil
 }
 
-func (s *userService) Authenticate(ctx context.Context, username, password string) (*model.User, error) {
+func (s *UserService) Authenticate(ctx context.Context, username, password string) (*model.User, error) {
 	u, _, err := s.GetByUsername(ctx, username)
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func (s *userService) Authenticate(ctx context.Context, username, password strin
 
 // ---------- JWT 会话 ----------
 
-func (s *userService) CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error) {
+func (s *UserService) CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error) {
 	refreshTTL := 7 * 24 * time.Hour
 	accessExpiry := time.Now().UTC().Add(24 * time.Hour)
 	refreshExpiry := time.Now().UTC().Add(refreshTTL)
@@ -68,7 +68,7 @@ func (s *userService) CreateTokens(ctx context.Context, u *model.User) (*dto.Tok
 
 // storeRefreshToken 把 refresh token 写入 Redis Hash（field=jti），并在超出
 // maxDevices 时驱逐 iat 最早的 field。
-func (s *userService) storeRefreshToken(ctx context.Context, userID uint, refreshToken string, ttl time.Duration) error {
+func (s *UserService) storeRefreshToken(ctx context.Context, userID uint, refreshToken string, ttl time.Duration) error {
 	key := "refresh:" + strconv.Itoa(int(userID))
 
 	claims, err := jwt.ParseToken(refreshToken)
@@ -125,7 +125,7 @@ func evictOldest(ctx context.Context, r *redis.Client, key string, max int) {
 	}
 }
 
-func (s *userService) RefreshTokens(ctx context.Context, refreshToken string) (*dto.TokensResponse, error) {
+func (s *UserService) RefreshTokens(ctx context.Context, refreshToken string) (*dto.TokensResponse, error) {
 	claims, err := jwt.ParseToken(refreshToken)
 	if err != nil {
 		return nil, usererrs.ErrInvalidToken
@@ -157,7 +157,7 @@ func (s *userService) RefreshTokens(ctx context.Context, refreshToken string) (*
 }
 
 // Logout 登出：从 Redis Hash 删掉当前设备的 refresh token field（jti）。
-func (s *userService) Logout(ctx context.Context, userID uint, jti string) {
+func (s *UserService) Logout(ctx context.Context, userID uint, jti string) {
 	if s.redis != nil {
 		s.redis.HDel(ctx, "refresh:"+strconv.Itoa(int(userID)), jti)
 	}

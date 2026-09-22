@@ -23,24 +23,24 @@ import (
 type AppState struct {
 	config      *config.Config
 	userRepo    *postgres.UserRepo
-	userSvc     service.Userer
-	adminSvc    service.Adminer
-	blogSvc     service.Bloger
-	devTaskSvc  service.DevTasker
-	passkeySvc  service.Passkeyer
-	githubOAuth service.GitHubOAuther
-	monitorSvc  service.Monitorer
-	systemSvc   service.Systemer
-	wsSvc       service.WSer
-	fishSvc     service.Fisher
-	uploadSvc   service.Uploader
-	momentSvc   service.Momenter
-	weatherSvc  service.Weatherer
+	userSvc     *service.UserService
+	adminSvc    *service.AdminService
+	blogSvc     *service.BlogService
+	devTaskSvc  *service.DevTaskService
+	passkeySvc  *service.PasskeyService
+	githubOAuth *service.GitHubOAuth
+	monitorSvc  *service.MonitorService
+	systemSvc   *service.SystemService
+	wsSvc       *service.WSService
+	fishSvc     *service.FishService
+	uploadSvc   *service.UploadService
+	momentSvc   *service.MomentService
+	weatherSvc  *service.WeatherService
 	wereadSvc   wereadSvc.Reader
-	currencySvc service.Currencyer
-	creditSvc   service.Creditser
+	currencySvc *service.CurrencyService
+	creditSvc   *service.CreditService
 	designSvc   *nomuSvc.DesignService
-	nomuSvc     service.NomuService
+	nomuSvc     *service.NomuServiceStruct
 	syncBus     *syncbus.Bus
 	dispatcher  *pubsub.Dispatcher
 }
@@ -142,26 +142,26 @@ func NewAppState(
 }
 
 // Dependency Injection
-func (a *AppState) UserRepo() *postgres.UserRepo       { return a.userRepo }
-func (a *AppState) UserSvc() service.Userer            { return a.userSvc }
-func (a *AppState) AdminSvc() service.Adminer          { return a.adminSvc }
-func (a *AppState) BlogSvc() service.Bloger            { return a.blogSvc }
-func (a *AppState) DevTaskSvc() service.DevTasker      { return a.devTaskSvc }
-func (a *AppState) PasskeySvc() service.Passkeyer      { return a.passkeySvc }
-func (a *AppState) WSSvc() service.WSer                { return a.wsSvc }
-func (a *AppState) MonitorSvc() service.Monitorer      { return a.monitorSvc }
-func (a *AppState) SystemSvc() service.Systemer        { return a.systemSvc }
-func (a *AppState) GitHubOAuth() service.GitHubOAuther { return a.githubOAuth }
-func (a *AppState) FishSvc() service.Fisher            { return a.fishSvc }
-func (a *AppState) UploadSvc() service.Uploader        { return a.uploadSvc }
-func (a *AppState) MomentSvc() service.Momenter        { return a.momentSvc }
-func (a *AppState) WeatherSvc() service.Weatherer      { return a.weatherSvc }
-func (a *AppState) WereadSvc() wereadSvc.Reader        { return a.wereadSvc }
-func (a *AppState) CurrencySvc() service.Currencyer    { return a.currencySvc }
-func (a *AppState) CreditSvc() service.Creditser       { return a.creditSvc }
-func (a *AppState) DesignSvc() *nomuSvc.DesignService  { return a.designSvc }
-func (a *AppState) NomuSvc() service.NomuService       { return a.nomuSvc }
-func (a *AppState) SyncBus() *syncbus.Bus              { return a.syncBus }
+func (a *AppState) UserRepo() *postgres.UserRepo           { return a.userRepo }
+func (a *AppState) UserSvc() *service.UserService          { return a.userSvc }
+func (a *AppState) AdminSvc() *service.AdminService         { return a.adminSvc }
+func (a *AppState) BlogSvc() *service.BlogService           { return a.blogSvc }
+func (a *AppState) DevTaskSvc() *service.DevTaskService     { return a.devTaskSvc }
+func (a *AppState) PasskeySvc() *service.PasskeyService     { return a.passkeySvc }
+func (a *AppState) WSSvc() *service.WSService               { return a.wsSvc }
+func (a *AppState) MonitorSvc() *service.MonitorService     { return a.monitorSvc }
+func (a *AppState) SystemSvc() *service.SystemService       { return a.systemSvc }
+func (a *AppState) GitHubOAuth() *service.GitHubOAuth       { return a.githubOAuth }
+func (a *AppState) FishSvc() *service.FishService           { return a.fishSvc }
+func (a *AppState) UploadSvc() *service.UploadService       { return a.uploadSvc }
+func (a *AppState) MomentSvc() *service.MomentService       { return a.momentSvc }
+func (a *AppState) WeatherSvc() *service.WeatherService     { return a.weatherSvc }
+func (a *AppState) WereadSvc() wereadSvc.Reader             { return a.wereadSvc }
+func (a *AppState) CurrencySvc() *service.CurrencyService   { return a.currencySvc }
+func (a *AppState) CreditSvc() *service.CreditService       { return a.creditSvc }
+func (a *AppState) DesignSvc() *nomuSvc.DesignService       { return a.designSvc }
+func (a *AppState) NomuSvc() *service.NomuServiceStruct     { return a.nomuSvc }
+func (a *AppState) SyncBus() *syncbus.Bus                   { return a.syncBus }
 
 func (a *AppState) PubSub() *pubsub.Dispatcher { return a.dispatcher }
 

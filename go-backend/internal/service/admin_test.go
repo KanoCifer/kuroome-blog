@@ -25,7 +25,7 @@ func ptr[T any](v T) *T { return new(v) }
 // 校验分支不依赖 repo，repo 为 nil 也能覆盖（在调用 repo 前返回）。
 
 func TestAdminService_UpdatePost_InvalidID(t *testing.T) {
-	svc := &adminService{} // repo/redis 均为 nil
+	svc := &AdminService{} // repo/redis 均为 nil
 	err := svc.UpdatePost(context.Background(), "not-a-hex", dto.PostUpdate{
 		Title: new("t"),
 		Body:  new("b"),
@@ -37,7 +37,7 @@ func TestAdminService_UpdatePost_InvalidID(t *testing.T) {
 }
 
 func TestAdminService_DeletePost_InvalidID(t *testing.T) {
-	svc := &adminService{}
+	svc := &AdminService{}
 	err := svc.DeletePost(context.Background(), "%%%")
 	if !errors.Is(err, blogerrs.ErrInvalidPostID) {
 		t.Errorf("err = %v, want ErrInvalidPostID", err)
@@ -122,7 +122,7 @@ func TestAdminService_AddPost_Success(t *testing.T) {
 			return "507f1f77bcf86cd799439011", nil
 		},
 	}
-	svc := &adminService{repo: repo, redis: nil}
+	svc := &AdminService{repo: repo, redis: nil}
 
 	id, err := svc.AddPost(context.Background(), dto.PostRequest{
 		Title: "Hello", Body: "World", Tags: []string{"go"}, IsPinned: true,
@@ -149,7 +149,7 @@ func TestAdminService_AddPost_WithOptionalFields(t *testing.T) {
 			return "id-1", nil
 		},
 	}
-	svc := &adminService{repo: repo, redis: nil}
+	svc := &AdminService{repo: repo, redis: nil}
 
 	_, err := svc.AddPost(context.Background(), dto.PostRequest{
 		Title: "T", Body: "B", Summary: "Summary", Cover: "cover.png",
@@ -173,7 +173,7 @@ func TestAdminService_DeletePost_NotFound(t *testing.T) {
 			return nil, mongo.ErrNoDocuments
 		},
 	}
-	svc := &adminService{repo: repo, redis: nil}
+	svc := &AdminService{repo: repo, redis: nil}
 
 	err := svc.DeletePost(context.Background(), "507f1f77bcf86cd799439011")
 	if !errors.Is(err, blogerrs.ErrPostNotFound) {
@@ -192,7 +192,7 @@ func TestAdminService_DeletePost_Success(t *testing.T) {
 			return nil
 		},
 	}
-	svc := &adminService{repo: repo, redis: nil}
+	svc := &AdminService{repo: repo, redis: nil}
 
 	err := svc.DeletePost(context.Background(), "507f1f77bcf86cd799439011")
 	if err != nil {
@@ -211,7 +211,7 @@ func TestAdminService_UpdatePost_NotFound(t *testing.T) {
 			return nil, mongo.ErrNoDocuments
 		},
 	}
-	svc := &adminService{repo: repo, redis: nil}
+	svc := &AdminService{repo: repo, redis: nil}
 
 	err := svc.UpdatePost(context.Background(), "507f1f77bcf86cd799439011", dto.PostUpdate{
 		Title: new("t"),
@@ -233,7 +233,7 @@ func TestAdminService_ListPostViewsData_Passthrough(t *testing.T) {
 			}, nil
 		},
 	}
-	svc := &adminService{repo: repo}
+	svc := &AdminService{repo: repo}
 
 	data, err := svc.ListPostViewsData(context.Background())
 	if err != nil {
@@ -253,7 +253,7 @@ func TestAdminService_ListPostViewsData_Error(t *testing.T) {
 			return nil, errors.New("mongo error")
 		},
 	}
-	svc := &adminService{repo: repo}
+	svc := &AdminService{repo: repo}
 
 	_, err := svc.ListPostViewsData(context.Background())
 	if err == nil {

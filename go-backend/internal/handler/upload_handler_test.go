@@ -17,7 +17,6 @@ import (
 
 	"github.com/KanoCifer/kuroome-blog/internal/domain/upload/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
-	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
 func init() {
@@ -82,7 +81,7 @@ func (m *mockAvatarView) UserToDict(u *model.User, p *model.Profile) map[string]
 
 // ---------- helpers ----------
 
-func setupUpload(t *testing.T, up service.Uploader, view avatarViewer) *gin.Engine {
+func setupUpload(t *testing.T, up Uploader, view avatarViewer) *gin.Engine {
 	t.Helper()
 	h := NewUploadHandler(up, view)
 	r := gin.New()

@@ -1,6 +1,8 @@
 package handler
 
 import (
+
+	"context"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -10,6 +12,22 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
+// Momenter 定义 moment 服务的能力集合。
+// 由 *service.MomentService 隐式满足。
+type Momenter interface {
+	Create(ctx context.Context, userID int, req dto.MomentRequest) (*dto.MomentResponse, error)
+	GetByID(ctx context.Context, id string) (*dto.MomentResponse, error)
+	GetByIDAdmin(ctx context.Context, id string) (*dto.MomentResponse, error)
+	ListPublic(ctx context.Context, filter dto.MomentFilter, page, pageSize int) (*dto.MomentListResponse, error)
+	ListAdmin(ctx context.Context, filter dto.MomentFilter, page, pageSize int) (*dto.MomentListResponse, error)
+	Update(ctx context.Context, id string, req dto.MomentUpdate) error
+	SoftDelete(ctx context.Context, id string) error
+	HardDelete(ctx context.Context, id string) error
+}
+
+var _ Momenter = (*service.MomentService)(nil)
+
+
 // MomentHandler 处理 moment 资源的 HTTP 请求。
 //
 // 错误处理契约（哨兵在 errs 包声明状态码，respondErr 经 errors.As 取用）：
@@ -17,10 +35,10 @@ import (
 //   - momenterrs.ErrInvalidObjectID  → 400
 //   - 其他                           → 500
 type MomentHandler struct {
-	svc service.Momenter
+	svc Momenter
 }
 
-func NewMomentHandler(svc service.Momenter) *MomentHandler {
+func NewMomentHandler(svc Momenter) *MomentHandler {
 	return &MomentHandler{svc: svc}
 }
 

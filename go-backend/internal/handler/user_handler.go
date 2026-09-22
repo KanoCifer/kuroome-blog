@@ -1,6 +1,7 @@
 package handler
 
 import (
+
 	"context"
 	"log/slog"
 	"strconv"
@@ -17,19 +18,26 @@ import (
 	"github.com/KanoCifer/kuroome-blog/pkg/jwt"
 )
 
+// Userer 定义 handler 依赖的用户业务能力集合。
+// 由 *service.UserService 隐式满足。接口在消费方（handler）一侧定义，
+// 遵循 Go 的 "accept interfaces, return structs" 惯例。
 type Userer interface {
+	GetByID(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
+	GetByUsername(ctx context.Context, username string) (*model.User, *model.Profile, error)
+	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error)
+	SendEmailCode(ctx context.Context, email, mode string) bool
+	SendMagicLoginEmail(ctx context.Context, email, mode, deviceID string) bool
 	Authenticate(ctx context.Context, username, password string) (*model.User, error)
 	AuthenticateMagicLogin(ctx context.Context, token string) (*model.User, *model.Profile, error)
 	CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
-	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error)
-	GetByID(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
-	Logout(ctx context.Context, userID uint, jti string)
 	RefreshTokens(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
+	Logout(ctx context.Context, userID uint, jti string)
 	UserToDict(u *model.User, p *model.Profile) map[string]any
-	SendEmailCode(ctx context.Context, email, mode string) bool
-	SendMagicLoginEmail(ctx context.Context, email, mode, deviceID string) bool
 	PollNomuLogin(ctx context.Context, deviceID string) (*service.NomuLoginState, error)
 }
+
+var _ Userer = (*service.UserService)(nil)
+
 
 // UserHandler 持有业务服务，gin 路由方法挂在其上。
 type UserHandler struct {

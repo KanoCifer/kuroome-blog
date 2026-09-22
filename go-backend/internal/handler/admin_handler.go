@@ -1,6 +1,7 @@
 package handler
 
 import (
+
 	"context"
 	"log/slog"
 
@@ -9,21 +10,28 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
+	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
-type AdminServiceer interface {
+// Adminer 定义 handler 依赖的管理后台能力集合。
+// 由 *service.AdminService 隐式满足。
+type Adminer interface {
 	AddPost(ctx context.Context, post dto.PostRequest) (id string, err error)
 	UpdatePost(ctx context.Context, id string, post dto.PostUpdate) error
 	DeletePost(ctx context.Context, id string) error
+	TrackVisitor(ctx context.Context, data dto.VisitorTrackRequest) error
 	ListPostViewsData(ctx context.Context) ([]dto.PostViewResponse, error)
 }
 
+var _ Adminer = (*service.AdminService)(nil)
+
+
 type AdminHandler struct {
-	adminSvc AdminServiceer
+	adminSvc Adminer
 	cfg      *config.Config
 }
 
-func NewAdminHandler(adminSvc AdminServiceer, cfg *config.Config) *AdminHandler {
+func NewAdminHandler(adminSvc Adminer, cfg *config.Config) *AdminHandler {
 	return &AdminHandler{adminSvc: adminSvc, cfg: cfg}
 }
 

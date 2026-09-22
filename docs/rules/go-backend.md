@@ -26,17 +26,17 @@ Python `backend/` 的 Go 重构（核心功能已实现，持续完善中）。�
 
 ### 双层接口
 
-- **service 文件**：定义 `XRepository interface`（同文件），供 service struct 持有；定义 `XService interface`（供 handler 依赖）
+- **service 文件**：定义 `XRepositoryer interface`（同文件），供 service struct 持有；定义 `XService interface`（供 handler 依赖）
 - **handler 文件**：定义 `XService interface`（handler 拥有），持有该接口而非 concrete struct
 - **handler 依赖 repo 时**：在 handler 文件定义最小读接口（如 `creditUserLocator`），**禁止** import `repository/*` 具体类型——那是唯一例外，会被判定规则 11 打回
 - 便于独立 mock 测试
 
 ```go
 // service/user_service.go
-type UserRepository interface { ... }   // service 拥有
-type UserService interface { ... }      // handler 依赖
-type userService struct { repo UserRepository }
-func NewUserService(repo UserRepository, ...) *userService { return &userService{repo: repo} }
+type UserRepositoryer interface { ... }   // service 拥有
+type UserService interface { ... }        // handler 依赖
+type userService struct { repo UserRepositoryer }
+func NewUserService(repo UserRepositoryer, ...) *userService { return &userService{repo: repo} }
 
 // handler/user_handler.go
 type UserService interface { ... }   // handler 拥有（复用签名，解耦）
@@ -63,7 +63,7 @@ type UserHandler struct { svc UserService }
 
 | #   | 规则                | 判定                                                                                        |
 | --- | ------------------- | ------------------------------------------------------------------------------------------- |
-| 1   | 双层接口            | `grep "type.*Repository interface" service/*.go` 每个 service 文件都有                      |
+| 1   | 双层接口            | `rg "type \w+Repositoryer interface" internal/service` 依赖 repo 的 service 各有定义；`rg -e "type \w+Repository interface" -e "type \w+Repoer interface" internal/service` → 0 |
 | 2   | ctx 强制            | `grep -rn "context.Background()" internal/` → 0（测试除外）                                 |
 | 3   | 构造全收回 appstate | main.go 无 `service.NewXxx`                                                                 |
 | 4   | 文件命名 snake_case | 无 flat 命名残留                                                                            |

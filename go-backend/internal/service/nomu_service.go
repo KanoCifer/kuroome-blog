@@ -39,12 +39,6 @@ type NomuRepository interface {
 }
 
 // NomuService 是 handler 依赖的接口。
-type NomuService interface {
-	SyncNomuConfig(ctx context.Context, userId uint, local []NomuSyncItem, lastSyncAt *time.Time) ([]NomuSyncItem, error)
-	// ProxyBlob 拉取上游 blob。返回的 body 未读，由调用方负责 Close；
-	// 不要在函数内 defer Close——那会在调用方读到数据前就掐断连接。
-	ProxyBlob(ctx context.Context, url *url.URL) (contentLength int64, contentType string, body io.ReadCloser, extraHeaders map[string]string, err error)
-}
 
 // NomuSyncItem 是单条配置在同步协议中的表示（对齐 Dexie configs 表一行）。
 type NomuSyncItem struct {

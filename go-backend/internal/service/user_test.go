@@ -27,7 +27,7 @@ func TestCheckPassword_Correct(t *testing.T) {
 	if err != nil {
 		t.Fatalf("hash error: %v", err)
 	}
-	svc := &userService{}
+	svc := &UserService{}
 	u := &model.User{PasswordHash: string(hash)}
 	if !svc.CheckPassword(u, "secret123") {
 		t.Error("CheckPassword should return true for correct password")
@@ -39,7 +39,7 @@ func TestCheckPassword_Wrong(t *testing.T) {
 	if err != nil {
 		t.Fatalf("hash error: %v", err)
 	}
-	svc := &userService{}
+	svc := &UserService{}
 	u := &model.User{PasswordHash: string(hash)}
 	if svc.CheckPassword(u, "wrong") {
 		t.Error("CheckPassword should return false for wrong password")
@@ -47,7 +47,7 @@ func TestCheckPassword_Wrong(t *testing.T) {
 }
 
 func TestCheckPassword_EmptyHash(t *testing.T) {
-	svc := &userService{}
+	svc := &UserService{}
 	u := &model.User{PasswordHash: ""}
 	if svc.CheckPassword(u, "anything") {
 		t.Error("CheckPassword should return false when hash is empty")
@@ -74,7 +74,7 @@ func TestBoolToInt_Helper(t *testing.T) {
 // ---------- IsAdmin ----------
 
 func TestIsAdmin_InList(t *testing.T) {
-	svc := &userService{adminUserIDs: []int{1, 42, 99}}
+	svc := &UserService{adminUserIDs: []int{1, 42, 99}}
 	u := &model.User{Model: gormModel(42)}
 	if !svc.IsAdmin(u) {
 		t.Error("IsAdmin should return true for user in adminUserIDs")
@@ -82,7 +82,7 @@ func TestIsAdmin_InList(t *testing.T) {
 }
 
 func TestIsAdmin_NotInList(t *testing.T) {
-	svc := &userService{adminUserIDs: []int{1, 42, 99}}
+	svc := &UserService{adminUserIDs: []int{1, 42, 99}}
 	u := &model.User{Model: gormModel(7)}
 	if svc.IsAdmin(u) {
 		t.Error("IsAdmin should return false for user not in adminUserIDs")
@@ -90,7 +90,7 @@ func TestIsAdmin_NotInList(t *testing.T) {
 }
 
 func TestIsAdmin_EmptyList(t *testing.T) {
-	svc := &userService{adminUserIDs: []int{}}
+	svc := &UserService{adminUserIDs: []int{}}
 	u := &model.User{Model: gormModel(1)}
 	if svc.IsAdmin(u) {
 		t.Error("IsAdmin should return false when adminUserIDs is empty")
@@ -100,7 +100,7 @@ func TestIsAdmin_EmptyList(t *testing.T) {
 // ---------- UserToDict ----------
 
 func TestUserToDict_BasicFields(t *testing.T) {
-	svc := &userService{adminUserIDs: []int{1}}
+	svc := &UserService{adminUserIDs: []int{1}}
 	email := "test@example.com"
 	profile := &model.Profile{ID: 1, Email: &email}
 	u := &model.User{
@@ -132,7 +132,7 @@ func TestUserToDict_BasicFields(t *testing.T) {
 }
 
 func TestUserToDict_GitHubBound(t *testing.T) {
-	svc := &userService{adminUserIDs: []int{}}
+	svc := &UserService{adminUserIDs: []int{}}
 	githubID := 12345
 	u := &model.User{
 		Model:    gormModel(2),
@@ -151,7 +151,7 @@ func TestUserToDict_GitHubBound(t *testing.T) {
 }
 
 func TestUserToDict_NilProfileOmitsFields(t *testing.T) {
-	svc := &userService{adminUserIDs: []int{}}
+	svc := &UserService{adminUserIDs: []int{}}
 	u := &model.User{Model: gormModel(3), Username: "carol"}
 
 	d := svc.UserToDict(u, nil)
@@ -166,7 +166,7 @@ func TestUserToDict_NilProfileOmitsFields(t *testing.T) {
 
 func TestUserToDict_ProfileWithZeroID(t *testing.T) {
 	// profile.ID == 0 视为"无有效 profile"，不输出 profile 字段
-	svc := &userService{adminUserIDs: []int{}}
+	svc := &UserService{adminUserIDs: []int{}}
 	email := "x@test.com"
 	u := &model.User{Model: gormModel(4), Username: "dave"}
 	p := &model.Profile{ID: 0, Email: &email}
@@ -398,7 +398,7 @@ func TestCreateTokens_NilRedis(t *testing.T) {
 	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
 	t.Cleanup(func() { config.Cfg = prevCfg })
 
-	svc := &userService{redis: nil, maxDevices: 5}
+	svc := &UserService{redis: nil, maxDevices: 5}
 	u := &model.User{Model: gormModel(1)}
 	toks, err := svc.CreateTokens(context.Background(), u)
 	if err != nil {
@@ -422,7 +422,7 @@ func TestCreateTokens_MultiDeviceHash_EvictOldest(t *testing.T) {
 	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
 	t.Cleanup(func() { config.Cfg = prevCfg })
 
-	svc := &userService{redis: rdb, maxDevices: 3}
+	svc := &UserService{redis: rdb, maxDevices: 3}
 	u := &model.User{Model: gormModel(10)}
 
 	// 记录第 1 个 jti（最早）
@@ -477,7 +477,7 @@ func TestCreateTokens_NoLimitWhenMaxDevicesZero(t *testing.T) {
 	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
 	t.Cleanup(func() { config.Cfg = prevCfg })
 
-	svc := &userService{redis: rdb, maxDevices: 0}
+	svc := &UserService{redis: rdb, maxDevices: 0}
 	u := &model.User{Model: gormModel(20)}
 
 	for i := range 10 {
@@ -509,7 +509,7 @@ func TestRefreshTokens_HashFieldMatch(t *testing.T) {
 	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
 	t.Cleanup(func() { config.Cfg = prevCfg })
 
-	svc := &userService{redis: rdb, maxDevices: 5}
+	svc := &UserService{redis: rdb, maxDevices: 5}
 	u := &model.User{Model: gormModel(1)}
 
 	// 设备 A 登录，记录旧 token
@@ -553,7 +553,7 @@ func TestRefreshTokens_StaleJTIRejected(t *testing.T) {
 	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
 	t.Cleanup(func() { config.Cfg = prevCfg })
 
-	svc := &userService{redis: rdb, maxDevices: 5}
+	svc := &UserService{redis: rdb, maxDevices: 5}
 	u := &model.User{Model: gormModel(1)}
 
 	old, err := svc.CreateTokens(context.Background(), u)
@@ -584,7 +584,7 @@ func TestRefreshTokens_RotationSwapsField(t *testing.T) {
 	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
 	t.Cleanup(func() { config.Cfg = prevCfg })
 
-	svc := &userService{redis: rdb, maxDevices: 5}
+	svc := &UserService{redis: rdb, maxDevices: 5}
 	u := &model.User{Model: gormModel(1)}
 
 	old, err := svc.CreateTokens(context.Background(), u)
@@ -613,7 +613,7 @@ func TestRefreshTokens_RotationSwapsField(t *testing.T) {
 
 func TestLogout_NilRedis(t *testing.T) {
 	// redis 为 nil 时不应 panic
-	svc := &userService{redis: nil}
+	svc := &UserService{redis: nil}
 	svc.Logout(context.Background(), 1, "jti-old") // should not panic
 }
 
@@ -621,7 +621,7 @@ func TestLogout_WithRedis(t *testing.T) {
 	// 用真实 redis 客户端验证 Logout 调用 HDel（需要 redis 可用，这里仅验证不 panic）
 	// 完整集成测试留到 e2e；此处验证 nil 安全与接口签名
 	var r *redis.Client
-	svc := &userService{redis: r}
+	svc := &UserService{redis: r}
 	svc.Logout(context.Background(), 1, "jti-old")
 }
 
@@ -638,7 +638,7 @@ func TestLogout_OnlyDeletesOwnDevice(t *testing.T) {
 	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
 	t.Cleanup(func() { config.Cfg = prevCfg })
 
-	svc := &userService{redis: rdb, maxDevices: 5}
+	svc := &UserService{redis: rdb, maxDevices: 5}
 	u := &model.User{Model: gormModel(1)}
 
 	tokA, err := svc.CreateTokens(context.Background(), u)
@@ -668,14 +668,14 @@ func TestLogout_OnlyDeletesOwnDevice(t *testing.T) {
 // ---------- VerifyEmailCode ----------
 
 func TestVerifyEmailCode_NilRedis(t *testing.T) {
-	svc := &userService{redis: nil}
+	svc := &UserService{redis: nil}
 	if svc.verifyEmailCode(context.Background(), "a@b.com", "123456", modeBlog) {
 		t.Error("verifyEmailCode should return false when redis is nil")
 	}
 }
 
 func TestVerifyEmailCode_EmptyEmail(t *testing.T) {
-	svc := &userService{redis: nil}
+	svc := &UserService{redis: nil}
 	if svc.verifyEmailCode(context.Background(), "", "123456", modeBlog) {
 		t.Error("verifyEmailCode should return false when email is empty")
 	}
@@ -690,7 +690,7 @@ func TestEmailCode_SendAndVerifyShareKeyNamespace(t *testing.T) {
 	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
 	t.Cleanup(func() { _ = rdb.Close() })
 
-	svc := &userService{redis: rdb}
+	svc := &UserService{redis: rdb}
 	const email = "alice@example.com"
 	const code = "654321"
 
@@ -722,7 +722,7 @@ func TestEmailCode_CrossModeIsolation(t *testing.T) {
 	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
 	t.Cleanup(func() { _ = rdb.Close() })
 
-	svc := &userService{redis: rdb}
+	svc := &UserService{redis: rdb}
 	const email = "alice@example.com"
 	const code = "111222"
 
@@ -859,7 +859,7 @@ func TestSplitMagicLoginToken(t *testing.T) {
 // TestMagicLoginLink_BlogHost 校验 blog mode 拼出的链接：
 // <blogHost>/auth/magic?token=<token>。
 func TestMagicLoginLink_BlogHost(t *testing.T) {
-	svc := &userService{frontendURLs: map[string]string{
+	svc := &UserService{frontendURLs: map[string]string{
 		"blog": "https://kanocifer.chat",
 		"nomu": "https://nomu.kanocifer.chat",
 	}}
@@ -874,7 +874,7 @@ func TestMagicLoginLink_BlogHost(t *testing.T) {
 // <nomuHost>/nomu/login?token=<token>。nomu 回调页部署在独立的
 // nomu.kanocifer.chat 落地页站点上。
 func TestMagicLoginLink_NomuHost(t *testing.T) {
-	svc := &userService{frontendURLs: map[string]string{
+	svc := &UserService{frontendURLs: map[string]string{
 		"blog": "https://kanocifer.chat",
 		"nomu": "https://nomu.kanocifer.chat",
 	}}
@@ -888,7 +888,7 @@ func TestMagicLoginLink_NomuHost(t *testing.T) {
 // TestMagicLoginLink_HostMissing 未注入对应 mode 的 host 时回退为相对路径，
 // 方便 dev / 配置漂移时排查。
 func TestMagicLoginLink_HostMissing(t *testing.T) {
-	svc := &userService{frontendURLs: map[string]string{}}
+	svc := &UserService{frontendURLs: map[string]string{}}
 	if got := svc.magicLoginLink("h:blog", "blog"); got != "/auth/magic?token=h:blog" {
 		t.Errorf("missing host blog = %q", got)
 	}

@@ -1,6 +1,8 @@
 package handler
 
 import (
+
+	"context"
 	"errors"
 	"io"
 	"net/http"
@@ -14,14 +16,29 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
+// Monitorer 定义 monitor handler 依赖的能力集合。
+// 由 *service.MonitorService 隐式满足。
+type Monitorer interface {
+	GetOverview(ctx context.Context, days int) (dto.OverviewResponse, error)
+	GetVisitors(ctx context.Context, days, page, pageSize int) (dto.VisitorListResponse, error)
+	GetUserLogins(ctx context.Context, days, page, pageSize int) (dto.UserLoginsResponse, error)
+	GetServerStatus() (dto.ServerStatusResponse, error)
+	StreamServerStatus(ctx context.Context) (<-chan dto.ServerStatusResponse, error)
+	TrackVisitor(ctx context.Context, data dto.VisitorTrackRequest) error
+	GetStatusDetail(ctx context.Context) (dto.StatusDetailResponse, error)
+}
+
+var _ Monitorer = (*service.MonitorService)(nil)
+
+
 var errNotNumber = errors.New("not a number")
 
 type MonitorHandler struct {
-	svc service.Monitorer
+	svc Monitorer
 	cfg *config.Config
 }
 
-func NewMonitorHandler(svc service.Monitorer, cfg *config.Config) *MonitorHandler {
+func NewMonitorHandler(svc Monitorer, cfg *config.Config) *MonitorHandler {
 	return &MonitorHandler{svc: svc, cfg: cfg}
 }
 

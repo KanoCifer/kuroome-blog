@@ -1,20 +1,36 @@
 package handler
 
 import (
+
 	"context"
 	"log/slog"
 	"time"
 
-	"github.com/KanoCifer/kuroome-blog/internal/service"
 	"github.com/coder/websocket"
 	"github.com/gin-gonic/gin"
+
+	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
-type WSHandler struct {
-	Svc service.WSer
+// WSer 定义 handler 依赖的 WebSocket 能力集合。
+// 由 *service.WSService 隐式满足。
+type WSer interface {
+	ReadMsg(ctx context.Context, conn *websocket.Conn, msg any) error
+	HandleFirstMessage(ctx context.Context, conn *websocket.Conn, msg map[string]any) (bool, error)
+	RedisListener(ctx context.Context, conn *websocket.Conn) error
+	WSReceiver(ctx context.Context, conn *websocket.Conn) error
+	RemoveVisitor(ctx context.Context, visitorId string) error
+	PublishCount(ctx context.Context) error
 }
 
-func NewWSHandler(svc service.WSer) *WSHandler {
+var _ WSer = (*service.WSService)(nil)
+
+
+type WSHandler struct {
+	Svc WSer
+}
+
+func NewWSHandler(svc WSer) *WSHandler {
 	return &WSHandler{
 		Svc: svc,
 	}

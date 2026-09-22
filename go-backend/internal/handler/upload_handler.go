@@ -1,7 +1,9 @@
 package handler
 
 import (
+
 	"context"
+	"io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,6 +14,29 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
+// Uploader 定义 handler 依赖的文件上传能力集合。
+// 由 *service.UploadService 隐式满足。
+type Uploader interface {
+	// UploadFile 保存通用文件，返回相对存储根的路径（如 uploads/1/xxx.png）。
+	UploadFile(ctx context.Context, userID uint, filename string, src io.Reader) (string, error)
+
+	// UploadBlogImage 保存博客文章图片，校验类型后保存到 posts/{userID}/ 并返回相对路径。
+	UploadBlogImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
+
+	// UploadGalleryImage 保存图片墙图片，校验类型后保存到 gallery/{userID}/ 并返回相对路径。
+	UploadGalleryImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
+
+	// UploadAvatar 保存头像图片，回写 profile.photo 后返回相对路径。
+	UploadAvatar(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
+
+	// UploadDesignImage 保存 AI 出图结果（上游固定 output_format=jpeg），
+	// 保存到 design/{userID}/ 并返回相对路径。
+	UploadDesignImage(ctx context.Context, userID uint, src io.Reader) (string, error)
+}
+
+var _ Uploader = (*service.UploadService)(nil)
+
+
 // avatarViewer 是 UploadPic 成功后回读用户字典所需的最小接口。
 // service.Userer 满足此接口；handler 以窄接口注入，便于 mock 测试。
 type avatarViewer interface {
@@ -21,12 +46,12 @@ type avatarViewer interface {
 
 // UploadHandler 处理文件 / 图片上传（均需登录）。
 type UploadHandler struct {
-	uploadSvc  service.Uploader
+	uploadSvc  Uploader
 	avatarView avatarViewer
 }
 
 // NewUploadHandler 构造 UploadHandler。
-func NewUploadHandler(uploadSvc service.Uploader, avatarView avatarViewer) *UploadHandler {
+func NewUploadHandler(uploadSvc Uploader, avatarView avatarViewer) *UploadHandler {
 	return &UploadHandler{uploadSvc: uploadSvc, avatarView: avatarView}
 }
 

@@ -29,9 +29,6 @@ type CurrencyService struct {
 	baseURL string
 }
 
-type Currencyer interface {
-	GetExchange(ctx context.Context, baseCurrency string) (*dto.ExchangeResponse, error)
-}
 
 // ClientOption 覆盖默认上游配置（测试注入用）。
 type ClientOption func(*CurrencyService)

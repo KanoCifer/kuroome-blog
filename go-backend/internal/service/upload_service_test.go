@@ -55,7 +55,7 @@ func (m *mockProfileStorage) UpdateProfile(ctx context.Context, profile *model.P
 	return nil
 }
 
-func newUploadSvc(t *testing.T, st *mockProfileStorage) *uploadService {
+func newUploadSvc(t *testing.T, st *mockProfileStorage) *UploadService {
 	t.Helper()
 	return NewUploadService(st, &config.Config{Upload: config.UploadConfig{
 		UploadDir:   t.TempDir(),

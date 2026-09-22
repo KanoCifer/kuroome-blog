@@ -1,6 +1,7 @@
 package handler
 
 import (
+
 	"context"
 	"encoding/json"
 	"log/slog"
@@ -10,8 +11,11 @@ import (
 
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
+	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
+// Weatherer 定义 handler 依赖的天气数据能力集合。
+// 由 *service.WeatherService 隐式满足。
 type Weatherer interface {
 	GetTide(ctx context.Context, harbor, date string) (json.RawMessage, bool, error)
 
@@ -24,6 +28,9 @@ type Weatherer interface {
 
 	GetFullWeatherData(ctx context.Context, location string) (*dto.FullWeatherData, error)
 }
+
+var _ Weatherer = (*service.WeatherService)(nil)
+
 
 type WeatherHandler struct {
 	svc Weatherer

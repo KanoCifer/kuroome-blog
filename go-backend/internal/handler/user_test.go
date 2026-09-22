@@ -1,6 +1,7 @@
 package handler
 
 import (
+
 	"bytes"
 	"context"
 	"encoding/json"
@@ -51,6 +52,8 @@ type mockUserService struct {
 	pollNomuLoginFn       func(ctx context.Context, deviceID string) (*service.NomuLoginState, error)
 	userToDictFn          func(u *model.User, p *model.Profile) map[string]any
 }
+
+var _ Userer = (*mockUserService)(nil)
 
 func (m *mockUserService) Authenticate(ctx context.Context, username, password string) (*model.User, error) {
 	return m.authenticateFn(ctx, username, password)

@@ -12,14 +12,6 @@ import (
 
 // Systemer 定义 system handler 依赖的能力集合。
 // 由 service.Systemer 实现；handler 仅依赖此接口，便于测试替换。
-type Systemer interface {
-	ListEvents(
-		ctx context.Context,
-		page, perPage int,
-		eventType *string,
-		start, end *time.Time,
-	) (dto.EventsResponse, error)
-}
 
 // EventRepositoryer 定义 SystemService 依赖的持久层能力集合。
 // 由 postgres.EventRepo 实现；service 仅依赖此接口，便于测试替换。

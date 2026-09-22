@@ -18,15 +18,6 @@ import (
 
 // Monitorer 定义 monitor handler 依赖的能力集合。
 // 由 service.Monitorer 实现；handler 仅依赖此接口，便于测试替换。
-type Monitorer interface {
-	GetOverview(ctx context.Context, days int) (dto.OverviewResponse, error)
-	GetVisitors(ctx context.Context, days, page, pageSize int) (dto.VisitorListResponse, error)
-	GetUserLogins(ctx context.Context, days, page, pageSize int) (dto.UserLoginsResponse, error)
-	GetServerStatus() (dto.ServerStatusResponse, error)
-	StreamServerStatus(ctx context.Context) (<-chan dto.ServerStatusResponse, error)
-	TrackVisitor(ctx context.Context, data dto.VisitorTrackRequest) error
-	GetStatusDetail(ctx context.Context) (dto.StatusDetailResponse, error)
-}
 
 // MonitorService 实现 monitor 端点的业务逻辑（overview / visitors / user-logins
 // / status-detail）。

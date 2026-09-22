@@ -1,21 +1,38 @@
 package handler
 
 import (
+
+	"context"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
-type SystemHandler struct {
-	svc service.Systemer
+// Systemer 定义 handler 依赖的系统事件能力。
+// 由 *service.SystemService 隐式满足。
+type Systemer interface {
+	ListEvents(
+		ctx context.Context,
+		page, perPage int,
+		eventType *string,
+		start, end *time.Time,
+	) (dto.EventsResponse, error)
 }
 
-func NewSystemHandler(svc service.Systemer) *SystemHandler {
+var _ Systemer = (*service.SystemService)(nil)
+
+
+type SystemHandler struct {
+	svc Systemer
+}
+
+func NewSystemHandler(svc Systemer) *SystemHandler {
 	return &SystemHandler{svc: svc}
 }
 

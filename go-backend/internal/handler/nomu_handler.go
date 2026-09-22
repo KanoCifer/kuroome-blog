@@ -1,6 +1,7 @@
 package handler
 
 import (
+
 	"context"
 	"io"
 	"log/slog"
@@ -14,17 +15,23 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
-// NomuSyncer handler 依赖的配置同步窄接口，*service.NomuServiceStruct 满足。
-type NomuSyncer interface {
+// NomuService 定义 handler 依赖的配置同步 / blob 代理能力。
+// 由 *service.NomuServiceStruct 隐式满足。
+type NomuService interface {
 	SyncNomuConfig(ctx context.Context, userId uint, local []service.NomuSyncItem, lastSyncAt *time.Time) ([]service.NomuSyncItem, error)
+	// ProxyBlob 拉取上游 blob。返回的 body 未读，由调用方负责 Close；
+	// 不要在函数内 defer Close——那会在调用方读到数据前就掐断连接。
 	ProxyBlob(ctx context.Context, url *url.URL) (contentLength int64, contentType string, body io.ReadCloser, extraHeaders map[string]string, err error)
 }
 
+var _ NomuService = (*service.NomuServiceStruct)(nil)
+
+
 type NomuHandler struct {
-	svc NomuSyncer
+	svc NomuService
 }
 
-func NewNomuHandler(svc NomuSyncer) *NomuHandler {
+func NewNomuHandler(svc NomuService) *NomuHandler {
 	return &NomuHandler{svc: svc}
 }
 

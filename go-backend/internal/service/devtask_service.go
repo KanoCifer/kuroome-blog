@@ -19,16 +19,6 @@ import (
 
 // DevTaskServiceer devtask 读表面 —— handler 依赖接口，便于 mock 测试。
 // 所有接口一律使用 slug 作为任务标识，不暴露 ObjectID。
-type DevTasker interface {
-	Create(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskResponse, error)
-	GetBySlug(ctx context.Context, slug string, withParent bool) (*dto.DevTaskResponse, error)
-	List(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListResponse, error)
-	Update(ctx context.Context, slug string, req dto.DevTaskUpdate) error
-	BatchUpdateStatus(ctx context.Context, slugs []string, status document.DevTaskStatus) (*BatchStatusResult, error)
-	SoftDelete(ctx context.Context, slug string) error
-	HardDelete(ctx context.Context, slug string) error
-	FindFrontier(ctx context.Context, limit int) ([]dto.DevTaskResponse, error)
-}
 
 // DevTaskRepositoryer devtask 持久层接口 —— service 依赖接口，便于 mock 测试。
 // 所有接口一律使用 slug 作为任务标识，不暴露 ObjectID。

@@ -34,11 +34,6 @@ type UserSvcer interface {
 }
 
 // GitHubOAuther 定义 github handler 依赖的业务能力。
-type GitHubOAuther interface {
-	AuthURL(ctx context.Context, mode string, userID uint) (string, error)
-	HandleCallback(ctx context.Context, state, code string) (*model.User, *dto.TokensResponse, error)
-	UnbindGitHub(ctx context.Context, userID uint) error
-}
 
 // GitHubOAuth 封装 GitHub OAuth 业务逻辑。
 //

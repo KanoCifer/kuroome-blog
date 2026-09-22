@@ -1,19 +1,32 @@
 package handler
 
 import (
+
+	"context"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
+	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
-	"github.com/gin-gonic/gin"
 )
 
+// Currencyer 定义 handler 依赖的汇率查询能力。
+// 由 *service.CurrencyService 隐式满足。
+type Currencyer interface {
+	GetExchange(ctx context.Context, baseCurrency string) (*dto.ExchangeResponse, error)
+}
+
+var _ Currencyer = (*service.CurrencyService)(nil)
+
+
 type CurrencyHandler struct {
-	svc service.Currencyer
+	svc Currencyer
 }
 
 func NewCurrencyHandler(
-	svc service.Currencyer,
+	svc Currencyer,
 ) *CurrencyHandler {
 	return &CurrencyHandler{svc: svc}
 }

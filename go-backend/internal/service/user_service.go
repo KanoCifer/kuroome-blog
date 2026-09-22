@@ -15,7 +15,6 @@ import (
 	"gorm.io/gorm"
 
 	usererrs "github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
-	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/pkg/emailtemplates"
 	"github.com/KanoCifer/kuroome-blog/pkg/notification"
@@ -59,22 +58,8 @@ type UserRepositoryer interface {
 
 // Userer 是 handler 层注入面。方法实现散落在 auth_service.go /
 // magic_login_service.go / user_service.go（CRUD+Register+Response）。
-type Userer interface {
-	GetByID(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
-	GetByUsername(ctx context.Context, username string) (*model.User, *model.Profile, error)
-	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error)
-	SendEmailCode(ctx context.Context, email, mode string) bool
-	SendMagicLoginEmail(ctx context.Context, email, mode, deviceID string) bool
-	Authenticate(ctx context.Context, username, password string) (*model.User, error)
-	AuthenticateMagicLogin(ctx context.Context, token string) (*model.User, *model.Profile, error)
-	CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
-	RefreshTokens(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
-	Logout(ctx context.Context, userID uint, jti string)
-	UserToDict(u *model.User, p *model.Profile) map[string]any
-	PollNomuLogin(ctx context.Context, deviceID string) (*NomuLoginState, error)
-}
 
-type userService struct {
+type UserService struct {
 	repo         UserRepositoryer
 	redis        *redis.Client
 	adminUserIDs []int
@@ -88,12 +73,12 @@ func NewUserService(
 	adminUserIDs []int,
 	frontendURLs map[string]string,
 	maxDevices int,
-) *userService {
+) *UserService {
 	trimmed := make(map[string]string, len(frontendURLs))
 	for k, v := range frontendURLs {
 		trimmed[k] = strings.TrimRight(v, "/")
 	}
-	return &userService{
+	return &UserService{
 		repo:         repo,
 		redis:        redis,
 		adminUserIDs: adminUserIDs,
@@ -104,7 +89,7 @@ func NewUserService(
 
 // ---------- 查询 ----------
 
-func (s *userService) GetByID(ctx context.Context, userID uint) (*model.User, *model.Profile, error) {
+func (s *UserService) GetByID(ctx context.Context, userID uint) (*model.User, *model.Profile, error) {
 	u, err := s.repo.GetByID(ctx, userID)
 	if err != nil {
 		return nil, nil, err
@@ -115,7 +100,7 @@ func (s *userService) GetByID(ctx context.Context, userID uint) (*model.User, *m
 	return u, u.Profile, nil
 }
 
-func (s *userService) GetByUsername(ctx context.Context, username string) (*model.User, *model.Profile, error) {
+func (s *UserService) GetByUsername(ctx context.Context, username string) (*model.User, *model.Profile, error) {
 	u, err := s.repo.GetByUsername(ctx, username)
 	if err != nil {
 		return nil, nil, err
@@ -128,7 +113,7 @@ func (s *userService) GetByUsername(ctx context.Context, username string) (*mode
 
 // ---------- 注册 ----------
 
-func (s *userService) CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error) {
+func (s *UserService) CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error) {
 	if s.repo.UsernameExists(ctx, username) {
 		return nil, nil, usererrs.ErrUserExists
 	}
@@ -166,7 +151,7 @@ func (s *userService) CreateUser(ctx context.Context, username, password, email,
 	return u, p, nil
 }
 
-func (s *userService) SendEmailCode(ctx context.Context, email, mode string) bool {
+func (s *UserService) SendEmailCode(ctx context.Context, email, mode string) bool {
 	mode = normalizeMode(mode)
 	var ch notification.Channel = &notification.EmailChannel{}
 	code := generateCode()
@@ -182,11 +167,11 @@ func (s *userService) SendEmailCode(ctx context.Context, email, mode string) boo
 
 // ---------- 响应构造 ----------
 
-func (s *userService) IsAdmin(u *model.User) bool {
+func (s *UserService) IsAdmin(u *model.User) bool {
 	return slices.Contains(s.adminUserIDs, int(u.ID))
 }
 
-func (s *userService) UserToDict(u *model.User, p *model.Profile) map[string]any {
+func (s *UserService) UserToDict(u *model.User, p *model.Profile) map[string]any {
 	d := map[string]any{
 		"id":           u.ID,
 		"username":     u.Username,
@@ -231,7 +216,7 @@ func emailCodeKey(email, mode string) string {
 	return fmt.Sprintf(emailCodeCacheKeyFmt, email, normalizeMode(mode))
 }
 
-func (s *userService) verifyEmailCode(ctx context.Context, email, code, mode string) bool {
+func (s *UserService) verifyEmailCode(ctx context.Context, email, code, mode string) bool {
 	if s.redis == nil || email == "" {
 		return false
 	}

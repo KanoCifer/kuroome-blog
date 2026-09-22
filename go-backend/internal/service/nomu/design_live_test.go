@@ -27,7 +27,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
 )
 
-// liveStore 把结果图写到 dir，返回文件名（仅联调用，替代 uploadService）。
+// liveStore 把结果图写到 dir，返回文件名（仅联调用，替代 UploadService）。
 type liveStore struct{ dir string }
 
 func (s liveStore) UploadDesignImage(_ context.Context, _ uint, src io.Reader) (string, error) {

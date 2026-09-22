@@ -24,21 +24,13 @@ type BlogRepositoryer interface {
 }
 
 // Bloger 定义博客读表面的用例契约。
-type Bloger interface {
-	ListPosts(ctx context.Context, page int, search string) (*dto.BlogListResponse, error)
-	GetPost(ctx context.Context, id string) (*dto.PostResponse, error)
-	IncrementViews(ctx context.Context, id string) error
-	LikePost(ctx context.Context, id string) (int, error)
-	ListTags(ctx context.Context) ([]dto.TagResponse, error)
-	ListPostsByTag(ctx context.Context, tag string, page, perPage int) (*dto.PostsByTagResponse, error)
-}
 
-type blogService struct {
+type BlogService struct {
 	repo BlogRepositoryer
 }
 
-func NewBlogService(repo BlogRepositoryer) *blogService {
-	return &blogService{repo: repo}
+func NewBlogService(repo BlogRepositoryer) *BlogService {
+	return &BlogService{repo: repo}
 }
 
 func pagination(page, perPage, total int) dto.Pagination {
@@ -68,7 +60,7 @@ func pagination(page, perPage, total int) dto.Pagination {
 }
 
 // ListPosts 分页列出博客（含标签聚合）—— 与 Python get_blogs 对齐。
-func (s *blogService) ListPosts(ctx context.Context, page int, search string) (*dto.BlogListResponse, error) {
+func (s *BlogService) ListPosts(ctx context.Context, page int, search string) (*dto.BlogListResponse, error) {
 	if page < 1 {
 		page = 1
 	}
@@ -97,7 +89,7 @@ func (s *blogService) ListPosts(ctx context.Context, page int, search string) (*
 }
 
 // GetPost 按 ID 获取单篇博客 —— 与 Python get_blog_post 对齐。
-func (s *blogService) GetPost(ctx context.Context, id string) (*dto.PostResponse, error) {
+func (s *BlogService) GetPost(ctx context.Context, id string) (*dto.PostResponse, error) {
 	if id == "" {
 		return nil, blogerrs.ErrInvalidPostID
 	}
@@ -118,7 +110,7 @@ func (s *blogService) GetPost(ctx context.Context, id string) (*dto.PostResponse
 
 // IncrementViews 原子递增单篇文章的浏览量。
 // 调用方以 fire-and-forget goroutine 触发，不阻塞读取路径。
-func (s *blogService) IncrementViews(ctx context.Context, id string) error {
+func (s *BlogService) IncrementViews(ctx context.Context, id string) error {
 	if id == "" {
 		return blogerrs.ErrInvalidPostID
 	}
@@ -127,7 +119,7 @@ func (s *blogService) IncrementViews(ctx context.Context, id string) error {
 
 // LikePost 原子递增单篇文章的喜欢数并返回递增后的值。
 // 一次性表态：调用方（handler / 客户端）负责幂等，服务端不做重复判定。
-func (s *blogService) LikePost(ctx context.Context, id string) (int, error) {
+func (s *BlogService) LikePost(ctx context.Context, id string) (int, error) {
 	if id == "" {
 		return 0, blogerrs.ErrInvalidPostID
 	}
@@ -138,7 +130,7 @@ func (s *blogService) LikePost(ctx context.Context, id string) (int, error) {
 }
 
 // ListTags 列出所有标签及文章数 —— 与 Python list_tags 对齐。
-func (s *blogService) ListTags(ctx context.Context) ([]dto.TagResponse, error) {
+func (s *BlogService) ListTags(ctx context.Context) ([]dto.TagResponse, error) {
 	tagCounts, err := s.repo.AggregateTagCounts(ctx)
 	if err != nil {
 		return nil, err
@@ -151,7 +143,7 @@ func (s *blogService) ListTags(ctx context.Context) ([]dto.TagResponse, error) {
 }
 
 // ListPostsByTag 按标签分页列出博客 —— 与 Python get_posts_by_tag 对齐。
-func (s *blogService) ListPostsByTag(ctx context.Context, tag string, page, perPage int) (*dto.PostsByTagResponse, error) {
+func (s *BlogService) ListPostsByTag(ctx context.Context, tag string, page, perPage int) (*dto.PostsByTagResponse, error) {
 	tag = strings.TrimSpace(tag)
 	if tag == "" {
 		return nil, blogerrs.ErrInvalidPostID

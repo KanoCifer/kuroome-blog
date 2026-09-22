@@ -1,6 +1,7 @@
 package handler
 
 import (
+
 	"context"
 	"errors"
 	"log/slog"
@@ -14,11 +15,13 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
+	"github.com/KanoCifer/kuroome-blog/internal/service"
 	"github.com/KanoCifer/kuroome-blog/internal/util"
 )
 
-// GitHubOAuthServiceer 定义 handler 依赖的 GitHub OAuth 业务接口。
-type GitHubOAuthServiceer interface {
+// GitHubOAuther 定义 handler 依赖的 GitHub OAuth 业务能力。
+// 由 *service.GitHubOAuth 隐式满足。
+type GitHubOAuther interface {
 	// AuthURL 构造 GitHub 授权地址。 mode="login" | "bind"。
 	AuthURL(ctx context.Context, mode string, userID uint) (string, error)
 
@@ -30,14 +33,17 @@ type GitHubOAuthServiceer interface {
 	UnbindGitHub(ctx context.Context, userID uint) error
 }
 
+var _ GitHubOAuther = (*service.GitHubOAuth)(nil)
+
+
 // GitHubHandler 持有 GitHub OAuth 服务。
 type GitHubHandler struct {
-	githubSvc GitHubOAuthServiceer
+	githubSvc GitHubOAuther
 	cfg       *config.Config
 }
 
 // NewGitHubHandler 构造一个 GitHubHandler。
-func NewGitHubHandler(githubSvc GitHubOAuthServiceer, cfg *config.Config) *GitHubHandler {
+func NewGitHubHandler(githubSvc GitHubOAuther, cfg *config.Config) *GitHubHandler {
 	return &GitHubHandler{githubSvc: githubSvc, cfg: cfg}
 }
 

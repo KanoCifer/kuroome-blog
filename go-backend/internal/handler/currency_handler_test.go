@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
-	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
 // ── mock Currencyer ──────────────────────────────────────────────────
@@ -19,7 +18,7 @@ type mockCurrencyService struct {
 	getExchangeFn func(ctx context.Context, baseCurrency string) (*dto.ExchangeResponse, error)
 }
 
-var _ service.Currencyer = (*mockCurrencyService)(nil)
+var _ Currencyer = (*mockCurrencyService)(nil)
 
 func (m *mockCurrencyService) GetExchange(ctx context.Context, baseCurrency string) (*dto.ExchangeResponse, error) {
 	if m.getExchangeFn != nil {
@@ -31,7 +30,7 @@ func (m *mockCurrencyService) GetExchange(ctx context.Context, baseCurrency stri
 // ── helpers ─────────────────────────────────────────────────────────
 
 // newCurrencyRouter 构造一个独立的 gin 引擎并挂载 currency 路由。
-func newCurrencyRouter(svc service.Currencyer) *gin.Engine {
+func newCurrencyRouter(svc Currencyer) *gin.Engine {
 	h := NewCurrencyHandler(svc)
 	r := gin.New()
 	g := r.Group("/v3")

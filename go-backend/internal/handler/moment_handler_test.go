@@ -13,12 +13,11 @@ import (
 
 	"github.com/KanoCifer/kuroome-blog/internal/domain/moment/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
-	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
 // ---------- mock Momenter ----------
 
-// mockMomentService 严格匹配 service.Momenter 接口签名 —— Go 要求 context.Context
+// mockMomentService 严格匹配 Momenter 接口签名 —— Go 要求 context.Context
 // 精确类型匹配，不能用 interface{} 替代。
 type mockMomentService struct {
 	createFn       func(ctx context.Context, userID int, req dto.MomentRequest) (*dto.MomentResponse, error)
@@ -31,7 +30,7 @@ type mockMomentService struct {
 	hardDelFn      func(ctx context.Context, id string) error
 }
 
-var _ service.Momenter = (*mockMomentService)(nil)
+var _ Momenter = (*mockMomentService)(nil)
 
 func (m *mockMomentService) Create(ctx context.Context, userID int, req dto.MomentRequest) (*dto.MomentResponse, error) {
 	if m.createFn != nil {

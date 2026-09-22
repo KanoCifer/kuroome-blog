@@ -1,6 +1,8 @@
 package handler
 
 import (
+
+	"context"
 	"net/http"
 	"strconv"
 	"time"
@@ -9,18 +11,35 @@ import (
 
 	"github.com/KanoCifer/kuroome-blog/internal/config"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
+	"github.com/KanoCifer/kuroome-blog/internal/mongo/document"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 	"github.com/KanoCifer/kuroome-blog/pkg/jwt"
 )
 
+// DevTasker 定义 devtask 读表面的能力集合。
+// 由 *service.DevTaskService 隐式满足。所有接口一律使用 slug 作为任务标识。
+type DevTasker interface {
+	Create(ctx context.Context, userID int, req dto.DevTaskCreate) (*dto.DevTaskResponse, error)
+	GetBySlug(ctx context.Context, slug string, withParent bool) (*dto.DevTaskResponse, error)
+	List(ctx context.Context, filter dto.DevTaskFilter, page, perPage int) (*dto.DevTaskListResponse, error)
+	Update(ctx context.Context, slug string, req dto.DevTaskUpdate) error
+	BatchUpdateStatus(ctx context.Context, slugs []string, status document.DevTaskStatus) (*service.BatchStatusResult, error)
+	SoftDelete(ctx context.Context, slug string) error
+	HardDelete(ctx context.Context, slug string) error
+	FindFrontier(ctx context.Context, limit int) ([]dto.DevTaskResponse, error)
+}
+
+var _ DevTasker = (*service.DevTaskService)(nil)
+
+
 // DevTaskHandler 处理开发与需求看板请求（需登录 + admin）。
 type DevTaskHandler struct {
-	svc service.DevTasker
+	svc DevTasker
 	cfg *config.Config
 }
 
-func NewDevTaskHandler(svc service.DevTasker, cfg *config.Config) *DevTaskHandler {
+func NewDevTaskHandler(svc DevTasker, cfg *config.Config) *DevTaskHandler {
 	return &DevTaskHandler{svc: svc, cfg: cfg}
 }
 

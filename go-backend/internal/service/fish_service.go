@@ -19,13 +19,6 @@ type FishRepoer interface {
 	GetByID(ctx context.Context, id string) (*document.FishingSpot, error)
 }
 
-type Fisher interface {
-	GetFishingSpots(ctx context.Context) ([]*dto.FishingSpotResponse, error)
-	GetFishingSpotByID(ctx context.Context, id string) (*dto.FishingSpotResponse, error)
-	CreateFishingSpot(ctx context.Context, spot *dto.FishingSpotRequest) error
-	UpdateFishingSpot(ctx context.Context, id string, spot *dto.FishingSpotUpdate) error
-	Delete(ctx context.Context, id string, hardDelete ...bool) error
-}
 
 // ErrInvalidKind 是领域错误 —— handler 据此映射 400 + invalid_kind 标记。
 // 定义在 internal/domain/fish/errs，此处转出以保持既有引用不变。

@@ -16,18 +16,6 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/util"
 )
 
-type Weatherer interface {
-	GetTide(ctx context.Context, harbor, date string) (json.RawMessage, bool, error)
-
-	GetCurrent(ctx context.Context, location, locationID *string) (json.RawMessage, error)
-	GetHourly(ctx context.Context, hours int, location, locationID *string) (json.RawMessage, error)
-	GetForecast(ctx context.Context, days int, location, locationID *string) (json.RawMessage, error)
-	GetIndices(ctx context.Context, location, locationID *string) (json.RawMessage, error)
-	GetPOI(ctx context.Context, location string) (json.RawMessage, error)
-	GetNearbyTSTA(ctx context.Context, location string) (map[string]string, error)
-
-	GetFullWeatherData(ctx context.Context, location string) (*dto.FullWeatherData, error)
-}
 
 // weatherPart 给 FanOut 结果打标签，配合完成顺序无关的 channel 读取。
 type weatherPart struct {

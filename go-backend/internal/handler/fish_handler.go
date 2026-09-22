@@ -1,18 +1,33 @@
 package handler
 
 import (
+
+	"context"
 	"errors"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 
-	fisherrs "github.com/KanoCifer/kuroome-blog/internal/domain/fish/errs"
+	"github.com/KanoCifer/kuroome-blog/internal/domain/fish/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/middleware"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
+
+// Fisher 定义 handler 依赖的钓点管理能力。
+// 由 *service.FishService 隐式满足。
+type Fisher interface {
+	GetFishingSpots(ctx context.Context) ([]*dto.FishingSpotResponse, error)
+	GetFishingSpotByID(ctx context.Context, id string) (*dto.FishingSpotResponse, error)
+	CreateFishingSpot(ctx context.Context, spot *dto.FishingSpotRequest) error
+	UpdateFishingSpot(ctx context.Context, id string, spot *dto.FishingSpotUpdate) error
+	Delete(ctx context.Context, id string, hardDelete ...bool) error
+}
+
+var _ Fisher = (*service.FishService)(nil)
+
 
 // kindBindingErrMessage gin binding tag 触发 oneof 失败时返回的字符串固定形态。
 // 我们嗅探字符串以把 binding 阶段的 kind 错误也归一为同一个 invalid_kind 标记。
@@ -41,10 +56,10 @@ func isInvalidKindError(err error) bool {
 
 // FishHandler 处理钓点资源的 CRUD 请求。
 type FishHandler struct {
-	svc service.Fisher
+	svc Fisher
 }
 
-func NewFishHandler(svc service.Fisher) *FishHandler {
+func NewFishHandler(svc Fisher) *FishHandler {
 	return &FishHandler{svc: svc}
 }
 

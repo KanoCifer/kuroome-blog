@@ -44,16 +44,6 @@ var momentAttachmentTypeValues = map[dto.MomentAttachmentType]document.MomentAtt
 }
 
 // Momenter moment 服务接口 —— handler 依赖接口，便于 mock 测试。
-type Momenter interface {
-	Create(ctx context.Context, userID int, req dto.MomentRequest) (*dto.MomentResponse, error)
-	GetByID(ctx context.Context, id string) (*dto.MomentResponse, error)
-	GetByIDAdmin(ctx context.Context, id string) (*dto.MomentResponse, error)
-	ListPublic(ctx context.Context, filter dto.MomentFilter, page, pageSize int) (*dto.MomentListResponse, error)
-	ListAdmin(ctx context.Context, filter dto.MomentFilter, page, pageSize int) (*dto.MomentListResponse, error)
-	Update(ctx context.Context, id string, req dto.MomentUpdate) error
-	SoftDelete(ctx context.Context, id string) error
-	HardDelete(ctx context.Context, id string) error
-}
 
 // MomentRepositoryer moment 持久层接口 —— service 依赖接口，便于 mock 测试。
 type MomentRepositoryer interface {

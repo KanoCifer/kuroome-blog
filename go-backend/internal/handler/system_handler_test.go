@@ -12,7 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
-	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
 func init() {
@@ -44,7 +43,7 @@ func (m *mockSystemService) ListEvents(
 
 // ---------- helpers ----------
 
-func setupSystem(svc service.Systemer) *gin.Engine {
+func setupSystem(svc Systemer) *gin.Engine {
 	h := NewSystemHandler(svc)
 	r := gin.New()
 	v3 := r.Group("/v3")

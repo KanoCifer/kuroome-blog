@@ -1,6 +1,7 @@
 package handler
 
 import (
+
 	"context"
 	"errors"
 	"log/slog"
@@ -9,13 +10,15 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	blogerrs "github.com/KanoCifer/kuroome-blog/internal/domain/blog/errs"
+	"github.com/KanoCifer/kuroome-blog/internal/domain/blog/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
+	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
-// BlogServiceer 博客读表面 —— handler 依赖接口，便于 mock 测试。
-type BlogServiceer interface {
+// Bloger 定义博客读表面的用例契约。
+// 由 *service.BlogService 隐式满足。
+type Bloger interface {
 	ListPosts(ctx context.Context, page int, search string) (*dto.BlogListResponse, error)
 	GetPost(ctx context.Context, id string) (*dto.PostResponse, error)
 	IncrementViews(ctx context.Context, id string) error
@@ -24,12 +27,15 @@ type BlogServiceer interface {
 	ListPostsByTag(ctx context.Context, tag string, page, perPage int) (*dto.PostsByTagResponse, error)
 }
 
+var _ Bloger = (*service.BlogService)(nil)
+
+
 // BlogHandler 处理博客读请求（公开接口，无需鉴权）。
 type BlogHandler struct {
-	blogSvc BlogServiceer
+	blogSvc Bloger
 }
 
-func NewBlogHandler(blogSvc BlogServiceer) *BlogHandler {
+func NewBlogHandler(blogSvc Bloger) *BlogHandler {
 	return &BlogHandler{blogSvc: blogSvc}
 }
 

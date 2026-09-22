@@ -1,6 +1,7 @@
 package handler
 
 import (
+
 	"context"
 	"errors"
 	"log/slog"
@@ -12,11 +13,13 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
+	"github.com/KanoCifer/kuroome-blog/internal/service"
 	"github.com/KanoCifer/kuroome-blog/internal/util"
 )
 
-// PasskeyServiceer 定义 handler 依赖的 Passkey 业务接口。
-type PasskeyServiceer interface {
+// Passkeyer 定义 handler 依赖的 Passkey 业务能力。
+// 由 *service.PasskeyService 隐式满足。
+type Passkeyer interface {
 	HasPasskey(ctx context.Context, userID uint) bool
 	BeginRegistration(ctx context.Context, userID uint) (map[string]any, error)
 	FinishRegistration(ctx context.Context, userID uint, response map[string]any) error
@@ -25,21 +28,24 @@ type PasskeyServiceer interface {
 	DeletePasskey(ctx context.Context, userID uint) error
 }
 
+var _ Passkeyer = (*service.PasskeyService)(nil)
+
+
 // passkeyTokenCreator 是 PasskeyHandler 为签发 token 所需的窄接口。
-// handler 自定接口，不直接依赖 service.Userer，便于 mock 测试。
+// 比 service.Userer 小，只用 CreateTokens / UserToDict 两方法；mock 测试更轻。
 type passkeyTokenCreator interface {
 	CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
 	UserToDict(u *model.User, p *model.Profile) map[string]any
 }
 
-// PasskeyHandler 持有 PasskeyServiceer 和 passkeyTokenCreator（登录后构造 token）。
+// PasskeyHandler 持有 passkeySvc 和 passkeyTokenCreator（登录后构造 token）。
 type PasskeyHandler struct {
-	passkeySvc PasskeyServiceer
+	passkeySvc Passkeyer
 	userSvc    passkeyTokenCreator
 	cfg        *config.Config
 }
 
-func NewPasskeyHandler(passkeySvc PasskeyServiceer, userSvc passkeyTokenCreator, cfg *config.Config) *PasskeyHandler {
+func NewPasskeyHandler(passkeySvc Passkeyer, userSvc passkeyTokenCreator, cfg *config.Config) *PasskeyHandler {
 	return &PasskeyHandler{passkeySvc: passkeySvc, userSvc: userSvc, cfg: cfg}
 }
 

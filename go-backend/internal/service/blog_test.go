@@ -65,8 +65,8 @@ func (m *mockBlogRepo) ListPostsByTag(ctx context.Context, tag string, page, per
 	return nil, 0, nil
 }
 
-func newBlogService(repo BlogRepositoryer) *blogService {
-	return &blogService{repo: repo}
+func newBlogService(repo BlogRepositoryer) *BlogService {
+	return &BlogService{repo: repo}
 }
 
 // ---------- GetPost ----------

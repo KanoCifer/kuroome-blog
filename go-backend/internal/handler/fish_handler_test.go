@@ -15,7 +15,6 @@ import (
 	fisherrs "github.com/KanoCifer/kuroome-blog/internal/domain/fish/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/mongo/document"
-	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
 func init() {
@@ -23,7 +22,7 @@ func init() {
 }
 
 // ---------- mock Fisher ----------
-// 字段签名与 service.Fisher 接口严格一致 —— Go 要求参数类型精确匹配，
+// 字段签名与 Fisher 接口严格一致 —— Go 要求参数类型精确匹配，
 // 不能用 interface{} 替代 context.Context。
 
 type mockFishService struct {
@@ -34,7 +33,7 @@ type mockFishService struct {
 	deleteFn  func(ctx context.Context, id string, hard ...bool) error
 }
 
-var _ service.Fisher = (*mockFishService)(nil)
+var _ Fisher = (*mockFishService)(nil)
 
 func (m *mockFishService) GetFishingSpots(ctx context.Context) ([]*dto.FishingSpotResponse, error) {
 	if m.listFn != nil {

@@ -57,17 +57,9 @@ type PasskeyRepositoryer interface {
 }
 
 // Passkeyer 定义 passkey handler 依赖的业务能力。
-type Passkeyer interface {
-	HasPasskey(ctx context.Context, userID uint) bool
-	BeginRegistration(ctx context.Context, userID uint) (map[string]any, error)
-	FinishRegistration(ctx context.Context, userID uint, response map[string]any) error
-	BeginLogin(ctx context.Context) (map[string]any, error)
-	FinishLogin(ctx context.Context, response map[string]any) (*model.User, error)
-	DeletePasskey(ctx context.Context, userID uint) error
-}
 
 // PasskeyServiceer 编排 WebAuthn 注册 / 认证流程，challenge 存 Redis。
-type passkeyService struct {
+type PasskeyService struct {
 	webauthn    *webauthn.WebAuthn
 	redis       *redis.Client
 	passkeyRepo PasskeyRepositoryer
@@ -79,8 +71,8 @@ func NewPasskeyService(
 	redis *redis.Client,
 	passkeyRepo PasskeyRepositoryer,
 	userRepo UserRepositoryer,
-) *passkeyService {
-	return &passkeyService{
+) *PasskeyService {
+	return &PasskeyService{
 		webauthn:    wa,
 		redis:       redis,
 		passkeyRepo: passkeyRepo,
@@ -105,13 +97,13 @@ func NewWebAuthn(rpID, rpOrigin string) (*webauthn.WebAuthn, error) {
 // ---------- 注册 ----------
 
 // HasPasskey 检查用户是否已注册 Passkey。
-func (s *passkeyService) HasPasskey(ctx context.Context, userID uint) bool {
+func (s *PasskeyService) HasPasskey(ctx context.Context, userID uint) bool {
 	cred, err := s.passkeyRepo.GetByUserID(ctx, userID)
 	return err == nil && cred != nil
 }
 
 // BeginRegistration 生成注册选项，challenge 存 Redis（以 userID 为 key）。
-func (s *passkeyService) BeginRegistration(ctx context.Context, userID uint) (map[string]any, error) {
+func (s *PasskeyService) BeginRegistration(ctx context.Context, userID uint) (map[string]any, error) {
 	if s.HasPasskey(ctx, userID) {
 		return nil, passkeyerrs.ErrPasskeyExists
 	}
@@ -139,7 +131,7 @@ func (s *passkeyService) BeginRegistration(ctx context.Context, userID uint) (ma
 }
 
 // FinishRegistration 验证注册响应并存储凭证。
-func (s *passkeyService) FinishRegistration(ctx context.Context, userID uint, response map[string]any) error {
+func (s *PasskeyService) FinishRegistration(ctx context.Context, userID uint, response map[string]any) error {
 	session, err := s.getRegistrationSession(ctx, userID)
 	if err != nil {
 		return err
@@ -180,7 +172,7 @@ func (s *passkeyService) FinishRegistration(ctx context.Context, userID uint, re
 // ---------- 认证 ----------
 
 // BeginLogin 生成 discoverable 认证选项，challenge 存 Redis（以 challenge 为 key）。
-func (s *passkeyService) BeginLogin(ctx context.Context) (map[string]any, error) {
+func (s *PasskeyService) BeginLogin(ctx context.Context) (map[string]any, error) {
 	assertion, session, err := s.webauthn.BeginDiscoverableLogin()
 	if err != nil {
 		return nil, fmt.Errorf("begin login: %w", err)
@@ -197,7 +189,7 @@ func (s *passkeyService) BeginLogin(ctx context.Context) (map[string]any, error)
 }
 
 // FinishLogin 验证认证响应，返回登录用户。
-func (s *passkeyService) FinishLogin(ctx context.Context, response map[string]any) (*model.User, error) {
+func (s *PasskeyService) FinishLogin(ctx context.Context, response map[string]any) (*model.User, error) {
 	credentialID, err := extractCredentialID(response)
 	if err != nil {
 		return nil, err
@@ -245,7 +237,7 @@ func (s *passkeyService) FinishLogin(ctx context.Context, response map[string]an
 }
 
 // DeletePasskey 删除用户 Passkey 凭证。
-func (s *passkeyService) DeletePasskey(ctx context.Context, userID uint) error {
+func (s *PasskeyService) DeletePasskey(ctx context.Context, userID uint) error {
 	cred, err := s.passkeyRepo.GetByUserID(ctx, userID)
 	if err != nil || cred == nil {
 		return passkeyerrs.ErrPasskeyNotFound
@@ -260,7 +252,7 @@ func (s *passkeyService) DeletePasskey(ctx context.Context, userID uint) error {
 // discoverableHandler 提供 discoverable login 的用户查找回调。
 // 注意：ValidatePasskeyLogin 要求返回的 user.WebAuthnCredentials() 包含匹配的凭证。
 // cred 为 FinishLogin 已预加载的凭证,避免回调内重复查询 DB。
-func (s *passkeyService) discoverableHandler(cred *model.PasskeyCredential) webauthn.DiscoverableUserHandler {
+func (s *PasskeyService) discoverableHandler(cred *model.PasskeyCredential) webauthn.DiscoverableUserHandler {
 	return func(rawID, userHandle []byte) (webauthn.User, error) {
 		username := ""
 		if cred.User != nil {
@@ -276,7 +268,7 @@ func (s *passkeyService) discoverableHandler(cred *model.PasskeyCredential) weba
 
 // ---------- Redis 操作 ----------
 
-func (s *passkeyService) storeRegistrationSession(ctx context.Context, userID uint, session *webauthn.SessionData) {
+func (s *PasskeyService) storeRegistrationSession(ctx context.Context, userID uint, session *webauthn.SessionData) {
 	if s.redis == nil {
 		return
 	}
@@ -284,7 +276,7 @@ func (s *passkeyService) storeRegistrationSession(ctx context.Context, userID ui
 	s.redis.Set(ctx, registrationKeyPrefix+fmt.Sprintf("%d", userID), data, challengeTTL)
 }
 
-func (s *passkeyService) getRegistrationSession(ctx context.Context, userID uint) (*webauthn.SessionData, error) {
+func (s *PasskeyService) getRegistrationSession(ctx context.Context, userID uint) (*webauthn.SessionData, error) {
 	if s.redis == nil {
 		return nil, passkeyerrs.ErrInvalidPasskey
 	}
@@ -299,14 +291,14 @@ func (s *passkeyService) getRegistrationSession(ctx context.Context, userID uint
 	return &session, nil
 }
 
-func (s *passkeyService) deleteRegistrationSession(ctx context.Context, userID uint) {
+func (s *PasskeyService) deleteRegistrationSession(ctx context.Context, userID uint) {
 	if s.redis == nil {
 		return
 	}
 	s.redis.Del(ctx, registrationKeyPrefix+fmt.Sprintf("%d", userID))
 }
 
-func (s *passkeyService) storeAuthenticationSession(ctx context.Context, challenge string, session *webauthn.SessionData) {
+func (s *PasskeyService) storeAuthenticationSession(ctx context.Context, challenge string, session *webauthn.SessionData) {
 	if s.redis == nil {
 		return
 	}
@@ -314,7 +306,7 @@ func (s *passkeyService) storeAuthenticationSession(ctx context.Context, challen
 	s.redis.Set(ctx, authenticationKeyPrefix+challenge, data, challengeTTL)
 }
 
-func (s *passkeyService) getAuthenticationSession(ctx context.Context, challenge string) (*webauthn.SessionData, error) {
+func (s *PasskeyService) getAuthenticationSession(ctx context.Context, challenge string) (*webauthn.SessionData, error) {
 	if s.redis == nil {
 		return nil, passkeyerrs.ErrInvalidPasskey
 	}
@@ -329,7 +321,7 @@ func (s *passkeyService) getAuthenticationSession(ctx context.Context, challenge
 	return &session, nil
 }
 
-func (s *passkeyService) deleteAuthenticationSession(ctx context.Context, challenge string) {
+func (s *PasskeyService) deleteAuthenticationSession(ctx context.Context, challenge string) {
 	if s.redis == nil {
 		return
 	}
