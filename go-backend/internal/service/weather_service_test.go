@@ -448,8 +448,10 @@ func TestFullWeatherData_JSONShape(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Marshal: %v", err)
 	}
-	for _, key := range []string{`"current":`, `"hourly":`, `"daily":`, `"tide":`,
-		`"indices":`, `"locationName":"港口A"`, `"poiId":"P2352"`} {
+	for _, key := range []string{
+		`"current":`, `"hourly":`, `"daily":`, `"tide":`,
+		`"indices":`, `"locationName":"港口A"`, `"poiId":"P2352"`,
+	} {
 		if !strings.Contains(string(b), key) {
 			t.Errorf("JSON missing %s: %s", key, b)
 		}

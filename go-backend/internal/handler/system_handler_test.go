@@ -88,8 +88,10 @@ func TestEvents_DefaultParamsReturnsItemsAndPagination(t *testing.T) {
 					{ID: 1, Type: "startup", Message: "boot"},
 					{ID: 2, Type: "deploy", Message: "v1"},
 				},
-				Pagination: dto.Pagination{Page: 1, PerPage: 10, Total: 2, Pages: 1,
-					HasPrev: false, HasNext: false},
+				Pagination: dto.Pagination{
+					Page: 1, PerPage: 10, Total: 2, Pages: 1,
+					HasPrev: false, HasNext: false,
+				},
 			}, nil
 		},
 	}

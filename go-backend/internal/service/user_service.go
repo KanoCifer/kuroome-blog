@@ -33,12 +33,12 @@ const (
 	//   email_login_code:<email>:nomu             6 位验证码，TTL 5min
 	//   email_login_attempts:<email>:nomu         单码失败计数，TTL 与 code 同步
 	//   email_login_send_cooldown:<email>:nomu    发码冷却 60s（防邮件轰炸）
-	emailLoginCodeKeyFmt        = "email_login_code:%s:%s"
-	emailLoginAttemptsKeyFmt    = "email_login_attempts:%s:%s"
-	emailLoginCooldownKeyFmt    = "email_login_send_cooldown:%s:%s"
-	emailLoginCooldown          = time.Second * 60
-	emailLoginMaxAttempts       = 5
-	emailLoginCodeLength        = 6
+	emailLoginCodeKeyFmt     = "email_login_code:%s:%s"
+	emailLoginAttemptsKeyFmt = "email_login_attempts:%s:%s"
+	emailLoginCooldownKeyFmt = "email_login_send_cooldown:%s:%s"
+	emailLoginCooldown       = time.Second * 60
+	emailLoginMaxAttempts    = 5
+	emailLoginCodeLength     = 6
 
 	// bcryptCost 密码 hash cost。12 = 2^12 key schedule rounds，
 	// 2026 年推荐值（bcrypt.DefaultCost=10 已偏弱）。
@@ -208,7 +208,6 @@ func (s *UserService) RegisterFlow(
 	return u, p, nil
 }
 
-
 // ResetPasswordFlow 给指定邮箱发密码重置邮件，并把一次性 challenge 写到
 // redis 独立命名空间（不与 email code 共用 key），把 challenge return 给
 // handler，由 handler 回给浏览器。浏览器要在 confirm 请求里把 challenge
@@ -239,7 +238,7 @@ func (s *UserService) ResetPasswordFlow(ctx context.Context, email, mode string)
 			"err", err, "email", email, "mode", mode)
 	}
 
-	emailCtx , cancel := context.WithTimeout(ctx, time.Second*30)
+	emailCtx, cancel := context.WithTimeout(ctx, time.Second*30)
 	defer cancel()
 	go s.sendPasswordReset(emailCtx, email, mode)
 	return challenge, nil
@@ -326,9 +325,11 @@ func (s *UserService) SendEmailCode(ctx context.Context, email, mode string) boo
 func emailLoginKey(email string) string {
 	return fmt.Sprintf(emailLoginCodeKeyFmt, email, modeNomu)
 }
+
 func emailLoginAttemptsKey(email string) string {
 	return fmt.Sprintf(emailLoginAttemptsKeyFmt, email, modeNomu)
 }
+
 func emailLoginCooldownKey(email string) string {
 	return fmt.Sprintf(emailLoginCooldownKeyFmt, email, modeNomu)
 }
@@ -423,12 +424,12 @@ func (s *UserService) SendLoginEmailCode(ctx context.Context, email string) bool
 // AuthenticateEmailCode 用邮箱 + 6 位验证码登录 Nomu。
 //
 // 流程：
-//   1. redis 为 nil → fail closed（ErrInvalidEmailCode，避免缺 redis 时跳过验证）；
-//   2. 仓库按邮箱查 user，未注册 → ErrInvalidEmailCode（与错码同响应，隐藏存在性）；
-//   3. Lua 脚本原子核验 + 错误计数 + 消费；返回 0/-1/1，分别对应：
-//      0 = 验证码错但未到上限；-1 = 验证码错且达到 5 次上限（code 被清）；
-//      1 = 验证码正确（code 被一次性消费）；
-//   4. 成功 → 返回 user/profile，由 handler 走 CreateTokens 流程。
+//  1. redis 为 nil → fail closed（ErrInvalidEmailCode，避免缺 redis 时跳过验证）；
+//  2. 仓库按邮箱查 user，未注册 → ErrInvalidEmailCode（与错码同响应，隐藏存在性）；
+//  3. Lua 脚本原子核验 + 错误计数 + 消费；返回 0/-1/1，分别对应：
+//     0 = 验证码错但未到上限；-1 = 验证码错且达到 5 次上限（code 被清）；
+//     1 = 验证码正确（code 被一次性消费）；
+//  4. 成功 → 返回 user/profile，由 handler 走 CreateTokens 流程。
 //
 // 错误码与未知账户同响应：service 透传 ErrInvalidEmailCode，handler → 400。
 func (s *UserService) AuthenticateEmailCode(
@@ -454,7 +455,8 @@ func (s *UserService) AuthenticateEmailCode(
 		return nil, nil, usererrs.ErrInvalidEmailCode
 	}
 
-	res, err := loginCodeVerifyScript.Run(ctx, s.redis,
+	res, err := loginCodeVerifyScript.Run(
+		ctx, s.redis,
 		[]string{emailLoginKey(email), emailLoginAttemptsKey(email)},
 		code, emailLoginMaxAttempts,
 	).Int()

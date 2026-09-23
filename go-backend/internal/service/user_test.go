@@ -23,8 +23,8 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/logger"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/pkg/emailtemplates"
-	"github.com/KanoCifer/kuroome-blog/pkg/notification"
 	jwtpkg "github.com/KanoCifer/kuroome-blog/pkg/jwt"
+	"github.com/KanoCifer/kuroome-blog/pkg/notification"
 )
 
 func TestCheckPassword_Correct(t *testing.T) {
@@ -1486,9 +1486,9 @@ func TestConfirmPasswordReset_RejectsSamePassword(t *testing.T) {
 	t.Cleanup(func() { _ = rdb.Close() })
 
 	const (
-		email   = "bob@example.com"
-		pwd     = "samePass1"
-		code    = "555000"
+		email = "bob@example.com"
+		pwd   = "samePass1"
+		code  = "555000"
 	)
 	hash, _ := bcrypt.GenerateFromPassword([]byte(pwd), bcryptCost)
 	u := &model.User{Model: gormModel(7), PasswordHash: string(hash)}
@@ -1548,11 +1548,11 @@ func TestConfirmPasswordReset_WrongCodeDoesNotBurnChallenge(t *testing.T) {
 	t.Cleanup(func() { _ = rdb.Close() })
 
 	const (
-		email      = "carol@example.com"
-		rightCode  = "111111"
-		wrongCode  = "222222"
-		newPwd     = "freshPass9"
-		challenge  = "f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1"
+		email     = "carol@example.com"
+		rightCode = "111111"
+		wrongCode = "222222"
+		newPwd    = "freshPass9"
+		challenge = "f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1"
 	)
 	oldHash, _ := bcrypt.GenerateFromPassword([]byte("old"), bcryptCost)
 	u := &model.User{Model: gormModel(9), PasswordHash: string(oldHash)}
@@ -1654,8 +1654,8 @@ func (f *fakeChannel) Send(_ context.Context, _ notification.Message, nc notific
 // okLoad / okStore 对 atomic.Bool 的小封装，避免在测试中反复写.Load/.Store。
 type bool32 struct{ v atomic.Bool }
 
-func (b *bool32) Load() bool      { return b.v.Load() }
-func (b *bool32) Store(v bool)    { b.v.Store(v) }
+func (b *bool32) Load() bool   { return b.v.Load() }
+func (b *bool32) Store(v bool) { b.v.Store(v) }
 
 // newLoginCodeSvc 构造一个跑得起来的 UserService：miniredis + 一个 fake 邮件 channel + 注入 mockUserRepo。
 //
@@ -1676,9 +1676,9 @@ func newLoginCodeSvc(t *testing.T, repo *mockUserRepo, mailOK bool) (*UserServic
 	mailer := emailtemplates.NewMailerWithChannel(ch)
 
 	svc := &UserService{
-		repo:    repo,
-		redis:   rdb,
-		mailer:  mailer,
+		repo:       repo,
+		redis:      rdb,
+		mailer:     mailer,
 		maxDevices: 5,
 	}
 	return svc, mr, rdb, ch
@@ -2083,9 +2083,9 @@ func TestSendLoginEmailCode_KeyIsolation(t *testing.T) {
 
 	// 写其他用途的码
 	for _, k := range []string{
-		emailCodeKey(email, modeBlog, false),       // 注册
-		emailCodeKey(email, modeNomu, false),       // 注册 nomu
-		emailCodeKey(email, modeBlog, true),        // 重置 blog
+		emailCodeKey(email, modeBlog, false),                       // 注册
+		emailCodeKey(email, modeNomu, false),                       // 注册 nomu
+		emailCodeKey(email, modeBlog, true),                        // 重置 blog
 		fmt.Sprintf("magiclogintoken:%s:%s", "deadbeef", modeNomu), // 魔法登录
 	} {
 		if err := mr.Set(k, "111111"); err != nil {
@@ -2096,8 +2096,8 @@ func TestSendLoginEmailCode_KeyIsolation(t *testing.T) {
 	ch := &fakeChannel{}
 	ch.ok.Store(true)
 	svc := &UserService{
-		redis: rdb,
-		repo:  registeredRepo(email, 42),
+		redis:  rdb,
+		repo:   registeredRepo(email, 42),
 		mailer: emailtemplates.NewMailerWithChannel(ch),
 	}
 	if !svc.SendLoginEmailCode(context.Background(), email) {
@@ -2128,8 +2128,8 @@ func TestSendLoginEmailCode_NoMailer(t *testing.T) {
 	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
 	t.Cleanup(func() { _ = rdb.Close() })
 	svc := &UserService{
-		redis: rdb,
-		repo:  registeredRepo("alice@example.com", 42),
+		redis:  rdb,
+		repo:   registeredRepo("alice@example.com", 42),
 		mailer: nil,
 	}
 	if svc.SendLoginEmailCode(context.Background(), "alice@example.com") {

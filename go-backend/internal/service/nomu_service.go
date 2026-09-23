@@ -27,8 +27,10 @@ var (
 	ErrSyncTooMany = nomuerrs.ErrSyncTooMany
 )
 
-const syncMaxBatch = 200
-const UserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36"
+const (
+	syncMaxBatch = 200
+	UserAgent    = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36"
+)
 
 // NomuRepository 定义 NomuService 依赖的数据能力（供 mock 测试）。
 type NomuRepository interface {

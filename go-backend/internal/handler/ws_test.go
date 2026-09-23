@@ -34,7 +34,7 @@ func newMock() *mockWSService {
 
 func (m *mockWSService) ReadMsg(ctx context.Context, conn *websocket.Conn, msg any) error {
 	// 注入首条 visitor_id 消息，模拟真实客户端握手。
-	*(msg.(*map[string]any)) = map[string]any{
+	*msg.(*map[string]any) = map[string]any{
 		"type":       "visitor_id",
 		"visitor_id": "visitor-123",
 	}
@@ -207,7 +207,7 @@ type mockWSServiceNoVisitor struct {
 }
 
 func (m *mockWSServiceNoVisitor) ReadMsg(ctx context.Context, conn *websocket.Conn, msg any) error {
-	*(msg.(*map[string]any)) = map[string]any{"type": "ping"}
+	*msg.(*map[string]any) = map[string]any{"type": "ping"}
 	return nil
 }
 

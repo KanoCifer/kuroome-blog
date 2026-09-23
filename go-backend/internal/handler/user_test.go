@@ -44,20 +44,20 @@ type mockRegisterBonuser interface {
 }
 
 type mockUserService struct {
-	authenticateFn           func(ctx context.Context, username, password string) (*model.User, error)
-	authenticateEmailCodeFn  func(ctx context.Context, email, code string) (*model.User, *model.Profile, error)
-	authenticateMagicFn      func(ctx context.Context, token string) (*model.User, *model.Profile, error)
-	createTokensFn           func(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
-	createUserFn             func(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error)
-	getByIDFn                func(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
-	getByUsernameFn          func(ctx context.Context, username string) (*model.User, *model.Profile, error)
-	logoutFn                 func(ctx context.Context, userID uint, jti string)
-	refreshFn                func(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
-	sendEmailCodeFn          func(ctx context.Context, email, mode string) bool
-	sendLoginEmailCodeFn     func(ctx context.Context, email string) bool
-	sendMagicLoginEmailFn    func(ctx context.Context, email, mode, deviceID string) bool
-	pollNomuLoginFn          func(ctx context.Context, deviceID string) (*service.NomuLoginState, error)
-	userToDictFn             func(u *model.User, p *model.Profile) map[string]any
+	authenticateFn          func(ctx context.Context, username, password string) (*model.User, error)
+	authenticateEmailCodeFn func(ctx context.Context, email, code string) (*model.User, *model.Profile, error)
+	authenticateMagicFn     func(ctx context.Context, token string) (*model.User, *model.Profile, error)
+	createTokensFn          func(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
+	createUserFn            func(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error)
+	getByIDFn               func(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
+	getByUsernameFn         func(ctx context.Context, username string) (*model.User, *model.Profile, error)
+	logoutFn                func(ctx context.Context, userID uint, jti string)
+	refreshFn               func(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
+	sendEmailCodeFn         func(ctx context.Context, email, mode string) bool
+	sendLoginEmailCodeFn    func(ctx context.Context, email string) bool
+	sendMagicLoginEmailFn   func(ctx context.Context, email, mode, deviceID string) bool
+	pollNomuLoginFn         func(ctx context.Context, deviceID string) (*service.NomuLoginState, error)
+	userToDictFn            func(u *model.User, p *model.Profile) map[string]any
 	// bonusSvc 可选：注入后 RegisterFlow 默认实现会调它 GrantRegisterBonus。
 	// nil 时跳过赠送（与真实 UserService 的 bonusSvc=nil 行为一致）。
 	bonusSvc mockRegisterBonuser
@@ -1397,10 +1397,14 @@ func TestRegisterRoutes_WiresLoginCodeEndpoints(t *testing.T) {
 		path   string
 		body   []byte
 	}{
-		{"send login code", http.MethodPost, "/v3/email/login-code",
-			jsonBody(t, dto.LoginEmailCodeSendRequest{Email: "alice@example.com"})},
-		{"login with code", http.MethodPost, "/v3/login/email-code",
-			jsonBody(t, dto.LoginEmailCodeRequest{Email: "alice@example.com", EmailCode: "123456"})},
+		{
+			"send login code", http.MethodPost, "/v3/email/login-code",
+			jsonBody(t, dto.LoginEmailCodeSendRequest{Email: "alice@example.com"}),
+		},
+		{
+			"login with code", http.MethodPost, "/v3/login/email-code",
+			jsonBody(t, dto.LoginEmailCodeRequest{Email: "alice@example.com", EmailCode: "123456"}),
+		},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {

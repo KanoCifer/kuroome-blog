@@ -46,16 +46,16 @@ type LoginEmailCodeRequest struct {
 }
 
 type ResetPasswordRequest struct {
-	Email     string `json:"email" binding:"required,email"`
-	Mode      string `json:"mode,omitempty" binding:"omitempty,oneof=blog nomu"`
+	Email string `json:"email" binding:"required,email"`
+	Mode  string `json:"mode,omitempty" binding:"omitempty,oneof=blog nomu"`
 }
 
 type ResetPasswordConfirmRequest struct {
-	Challenge string `json:"challenge" binding:"required"`
-	Email     string `json:"email" binding:"required,email"`
-	EmailCode string `json:"email_code" binding:"required"`
+	Challenge   string `json:"challenge" binding:"required"`
+	Email       string `json:"email" binding:"required,email"`
+	EmailCode   string `json:"email_code" binding:"required"`
 	NewPassword string `json:"new_password" binding:"required,min=6"`
-	Mode      string `json:"mode,omitempty" binding:"omitempty,oneof=blog nomu"`
+	Mode        string `json:"mode,omitempty" binding:"omitempty,oneof=blog nomu"`
 }
 
 // LoginRequest 登录请求

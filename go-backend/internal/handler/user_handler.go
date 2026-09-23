@@ -350,7 +350,6 @@ func (h *UserHandler) MagicLoginConsume(c *gin.Context) {
 	response.Success(c, userData, "登录成功")
 }
 
-
 func (h *UserHandler) ResetPassword(c *gin.Context) {
 	var req dto.ResetPasswordRequest
 	if !bindJSON(c, &req) {
