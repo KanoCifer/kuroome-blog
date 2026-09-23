@@ -12,4 +12,6 @@ var (
 	ErrUserNotFound       = apierr.New(404, "用户不存在")
 	ErrInvalidToken       = apierr.New(401, "无效的令牌")
 	ErrInvalidMagicToken  = apierr.New(401, "魔法链接无效或已过期")
+	ErrEmailRequired      = apierr.New(400, "邮箱是必需的")
+	ErrPasswordHashExists   = apierr.New(400, "密码必须与之前的不同")
 )

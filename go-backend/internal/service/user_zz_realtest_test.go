@@ -98,11 +98,11 @@ func TestEmailCode_RealSend_ToOutlook(t *testing.T) {
 	t.Logf(">>> redis key %s 已写入，code = %s（5min TTL）", key, stored)
 
 	// verify 接受这个 code（锁住 send/verify 同一 key 命名空间）。
-	if !svc.verifyEmailCode(context.Background(), target, stored, modeBlog) {
+	if !svc.verifyEmailCode(context.Background(), target, stored, modeBlog, false) {
 		t.Fatal("verifyEmailCode 拒绝 redis 里的 code —— send/verify key 命名空间不一致？")
 	}
 	// 重复使用被拒（一次性消费）。
-	if svc.verifyEmailCode(context.Background(), target, stored, modeBlog) {
+	if svc.verifyEmailCode(context.Background(), target, stored, modeBlog, false) {
 		t.Error("verifyEmailCode 不该接受已消费的 code")
 	}
 }

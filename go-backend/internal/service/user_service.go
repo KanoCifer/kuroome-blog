@@ -2,11 +2,13 @@ package service
 
 import (
 	"context"
+	"crypto/rand"
+	"crypto/subtle"
+	"encoding/hex"
 	"fmt"
 	"log/slog"
-	"math/rand"
+	"math/big"
 	"slices"
-	"strconv"
 	"strings"
 	"time"
 
@@ -22,8 +24,14 @@ import (
 const (
 	emailCodeExpire = time.Minute * 5
 	// 命名空间 by mode，跨 mode 互不串
-	emailCodeCacheKeyFmt  = "email_code:%s:%s"
-	emailResetCacheKeyFmt = "email_reset:%s:%s"
+	emailCodeCacheKeyFmt           = "email_code:%s:%s"
+	emailResetCacheKeyFmt          = "email_reset:%s:%s"
+	emailResetChallengeCacheKeyFmt = "email_reset_challenge:%s:%s"
+
+	// bcryptCost 密码 hash cost。12 = 2^12 key schedule rounds，
+	// 2026 年推荐值（bcrypt.DefaultCost=10 已偏弱）。
+	// 升级只需改这个数字；旧 hash 仍可校验（cost 写在 hash 字符串里）。
+	bcryptCost = 12
 )
 
 // mode 常量：区分同一后端服务下的不同前端
@@ -48,7 +56,6 @@ type UserRepositoryer interface {
 	ClearGithubID(ctx context.Context, userID uint) error
 	UsernameExists(ctx context.Context, username string) bool
 	EmailExists(ctx context.Context, email string) bool
-	PasswordHashExists(ctx context.Context, hash string) bool
 	ListUsersWithLoginRecords(ctx context.Context) ([]model.User, error)
 	Update(ctx context.Context, user *model.User) error
 	UpdateProfile(ctx context.Context, profile *model.Profile) error
@@ -138,12 +145,12 @@ func (s *UserService) CreateUser(ctx context.Context, username, password, email,
 	}
 
 	if emailCode != "" {
-		if !s.verifyEmailCode(ctx, email, emailCode, mode) {
+		if !s.verifyEmailCode(ctx, email, emailCode, mode, false) {
 			return nil, nil, usererrs.ErrInvalidEmailCode
 		}
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcryptCost)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -189,6 +196,94 @@ func (s *UserService) RegisterFlow(
 	return u, p, nil
 }
 
+
+// ResetPasswordFlow 给指定邮箱发密码重置邮件，并把一次性 challenge 写到
+// redis 独立命名空间（不与 email code 共用 key），把 challenge return 给
+// handler，由 handler 回给浏览器。浏览器要在 confirm 请求里把 challenge
+// 原样回传，作为"我刚刚申请过重置"的不可伪造证明。
+//
+// challenge 不进邮件（邮件只有 6 位 code），因为：
+//   - 攻击者拿到邮件就能拿到 challenge，等于没设防；
+//   - 真正的防御点是：只有真正请求 reset 的浏览器才持有 challenge。
+//
+// mode=blog/nomu 决定走博客版还是 Nomu 版邮件模板（无 mode 校验步骤；
+// 邮箱不存在也照常返 200 防枚举，但邮件不会送达）。
+func (s *UserService) ResetPasswordFlow(ctx context.Context, email, mode string) (challenge string, err error) {
+	if email == "" {
+		return "", usererrs.ErrEmailRequired
+	}
+	mode = normalizeMode(mode)
+
+	b := make([]byte, 32)
+	if _, err := rand.Read(b); err != nil {
+		return "", err
+	}
+	challenge = hex.EncodeToString(b)
+
+	// 独立 redis key，与 email code 互不干扰；TTL 同 emailCodeExpire。
+	chKey := fmt.Sprintf(emailResetChallengeCacheKeyFmt, email, mode)
+	if err := s.redis.Set(ctx, chKey, challenge, emailCodeExpire).Err(); err != nil {
+		slog.ErrorContext(ctx, "reset challenge redis set failed",
+			"err", err, "email", email, "mode", mode)
+	}
+
+	s.sendPasswordReset(ctx, email, mode)
+	return challenge, nil
+}
+
+// ConfirmPasswordReset 用邮箱验证码 + 新密码完成密码重置。
+//
+// 流程：邮箱必填 → 用户存在 → 新密码不能复用旧值 → 验证码正确 →
+//
+//	bcrypt 重哈希 → 写回 User.PasswordHash。任一步骤失败回退并返回错误，
+//	验证码在 verifyEmailCode 里一次性消费（成功即删 redis key）。
+func (s *UserService) ConfirmPasswordReset(ctx context.Context, email, code, newPassword, mode, challenge string) (err error) {
+	if email == "" {
+		return usererrs.ErrEmailRequired
+	}
+	if challenge == "" {
+		return usererrs.ErrInvalidToken
+	}
+
+	if !challengeMatches(ctx, s.redis, email, mode, challenge) {
+		return usererrs.ErrInvalidToken
+	}
+	mode = normalizeMode(mode)
+
+	u, _, err := s.repo.GetByEmail(ctx, email)
+	if err != nil {
+		slog.ErrorContext(ctx, "password reset get-by-email failed",
+			"err", err, "email", email)
+		return err
+	}
+	// 不暴露邮箱是否注册：未注册走 ErrInvalidEmailCode（400 + "验证码无效"），
+	// 与错码错误同响应码 + 同文案，攻击者无法靠 HTTP code 区分。
+	if u == nil {
+		return usererrs.ErrInvalidEmailCode
+	}
+
+	if s.CheckPassword(u, newPassword) {
+		return usererrs.ErrPasswordHashExists
+	}
+
+	if !s.verifyEmailCode(ctx, email, code, mode, true) {
+		return usererrs.ErrInvalidEmailCode
+	}
+
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcryptCost)
+	if err != nil {
+		return err
+	}
+	u.PasswordHash = string(hash)
+
+	if err := s.repo.Update(ctx, u); err != nil {
+		slog.ErrorContext(ctx, "password reset update failed", "err", err, "user_id", u.ID)
+		return err
+	}
+	return nil
+}
+
 func (s *UserService) SendEmailCode(ctx context.Context, email, mode string) bool {
 	mode = normalizeMode(mode)
 	if s.mailer == nil {
@@ -204,7 +299,7 @@ func (s *UserService) SendEmailCode(ctx context.Context, email, mode string) boo
 	return s.mailer.SendVerificationCode(ctx, email, mode, code)
 }
 
-func (s *UserService) SendPasswordReset(ctx context.Context, email, mode string) bool {
+func (s *UserService) sendPasswordReset(ctx context.Context, email, mode string) bool {
 	mode = normalizeMode(mode)
 	if s.mailer == nil {
 		return false
@@ -273,20 +368,52 @@ func emailCodeKey(email, mode string, isReset bool) string {
 	return fmt.Sprintf(emailCodeCacheKeyFmt, email, normalizeMode(mode))
 }
 
-func (s *UserService) verifyEmailCode(ctx context.Context, email, code, mode string) bool {
+func (s *UserService) verifyEmailCode(ctx context.Context, email, code, mode string, isReset bool) bool {
 	if s.redis == nil || email == "" {
 		return false
 	}
-	stored, err := s.redis.Get(ctx, emailCodeKey(email, mode, false)).Result()
+	stored, err := s.redis.Get(ctx, emailCodeKey(email, mode, isReset)).Result()
 	if err != nil || stored != code {
 		return false
 	}
-	s.redis.Del(ctx, emailCodeKey(email, mode, false))
+	// 一次性消费：del 必须与 get 用同一 namespace（按 isReset 区分），
+	// 否则重置验证码被消费时会把注册 key 误删，反之亦然。
+	s.redis.Del(ctx, emailCodeKey(email, mode, isReset))
 	return true
 }
 
+// challengeMatches 比对 challenge，并在匹配时一次性消费（删除）。
+//
+// 返回 true 当且仅当 redis 里存的 challenge 等于传入 challenge：
+//   - 不存在 / redis 未配置 / 任何错误：视为不匹配；
+//   - 匹配：del key 后 return true；不匹配：不动 key（让攻击者重试多次
+//     也无法偷出真值，同常量时间字符串比较同样保护 timing）。
+//
+// challenge 与 email code 用不同 redis key，二者平行消费 —— 任意一个失败
+// 都不影响另一个继续有效，避免一个失败把另一个误删。
+func challengeMatches(ctx context.Context, rdb *redis.Client, email, mode, challenge string) bool {
+	if rdb == nil || email == "" || challenge == "" {
+		return false
+	}
+	key := fmt.Sprintf(emailResetChallengeCacheKeyFmt, email, normalizeMode(mode))
+	stored, err := rdb.Get(ctx, key).Result()
+	if err != nil || subtle.ConstantTimeCompare([]byte(stored), []byte(challenge)) != 1 {
+		return false
+	}
+	rdb.Del(ctx, key)
+	return true
+}
+
+// generateCode 用 crypto/rand 取 [0, 1_000_000) 的 6 位数字验证码。
+// zero-pad 前导 0（如 "000042"），避免与"5 位纯数字"撞型猜测。
 func generateCode() string {
-	return strconv.Itoa(rand.Intn(999999))
+	n, err := rand.Int(rand.Reader, big.NewInt(1_000_000))
+	if err != nil {
+		// 极少；crypto/rand 失败时降级 6 位 "000000"，让调用方走发邮件路径，
+		// 用户体验上等同"发送失败"而不是注册崩。这条分支不走敏感路径。
+		return "000000"
+	}
+	return fmt.Sprintf("%06d", n.Int64())
 }
 
 // gormModel 快速构造仅带 ID 的 model.User。包内测试大量复用。

@@ -35,6 +35,8 @@ type Userer interface {
 	PollNomuLogin(ctx context.Context, deviceID string) (*service.NomuLoginState, error)
 	// RegisterFlow 是 register handler 的编排入口：建账号 + 注册赠送积分。
 	RegisterFlow(ctx context.Context, username, password, email, emailCode, mode string) (*model.User, *model.Profile, error)
+	ResetPasswordFlow(ctx context.Context, email, mode string) (challenge string, err error)
+	ConfirmPasswordReset(ctx context.Context, email, code, newPassword, mode, challenge string) error
 }
 
 var _ Userer = (*service.UserService)(nil)
@@ -297,6 +299,36 @@ func (h *UserHandler) MagicLoginConsume(c *gin.Context) {
 	response.Success(c, userData, "登录成功")
 }
 
+
+func (h *UserHandler) ResetPassword(c *gin.Context) {
+	var req dto.ResetPasswordRequest
+	if !bindJSON(c, &req) {
+		return
+	}
+
+	challenge, err := h.userSvc.ResetPasswordFlow(c.Request.Context(), req.Email, req.Mode)
+	if respondErr(c, err, "reset password failed", "email", req.Email) {
+		return
+	}
+
+	response.Success(c, gin.H{"challenge": challenge}, "若该邮箱已注册，重置密码邮件已发送")
+}
+
+func (h *UserHandler) ConfirmPasswordReset(c *gin.Context) {
+	var req dto.ResetPasswordConfirmRequest
+	if !bindJSON(c, &req) {
+		return
+	}
+
+	err := h.userSvc.ConfirmPasswordReset(c.Request.Context(),
+		req.Email, req.EmailCode, req.NewPassword, req.Mode, req.Challenge)
+	if respondErr(c, err, "confirm password reset failed", "email", req.Email) {
+		return
+	}
+
+	response.Success(c, nil, "密码已重置")
+}
+
 func (h *UserHandler) RegisterRoutes(r *gin.RouterGroup, authMiddleware gin.HandlerFunc, publicMWs ...gin.HandlerFunc) {
 	r.POST("/login", append(publicMWs, h.Login)...)
 	r.POST("/register", append(publicMWs, h.Register)...)
@@ -309,4 +341,7 @@ func (h *UserHandler) RegisterRoutes(r *gin.RouterGroup, authMiddleware gin.Hand
 
 	r.POST("/nomu/magic-login", append(publicMWs, h.MagicLoginConsume)...)
 	r.GET("/nomu/login/:device_id", h.PollNomuLogin)
+
+	r.POST("/password/reset", append(publicMWs, h.ResetPassword)...)
+	r.POST("/password/reset/confirm", append(publicMWs, h.ConfirmPasswordReset)...)
 }

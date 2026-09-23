@@ -97,6 +97,14 @@ func (m *mockUserService) GetByID(ctx context.Context, userID uint) (*model.User
 	return m.getByIDFn(ctx, userID)
 }
 
+func (m *mockUserService) ResetPasswordFlow(ctx context.Context, email, mode string) (string, error) {
+	return "test-challenge-0000000000000000000000000000000000000000000000000000000000000000", nil
+}
+
+func (m *mockUserService) ConfirmPasswordReset(ctx context.Context, email, code, newPassword, mode, challenge string) error {
+	return nil
+}
+
 func (m *mockUserService) GetByUsername(ctx context.Context, username string) (*model.User, *model.Profile, error) {
 	if m.getByUsernameFn != nil {
 		return m.getByUsernameFn(ctx, username)

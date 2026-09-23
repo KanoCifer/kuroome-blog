@@ -24,6 +24,19 @@ type EmailCodeRequest struct {
 	Mode  string `json:"mode,omitempty" binding:"omitempty,oneof=blog nomu"`
 }
 
+type ResetPasswordRequest struct {
+	Email     string `json:"email" binding:"required,email"`
+	Mode      string `json:"mode,omitempty" binding:"omitempty,oneof=blog nomu"`
+}
+
+type ResetPasswordConfirmRequest struct {
+	Challenge string `json:"challenge" binding:"required"`
+	Email     string `json:"email" binding:"required,email"`
+	EmailCode string `json:"email_code" binding:"required"`
+	NewPassword string `json:"new_password" binding:"required,min=6"`
+	Mode      string `json:"mode,omitempty" binding:"omitempty,oneof=blog nomu"`
+}
+
 // LoginRequest 登录请求
 type LoginRequest struct {
 	Username string `json:"username" binding:"required"`

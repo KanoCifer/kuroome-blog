@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log/slog"
 	"strings"
 	"testing"
@@ -14,6 +15,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/KanoCifer/kuroome-blog/internal/apierr"
 	"github.com/KanoCifer/kuroome-blog/internal/config"
 	usererrs "github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/logger"
@@ -185,6 +187,7 @@ type mockUserRepo struct {
 	getByIDFn       func(ctx context.Context, id uint) (*model.User, error)
 	getByUsernameFn func(ctx context.Context, username string) (*model.User, error)
 	getByEmailFn    func(ctx context.Context, email string) (*model.User, *model.Profile, error)
+	updateFn        func(ctx context.Context, user *model.User) error
 	usernameExists  bool
 	emailExists     bool
 }
@@ -239,6 +242,9 @@ func (m *mockUserRepo) ListUsersWithLoginRecords(ctx context.Context) ([]model.U
 }
 
 func (m *mockUserRepo) Update(ctx context.Context, user *model.User) error {
+	if m.updateFn != nil {
+		return m.updateFn(ctx, user)
+	}
 	return nil
 }
 
@@ -669,14 +675,14 @@ func TestLogout_OnlyDeletesOwnDevice(t *testing.T) {
 
 func TestVerifyEmailCode_NilRedis(t *testing.T) {
 	svc := &UserService{redis: nil}
-	if svc.verifyEmailCode(context.Background(), "a@b.com", "123456", modeBlog) {
+	if svc.verifyEmailCode(context.Background(), "a@b.com", "123456", modeBlog, false) {
 		t.Error("verifyEmailCode should return false when redis is nil")
 	}
 }
 
 func TestVerifyEmailCode_EmptyEmail(t *testing.T) {
 	svc := &UserService{redis: nil}
-	if svc.verifyEmailCode(context.Background(), "", "123456", modeBlog) {
+	if svc.verifyEmailCode(context.Background(), "", "123456", modeBlog, false) {
 		t.Error("verifyEmailCode should return false when email is empty")
 	}
 }
@@ -700,7 +706,7 @@ func TestEmailCode_SendAndVerifyShareKeyNamespace(t *testing.T) {
 		t.Fatalf("seed: %v", err)
 	}
 
-	if !svc.verifyEmailCode(context.Background(), email, code, modeBlog) {
+	if !svc.verifyEmailCode(context.Background(), email, code, modeBlog, false) {
 		t.Fatal("verifyEmailCode should accept the code written under the same mode namespace")
 	}
 	// 消费后 key 被删除
@@ -735,7 +741,7 @@ func TestEmailCode_CrossModeIsolation(t *testing.T) {
 	}
 
 	// 拿 nomu 模式来消费 blog 验证码 → 应当被拒
-	if svc.verifyEmailCode(context.Background(), email, code, modeNomu) {
+	if svc.verifyEmailCode(context.Background(), email, code, modeNomu, false) {
 		t.Error("nomu mode consumed blog key — cross-mode isolation broken")
 	}
 	// blog 那份还在（没被 nomu 误删）
@@ -744,7 +750,7 @@ func TestEmailCode_CrossModeIsolation(t *testing.T) {
 	}
 
 	// blog 模式消费自己的 key → 应当成功
-	if !svc.verifyEmailCode(context.Background(), email, code, modeBlog) {
+	if !svc.verifyEmailCode(context.Background(), email, code, modeBlog, false) {
 		t.Error("blog mode should consume its own key")
 	}
 	if mr.Exists(blogKey) {
@@ -1381,5 +1387,187 @@ func TestMagicLoginScenarios_URLHTMLEscaped(t *testing.T) {
 		if strings.Contains(html, "<script>alert(1)</script>") {
 			t.Errorf("%s html should not embed raw <script>", name)
 		}
+	}
+}
+
+// ---------- ConfirmPasswordReset（核心流程接线）----------
+
+// TestConfirmPasswordReset_Success 端到端：写 reset 验证码到 redis，
+// 用合法 code + 新密码调 ConfirmPasswordReset，应当：
+//  1. 校验通过、不返回 error
+//  2. Update 被调用一次
+//  3. 写入 user.PasswordHash 是新密码的合法 bcrypt 哈希（cost=12 写在 hash 头）
+//  4. reset key 被一次性消费（删除）
+func TestConfirmPasswordReset_Success(t *testing.T) {
+	mr, err := miniredis.Run()
+	if err != nil {
+		t.Fatalf("miniredis: %v", err)
+	}
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+
+	const (
+		email       = "alice@example.com"
+		oldPassword = "oldPass1"
+		newPassword = "newPass2"
+		code        = "888111"
+	)
+	oldHash, err := bcrypt.GenerateFromPassword([]byte(oldPassword), bcryptCost)
+	if err != nil {
+		t.Fatalf("seed old hash: %v", err)
+	}
+	u := &model.User{Model: gormModel(42), PasswordHash: string(oldHash)}
+
+	var updated *model.User
+	updateCalls := 0
+	repo := &mockUserRepo{
+		getByEmailFn: func(ctx context.Context, e string) (*model.User, *model.Profile, error) {
+			if e != email {
+				return nil, nil, nil
+			}
+			return u, &model.Profile{UserID: u.ID, Email: ptr(email)}, nil
+		},
+		updateFn: func(ctx context.Context, target *model.User) error {
+			updateCalls++
+			updated = target
+			return nil
+		},
+	}
+	svc := &UserService{repo: repo, redis: rdb}
+
+	// 模拟 sendPasswordReset 写 reset 验证码 + challenge（两个独立 key）
+	key := emailCodeKey(email, modeBlog, true)
+	if err := rdb.Set(context.Background(), key, code, emailCodeExpire).Err(); err != nil {
+		t.Fatalf("seed reset key: %v", err)
+	}
+	const challenge = "f00dbabe00000000f00dbabe00000000f00dbabe00000000f00dbabe00000000"
+	chKey := fmt.Sprintf(emailResetChallengeCacheKeyFmt, email, modeBlog)
+	if err := rdb.Set(context.Background(), chKey, challenge, emailCodeExpire).Err(); err != nil {
+		t.Fatalf("seed challenge key: %v", err)
+	}
+
+	if err := svc.ConfirmPasswordReset(context.Background(), email, code, newPassword, modeBlog, challenge); err != nil {
+		t.Fatalf("ConfirmPasswordReset: %v", err)
+	}
+	if updateCalls != 1 {
+		t.Errorf("Update calls = %d, want 1", updateCalls)
+	}
+	if updated == nil || updated.PasswordHash == string(oldHash) {
+		t.Errorf("PasswordHash should be rewritten, got %q", updated.PasswordHash)
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(updated.PasswordHash), []byte(newPassword)); err != nil {
+		t.Errorf("new hash should verify against new password: %v", err)
+	}
+	// hash 字符串以 $2a$12$ 开头表示 cost=12 实际生效（避免回归到 DefaultCost=10）
+	if len(updated.PasswordHash) < 7 || updated.PasswordHash[:7] != "$2a$12$" {
+		t.Errorf("password hash should use bcryptCost=12, got prefix %q", updated.PasswordHash[:min(7, len(updated.PasswordHash))])
+	}
+	if mr.Exists(key) {
+		t.Error("reset key should be deleted after successful consume")
+	}
+	if mr.Exists(chKey) {
+		t.Error("challenge key should be deleted after successful consume")
+	}
+}
+
+// TestConfirmPasswordReset_RejectsSamePassword 锁死"新密码 = 旧密码"的拒绝路径。
+// 锁的是接口契约 ResetPasswordConfirmRequest 不会自动检查，必须靠 service 拦。
+func TestConfirmPasswordReset_RejectsSamePassword(t *testing.T) {
+	mr, err := miniredis.Run()
+	if err != nil {
+		t.Fatalf("miniredis: %v", err)
+	}
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+
+	const (
+		email   = "bob@example.com"
+		pwd     = "samePass1"
+		code    = "555000"
+	)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(pwd), bcryptCost)
+	u := &model.User{Model: gormModel(7), PasswordHash: string(hash)}
+
+	updateCalls := 0
+	repo := &mockUserRepo{
+		getByEmailFn: func(ctx context.Context, e string) (*model.User, *model.Profile, error) {
+			return u, &model.Profile{UserID: u.ID, Email: ptr(email)}, nil
+		},
+		updateFn: func(ctx context.Context, _ *model.User) error {
+			updateCalls++
+			return nil
+		},
+	}
+	svc := &UserService{repo: repo, redis: rdb}
+	key := emailCodeKey(email, modeBlog, true)
+	if err := rdb.Set(context.Background(), key, code, emailCodeExpire).Err(); err != nil {
+		t.Fatalf("seed reset key: %v", err)
+	}
+	if !mr.Exists(key) {
+		t.Fatalf("seed: key not present right after Set — miniredis bug?")
+	}
+	// 同密码路径在 challenge 校验之后才走，所以这里也要 seed 一个合法 challenge
+	const challenge = "deadbeefcafebabe000000000000000000000000000000000000000000000000"
+	chKey := fmt.Sprintf(emailResetChallengeCacheKeyFmt, email, modeBlog)
+	if err := rdb.Set(context.Background(), chKey, challenge, emailCodeExpire).Err(); err != nil {
+		t.Fatalf("seed challenge key: %v", err)
+	}
+
+	err = svc.ConfirmPasswordReset(context.Background(), email, code, pwd, modeBlog, challenge)
+	if err != usererrs.ErrPasswordHashExists {
+		t.Errorf("err = %v, want ErrPasswordHashExists", err)
+	}
+	if updateCalls != 0 {
+		t.Errorf("Update should NOT be called when rejected (got %d)", updateCalls)
+	}
+	if !mr.Exists(key) {
+		t.Error("reset key should NOT be consumed on validation failure")
+	}
+	// challenge 已被消费（同密码失败发生在 challenge 校验通过之后）
+	if mr.Exists(chKey) {
+		t.Error("challenge key should be consumed (challengeMatches ran before password check)")
+	}
+}
+
+// TestConfirmPasswordReset_EmailNotRegisteredNoEnumeration 锁死"邮箱是否注册"
+// 不暴露给攻击者。challenge + code 都正确但邮箱未注册时，响应必须与
+// "验证码无效"完全一致（同 message + 同 HTTP code = 400），让攻击者无法用
+// HTTP code 把"邮箱未注册"和"验证码错"区分开。
+func TestConfirmPasswordReset_EmailNotRegisteredNoEnumeration(t *testing.T) {
+	mr, err := miniredis.Run()
+	if err != nil {
+		t.Fatalf("miniredis: %v", err)
+	}
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+
+	const (
+		email  = "ghost@example.com"
+		code   = "111000"
+		chal   = "abc123abc123abc123abc123abc123abc123abc123abc123abc123abc123abcd"
+		newPwd = "anyNew123"
+	)
+	repo := &mockUserRepo{
+		getByEmailFn: func(ctx context.Context, e string) (*model.User, *model.Profile, error) {
+			return nil, nil, nil // 邮箱未注册
+		},
+	}
+	svc := &UserService{repo: repo, redis: rdb}
+	key := emailCodeKey(email, modeBlog, true)
+	_ = rdb.Set(context.Background(), key, code, emailCodeExpire).Err()
+	chKey := fmt.Sprintf(emailResetChallengeCacheKeyFmt, email, modeBlog)
+	_ = rdb.Set(context.Background(), chKey, chal, emailCodeExpire).Err()
+
+	got := svc.ConfirmPasswordReset(context.Background(), email, code, newPwd, modeBlog, chal)
+	if got != usererrs.ErrInvalidEmailCode {
+		t.Errorf("err = %v, want ErrInvalidEmailCode (must NOT be ErrUserNotFound)", got)
+	}
+	// status code 必须一致：ErrInvalidEmailCode 和 ErrUserNotFound 的 HTTP code 必须相同，
+	// 即都是 400 —— 否则前端/攻击者一眼看穿。这里通过 apierr.Error.Status() 显式断言。
+	if codeA := got.(*apierr.Error).Status(); codeA != 400 {
+		t.Errorf("http status = %d, want 400 (same as ErrInvalidEmailCode)", codeA)
 	}
 }
