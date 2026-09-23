@@ -34,6 +34,9 @@ func Setup(r *gin.Engine, state *app.AppState, rdb *redis.Client) {
 	registerLimiter := middleware.NewRateLimiter(rdb, "register", 5, 60*time.Second)
 	likeLimiter := middleware.NewRateLimiter(rdb, "like", 25, 24*time.Hour)
 	currencyLimiter := middleware.NewRateLimiter(rdb, "currency", 500, time.Hour)
+	// 登录发码独立限流：防止跨 IP 短时间内高频轰炸验证码接口；
+	// service 层另有 per-email 60s 冷却作为第二道闸门。
+	loginCodeSendLimiter := middleware.NewRateLimiter(rdb, "login_code_send", 5, 60*time.Second)
 
 	// 认证失败路径专用限流(在 handler 失败分支里调用,与前置 RateLimiter 不同):
 	//  - scope 独立:ws 走 nomu_ws_auth_fail,refresh 走 refresh_auth_fail,互不串;
@@ -48,7 +51,7 @@ func Setup(r *gin.Engine, state *app.AppState, rdb *redis.Client) {
 	adminOnly := middleware.AdminMiddleware(state.Cfg().Admin.UserIDs)
 
 	userH := handler.NewUserHandler(state.UserSvc(), state.Cfg(), refreshAuthFailLimiter)
-	userH.RegisterRoutes(v3, auth, loginLimiter.Middleware(), registerLimiter.Middleware())
+	userH.RegisterRoutes(v3, auth, loginCodeSendLimiter.Middleware(), loginLimiter.Middleware(), registerLimiter.Middleware())
 
 	adminH := handler.NewAdminHandler(state.AdminSvc(), state.Cfg())
 	adminH.RegisterRoutes(v3, auth, adminOnly)

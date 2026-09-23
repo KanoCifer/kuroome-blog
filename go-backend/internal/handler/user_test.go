@@ -44,18 +44,20 @@ type mockRegisterBonuser interface {
 }
 
 type mockUserService struct {
-	authenticateFn        func(ctx context.Context, username, password string) (*model.User, error)
-	authenticateMagicFn   func(ctx context.Context, token string) (*model.User, *model.Profile, error)
-	createTokensFn        func(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
-	createUserFn          func(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error)
-	getByIDFn             func(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
-	getByUsernameFn       func(ctx context.Context, username string) (*model.User, *model.Profile, error)
-	logoutFn              func(ctx context.Context, userID uint, jti string)
-	refreshFn             func(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
-	sendEmailCodeFn       func(ctx context.Context, email, mode string) bool
-	sendMagicLoginEmailFn func(ctx context.Context, email, mode, deviceID string) bool
-	pollNomuLoginFn       func(ctx context.Context, deviceID string) (*service.NomuLoginState, error)
-	userToDictFn          func(u *model.User, p *model.Profile) map[string]any
+	authenticateFn           func(ctx context.Context, username, password string) (*model.User, error)
+	authenticateEmailCodeFn  func(ctx context.Context, email, code string) (*model.User, *model.Profile, error)
+	authenticateMagicFn      func(ctx context.Context, token string) (*model.User, *model.Profile, error)
+	createTokensFn           func(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
+	createUserFn             func(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error)
+	getByIDFn                func(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
+	getByUsernameFn          func(ctx context.Context, username string) (*model.User, *model.Profile, error)
+	logoutFn                 func(ctx context.Context, userID uint, jti string)
+	refreshFn                func(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
+	sendEmailCodeFn          func(ctx context.Context, email, mode string) bool
+	sendLoginEmailCodeFn     func(ctx context.Context, email string) bool
+	sendMagicLoginEmailFn    func(ctx context.Context, email, mode, deviceID string) bool
+	pollNomuLoginFn          func(ctx context.Context, deviceID string) (*service.NomuLoginState, error)
+	userToDictFn             func(u *model.User, p *model.Profile) map[string]any
 	// bonusSvc 可选：注入后 RegisterFlow 默认实现会调它 GrantRegisterBonus。
 	// nil 时跳过赠送（与真实 UserService 的 bonusSvc=nil 行为一致）。
 	bonusSvc mockRegisterBonuser
@@ -127,6 +129,20 @@ func (m *mockUserService) SendEmailCode(ctx context.Context, email, mode string)
 		return m.sendEmailCodeFn(ctx, email, mode)
 	}
 	return true
+}
+
+func (m *mockUserService) SendLoginEmailCode(ctx context.Context, email string) bool {
+	if m.sendLoginEmailCodeFn != nil {
+		return m.sendLoginEmailCodeFn(ctx, email)
+	}
+	return true
+}
+
+func (m *mockUserService) AuthenticateEmailCode(ctx context.Context, email, code string) (*model.User, *model.Profile, error) {
+	if m.authenticateEmailCodeFn != nil {
+		return m.authenticateEmailCodeFn(ctx, email, code)
+	}
+	return nil, nil, usererrs.ErrInvalidEmailCode
 }
 
 func (m *mockUserService) SendMagicLoginEmail(ctx context.Context, email, mode, deviceID string) bool {
@@ -1114,5 +1130,311 @@ func TestLogin_LogPropagatesTraceID(t *testing.T) {
 	}
 	if rec["msg"] != "login failed" {
 		t.Errorf("msg = %v, want login failed", rec["msg"])
+	}
+}
+
+// ---------- LoginEmailCode (Nomu 邮箱验证码登录) ----------
+
+func TestLoginEmailCode_Success(t *testing.T) {
+	// 正确码 → 完整登录态：access/refresh token + user dict + refresh cookie。
+	svc := &mockUserService{
+		authenticateEmailCodeFn: func(_ context.Context, _ string, code string) (*model.User, *model.Profile, error) {
+			if code != "654321" {
+				return nil, nil, usererrs.ErrInvalidEmailCode
+			}
+			return &model.User{Model: gormModel(11), Username: "alice"}, &model.Profile{}, nil
+		},
+	}
+	h := NewUserHandler(svc, config.Cfg, nil)
+
+	w := doRequest(h.LoginEmailCode, http.MethodPost, "/login/email-code",
+		jsonBody(t, dto.LoginEmailCodeRequest{Email: "alice@example.com", EmailCode: "654321"}))
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200; body = %s", w.Code, w.Body.String())
+	}
+	data, _ := parseResp(t, w.Body.Bytes())
+	if data["access_token"] == nil {
+		t.Error("expected access_token in response")
+	}
+	if data["refresh_token"] == nil {
+		t.Error("expected refresh_token in response")
+	}
+	if cookie := findCookie(w, "refresh_token"); cookie == nil || cookie.Value != "refresh" {
+		t.Error("expected refresh_token HttpOnly cookie set")
+	}
+	if data["username"] != "alice" {
+		t.Errorf("user.username = %v, want alice", data["username"])
+	}
+}
+
+func TestLoginEmailCode_InvalidCode(t *testing.T) {
+	// service 返 ErrInvalidEmailCode → handler 透传 400。
+	svc := &mockUserService{
+		authenticateEmailCodeFn: func(_ context.Context, _ string, _ string) (*model.User, *model.Profile, error) {
+			return nil, nil, usererrs.ErrInvalidEmailCode
+		},
+	}
+	h := NewUserHandler(svc, config.Cfg, nil)
+
+	w := doRequest(h.LoginEmailCode, http.MethodPost, "/login/email-code",
+		jsonBody(t, dto.LoginEmailCodeRequest{Email: "alice@example.com", EmailCode: "000000"}))
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("status = %d, want 400", w.Code)
+	}
+}
+
+func TestLoginEmailCode_InvalidBody(t *testing.T) {
+	// 任何 binding 失败都 400。
+	svc := &mockUserService{}
+	h := NewUserHandler(svc, config.Cfg, nil)
+
+	cases := []struct {
+		name string
+		body any
+	}{
+		{"not json", []byte("not json")},
+		{"missing email", dto.LoginEmailCodeRequest{EmailCode: "123456"}},
+		{"bad email", dto.LoginEmailCodeRequest{Email: "not-an-email", EmailCode: "123456"}},
+		{"short code", dto.LoginEmailCodeRequest{Email: "a@b.com", EmailCode: "12345"}},
+		{"long code", dto.LoginEmailCodeRequest{Email: "a@b.com", EmailCode: "1234567"}},
+		{"non-digit code", dto.LoginEmailCodeRequest{Email: "a@b.com", EmailCode: "abcdef"}},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			var body []byte
+			if b, ok := c.body.([]byte); ok {
+				body = b
+			} else {
+				body = jsonBody(t, c.body)
+			}
+			w := doRequest(h.LoginEmailCode, http.MethodPost, "/login/email-code", body)
+			if w.Code != http.StatusBadRequest {
+				t.Errorf("status = %d, want 400", w.Code)
+			}
+		})
+	}
+}
+
+func TestLoginEmailCode_BadMode(t *testing.T) {
+	// DTO oneof=nomu 拦截 blog。
+	svc := &mockUserService{}
+	h := NewUserHandler(svc, config.Cfg, nil)
+
+	w := doRequest(h.LoginEmailCode, http.MethodPost, "/login/email-code",
+		jsonBody(t, dto.LoginEmailCodeRequest{Email: "alice@example.com", EmailCode: "123456", Mode: "blog"}))
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("status = %d, want 400 (invalid mode)", w.Code)
+	}
+}
+
+func TestLoginEmailCode_TokenErrorReturns500(t *testing.T) {
+	// CreateTokens 失败 → handler 500（service 内 code 已消费，handler 不回滚）。
+	svc := &mockUserService{
+		authenticateEmailCodeFn: func(_ context.Context, _ string, _ string) (*model.User, *model.Profile, error) {
+			return &model.User{Model: gormModel(11), Username: "alice"}, &model.Profile{}, nil
+		},
+		createTokensFn: func(_ context.Context, _ *model.User) (*dto.TokensResponse, error) {
+			return nil, errors.New("jwt signing failed")
+		},
+	}
+	h := NewUserHandler(svc, config.Cfg, nil)
+
+	w := doRequest(h.LoginEmailCode, http.MethodPost, "/login/email-code",
+		jsonBody(t, dto.LoginEmailCodeRequest{Email: "alice@example.com", EmailCode: "123456"}))
+
+	if w.Code != http.StatusInternalServerError {
+		t.Errorf("status = %d, want 500", w.Code)
+	}
+}
+
+// ---------- SendLoginEmailCode (Nomu 邮箱验证码登录申请) ----------
+
+func TestSendLoginEmailCode_Success(t *testing.T) {
+	// fire-and-forget：handler 立即 200，service 异步被调。
+	done := make(chan string, 1)
+	svc := &mockUserService{
+		sendLoginEmailCodeFn: func(_ context.Context, email string) bool {
+			done <- email
+			return true
+		},
+	}
+	h := NewUserHandler(svc, config.Cfg, nil)
+
+	w := doRequest(h.SendLoginEmailCode, http.MethodPost, "/email/login-code",
+		jsonBody(t, dto.LoginEmailCodeSendRequest{Email: "alice@example.com"}))
+
+	if w.Code != http.StatusOK {
+		t.Errorf("status = %d, want 200", w.Code)
+	}
+	select {
+	case got := <-done:
+		if got != "alice@example.com" {
+			t.Errorf("service email = %q, want alice@example.com", got)
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for service call")
+	}
+}
+
+func TestSendLoginEmailCode_InvalidBody(t *testing.T) {
+	svc := &mockUserService{}
+	h := NewUserHandler(svc, config.Cfg, nil)
+
+	cases := []struct {
+		name string
+		body any
+	}{
+		{"not json", []byte("not json")},
+		{"missing email", dto.LoginEmailCodeSendRequest{}},
+		{"bad email", dto.LoginEmailCodeSendRequest{Email: "not-an-email"}},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			var body []byte
+			if b, ok := c.body.([]byte); ok {
+				body = b
+			} else {
+				body = jsonBody(t, c.body)
+			}
+			w := doRequest(h.SendLoginEmailCode, http.MethodPost, "/email/login-code", body)
+			if w.Code != http.StatusBadRequest {
+				t.Errorf("status = %d, want 400", w.Code)
+			}
+		})
+	}
+}
+
+func TestSendLoginEmailCode_BadMode(t *testing.T) {
+	// DTO oneof=nomu 拦截 blog。
+	svc := &mockUserService{}
+	h := NewUserHandler(svc, config.Cfg, nil)
+
+	w := doRequest(h.SendLoginEmailCode, http.MethodPost, "/email/login-code",
+		jsonBody(t, dto.LoginEmailCodeSendRequest{Email: "alice@example.com", Mode: "blog"}))
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("status = %d, want 400 (invalid mode)", w.Code)
+	}
+}
+
+// TestSendLoginEmailCode_AlwaysReturns200  未知邮箱 / 发送失败 → handler 仍 200，
+// 隐藏账户存在性 / 邮件发送状态。
+func TestSendLoginEmailCode_AlwaysReturns200(t *testing.T) {
+	cases := []struct {
+		name string
+		ret  bool
+	}{
+		{"service says false (mail failed)", false},
+		{"service says true (silent unknown email)", true},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			svc := &mockUserService{
+				sendLoginEmailCodeFn: func(_ context.Context, _ string) bool { return c.ret },
+			}
+			h := NewUserHandler(svc, config.Cfg, nil)
+
+			w := doRequest(h.SendLoginEmailCode, http.MethodPost, "/email/login-code",
+				jsonBody(t, dto.LoginEmailCodeSendRequest{Email: "nobody@example.com"}))
+
+			if w.Code != http.StatusOK {
+				t.Errorf("status = %d, want 200 (handler must NOT distinguish)", w.Code)
+			}
+		})
+	}
+}
+
+// TestSendLoginEmailCode_PassesEmailToService 验证 handler 把 req.Email 透传给 service。
+func TestSendLoginEmailCode_PassesEmailToService(t *testing.T) {
+	done := make(chan string, 1)
+	svc := &mockUserService{
+		sendLoginEmailCodeFn: func(_ context.Context, email string) bool {
+			done <- email
+			return true
+		},
+	}
+	h := NewUserHandler(svc, config.Cfg, nil)
+
+	w := doRequest(h.SendLoginEmailCode, http.MethodPost, "/email/login-code",
+		jsonBody(t, dto.LoginEmailCodeSendRequest{Email: "alice@example.com", Mode: "nomu"}))
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("status = %d, want 200", w.Code)
+	}
+	select {
+	case got := <-done:
+		if got != "alice@example.com" {
+			t.Errorf("service email = %q, want alice@example.com", got)
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for service call")
+	}
+}
+
+// ---------- RegisterRoutes wiring ----------
+
+// TestRegisterRoutes_WiresLoginCodeEndpoints 验证 RegisterRoutes 把新端点挂到 router 上。
+func TestRegisterRoutes_WiresLoginCodeEndpoints(t *testing.T) {
+	svc := &mockUserService{
+		authenticateEmailCodeFn: func(_ context.Context, _ string, _ string) (*model.User, *model.Profile, error) {
+			return &model.User{Model: gormModel(1)}, &model.Profile{}, nil
+		},
+		sendLoginEmailCodeFn: func(_ context.Context, _ string) bool { return true },
+	}
+	h := NewUserHandler(svc, config.Cfg, nil)
+
+	gin.SetMode(gin.TestMode)
+	r := gin.New()
+	v3 := r.Group("/v3")
+	h.RegisterRoutes(v3, func(c *gin.Context) { c.Next() }, nil)
+
+	cases := []struct {
+		name   string
+		method string
+		path   string
+		body   []byte
+	}{
+		{"send login code", http.MethodPost, "/v3/email/login-code",
+			jsonBody(t, dto.LoginEmailCodeSendRequest{Email: "alice@example.com"})},
+		{"login with code", http.MethodPost, "/v3/login/email-code",
+			jsonBody(t, dto.LoginEmailCodeRequest{Email: "alice@example.com", EmailCode: "123456"})},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			req, _ := http.NewRequest(c.method, c.path, bytes.NewReader(c.body))
+			req.Header.Set("Content-Type", "application/json")
+			r.ServeHTTP(w, req)
+			if w.Code != http.StatusOK {
+				t.Errorf("%s %s: status = %d, want 200; body = %s", c.method, c.path, w.Code, w.Body.String())
+			}
+		})
+	}
+}
+
+// TestRegisterRoutes_LoginCodeSendUsesDedicatedLimiter 验证发码端点走独立限流器，
+// 验证路由接受 loginCodeSendMW 作为参数（nil 时不发码限流也能 200）。
+func TestRegisterRoutes_LoginCodeSendAcceptsNilLimiter(t *testing.T) {
+	svc := &mockUserService{
+		sendLoginEmailCodeFn: func(_ context.Context, _ string) bool { return true },
+	}
+	h := NewUserHandler(svc, config.Cfg, nil)
+
+	gin.SetMode(gin.TestMode)
+	r := gin.New()
+	v3 := r.Group("/v3")
+	// 显式传 nil loginCodeSendMW：路由必须仍然能命中 handler（兼容性）。
+	h.RegisterRoutes(v3, func(c *gin.Context) { c.Next() }, nil)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/v3/email/login-code",
+		bytes.NewReader(jsonBody(t, dto.LoginEmailCodeSendRequest{Email: "x@y.com"})))
+	req.Header.Set("Content-Type", "application/json")
+	r.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Errorf("status = %d, want 200 even with nil loginCodeSendMW", w.Code)
 	}
 }

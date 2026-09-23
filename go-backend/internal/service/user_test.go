@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"log/slog"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -21,6 +23,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/logger"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/pkg/emailtemplates"
+	"github.com/KanoCifer/kuroome-blog/pkg/notification"
 	jwtpkg "github.com/KanoCifer/kuroome-blog/pkg/jwt"
 )
 
@@ -1626,5 +1629,510 @@ func TestConfirmPasswordReset_EmailNotRegisteredNoEnumeration(t *testing.T) {
 	// 即都是 400 —— 否则前端/攻击者一眼看穿。这里通过 apierr.Error.Status() 显式断言。
 	if codeA := got.(*apierr.Error).Status(); codeA != 400 {
 		t.Errorf("http status = %d, want 400 (same as ErrInvalidEmailCode)", codeA)
+	}
+}
+
+// ---------- Nomu 邮箱验证码登录 ----------
+
+// fakeChannel 测试替身：可注入 SendEmailCodeLogin 的"成功 / 失败"语义，
+// 并通过 sendCount 统计调用次数。
+type fakeChannel struct {
+	ok        bool32 // atomic access via ok.Load()/Store()
+	sendCount atomic.Int32
+	lastEmail atomic.Value // string
+}
+
+func (f *fakeChannel) Name() string { return "fake" }
+func (f *fakeChannel) Send(_ context.Context, _ notification.Message, nc notification.NotificationContext) bool {
+	f.sendCount.Add(1)
+	if nc.Email != "" {
+		f.lastEmail.Store(nc.Email)
+	}
+	return f.ok.Load()
+}
+
+// okLoad / okStore 对 atomic.Bool 的小封装，避免在测试中反复写.Load/.Store。
+type bool32 struct{ v atomic.Bool }
+
+func (b *bool32) Load() bool      { return b.v.Load() }
+func (b *bool32) Store(v bool)    { b.v.Store(v) }
+
+// newLoginCodeSvc 构造一个跑得起来的 UserService：miniredis + 一个 fake 邮件 channel + 注入 mockUserRepo。
+//
+// 返回 (svc, miniredis, redis.Client, fakeChannel) —— redis 客户端和 fakeChannel 都
+// 暴露给测试，便于直接断言 key 状态 / 计数。
+func newLoginCodeSvc(t *testing.T, repo *mockUserRepo, mailOK bool) (*UserService, *miniredis.Miniredis, *redis.Client, *fakeChannel) {
+	t.Helper()
+	mr, err := miniredis.Run()
+	if err != nil {
+		t.Fatalf("miniredis: %v", err)
+	}
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+
+	ch := &fakeChannel{}
+	ch.ok.Store(mailOK)
+	mailer := emailtemplates.NewMailerWithChannel(ch)
+
+	svc := &UserService{
+		repo:    repo,
+		redis:   rdb,
+		mailer:  mailer,
+		maxDevices: 5,
+	}
+	return svc, mr, rdb, ch
+}
+
+// registeredRepo 构造一个"邮箱已注册"的 repo，未注册的邮箱由 mockUserRepo 默认 nil。
+func registeredRepo(email string, userID uint) *mockUserRepo {
+	return &mockUserRepo{
+		getByEmailFn: func(_ context.Context, e string) (*model.User, *model.Profile, error) {
+			if e == email {
+				return &model.User{Model: gormModel(userID), Username: "alice"}, &model.Profile{}, nil
+			}
+			return nil, nil, nil
+		},
+	}
+}
+
+// seedLoginCode 直接在 redis 写 code + 清空 attempts，方便在测试里跳过发送环节
+// 直接测验证逻辑。
+func seedLoginCode(t *testing.T, mr *miniredis.Miniredis, rdb *redis.Client, email, code string) {
+	t.Helper()
+	if err := mr.Set(emailLoginKey(email), code); err != nil {
+		t.Fatalf("seed code: %v", err)
+	}
+	// 同步 attempts TTL 到 code（用相同 TTL 5min）
+	mr.SetTTL(emailLoginKey(email), emailCodeExpire)
+	mr.SetTTL(emailLoginAttemptsKey(email), emailCodeExpire)
+}
+
+// ---------- SendLoginEmailCode ----------
+
+// TestSendLoginEmailCode_NilRedisFailClosed 无 redis → 拒绝（fail closed）。
+func TestSendLoginEmailCode_NilRedisFailClosed(t *testing.T) {
+	svc := &UserService{redis: nil, mailer: &emailtemplates.Mailer{}}
+	if svc.SendLoginEmailCode(context.Background(), "x@y.com") {
+		t.Error("SendLoginEmailCode should return false when redis is nil")
+	}
+}
+
+// TestSendLoginEmailCode_EmailNotRegisteredSilent 未知邮箱静默成功 + 不写 redis。
+func TestSendLoginEmailCode_EmailNotRegisteredSilent(t *testing.T) {
+	svc, mr, _, ch := newLoginCodeSvc(t, &mockUserRepo{
+		getByEmailFn: func(_ context.Context, _ string) (*model.User, *model.Profile, error) { return nil, nil, nil },
+	}, true)
+
+	if !svc.SendLoginEmailCode(context.Background(), "ghost@example.com") {
+		t.Error("should return true (silent success) for unregistered email")
+	}
+	if got := ch.sendCount.Load(); got != 0 {
+		t.Errorf("mailer.sendCount = %d, want 0 (no mail for unknown email)", got)
+	}
+	if mr.Exists(emailLoginKey("ghost@example.com")) {
+		t.Error("redis code key should NOT be written for unknown email")
+	}
+	if mr.Exists(emailLoginCooldownKey("ghost@example.com")) {
+		t.Error("redis cooldown key should NOT be written for unknown email")
+	}
+}
+
+// TestSendLoginEmailCode_WritesCodeAndSendsMail 已注册账户：写 redis + 发邮件。
+func TestSendLoginEmailCode_WritesCodeAndSendsMail(t *testing.T) {
+	svc, mr, _, ch := newLoginCodeSvc(t, registeredRepo("alice@example.com", 42), true)
+
+	if !svc.SendLoginEmailCode(context.Background(), "alice@example.com") {
+		t.Fatal("SendLoginEmailCode should return true for registered email + mailer ok")
+	}
+	if !mr.Exists(emailLoginKey("alice@example.com")) {
+		t.Error("code key should be set")
+	}
+	if !mr.Exists(emailLoginCooldownKey("alice@example.com")) {
+		t.Error("cooldown key should be set")
+	}
+	if got := ch.sendCount.Load(); got != 1 {
+		t.Errorf("mailer.sendCount = %d, want 1", got)
+	}
+	if mr.TTL(emailLoginKey("alice@example.com")) <= 0 {
+		t.Error("code key should have a positive TTL")
+	}
+}
+
+// TestSendLoginEmailCode_MailFailCleansRedis 邮件发送失败 → 清掉 redis key。
+// 守护契约：发码失败不留可登录凭证。
+func TestSendLoginEmailCode_MailFailCleansRedis(t *testing.T) {
+	svc, mr, _, _ := newLoginCodeSvc(t, registeredRepo("alice@example.com", 42), false)
+
+	if svc.SendLoginEmailCode(context.Background(), "alice@example.com") {
+		t.Error("SendLoginEmailCode should return false when mailer fails")
+	}
+	if mr.Exists(emailLoginKey("alice@example.com")) {
+		t.Error("code key should be cleaned on mail failure")
+	}
+	if mr.Exists(emailLoginCooldownKey("alice@example.com")) {
+		t.Error("cooldown key should be cleaned on mail failure")
+	}
+}
+
+// TestSendLoginEmailCode_CooldownSkipsResend 冷却中同邮箱二次申请不发新码。
+func TestSendLoginEmailCode_CooldownSkipsResend(t *testing.T) {
+	svc, mr, _, ch := newLoginCodeSvc(t, registeredRepo("alice@example.com", 42), true)
+	ctx := context.Background()
+
+	if !svc.SendLoginEmailCode(ctx, "alice@example.com") {
+		t.Fatal("first send should succeed")
+	}
+	first, err := mr.Get(emailLoginKey("alice@example.com"))
+	if err != nil {
+		t.Fatalf("first code missing: %v", err)
+	}
+
+	if !svc.SendLoginEmailCode(ctx, "alice@example.com") {
+		t.Error("second send during cooldown should still return true (silent)")
+	}
+	second, _ := mr.Get(emailLoginKey("alice@example.com"))
+	if first != second {
+		t.Errorf("cooldown should NOT overwrite code: first=%q second=%q", first, second)
+	}
+	if got := ch.sendCount.Load(); got != 1 {
+		t.Errorf("mailer.sendCount = %d, want 1 (cooldown skipped)", got)
+	}
+}
+
+// ---------- AuthenticateEmailCode ----------
+
+// TestAuthenticateEmailCode_NilRedisFailClosed 无 redis → 一律拒绝，不签发登录态。
+func TestAuthenticateEmailCode_NilRedisFailClosed(t *testing.T) {
+	svc := &UserService{redis: nil, repo: registeredRepo("alice@example.com", 1)}
+	_, _, err := svc.AuthenticateEmailCode(context.Background(), "alice@example.com", "123456")
+	if !errors.Is(err, usererrs.ErrInvalidEmailCode) {
+		t.Errorf("err = %v, want ErrInvalidEmailCode (fail closed when redis nil)", err)
+	}
+}
+
+// TestAuthenticateEmailCode_EmptyParamsFail 直接校验空入参。
+func TestAuthenticateEmailCode_EmptyParamsFail(t *testing.T) {
+	mr, _ := miniredis.Run()
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+	svc := &UserService{redis: rdb, repo: registeredRepo("alice@example.com", 1)}
+
+	cases := []struct{ email, code string }{
+		{"", "123456"},
+		{"alice@example.com", ""},
+	}
+	for _, c := range cases {
+		if _, _, err := svc.AuthenticateEmailCode(context.Background(), c.email, c.code); !errors.Is(err, usererrs.ErrInvalidEmailCode) {
+			t.Errorf("(%q,%q) err = %v, want ErrInvalidEmailCode", c.email, c.code, err)
+		}
+	}
+}
+
+// TestAuthenticateEmailCode_BadCodeLengthBadLength 不是 6 位直接拒绝，不走 lua。
+func TestAuthenticateEmailCode_BadCodeLength(t *testing.T) {
+	mr, _ := miniredis.Run()
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+	svc := &UserService{redis: rdb, repo: registeredRepo("alice@example.com", 1)}
+
+	badCodes := []string{"12345", "1234567", "abcdef", "  123456  "}
+	for _, c := range badCodes {
+		_, _, err := svc.AuthenticateEmailCode(context.Background(), "alice@example.com", c)
+		if !errors.Is(err, usererrs.ErrInvalidEmailCode) {
+			t.Errorf("code=%q err = %v, want ErrInvalidEmailCode", c, err)
+		}
+	}
+}
+
+// TestAuthenticateEmailCode_UnknownEmailHideExistence 未注册邮箱 → ErrInvalidEmailCode，
+// 与错码同响应，隐藏账户存在性。
+func TestAuthenticateEmailCode_UnknownEmailHideExistence(t *testing.T) {
+	mr, _ := miniredis.Run()
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+	repo := &mockUserRepo{
+		getByEmailFn: func(_ context.Context, _ string) (*model.User, *model.Profile, error) { return nil, nil, nil },
+	}
+	svc := &UserService{redis: rdb, repo: repo}
+
+	_, _, err := svc.AuthenticateEmailCode(context.Background(), "ghost@example.com", "123456")
+	if !errors.Is(err, usererrs.ErrInvalidEmailCode) {
+		t.Errorf("err = %v, want ErrInvalidEmailCode", err)
+	}
+	if status := err.(*apierr.Error).Status(); status != 400 {
+		t.Errorf("status = %d, want 400 (same as wrong code)", status)
+	}
+}
+
+// TestAuthenticateEmailCode_RepoErrorSurfaceInternalErr 仓库故障保留内部错误语义，
+// 不能因为"防枚举"把所有错误都映射到 ErrInvalidEmailCode —— 否则 DB 挂时排查困难。
+func TestAuthenticateEmailCode_RepoErrorSurfaceInternalErr(t *testing.T) {
+	mr, _ := miniredis.Run()
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+	dbErr := errors.New("db conn lost")
+	repo := &mockUserRepo{
+		getByEmailFn: func(_ context.Context, _ string) (*model.User, *model.Profile, error) { return nil, nil, dbErr },
+	}
+	svc := &UserService{redis: rdb, repo: repo}
+
+	_, _, err := svc.AuthenticateEmailCode(context.Background(), "alice@example.com", "123456")
+	if !errors.Is(err, dbErr) {
+		t.Errorf("err = %v, want original dbErr (preserve internal error)", err)
+	}
+}
+
+// TestAuthenticateEmailCode_SuccessConsumesCode 正确码命中 → 一次性消费 → 返回 user/profile。
+func TestAuthenticateEmailCode_SuccessConsumesCode(t *testing.T) {
+	svc, mr, _, _ := newLoginCodeSvc(t, registeredRepo("alice@example.com", 42), true)
+	const code = "654321"
+	seedLoginCode(t, mr, nil, "alice@example.com", code)
+
+	u, p, err := svc.AuthenticateEmailCode(context.Background(), "alice@example.com", code)
+	if err != nil {
+		t.Fatalf("AuthenticateEmailCode: %v", err)
+	}
+	if u == nil || u.ID != 42 {
+		t.Errorf("user = %v, want id=42", u)
+	}
+	if p == nil {
+		t.Error("profile should be returned on success")
+	}
+	// 一次性消费：code + attempts 必须被清。
+	if mr.Exists(emailLoginKey("alice@example.com")) {
+		t.Error("code key should be deleted after successful consume")
+	}
+	if mr.Exists(emailLoginAttemptsKey("alice@example.com")) {
+		t.Error("attempts key should be deleted after successful consume")
+	}
+}
+
+// TestAuthenticateEmailCode_WrongCodeIncrementsAttempts 错码 → INCR attempts，不动 code。
+func TestAuthenticateEmailCode_WrongCodeIncrementsAttempts(t *testing.T) {
+	svc, mr, rdb, _ := newLoginCodeSvc(t, registeredRepo("alice@example.com", 42), true)
+	const good = "654321"
+	seedLoginCode(t, mr, nil, "alice@example.com", good)
+	ctx := context.Background()
+
+	for i := 1; i <= 3; i++ {
+		_, _, err := svc.AuthenticateEmailCode(ctx, "alice@example.com", "000000")
+		if !errors.Is(err, usererrs.ErrInvalidEmailCode) {
+			t.Errorf("attempt %d: err = %v, want ErrInvalidEmailCode", i, err)
+		}
+	}
+	// attempts 累到 3
+	got, _ := rdb.Get(ctx, emailLoginAttemptsKey("alice@example.com")).Int()
+	if got != 3 {
+		t.Errorf("attempts = %d, want 3", got)
+	}
+	// code 还在（未达上限）
+	if !mr.Exists(emailLoginKey("alice@example.com")) {
+		t.Error("code key should still exist when attempts below cap")
+	}
+	// 紧接着用正确码仍能登录（前面错误没把 code 误删）
+	if _, _, err := svc.AuthenticateEmailCode(ctx, "alice@example.com", good); err != nil {
+		t.Errorf("correct code after wrong attempts should succeed: %v", err)
+	}
+}
+
+// TestAuthenticateEmailCode_AttemptsCapEvictsCode 5 次错码 → code 被清。
+func TestAuthenticateEmailCode_AttemptsCapEvictsCode(t *testing.T) {
+	svc, mr, _, _ := newLoginCodeSvc(t, registeredRepo("alice@example.com", 42), true)
+	seedLoginCode(t, mr, nil, "alice@example.com", "654321")
+	ctx := context.Background()
+
+	for i := 1; i <= 5; i++ {
+		_, _, err := svc.AuthenticateEmailCode(ctx, "alice@example.com", "000000")
+		if !errors.Is(err, usererrs.ErrInvalidEmailCode) {
+			t.Errorf("attempt %d: err = %v, want ErrInvalidEmailCode", i, err)
+		}
+	}
+	// 达到上限 → code 与 attempts 都应被清
+	if mr.Exists(emailLoginKey("alice@example.com")) {
+		t.Error("code key should be deleted after attempts cap")
+	}
+	if mr.Exists(emailLoginAttemptsKey("alice@example.com")) {
+		t.Error("attempts key should be deleted after cap")
+	}
+	// 即使给回正确码也不能登录（code 已蒸发）
+	if _, _, err := svc.AuthenticateEmailCode(ctx, "alice@example.com", "654321"); !errors.Is(err, usererrs.ErrInvalidEmailCode) {
+		t.Errorf("after cap, correct code should still be rejected (code evicted): err = %v", err)
+	}
+}
+
+// TestAuthenticateEmailCode_RejectsDifferentModeCode 同邮箱下 blog 注册码 / 重置码不能
+// 拿来登录。即使攻击者撞对 6 位数也过不了。
+func TestAuthenticateEmailCode_RejectsCrossPurposeCodes(t *testing.T) {
+	mr, _ := miniredis.Run()
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+	svc := &UserService{
+		redis: rdb,
+		repo:  registeredRepo("alice@example.com", 42),
+	}
+	const code = "654321"
+	ctx := context.Background()
+
+	// 写一个 blog 注册码（命名空间 email_code:<email>:blog）
+	blogKey := emailCodeKey("alice@example.com", modeBlog, false)
+	if err := mr.Set(blogKey, code); err != nil {
+		t.Fatalf("seed blog code: %v", err)
+	}
+	// 写一个重置码（命名空间 email_reset:<email>:blog）
+	resetKey := emailCodeKey("alice@example.com", modeBlog, true)
+	if err := mr.Set(resetKey, code); err != nil {
+		t.Fatalf("seed reset code: %v", err)
+	}
+
+	_, _, err := svc.AuthenticateEmailCode(ctx, "alice@example.com", code)
+	if !errors.Is(err, usererrs.ErrInvalidEmailCode) {
+		t.Errorf("err = %v, want ErrInvalidEmailCode (cross-purpose code must not login)", err)
+	}
+	// blog / reset 的 key 必须未被脚本误删（隔离守护）
+	if !mr.Exists(blogKey) {
+		t.Error("blog code key was wrongly consumed by login script")
+	}
+	if !mr.Exists(resetKey) {
+		t.Error("reset code key was wrongly consumed by login script")
+	}
+}
+
+// TestAuthenticateEmailCode_ConcurrentSameCorrectCodeOnlyOnce 并发提交同一正确码：
+// 至多一个成功，其它都收 ErrInvalidEmailCode（不变量）。
+func TestAuthenticateEmailCode_ConcurrentSameCorrectCodeOnlyOnce(t *testing.T) {
+	svc, mr, _, _ := newLoginCodeSvc(t, registeredRepo("alice@example.com", 42), true)
+	const code = "654321"
+	seedLoginCode(t, mr, nil, "alice@example.com", code)
+
+	const N = 16
+	var success atomic.Int32
+	var invalid atomic.Int32
+	var other atomic.Int32
+	var wg sync.WaitGroup
+	wg.Add(N)
+	for i := 0; i < N; i++ {
+		go func() {
+			defer wg.Done()
+			_, _, err := svc.AuthenticateEmailCode(context.Background(), "alice@example.com", code)
+			switch {
+			case err == nil:
+				success.Add(1)
+			case errors.Is(err, usererrs.ErrInvalidEmailCode):
+				invalid.Add(1)
+			default:
+				other.Add(1)
+			}
+		}()
+	}
+	wg.Wait()
+	if success.Load() != 1 {
+		t.Errorf("successes = %d, want exactly 1", success.Load())
+	}
+	if other.Load() != 0 {
+		t.Errorf("other errors = %d, want 0", other.Load())
+	}
+	if invalid.Load() != int32(N-1) {
+		t.Errorf("invalid count = %d, want %d", invalid.Load(), N-1)
+	}
+}
+
+// TestAuthenticateEmailCode_RejectsExpiredCode 5 分钟 TTL 到期 → 视为无效码。
+func TestAuthenticateEmailCode_RejectsExpiredCode(t *testing.T) {
+	svc, mr, _, _ := newLoginCodeSvc(t, registeredRepo("alice@example.com", 42), true)
+	seedLoginCode(t, mr, nil, "alice@example.com", "654321")
+	// miniredis 快进时间到 TTL 之后
+	mr.FastForward(emailCodeExpire + time.Second)
+
+	_, _, err := svc.AuthenticateEmailCode(context.Background(), "alice@example.com", "654321")
+	if !errors.Is(err, usererrs.ErrInvalidEmailCode) {
+		t.Errorf("err = %v, want ErrInvalidEmailCode (expired)", err)
+	}
+}
+
+// TestAuthenticateEmailCode_CleansCooldownOnSuccess 登录成功后清掉 cooldown，
+// 防止"刚登录又被限频发码"误伤正常用户。
+func TestAuthenticateEmailCode_CleansCooldownOnSuccess(t *testing.T) {
+	svc, mr, _, _ := newLoginCodeSvc(t, registeredRepo("alice@example.com", 42), true)
+	if err := mr.Set(emailLoginCooldownKey("alice@example.com"), "1"); err != nil {
+		t.Fatalf("seed cooldown: %v", err)
+	}
+	seedLoginCode(t, mr, nil, "alice@example.com", "654321")
+
+	if _, _, err := svc.AuthenticateEmailCode(context.Background(), "alice@example.com", "654321"); err != nil {
+		t.Fatalf("login should succeed: %v", err)
+	}
+	if mr.Exists(emailLoginCooldownKey("alice@example.com")) {
+		t.Error("cooldown key should be deleted after successful login")
+	}
+}
+
+// TestSendLoginEmailCode_KeyIsolation 登录码 key 与注册 / 重置 / magic login key 完全独立。
+func TestSendLoginEmailCode_KeyIsolation(t *testing.T) {
+	mr, _ := miniredis.Run()
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+
+	const email = "alice@example.com"
+
+	// 写其他用途的码
+	for _, k := range []string{
+		emailCodeKey(email, modeBlog, false),       // 注册
+		emailCodeKey(email, modeNomu, false),       // 注册 nomu
+		emailCodeKey(email, modeBlog, true),        // 重置 blog
+		fmt.Sprintf("magiclogintoken:%s:%s", "deadbeef", modeNomu), // 魔法登录
+	} {
+		if err := mr.Set(k, "111111"); err != nil {
+			t.Fatalf("seed %s: %v", k, err)
+		}
+	}
+
+	ch := &fakeChannel{}
+	ch.ok.Store(true)
+	svc := &UserService{
+		redis: rdb,
+		repo:  registeredRepo(email, 42),
+		mailer: emailtemplates.NewMailerWithChannel(ch),
+	}
+	if !svc.SendLoginEmailCode(context.Background(), email) {
+		t.Fatal("SendLoginEmailCode should succeed")
+	}
+
+	// 登录码已写
+	if !mr.Exists(emailLoginKey(email)) {
+		t.Error("login code key should be written")
+	}
+	// 其他用途的码必须原样保留
+	if got, _ := mr.Get(emailCodeKey(email, modeBlog, false)); got != "111111" {
+		t.Errorf("blog register code was disturbed: got %q", got)
+	}
+	if got, _ := mr.Get(emailCodeKey(email, modeNomu, false)); got != "111111" {
+		t.Errorf("nomu register code was disturbed: got %q", got)
+	}
+	if got, _ := mr.Get(emailCodeKey(email, modeBlog, true)); got != "111111" {
+		t.Errorf("reset code was disturbed: got %q", got)
+	}
+}
+
+// TestSendLoginEmailCode_NoMailer 当 mailer 未装配时静默返回 false，
+// handler 不区分原因（对外统一成功响应防枚举）。
+func TestSendLoginEmailCode_NoMailer(t *testing.T) {
+	mr, _ := miniredis.Run()
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+	svc := &UserService{
+		redis: rdb,
+		repo:  registeredRepo("alice@example.com", 42),
+		mailer: nil,
+	}
+	if svc.SendLoginEmailCode(context.Background(), "alice@example.com") {
+		t.Error("should return false when mailer is nil")
 	}
 }

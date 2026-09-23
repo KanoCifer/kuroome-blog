@@ -28,6 +28,18 @@ const (
 	emailResetCacheKeyFmt          = "email_reset:%s:%s"
 	emailResetChallengeCacheKeyFmt = "email_reset_challenge:%s:%s"
 
+	// 登录验证码专用 redis 命名空间（与注册 / 重置不互通，避免发错邮件却能
+	// 拿同一码登录）。key 段：
+	//   email_login_code:<email>:nomu             6 位验证码，TTL 5min
+	//   email_login_attempts:<email>:nomu         单码失败计数，TTL 与 code 同步
+	//   email_login_send_cooldown:<email>:nomu    发码冷却 60s（防邮件轰炸）
+	emailLoginCodeKeyFmt        = "email_login_code:%s:%s"
+	emailLoginAttemptsKeyFmt    = "email_login_attempts:%s:%s"
+	emailLoginCooldownKeyFmt    = "email_login_send_cooldown:%s:%s"
+	emailLoginCooldown          = time.Second * 60
+	emailLoginMaxAttempts       = 5
+	emailLoginCodeLength        = 6
+
 	// bcryptCost 密码 hash cost。12 = 2^12 key schedule rounds，
 	// 2026 年推荐值（bcrypt.DefaultCost=10 已偏弱）。
 	// 升级只需改这个数字；旧 hash 仍可校验（cost 写在 hash 字符串里）。
@@ -303,6 +315,162 @@ func (s *UserService) SendEmailCode(ctx context.Context, email, mode string) boo
 	}
 
 	return s.mailer.SendVerificationCode(ctx, email, mode, code)
+}
+
+// ---------- 邮箱验证码登录（Nomu 专用） ----------
+
+// emailLoginKey / attemptsKey / cooldownKey 是登录验证码三段 redis key 的拼装。
+//
+// 段组成：email + 强制 mode=nomu（登录码场景不接 blog，避免与注册 / 重置混用）。
+// 即便调用方漏传 mode，这里也强制 nomu，使不同 mode 互不串。
+func emailLoginKey(email string) string {
+	return fmt.Sprintf(emailLoginCodeKeyFmt, email, modeNomu)
+}
+func emailLoginAttemptsKey(email string) string {
+	return fmt.Sprintf(emailLoginAttemptsKeyFmt, email, modeNomu)
+}
+func emailLoginCooldownKey(email string) string {
+	return fmt.Sprintf(emailLoginCooldownKeyFmt, email, modeNomu)
+}
+
+// loginCodeVerifyScript 原子核验登录码：传入 code → 检查 → 命中则 DEL code+attempts
+// 返回 1；未命中则 INCR attempts，达到上限则 DEL code+attempts 返回 -1；其他返 0。
+//
+// 三件事必须在同一 Redis 调用里完成：
+//   - 拿到 code 的当前值；
+//   - 错误输入时 INCR 错误计数；
+//   - 错误达上限时清空 code（防止继续猜），或正确时清空 code（一次性消费）。
+//
+// ponytail: 用 Lua 而非 GET+DEL+INCR，理由是并发请求下 GET+DEL+INCR 之间存在
+// 竞态（两个并发都拿到正确码 → 都 DEL → 都返回成功；或两个并发错误计数都
+// 没到上限 → 绕过阈值）。升级路径：无 —— 真要拆就改用 HASH 字段（attempts 作
+// field、code 作 value），脚本继续单 key 即可。
+var loginCodeVerifyScript = redis.NewScript(`
+local stored = redis.call('GET', KEYS[1])
+if stored == false then
+  return 0
+end
+if stored == ARGV[1] then
+  redis.call('DEL', KEYS[1])
+  redis.call('DEL', KEYS[2])
+  return 1
+end
+local attempts = redis.call('INCR', KEYS[2])
+if attempts >= tonumber(ARGV[2]) then
+  redis.call('DEL', KEYS[1])
+  redis.call('DEL', KEYS[2])
+  return -1
+end
+return 0
+`)
+
+// SendLoginEmailCode 申请 Nomu 邮箱验证码登录：
+//   - 仅对已注册账户真正写 redis + 发邮件（未知邮箱静默吞掉，防枚举）；
+//   - 60s 内同邮箱重复申请不发新码（per-email cooldown），跨 IP 仍生效；
+//   - 邮件发送失败时清理已写入的 code / cooldown key，不留可登录凭证。
+//
+// 返回 true 表示「已成功发出或该邮箱无需发邮件」；false 表示「redis / mailer
+// 不可用或发送失败」。handler 不关心细节，统一对外回成功响应防枚举。
+func (s *UserService) SendLoginEmailCode(ctx context.Context, email string) bool {
+	if s.redis == nil || s.mailer == nil {
+		return false
+	}
+
+	u, _, err := s.repo.GetByEmail(ctx, email)
+	if err != nil || u == nil {
+		// 未知邮箱静默成功；仓库故障同样静默以防侧信道。
+		slog.InfoContext(ctx, "login email code: email not registered, silent skip",
+			"mode", modeNomu)
+		return true
+	}
+
+	// 60s 冷却：避免跨 IP 邮件轰炸。SETNX 不覆盖仍在倒计的窗口。
+	ok, err := s.redis.SetNX(ctx, emailLoginCooldownKey(email), "1", emailLoginCooldown).Result()
+	if err != nil {
+		slog.ErrorContext(ctx, "login email code cooldown set failed",
+			"err", err)
+		return false
+	}
+	if !ok {
+		// 冷却中：仍按"已发"对待，对客户端统一响应。code 不覆盖旧值。
+		slog.InfoContext(ctx, "login email code send skipped by cooldown",
+			"mode", modeNomu)
+		return true
+	}
+
+	code := generateCode()
+	codeKey := emailLoginKey(email)
+	if err := s.redis.Set(ctx, codeKey, code, emailCodeExpire).Err(); err != nil {
+		// redis 写失败：清掉 cooldown 放行重试，避免 cooldown 卡死。
+		s.redis.Del(ctx, emailLoginCooldownKey(email))
+		slog.ErrorContext(ctx, "login email code redis set failed",
+			"err", err)
+		return false
+	}
+
+	if !s.mailer.SendEmailCodeLogin(ctx, email, code) {
+		// 发送失败：清理已落 redis 的 code + cooldown，让调用方下一次重试有机会成功。
+		s.redis.Del(ctx, codeKey, emailLoginCooldownKey(email))
+		slog.ErrorContext(ctx, "login email code mail send failed",
+			"err", "mailer returned false")
+		return false
+	}
+
+	slog.InfoContext(ctx, "login email code sent", "user_id", u.ID)
+	return true
+}
+
+// AuthenticateEmailCode 用邮箱 + 6 位验证码登录 Nomu。
+//
+// 流程：
+//   1. redis 为 nil → fail closed（ErrInvalidEmailCode，避免缺 redis 时跳过验证）；
+//   2. 仓库按邮箱查 user，未注册 → ErrInvalidEmailCode（与错码同响应，隐藏存在性）；
+//   3. Lua 脚本原子核验 + 错误计数 + 消费；返回 0/-1/1，分别对应：
+//      0 = 验证码错但未到上限；-1 = 验证码错且达到 5 次上限（code 被清）；
+//      1 = 验证码正确（code 被一次性消费）；
+//   4. 成功 → 返回 user/profile，由 handler 走 CreateTokens 流程。
+//
+// 错误码与未知账户同响应：service 透传 ErrInvalidEmailCode，handler → 400。
+func (s *UserService) AuthenticateEmailCode(
+	ctx context.Context,
+	email, code string,
+) (*model.User, *model.Profile, error) {
+	if s.redis == nil || email == "" || code == "" {
+		return nil, nil, usererrs.ErrInvalidEmailCode
+	}
+	if len(code) != emailLoginCodeLength {
+		return nil, nil, usererrs.ErrInvalidEmailCode
+	}
+
+	u, p, err := s.repo.GetByEmail(ctx, email)
+	if err != nil {
+		slog.ErrorContext(ctx, "auth email code get-by-email failed",
+			"err", err, "mode", modeNomu)
+		// 仓库故障 → 返回内部错误而不是 ErrInvalidEmailCode，
+		// 避免把 DB 故障误表为验证码错（隐藏账户存在性不能盖过排障线索）。
+		return nil, nil, err
+	}
+	if u == nil {
+		return nil, nil, usererrs.ErrInvalidEmailCode
+	}
+
+	res, err := loginCodeVerifyScript.Run(ctx, s.redis,
+		[]string{emailLoginKey(email), emailLoginAttemptsKey(email)},
+		code, emailLoginMaxAttempts,
+	).Int()
+	if err != nil {
+		slog.ErrorContext(ctx, "auth email code redis script failed",
+			"err", err, "mode", modeNomu)
+		return nil, nil, err
+	}
+	if res != 1 {
+		return nil, nil, usererrs.ErrInvalidEmailCode
+	}
+
+	// 命中：清掉 cooldown，让用户能立即重发（避免上次的 60s 限制误伤正常用户）。
+	s.redis.Del(ctx, emailLoginCooldownKey(email))
+	slog.InfoContext(ctx, "email code login consumed", "user_id", u.ID)
+	return u, p, nil
 }
 
 func (s *UserService) sendPasswordReset(ctx context.Context, email, mode string) bool {

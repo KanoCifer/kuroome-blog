@@ -25,8 +25,10 @@ type Userer interface {
 	GetByUsername(ctx context.Context, username string) (*model.User, *model.Profile, error)
 	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error)
 	SendEmailCode(ctx context.Context, email, mode string) bool
+	SendLoginEmailCode(ctx context.Context, email string) bool
 	SendMagicLoginEmail(ctx context.Context, email, mode, deviceID string) bool
 	Authenticate(ctx context.Context, username, password string) (*model.User, error)
+	AuthenticateEmailCode(ctx context.Context, email, code string) (*model.User, *model.Profile, error)
 	AuthenticateMagicLogin(ctx context.Context, token string) (*model.User, *model.Profile, error)
 	CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
 	RefreshTokens(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
@@ -235,6 +237,55 @@ func (h *UserHandler) EmailCode(c *gin.Context) {
 	response.Success(c, nil, "验证码已发送")
 }
 
+// SendLoginEmailCode 申请 Nomu 邮箱验证码登录的邮件。
+//
+// 与 EmailCode 的差别：
+//   - 仅 Nomu 模式（blog 不发邮件登录码）；DTO 强制 mode=nomu；
+//   - 未知邮箱 / 邮件发送失败对客户端返回同一通用成功响应，隐藏账户是否存在；
+//   - 复用现有 fire-and-forget 范式，但 service 内部已先写 redis 才发邮件，
+//     发送失败会清掉刚写的 code key，不会留下可登录凭证。
+//
+// 测试需要等待后台 service 调用完成（用 channel / WaitGroup 同步）。
+func (h *UserHandler) SendLoginEmailCode(c *gin.Context) {
+	var req dto.LoginEmailCodeSendRequest
+	if !bindJSON(c, &req) {
+		return
+	}
+	// fire-and-forget；WithoutCancel 避免 handler 返回后 ctx 取消导致发送中断
+	go h.userSvc.SendLoginEmailCode(context.WithoutCancel(c.Request.Context()), req.Email)
+	response.Success(c, nil, "若该邮箱已注册，验证码已发送")
+}
+
+// LoginEmailCode 提交 Nomu 邮箱验证码完成登录。
+//
+// 与密码登录共用响应形态：handler 调 CreateTokens 拿 access/refresh，写
+// refresh_token HttpOnly cookie，把 user dict 平铺到 data 顶层并补 access/
+// refresh 字段。未知账户、错码、过期码、已消费码、错误次数耗尽 →
+// service 统一返 ErrInvalidEmailCode（400「验证码无效」），handler 不区分
+// 账户状态，避免侧信道枚举。
+func (h *UserHandler) LoginEmailCode(c *gin.Context) {
+	var req dto.LoginEmailCodeRequest
+	if !bindJSON(c, &req) {
+		return
+	}
+
+	u, p, err := h.userSvc.AuthenticateEmailCode(c.Request.Context(), req.Email, req.EmailCode)
+	if respondErr(c, err, "email code login failed", "mode", "nomu") {
+		return
+	}
+
+	tokens, err := h.userSvc.CreateTokens(c.Request.Context(), u)
+	if respondErr(c, err, "create tokens error", "user_id", u.ID) {
+		return
+	}
+
+	util.SetRefreshCookie(c, h.cfg, tokens.RefreshToken)
+	userData := h.userSvc.UserToDict(u, p)
+	userData["access_token"] = tokens.AccessToken
+	userData["refresh_token"] = tokens.RefreshToken
+	response.Success(c, userData, "登录成功")
+}
+
 // MagicLoginEmail 申请魔法登录邮件。
 //
 // req.Mode 决定链接 host + Redis key 命名空间（blog / nomu），
@@ -329,13 +380,28 @@ func (h *UserHandler) ConfirmPasswordReset(c *gin.Context) {
 	response.Success(c, nil, "密码已重置")
 }
 
-func (h *UserHandler) RegisterRoutes(r *gin.RouterGroup, authMiddleware gin.HandlerFunc, publicMWs ...gin.HandlerFunc) {
+func (h *UserHandler) RegisterRoutes(
+	r *gin.RouterGroup,
+	authMiddleware gin.HandlerFunc,
+	loginCodeSendMW gin.HandlerFunc,
+	publicMWs ...gin.HandlerFunc,
+) {
 	r.POST("/login", append(publicMWs, h.Login)...)
 	r.POST("/register", append(publicMWs, h.Register)...)
 	r.POST("/refresh-token", h.RefreshToken)
 	r.POST("/logout", authMiddleware, h.Logout)
 	r.GET("/me", authMiddleware, h.Me)
 	r.POST("/email/code", h.EmailCode)
+	// Nomu 邮箱验证码登录：发码 + 提交登录两个公开端点。
+	//   /email/login-code   走独立 IP 限流器（防跨 IP 邮件轰炸），service 内部
+	//                       还有 per-email 60s 冷却作为第二道闸门；
+	//   /login/email-code   复用现有 loginLimiter（5/min IP），与密码登录同等待遇。
+	if loginCodeSendMW != nil {
+		r.POST("/email/login-code", loginCodeSendMW, h.SendLoginEmailCode)
+	} else {
+		r.POST("/email/login-code", h.SendLoginEmailCode)
+	}
+	r.POST("/login/email-code", append(publicMWs, h.LoginEmailCode)...)
 	r.POST("/magic-login/consume", append(publicMWs, h.MagicLoginConsume)...)
 	r.POST("/email/magic-login", append(publicMWs, h.MagicLoginEmail)...)
 

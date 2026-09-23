@@ -24,6 +24,27 @@ type EmailCodeRequest struct {
 	Mode  string `json:"mode,omitempty" binding:"omitempty,oneof=blog nomu"`
 }
 
+// LoginEmailCodeSendRequest 申请 Nomu 邮箱验证码登录的请求。
+//
+// 登录验证码是 Nomu 专用：mode 缺省按 nomu 处理；若传入则必须为 nomu（blog 不
+// 发邮件登录码）。service 只对已存在账户真正写 redis + 发邮件，未知邮箱与发送
+// 失败均返回同一通用成功响应，避免账户枚举。
+type LoginEmailCodeSendRequest struct {
+	Email string `json:"email" binding:"required,email"`
+	Mode  string `json:"mode,omitempty" binding:"omitempty,oneof=nomu"`
+}
+
+// LoginEmailCodeRequest 提交邮箱验证码登录的请求。
+//
+// EmailCode 必须是恰为 6 位 ASCII 数字。mode 缺省按 nomu 处理；若传入则必须为
+// nomu。错码/过期码/已消费码/未知邮箱在 service 层统一映射为 ErrInvalidEmailCode
+// （400「验证码无效」），handler 不区分账户状态。
+type LoginEmailCodeRequest struct {
+	Email     string `json:"email" binding:"required,email"`
+	EmailCode string `json:"email_code" binding:"required,len=6"`
+	Mode      string `json:"mode,omitempty" binding:"omitempty,oneof=nomu"`
+}
+
 type ResetPasswordRequest struct {
 	Email     string `json:"email" binding:"required,email"`
 	Mode      string `json:"mode,omitempty" binding:"omitempty,oneof=blog nomu"`
