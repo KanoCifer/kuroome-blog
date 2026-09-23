@@ -695,7 +695,7 @@ func TestEmailCode_SendAndVerifyShareKeyNamespace(t *testing.T) {
 	const code = "654321"
 
 	// 模拟 SendEmailCode 写 key 的形态（blog 模式）
-	key := emailCodeKey(email, modeBlog)
+	key := emailCodeKey(email, modeBlog, false)
 	if err := rdb.Set(context.Background(), key, code, emailCodeExpire).Err(); err != nil {
 		t.Fatalf("seed: %v", err)
 	}
@@ -726,8 +726,8 @@ func TestEmailCode_CrossModeIsolation(t *testing.T) {
 	const email = "alice@example.com"
 	const code = "111222"
 
-	blogKey := emailCodeKey(email, modeBlog)
-	nomuKey := emailCodeKey(email, modeNomu)
+	blogKey := emailCodeKey(email, modeBlog, false)
+	nomuKey := emailCodeKey(email, modeNomu, false)
 
 	// 只写 blog 模式
 	if err := rdb.Set(context.Background(), blogKey, code, emailCodeExpire).Err(); err != nil {

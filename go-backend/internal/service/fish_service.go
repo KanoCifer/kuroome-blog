@@ -19,7 +19,6 @@ type FishRepoer interface {
 	GetByID(ctx context.Context, id string) (*document.FishingSpot, error)
 }
 
-
 // ErrInvalidKind 是领域错误 —— handler 据此映射 400 + invalid_kind 标记。
 // 定义在 internal/domain/fish/errs，此处转出以保持既有引用不变。
 var ErrInvalidKind = fisherrs.ErrInvalidKind

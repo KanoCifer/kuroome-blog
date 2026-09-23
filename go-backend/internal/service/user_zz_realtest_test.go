@@ -70,7 +70,7 @@ func TestEmailCode_RealSend_ToOutlook(t *testing.T) {
 	t.Cleanup(func() { config.Cfg = prev })
 
 	// 干净起点：清掉这个 email 之前的残留 key（如果上次跑挂的话）
-	_ = rdb.Del(context.Background(), emailCodeKey(target, modeBlog)).Err()
+	_ = rdb.Del(context.Background(), emailCodeKey(target, modeBlog, false)).Err()
 
 	repo := &mockUserRepo{
 		getByEmailFn: func(ctx context.Context, email string) (*model.User, *model.Profile, error) {
@@ -87,7 +87,7 @@ func TestEmailCode_RealSend_ToOutlook(t *testing.T) {
 	}
 
 	// 验证码在 redis 里 TTL 5min，5s 内一定能 Get 到。
-	key := emailCodeKey(target, modeBlog)
+	key := emailCodeKey(target, modeBlog, false)
 	stored, err := rdb.Get(context.Background(), key).Result()
 	if err != nil {
 		t.Fatalf("redis key %q 写失败：%v", key, err)

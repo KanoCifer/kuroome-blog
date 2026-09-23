@@ -1,7 +1,6 @@
 package handler
 
 import (
-
 	"context"
 	"net/http"
 	"strconv"
@@ -26,7 +25,6 @@ type Systemer interface {
 }
 
 var _ Systemer = (*service.SystemService)(nil)
-
 
 type SystemHandler struct {
 	svc Systemer

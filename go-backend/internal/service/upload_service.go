@@ -22,8 +22,8 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/KanoCifer/kuroome-blog/internal/config"
-	"github.com/KanoCifer/kuroome-blog/internal/domain/upload/errs"
-	"github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
+	uploaderrs "github.com/KanoCifer/kuroome-blog/internal/domain/upload/errs"
+	usererrs "github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/util"
 )

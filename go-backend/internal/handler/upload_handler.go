@@ -1,14 +1,13 @@
 package handler
 
 import (
-
 	"context"
 	"io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/KanoCifer/kuroome-blog/internal/domain/upload/errs"
+	uploaderrs "github.com/KanoCifer/kuroome-blog/internal/domain/upload/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
@@ -35,7 +34,6 @@ type Uploader interface {
 }
 
 var _ Uploader = (*service.UploadService)(nil)
-
 
 // avatarViewer 是 UploadPic 成功后回读用户字典所需的最小接口。
 // service.Userer 满足此接口；handler 以窄接口注入，便于 mock 测试。

@@ -39,7 +39,6 @@ type Userer interface {
 
 var _ Userer = (*service.UserService)(nil)
 
-
 // UserHandler 持有业务服务，gin 路由方法挂在其上。
 type UserHandler struct {
 	userSvc Userer

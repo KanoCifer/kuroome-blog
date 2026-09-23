@@ -1,7 +1,6 @@
 package handler
 
 import (
-
 	"context"
 	"log/slog"
 	"time"
@@ -24,7 +23,6 @@ type WSer interface {
 }
 
 var _ WSer = (*service.WSService)(nil)
-
 
 type WSHandler struct {
 	Svc WSer

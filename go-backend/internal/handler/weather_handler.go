@@ -1,7 +1,6 @@
 package handler
 
 import (
-
 	"context"
 	"encoding/json"
 	"log/slog"
@@ -30,7 +29,6 @@ type Weatherer interface {
 }
 
 var _ Weatherer = (*service.WeatherService)(nil)
-
 
 type WeatherHandler struct {
 	svc Weatherer

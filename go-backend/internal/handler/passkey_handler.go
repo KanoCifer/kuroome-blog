@@ -1,7 +1,6 @@
 package handler
 
 import (
-
 	"context"
 	"errors"
 	"log/slog"
@@ -9,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/KanoCifer/kuroome-blog/internal/config"
-	"github.com/KanoCifer/kuroome-blog/internal/domain/passkey/errs"
+	passkeyerrs "github.com/KanoCifer/kuroome-blog/internal/domain/passkey/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
@@ -32,7 +31,6 @@ type Passkeyer interface {
 }
 
 var _ Passkeyer = (*service.PasskeyService)(nil)
-
 
 // PasskeyHandler 持有 passkeySvc（cookie 设置等 HTTP 关注点留在 handler）。
 type PasskeyHandler struct {

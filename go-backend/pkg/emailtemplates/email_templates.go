@@ -6,11 +6,13 @@
 //   - Scenario 文案字段（Heading / Description / Brand / FooterBy …）
 //
 // 场景清单（Kind）：
-//   - KindRegister        注册验证码
-//   - KindPasswordReset   找回密码
-//   - KindEmailCodeLogin  邮箱验证码登录
-//   - KindMagicLoginBlog  魔法登录 · 博客版
-//   - KindMagicLoginNomu  魔法登录 · Nomu 版
+//   - KindRegister           注册验证码
+//   - KindPasswordReset      找回密码（单 mode 兜底，Nomu 版）
+//   - KindPasswordResetBlog  找回密码 · 博客版
+//   - KindPasswordResetNomu  找回密码 · Nomu 版
+//   - KindEmailCodeLogin     邮箱验证码登录
+//   - KindMagicLoginBlog     魔法登录 · 博客版
+//   - KindMagicLoginNomu     魔法登录 · Nomu 版
 //
 // 加一类邮件 = 加一个 Scenario 字面量 + 一组预填常量，HTML 模板本身不动。
 package emailtemplates
@@ -26,11 +28,13 @@ import (
 type Kind string
 
 const (
-	KindRegister       Kind = "register"
-	KindPasswordReset  Kind = "password_reset"
-	KindEmailCodeLogin Kind = "email_code_login"
-	KindMagicLoginBlog Kind = "magic_login_blog"
-	KindMagicLoginNomu Kind = "magic_login_nomu"
+	KindRegister          Kind = "register"
+	KindPasswordReset     Kind = "password_reset"
+	KindPasswordResetBlog Kind = "password_reset_blog"
+	KindPasswordResetNomu Kind = "password_reset_nomu"
+	KindEmailCodeLogin    Kind = "email_code_login"
+	KindMagicLoginBlog    Kind = "magic_login_blog"
+	KindMagicLoginNomu    Kind = "magic_login_nomu"
 )
 
 // ActionKind 描述 Pillow 容器的主交互元素 —— Pillow 模板里据此切换
@@ -105,6 +109,44 @@ func RegisterScenario(code string) Scenario {
 func PasswordResetScenario(code string) Scenario {
 	return Scenario{
 		Kind:         KindPasswordReset,
+		Title:        "Nomu 找回密码",
+		LogoURL:      NomuLogoURL,
+		Brand:        "Nomu",
+		Subtitle:     "Chrome 扩展 · 找回密码",
+		Heading:      "重置您的密码",
+		Description:  "使用以下验证码重置 Nomu 账号密码。",
+		Action:       Action{Kind: ActionCode, Label: html.EscapeString(code)},
+		Expiry:       "请在 10 分钟内使用。",
+		SecurityNote: "验证码仅用于本次重置，不会以任何形式再次索取。若非本人操作，请忽略此邮件。",
+		FooterBy:     "kanocifer.chat",
+		FooterLine:   "Nomu · 找回密码",
+	}
+}
+
+// ---------- 找回密码 · 博客版 ----------
+
+func PasswordResetBlogScenario(code string) Scenario {
+	return Scenario{
+		Kind:         KindPasswordResetBlog,
+		Title:        "kanocifer.chat 找回密码",
+		LogoURL:      BlogLogoURL,
+		Brand:        "kanocifer.chat",
+		Subtitle:     "找回密码",
+		Heading:      "重置您的密码",
+		Description:  "使用以下验证码重置 kanocifer.chat 账号密码。",
+		Action:       Action{Kind: ActionCode, Label: html.EscapeString(code)},
+		Expiry:       "请在 10 分钟内使用。",
+		SecurityNote: "验证码仅用于本次重置，不会以任何形式再次索取。若非本人操作，请忽略此邮件。",
+		FooterBy:     "", // 自营产品，跳过"代发"行
+		FooterLine:   "kanocifer.chat · 找回密码",
+	}
+}
+
+// ---------- 找回密码 · Nomu 版 ----------
+
+func PasswordResetNomuScenario(code string) Scenario {
+	return Scenario{
+		Kind:         KindPasswordResetNomu,
 		Title:        "Nomu 找回密码",
 		LogoURL:      NomuLogoURL,
 		Brand:        "Nomu",
@@ -208,6 +250,22 @@ func magicLoginScenario(link, mode string) Scenario {
 		return MagicLoginNomuScenario(link)
 	}
 	return MagicLoginBlogScenario(link)
+}
+
+// PasswordResetEmail 构造密码重置邮件，按 mode 选 blog/nomu 场景。
+//
+// password_reset_blog → BlogLogoURL + kanocifer 品牌 + 单行页脚；
+// password_reset_nomu → NomuLogoURL + Nomu 品牌 + 代发双行页脚。
+// 与 magicLoginScenario 同构：非法 mode 一律 blog 兜底。
+func PasswordResetEmail(code, mode string) notification.Message {
+	return BuildScenarioEmail(passwordResetScenario(code, mode))
+}
+
+func passwordResetScenario(code, mode string) Scenario {
+	if mode == modeNomu {
+		return PasswordResetNomuScenario(code)
+	}
+	return PasswordResetBlogScenario(code)
 }
 
 // BuildScenarioEmail 把任意 Scenario 包成 notification.Message。

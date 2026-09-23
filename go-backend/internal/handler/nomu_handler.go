@@ -1,7 +1,6 @@
 package handler
 
 import (
-
 	"context"
 	"io"
 	"log/slog"
@@ -25,7 +24,6 @@ type NomuService interface {
 }
 
 var _ NomuService = (*service.NomuServiceStruct)(nil)
-
 
 type NomuHandler struct {
 	svc NomuService

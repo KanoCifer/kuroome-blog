@@ -13,8 +13,8 @@ import (
 	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/redis/go-redis/v9"
 
-	"github.com/KanoCifer/kuroome-blog/internal/domain/passkey/errs"
-	"github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
+	passkeyerrs "github.com/KanoCifer/kuroome-blog/internal/domain/passkey/errs"
+	usererrs "github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 )

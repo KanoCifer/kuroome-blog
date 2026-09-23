@@ -1,7 +1,6 @@
 package handler
 
 import (
-
 	"context"
 	"errors"
 	"strings"
@@ -9,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 
-	"github.com/KanoCifer/kuroome-blog/internal/domain/fish/errs"
+	fisherrs "github.com/KanoCifer/kuroome-blog/internal/domain/fish/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/middleware"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
@@ -27,7 +26,6 @@ type Fisher interface {
 }
 
 var _ Fisher = (*service.FishService)(nil)
-
 
 // kindBindingErrMessage gin binding tag 触发 oneof 失败时返回的字符串固定形态。
 // 我们嗅探字符串以把 binding 阶段的 kind 错误也归一为同一个 invalid_kind 标记。

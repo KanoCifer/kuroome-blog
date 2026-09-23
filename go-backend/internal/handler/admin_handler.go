@@ -1,7 +1,6 @@
 package handler
 
 import (
-
 	"context"
 	"log/slog"
 
@@ -24,7 +23,6 @@ type Adminer interface {
 }
 
 var _ Adminer = (*service.AdminService)(nil)
-
 
 type AdminHandler struct {
 	adminSvc Adminer

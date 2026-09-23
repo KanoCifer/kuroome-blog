@@ -1,7 +1,6 @@
 package handler
 
 import (
-
 	"context"
 	"net/http"
 
@@ -19,7 +18,6 @@ type Currencyer interface {
 }
 
 var _ Currencyer = (*service.CurrencyService)(nil)
-
 
 type CurrencyHandler struct {
 	svc Currencyer

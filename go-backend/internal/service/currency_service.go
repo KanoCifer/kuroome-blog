@@ -29,7 +29,6 @@ type CurrencyService struct {
 	baseURL string
 }
 
-
 // ClientOption 覆盖默认上游配置（测试注入用）。
 type ClientOption func(*CurrencyService)
 

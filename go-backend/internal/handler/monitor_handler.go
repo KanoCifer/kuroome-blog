@@ -1,7 +1,6 @@
 package handler
 
 import (
-
 	"context"
 	"errors"
 	"io"
@@ -29,7 +28,6 @@ type Monitorer interface {
 }
 
 var _ Monitorer = (*service.MonitorService)(nil)
-
 
 var errNotNumber = errors.New("not a number")
 

@@ -1,7 +1,6 @@
 package handler
 
 import (
-
 	"context"
 	"strconv"
 
@@ -26,7 +25,6 @@ type Momenter interface {
 }
 
 var _ Momenter = (*service.MomentService)(nil)
-
 
 // MomentHandler 处理 moment 资源的 HTTP 请求。
 //

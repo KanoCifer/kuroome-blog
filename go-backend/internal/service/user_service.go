@@ -22,7 +22,8 @@ import (
 const (
 	emailCodeExpire = time.Minute * 5
 	// 命名空间 by mode，跨 mode 互不串
-	emailCodeCacheKeyFmt = "email_code:%s:%s"
+	emailCodeCacheKeyFmt  = "email_code:%s:%s"
+	emailResetCacheKeyFmt = "email_reset:%s:%s"
 )
 
 // mode 常量：区分同一后端服务下的不同前端
@@ -47,6 +48,7 @@ type UserRepositoryer interface {
 	ClearGithubID(ctx context.Context, userID uint) error
 	UsernameExists(ctx context.Context, username string) bool
 	EmailExists(ctx context.Context, email string) bool
+	PasswordHashExists(ctx context.Context, hash string) bool
 	ListUsersWithLoginRecords(ctx context.Context) ([]model.User, error)
 	Update(ctx context.Context, user *model.User) error
 	UpdateProfile(ctx context.Context, profile *model.Profile) error
@@ -194,12 +196,27 @@ func (s *UserService) SendEmailCode(ctx context.Context, email, mode string) boo
 	}
 	code := generateCode()
 
-	key := emailCodeKey(email, mode)
+	key := emailCodeKey(email, mode, false)
 	if err := s.redis.Set(ctx, key, code, emailCodeExpire).Err(); err != nil {
 		slog.ErrorContext(ctx, "email code redis set failed", "err", err, "email", email, "mode", mode)
 	}
 
 	return s.mailer.SendVerificationCode(ctx, email, mode, code)
+}
+
+func (s *UserService) SendPasswordReset(ctx context.Context, email, mode string) bool {
+	mode = normalizeMode(mode)
+	if s.mailer == nil {
+		return false
+	}
+	code := generateCode()
+
+	key := emailCodeKey(email, mode, true)
+	if err := s.redis.Set(ctx, key, code, emailCodeExpire).Err(); err != nil {
+		slog.ErrorContext(ctx, "email reset redis set failed", "err", err, "email", email, "mode", mode)
+	}
+
+	return s.mailer.SendPasswordResetCode(ctx, email, mode, code)
 }
 
 // ---------- 响应构造 ----------
@@ -249,7 +266,10 @@ func normalizeMode(mode string) string {
 
 // emailCodeKey 拼出 email 验证码的 redis key；mode 段隔离 blog / nomu，
 // 同邮箱同时申两个 mode 的验证码互不覆盖。
-func emailCodeKey(email, mode string) string {
+func emailCodeKey(email, mode string, isReset bool) string {
+	if isReset {
+		return fmt.Sprintf(emailResetCacheKeyFmt, email, normalizeMode(mode))
+	}
 	return fmt.Sprintf(emailCodeCacheKeyFmt, email, normalizeMode(mode))
 }
 
@@ -257,11 +277,11 @@ func (s *UserService) verifyEmailCode(ctx context.Context, email, code, mode str
 	if s.redis == nil || email == "" {
 		return false
 	}
-	stored, err := s.redis.Get(ctx, emailCodeKey(email, mode)).Result()
+	stored, err := s.redis.Get(ctx, emailCodeKey(email, mode, false)).Result()
 	if err != nil || stored != code {
 		return false
 	}
-	s.redis.Del(ctx, emailCodeKey(email, mode))
+	s.redis.Del(ctx, emailCodeKey(email, mode, false))
 	return true
 }
 

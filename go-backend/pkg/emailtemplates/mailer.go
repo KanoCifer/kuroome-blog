@@ -41,9 +41,10 @@ func (m *Mailer) SendMagicLogin(ctx context.Context, email, mode, link string) b
 		notification.NotificationContext{Email: email})
 }
 
-// SendPasswordReset 找回密码验证码（template 已就绪，待业务接线）。
-func (m *Mailer) SendPasswordReset(ctx context.Context, email, code string) bool {
-	return m.channel.Send(ctx, BuildScenarioEmail(PasswordResetScenario(code)),
+// SendPasswordResetCode 找回密码验证码，按 mode 选 blog / nomu 场景。
+// 与 user_service.sendPasswordReset 的调用签名一致。
+func (m *Mailer) SendPasswordResetCode(ctx context.Context, email, mode, code string) bool {
+	return m.channel.Send(ctx, PasswordResetEmail(code, mode),
 		notification.NotificationContext{Email: email})
 }
 

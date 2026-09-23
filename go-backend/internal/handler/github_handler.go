@@ -1,7 +1,6 @@
 package handler
 
 import (
-
 	"context"
 	"errors"
 	"log/slog"
@@ -10,8 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/KanoCifer/kuroome-blog/internal/config"
-	"github.com/KanoCifer/kuroome-blog/internal/domain/github/errs"
-	"github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
+	githuberrs "github.com/KanoCifer/kuroome-blog/internal/domain/github/errs"
+	usererrs "github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
@@ -34,7 +33,6 @@ type GitHubOAuther interface {
 }
 
 var _ GitHubOAuther = (*service.GitHubOAuth)(nil)
-
 
 // GitHubHandler 持有 GitHub OAuth 服务。
 type GitHubHandler struct {

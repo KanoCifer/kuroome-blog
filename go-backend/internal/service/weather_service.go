@@ -16,7 +16,6 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/util"
 )
 
-
 // weatherPart 给 FanOut 结果打标签，配合完成顺序无关的 channel 读取。
 type weatherPart struct {
 	Kind string            // "poi" / "tsta" / "current" / "hourly" / "daily" / "tide" / "indices"

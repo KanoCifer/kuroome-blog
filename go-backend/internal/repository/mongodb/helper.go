@@ -1,7 +1,7 @@
 package mongodb
 
 import (
-	"github.com/KanoCifer/kuroome-blog/internal/domain/moment/errs"
+	momenterrs "github.com/KanoCifer/kuroome-blog/internal/domain/moment/errs"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 

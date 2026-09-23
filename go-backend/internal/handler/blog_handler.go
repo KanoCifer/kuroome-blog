@@ -1,7 +1,6 @@
 package handler
 
 import (
-
 	"context"
 	"errors"
 	"log/slog"
@@ -10,7 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/KanoCifer/kuroome-blog/internal/domain/blog/errs"
+	blogerrs "github.com/KanoCifer/kuroome-blog/internal/domain/blog/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
@@ -28,7 +27,6 @@ type Bloger interface {
 }
 
 var _ Bloger = (*service.BlogService)(nil)
-
 
 // BlogHandler 处理博客读请求（公开接口，无需鉴权）。
 type BlogHandler struct {

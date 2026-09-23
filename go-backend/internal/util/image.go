@@ -18,7 +18,7 @@ import (
 
 	"golang.org/x/image/draw"
 
-	"github.com/KanoCifer/kuroome-blog/internal/domain/upload/errs"
+	uploaderrs "github.com/KanoCifer/kuroome-blog/internal/domain/upload/errs"
 )
 
 // ThumbSize 缩略图目标边长（与 Python compress_avatar (256,256) 一致）。
