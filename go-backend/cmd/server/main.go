@@ -95,8 +95,38 @@ func main() {
 	if err := srv.Shutdown(shutdownCtx); err != nil {
 		slog.Error("server forced to shutdown", "error", err.Error())
 	}
+	sendShutdownNotification(err)
 
 	slog.Warn("server exiting")
+}
+
+// sendShutdownNotification → Feishu webhook 退出通知。正常退出灰色，异常退出
+// 红色。复用 SendBootEmail 开关；进程即将退出，独立 5s 超时避免 webhook 抖动
+// 拖死进程。
+func sendShutdownNotification(shutdownErr error) {
+	if !config.Cfg.Admin.SendBootEmail || config.Cfg.Feishu.WebhookURL == "" {
+		reason := "send_boot_email_disabled"
+		if config.Cfg.Feishu.WebhookURL == "" {
+			reason = "feishu_webhook_unset"
+		}
+		slog.Debug("shutdown notification disabled", "reason", reason)
+		return
+	}
+	body, color := "Go Backend exited normally", "grey"
+	if shutdownErr != nil {
+		body = "Go Backend exited with error: " + shutdownErr.Error()
+		color = "red"
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	nc := notification.NewFeishuChannel()
+	if !nc.Send(ctx, notification.Message{
+		Title: "Go Backend Exited",
+		Body:  body,
+		Color: color,
+	}, notification.NotificationContext{}) {
+		slog.Error("send shutdown notification", "reason", "send_returned_false")
+	}
 }
 
 // sendBootEmail → Feishu webhook 启动通知。配置缺失或开关关闭时 Debug 跳过。
