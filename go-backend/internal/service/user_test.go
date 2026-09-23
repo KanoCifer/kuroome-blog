@@ -1523,11 +1523,68 @@ func TestConfirmPasswordReset_RejectsSamePassword(t *testing.T) {
 		t.Errorf("Update should NOT be called when rejected (got %d)", updateCalls)
 	}
 	if !mr.Exists(key) {
-		t.Error("reset key should NOT be consumed on validation failure")
+		t.Error("email code key should NOT be consumed on validation failure")
 	}
-	// challenge 已被消费（同密码失败发生在 challenge 校验通过之后）
-	if mr.Exists(chKey) {
-		t.Error("challenge key should be consumed (challengeMatches ran before password check)")
+	// 关键点：密码重复被拒时 challenge 必须仍在！用户改正密码再提交还能复用，
+	// 否则会撞 ErrInvalidToken、得重新申请重置邮件。
+	if !mr.Exists(chKey) {
+		t.Error("challenge key MUST still exist after password rejection — user can retry with a different new password")
+	}
+}
+
+// TestConfirmPasswordReset_WrongCodeDoesNotBurnChallenge 锁死对称的契约：
+// email code 错误被拒时，challenge 必须仍在。前端展示"验证码错误，请重新输入"
+// 后用户改正 code 再提交，仍可复用 challenge 直到 5min TTL 或写库成功。
+func TestConfirmPasswordReset_WrongCodeDoesNotBurnChallenge(t *testing.T) {
+	mr, err := miniredis.Run()
+	if err != nil {
+		t.Fatalf("miniredis: %v", err)
+	}
+	t.Cleanup(mr.Close)
+	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
+	t.Cleanup(func() { _ = rdb.Close() })
+
+	const (
+		email      = "carol@example.com"
+		rightCode  = "111111"
+		wrongCode  = "222222"
+		newPwd     = "freshPass9"
+		challenge  = "f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1"
+	)
+	oldHash, _ := bcrypt.GenerateFromPassword([]byte("old"), bcryptCost)
+	u := &model.User{Model: gormModel(9), PasswordHash: string(oldHash)}
+
+	repo := &mockUserRepo{
+		getByEmailFn: func(ctx context.Context, e string) (*model.User, *model.Profile, error) {
+			return u, &model.Profile{UserID: u.ID, Email: ptr(email)}, nil
+		},
+	}
+	svc := &UserService{repo: repo, redis: rdb}
+
+	// 写 rightCode 入 redis（不是 wrongCode）
+	key := emailCodeKey(email, modeBlog, true)
+	if err := rdb.Set(context.Background(), key, rightCode, emailCodeExpire).Err(); err != nil {
+		t.Fatalf("seed code key: %v", err)
+	}
+	chKey := fmt.Sprintf(emailResetChallengeCacheKeyFmt, email, modeBlog)
+	if err := rdb.Set(context.Background(), chKey, challenge, emailCodeExpire).Err(); err != nil {
+		t.Fatalf("seed challenge key: %v", err)
+	}
+
+	got := svc.ConfirmPasswordReset(context.Background(), email, wrongCode, newPwd, modeBlog, challenge)
+	if got != usererrs.ErrInvalidEmailCode {
+		t.Fatalf("err = %v, want ErrInvalidEmailCode", got)
+	}
+	if !mr.Exists(key) {
+		t.Error("email code key should still exist (code consume is success-only) — wrong code shouldn't burn it")
+	}
+	if !mr.Exists(chKey) {
+		t.Error("challenge key MUST still exist after wrong-code rejection — symmetric to same-password case")
+	}
+
+	// 用对的 code 改一下 newPwd 重新提交（业务逻辑视角：用户改了"验证码"输入），应当通过
+	if err := svc.ConfirmPasswordReset(context.Background(), email, rightCode, newPwd, modeBlog, challenge); err != nil {
+		t.Errorf("retry with corrected code should succeed, got %v", err)
 	}
 }
 

@@ -214,7 +214,7 @@ func (s *UserService) ResetPasswordFlow(ctx context.Context, email, mode string)
 	}
 	mode = normalizeMode(mode)
 
-	b := make([]byte, 32)
+	b := make([]byte, 4) // 32 bit = 8 hex chars
 	if _, err := rand.Read(b); err != nil {
 		return "", err
 	}
@@ -227,25 +227,26 @@ func (s *UserService) ResetPasswordFlow(ctx context.Context, email, mode string)
 			"err", err, "email", email, "mode", mode)
 	}
 
-	s.sendPasswordReset(ctx, email, mode)
+	emailCtx , cancel := context.WithTimeout(ctx, time.Second*30)
+	defer cancel()
+	go s.sendPasswordReset(emailCtx, email, mode)
 	return challenge, nil
 }
 
 // ConfirmPasswordReset 用邮箱验证码 + 新密码完成密码重置。
 //
-// 流程：邮箱必填 → 用户存在 → 新密码不能复用旧值 → 验证码正确 →
+// 校验顺序：邮箱必填 → 用户存在 → 新密码不能复用旧值 → email code 正确
 //
-//	bcrypt 重哈希 → 写回 User.PasswordHash。任一步骤失败回退并返回错误，
-//	验证码在 verifyEmailCode 里一次性消费（成功即删 redis key）。
+//	→ challenge 正确 → bcrypt 重哈希 → 写回 User.PasswordHash。
+//
+// 任一步骤失败回退并返回错误。challenge 与 email code 都在"对应校验成功
+// 之后、写库之前"一次性消费：业务拒绝（同旧密码 / 验证码错）时不会误删，
+// 用户改正输入再提交还能复用。
 func (s *UserService) ConfirmPasswordReset(ctx context.Context, email, code, newPassword, mode, challenge string) (err error) {
 	if email == "" {
 		return usererrs.ErrEmailRequired
 	}
 	if challenge == "" {
-		return usererrs.ErrInvalidToken
-	}
-
-	if !challengeMatches(ctx, s.redis, email, mode, challenge) {
 		return usererrs.ErrInvalidToken
 	}
 	mode = normalizeMode(mode)
@@ -262,6 +263,8 @@ func (s *UserService) ConfirmPasswordReset(ctx context.Context, email, code, new
 		return usererrs.ErrInvalidEmailCode
 	}
 
+	// 同旧密码的拒绝路径必须早于 challenge 消费，否则用户改正密码再提交
+	// 时 challenge 已被 Del，会被误判 ErrInvalidToken。
 	if s.CheckPassword(u, newPassword) {
 		return usererrs.ErrPasswordHashExists
 	}
@@ -270,6 +273,9 @@ func (s *UserService) ConfirmPasswordReset(ctx context.Context, email, code, new
 		return usererrs.ErrInvalidEmailCode
 	}
 
+	if !challengeMatches(ctx, s.redis, email, mode, challenge) {
+		return usererrs.ErrInvalidToken
+	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcryptCost)
 	if err != nil {
