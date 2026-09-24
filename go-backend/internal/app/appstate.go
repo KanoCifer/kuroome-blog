@@ -13,6 +13,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/KanoCifer/kuroome-blog/internal/config"
+	"github.com/KanoCifer/kuroome-blog/internal/infra/eventbus"
 	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
 	"github.com/KanoCifer/kuroome-blog/internal/infra/pubsub"
 	"github.com/KanoCifer/kuroome-blog/internal/infra/qweather"
@@ -39,6 +40,7 @@ type AppState struct {
 	// infra
 	syncBus    *syncbus.Bus
 	dispatcher *pubsub.Dispatcher
+	eventBus   eventbus.Bus
 
 	// services
 	userSvc     *userservice.UserService
@@ -105,6 +107,7 @@ type infra struct {
 	qweatherSigner *qweather.Signer
 	dispatcher     *pubsub.Dispatcher
 	syncBus        *syncbus.Bus
+	eventBus       eventbus.Bus
 }
 
 func buildInfra(cfg *config.Config, rdb *redis.Client) infra {
@@ -135,6 +138,7 @@ func buildInfra(cfg *config.Config, rdb *redis.Client) infra {
 	dispatcher := pubsub.NewDispatcher(rdb)
 	syncBus := syncbus.NewSyncBus(rdb, dispatcher)
 	syncBus.Register(syncbus.DuplicateSnapshotHandler{})
+	eventBus := eventbus.NewEventBus()
 
 	return infra{
 		httpCli:        httpCli,
@@ -143,6 +147,7 @@ func buildInfra(cfg *config.Config, rdb *redis.Client) infra {
 		qweatherSigner: signer,
 		dispatcher:     dispatcher,
 		syncBus:        syncBus,
+		eventBus:       eventBus,
 	}
 }
 
@@ -160,9 +165,9 @@ func NewAppState(
 	rs := buildRepos(db, mongoDB)
 	ifc := buildInfra(cfg, rdb)
 
-	// mailer 邮件发送器。UserService 通过它发验证码 / 魔法登录链接；
-	// SMTP 未配置时 Mailer.Send* 自身返回 false，与旧 EmailChannel 行为对齐。
+	// mailer 只暴露业务语义；生产发送先进入 EventBus，再由 handler 执行 SMTP。
 	mailer := emailtemplates.NewMailer()
+	mailer.RegisterEventBus(ifc.eventBus)
 
 	// creditSvc 在 userService.RegisterFlow 收尾处调 GrantRegisterBonus 赠送 100 积分；
 	// 只走密码注册 handler 这一条路径，GitHub 自动建号 / magic-login 不发。
@@ -185,6 +190,7 @@ func NewAppState(
 		userRepo:   rs.user,
 		syncBus:    ifc.syncBus,
 		dispatcher: ifc.dispatcher,
+		eventBus:   ifc.eventBus,
 
 		userSvc:    userSvc,
 		authSvc:    authSvc,
@@ -236,6 +242,7 @@ func (a *AppState) CreditSvc() *service.CreditService       { return a.creditSvc
 func (a *AppState) DesignSvc() *nomuSvc.DesignService       { return a.designSvc }
 func (a *AppState) NomuSvc() *service.NomuServiceStruct     { return a.nomuSvc }
 func (a *AppState) SyncBus() *syncbus.Bus                   { return a.syncBus }
+func (a *AppState) EventBus() eventbus.Bus                  { return a.eventBus }
 func (a *AppState) Mailer() *emailtemplates.Mailer          { return a.mailer }
 
 func (a *AppState) PubSub() *pubsub.Dispatcher { return a.dispatcher }
