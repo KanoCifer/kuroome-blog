@@ -90,7 +90,7 @@ func Setup(r *gin.Engine, state *app.AppState, rdb *redis.Client) {
 	amapH := handler.NewAmapHandler(state.Cfg())
 	amapH.RegisterRoutes(v3)
 
-	weatherH := handler.NewWeatherHandler(state.WeatherSvc())
+	weatherH := handler.NewWeatherHandler(state.WeatherQuerySvc(), state.WeatherFullSvc())
 	// weather：公开访问，对齐 Python 端 /api/v2/weather/*。
 	weatherH.RegisterRoutes(v3)
 

@@ -28,6 +28,7 @@ import (
 	uploadsvc "github.com/KanoCifer/kuroome-blog/internal/service/upload"
 	userservice "github.com/KanoCifer/kuroome-blog/internal/service/user"
 	visitorsvc "github.com/KanoCifer/kuroome-blog/internal/service/visitor"
+	weathersvc "github.com/KanoCifer/kuroome-blog/internal/service/weather"
 	wereadSvc "github.com/KanoCifer/kuroome-blog/internal/service/weread"
 	"github.com/KanoCifer/kuroome-blog/pkg/emailtemplates"
 	"github.com/redis/go-redis/v9"
@@ -67,7 +68,8 @@ type AppState struct {
 	imageSvc           *uploadsvc.ImageService
 	avatarSvc          *uploadsvc.AvatarService
 	momentSvc          *service.MomentService
-	weatherSvc         *service.WeatherService
+	weatherQuerySvc    *weathersvc.QueryService
+	weatherFullSvc     *weathersvc.FullWeatherService
 	wereadSvc          wereadSvc.Reader
 	currencySvc        *service.CurrencyService
 	creditSvc          *service.CreditService
@@ -199,6 +201,9 @@ func NewAppState(
 	avatarSvc := uploadsvc.NewAvatarService(rs.user, &cfg.Upload)
 	visitorSvc := visitorsvc.NewTracker(rs.visitor)
 
+	weatherQuerySvc := weathersvc.NewQueryService(ifc.httpCli, rdb, cfg.Weather, ifc.qweatherSigner)
+	weatherFullSvc := weathersvc.NewFullWeatherService(weatherQuerySvc)
+
 	return &AppState{
 		config:     cfg,
 		userRepo:   rs.user,
@@ -226,7 +231,8 @@ func NewAppState(
 		imageSvc:           imageSvc,
 		avatarSvc:          avatarSvc,
 		momentSvc:          service.NewMomentService(rs.moment),
-		weatherSvc:         service.NewWeatherService(ifc.httpCli, rdb, cfg.Weather, ifc.qweatherSigner),
+		weatherQuerySvc:    weatherQuerySvc,
+		weatherFullSvc:     weatherFullSvc,
 		wereadSvc:          wereadSvc.New(ifc.httpCli, rdb, rs.weread),
 		currencySvc:        service.NewCurrencyService(ifc.httpCli, rdb),
 		creditSvc:          creditSvc,
@@ -260,7 +266,8 @@ func (a *AppState) FileSvc() *uploadsvc.FileService                    { return 
 func (a *AppState) ImageSvc() *uploadsvc.ImageService                  { return a.imageSvc }
 func (a *AppState) AvatarSvc() *uploadsvc.AvatarService                { return a.avatarSvc }
 func (a *AppState) MomentSvc() *service.MomentService                  { return a.momentSvc }
-func (a *AppState) WeatherSvc() *service.WeatherService                { return a.weatherSvc }
+func (a *AppState) WeatherQuerySvc() *weathersvc.QueryService          { return a.weatherQuerySvc }
+func (a *AppState) WeatherFullSvc() *weathersvc.FullWeatherService     { return a.weatherFullSvc }
 func (a *AppState) WereadSvc() wereadSvc.Reader                        { return a.wereadSvc }
 func (a *AppState) CurrencySvc() *service.CurrencyService              { return a.currencySvc }
 func (a *AppState) CreditSvc() *service.CreditService                  { return a.creditSvc }

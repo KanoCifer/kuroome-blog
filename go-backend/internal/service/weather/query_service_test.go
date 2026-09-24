@@ -1,12 +1,10 @@
-package service
+package weather
 
 import (
 	"context"
 	"crypto/ed25519"
 	"crypto/x509"
-	"encoding/json"
 	"encoding/pem"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -18,14 +16,13 @@ import (
 	"github.com/redis/go-redis/v9"
 
 	"github.com/KanoCifer/kuroome-blog/internal/config"
-	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
 	"github.com/KanoCifer/kuroome-blog/internal/infra/qweather"
 )
 
 // ── shared fixtures ─────────────────────────────────────────────────
 
-func newTestWeatherService(t *testing.T, srvURL string) (*WeatherService, *miniredis.Miniredis) {
+func newTestWeatherService(t *testing.T, srvURL string) (*QueryService, *miniredis.Miniredis) {
 	t.Helper()
 
 	mr, err := miniredis.Run()
@@ -48,7 +45,7 @@ func newTestWeatherService(t *testing.T, srvURL string) (*WeatherService, *minir
 		t.Fatalf("NewSigner: %v", err)
 	}
 
-	svc := NewWeatherService(
+	svc := NewQueryService(
 		httpclient.New(),
 		rdb,
 		config.WeatherConfig{QweatherBaseURL: srvURL},
@@ -87,7 +84,7 @@ func waitForCache(t *testing.T, mr *miniredis.Miniredis, key, want string) {
 
 // ── GetTide ─────────────────────────────────────────────────────────
 
-func TestWeatherService_GetTide_CacheHit(t *testing.T) {
+func TestQueryService_GetTide_CacheHit(t *testing.T) {
 	var hits atomic.Int32
 	srv := newCapturingServer(t, &hits, `{"code":"200"}`)
 	svc, mr := newTestWeatherService(t, srv.URL)
@@ -113,7 +110,7 @@ func TestWeatherService_GetTide_CacheHit(t *testing.T) {
 	}
 }
 
-func TestWeatherService_GetTide_CacheMiss_FetchesUpstream(t *testing.T) {
+func TestQueryService_GetTide_CacheMiss_FetchesUpstream(t *testing.T) {
 	hits := atomic.Int32{}
 	srv := newCapturingServer(t, &hits, `{"code":"200","data":[1,2,3]}`)
 	svc, mr := newTestWeatherService(t, srv.URL)
@@ -139,7 +136,7 @@ func TestWeatherService_GetTide_CacheMiss_FetchesUpstream(t *testing.T) {
 
 // ── GetCurrent ──────────────────────────────────────────────────────
 
-func TestWeatherService_GetCurrent_PathAndParams(t *testing.T) {
+func TestQueryService_GetCurrent_PathAndParams(t *testing.T) {
 	var gotPath atomic.Value
 	var gotQuery atomic.Value
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -170,7 +167,7 @@ func TestWeatherService_GetCurrent_PathAndParams(t *testing.T) {
 
 // ── GetHourly ───────────────────────────────────────────────────────
 
-func TestWeatherService_GetHourly_PathIncludesHours(t *testing.T) {
+func TestQueryService_GetHourly_PathIncludesHours(t *testing.T) {
 	var gotPath atomic.Value
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gotPath.Store(r.URL.Path)
@@ -192,7 +189,7 @@ func TestWeatherService_GetHourly_PathIncludesHours(t *testing.T) {
 
 // ── GetForecast ─────────────────────────────────────────────────────
 
-func TestWeatherService_GetForecast_PathAndCacheKey(t *testing.T) {
+func TestQueryService_GetForecast_PathAndCacheKey(t *testing.T) {
 	var gotPath atomic.Value
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gotPath.Store(r.URL.Path)
@@ -217,7 +214,7 @@ func TestWeatherService_GetForecast_PathAndCacheKey(t *testing.T) {
 
 // ── GetIndices ──────────────────────────────────────────────────────
 
-func TestWeatherService_GetIndices_TypeAdded(t *testing.T) {
+func TestQueryService_GetIndices_TypeAdded(t *testing.T) {
 	var gotQuery atomic.Value
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gotQuery.Store(r.URL.RawQuery)
@@ -243,7 +240,7 @@ func TestWeatherService_GetIndices_TypeAdded(t *testing.T) {
 
 // ── GetNearbyTSTA ───────────────────────────────────────────────────
 
-func TestWeatherService_GetNearbyTSTA_FirstID(t *testing.T) {
+func TestQueryService_GetNearbyTSTA_FirstID(t *testing.T) {
 	srv := newCapturingServer(t, &atomic.Int32{}, `{"poi":[{"id":"P9999","name":"X"},{"id":"P8888"}]}`)
 	svc, mr := newTestWeatherService(t, srv.URL)
 	defer mr.Close()
@@ -257,7 +254,7 @@ func TestWeatherService_GetNearbyTSTA_FirstID(t *testing.T) {
 	}
 }
 
-func TestWeatherService_GetNearbyTSTA_EmptyPOI(t *testing.T) {
+func TestQueryService_GetNearbyTSTA_EmptyPOI(t *testing.T) {
 	srv := newCapturingServer(t, &atomic.Int32{}, `{"poi":[]}`)
 	svc, mr := newTestWeatherService(t, srv.URL)
 	defer mr.Close()
@@ -268,192 +265,5 @@ func TestWeatherService_GetNearbyTSTA_EmptyPOI(t *testing.T) {
 	}
 	if len(info) != 0 {
 		t.Errorf("expected empty map, got %+v", info)
-	}
-}
-
-// ── GetFullWeatherData ──────────────────────────────────────────────
-
-// stubUpstream 按 path 分发 mock payload；用于 GetFullWeatherData 的组合测试。
-type stubUpstream struct {
-	paths map[string]string // path → payload
-	hits  map[string]*atomic.Int32
-}
-
-func (s *stubUpstream) handler() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if h, ok := s.hits[r.URL.Path]; ok {
-			h.Add(1)
-		}
-		payload, ok := s.paths[r.URL.Path]
-		if !ok {
-			http.Error(w, `{"code":"404"}`, http.StatusNotFound)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(payload))
-	})
-}
-
-func TestWeatherService_GetFullWeatherData_HappyPath(t *testing.T) {
-	hits := map[string]*atomic.Int32{
-		"/geo/v2/poi/lookup": new(atomic.Int32),
-		"/v7/weather/now":    new(atomic.Int32),
-		"/v7/weather/24h":    new(atomic.Int32),
-		"/v7/weather/3d":     new(atomic.Int32),
-		"/v7/ocean/tide":     new(atomic.Int32),
-		"/v7/indices/1d":     new(atomic.Int32),
-	}
-	stub := &stubUpstream{
-		paths: map[string]string{
-			"/geo/v2/poi/lookup": `{"poi":[{"id":"P2352","name":"港口A"}]}`,
-			"/v7/weather/now":    `{"now":{"temp":"25"}}`,
-			"/v7/weather/24h":    `{"hourly":[]}`,
-			"/v7/weather/3d":     `{"daily":[]}`,
-			"/v7/ocean/tide":     `{"tide":[]}`,
-			"/v7/indices/1d":     `{"daily":[]}`,
-		},
-		hits: hits,
-	}
-	srv := httptest.NewServer(stub.handler())
-	defer srv.Close()
-
-	svc, mr := newTestWeatherService(t, srv.URL)
-	defer mr.Close()
-
-	out, err := svc.GetFullWeatherData(context.Background(), "116.40,39.90")
-	if err != nil {
-		t.Fatalf("GetFullWeatherData: %v", err)
-	}
-	if out == nil {
-		t.Fatal("expected non-nil FullWeatherData")
-	}
-	if out.LocationName != "港口A" {
-		t.Errorf("LocationName = %q", out.LocationName)
-	}
-	if out.POIID != "P2352" {
-		t.Errorf("POIID = %q", out.POIID)
-	}
-	if string(out.Current) != `{"now":{"temp":"25"}}` {
-		t.Errorf("Current = %s", out.Current)
-	}
-	if string(out.Tide) != `{"tide":[]}` {
-		t.Errorf("Tide = %s", out.Tide)
-	}
-
-	// 5 个 endpoint + 至少一次 POI lookup 都被调用
-	// 注意 POI lookup 在 POI 阶段 + 后续 GetNearbyTSTA 阶段会被打两次，
-	// 所以单独验证 path 总数 ≥ 5。
-	total := int32(0)
-	for _, h := range hits {
-		total += h.Load()
-	}
-	if total < 5 {
-		t.Errorf("expected ≥5 upstream calls, got %d", total)
-	}
-}
-
-func TestWeatherService_GetFullWeatherData_NoPOI_ErrUpstream(t *testing.T) {
-	stub := &stubUpstream{
-		paths: map[string]string{
-			"/geo/v2/poi/lookup": `{"poi":[]}`,
-		},
-		hits: map[string]*atomic.Int32{"/geo/v2/poi/lookup": new(atomic.Int32)},
-	}
-	srv := httptest.NewServer(stub.handler())
-	defer srv.Close()
-
-	svc, mr := newTestWeatherService(t, srv.URL)
-	defer mr.Close()
-
-	_, err := svc.GetFullWeatherData(context.Background(), "0,0")
-	if !errors.Is(err, qweather.ErrUpstream) {
-		t.Errorf("expected ErrUpstream, got %v", err)
-	}
-}
-
-func TestWeatherService_GetFullWeatherData_TSTAFailure_FallsBackToP2352(t *testing.T) {
-	hits := map[string]*atomic.Int32{
-		"/geo/v2/poi/lookup": new(atomic.Int32),
-		"/v7/weather/now":    new(atomic.Int32),
-		"/v7/weather/24h":    new(atomic.Int32),
-		"/v7/weather/3d":     new(atomic.Int32),
-		"/v7/ocean/tide":     new(atomic.Int32),
-		"/v7/indices/1d":     new(atomic.Int32),
-	}
-	stub := &stubUpstream{
-		paths: map[string]string{
-			// 第一次调用（POI scenic）：返回有效 POI
-			// 第二次调用（TSTA 查找）：返回 404 → GetNearbyTSTA 抛 ErrUpstream，
-			// GetFullWeatherData 走 fallback → 用 P2352 取潮汐
-			"/geo/v2/poi/lookup": ``, // 仅用 hits 计数；handler 内分别处理
-			"/v7/weather/now":    `{"now":{}}`,
-			"/v7/weather/24h":    `{"hourly":[]}`,
-			"/v7/weather/3d":     `{"daily":[]}`,
-			"/v7/ocean/tide":     `{"tide":[]}`,
-			"/v7/indices/1d":     `{"daily":[]}`,
-		},
-		hits: hits,
-	}
-	// 区分两次 POI 调用：第一次 scenic 成功，第二次 TSTA 失败
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		hits[r.URL.Path].Add(1)
-		q := r.URL.Query()
-		switch r.URL.Path {
-		case "/geo/v2/poi/lookup":
-			if q.Get("type") == "TSTA" {
-				http.Error(w, `{"code":"404"}`, http.StatusNotFound)
-				return
-			}
-			// scenic 走默认 stub
-			if stub.paths[r.URL.Path] != "" {
-				w.Write([]byte(stub.paths[r.URL.Path]))
-				return
-			}
-			w.Write([]byte(`{"poi":[{"id":"P7777","name":"主港"}]}`))
-		default:
-			w.Write([]byte(stub.paths[r.URL.Path]))
-		}
-	}))
-	defer srv.Close()
-
-	svc, mr := newTestWeatherService(t, srv.URL)
-	defer mr.Close()
-
-	out, err := svc.GetFullWeatherData(context.Background(), "116.40,39.90")
-	if err != nil {
-		t.Fatalf("GetFullWeatherData should not fail when TSTA fails: %v", err)
-	}
-	if out.POIID != "P7777" {
-		t.Errorf("POIID = %q, want P7777 (from scenic POI)", out.POIID)
-	}
-	// 潮汐必须仍被取到（fallback harbor P2352）
-	if len(out.Tide) == 0 {
-		t.Error("expected tide data via P2352 fallback")
-	}
-}
-
-// ── FullWeatherData JSON shape ──────────────────────────────────────
-
-func TestFullWeatherData_JSONShape(t *testing.T) {
-	out := dto.FullWeatherData{
-		Current:      json.RawMessage(`{"now":{}}`),
-		Hourly:       json.RawMessage(`{"hourly":[]}`),
-		Daily:        json.RawMessage(`{"daily":[]}`),
-		Tide:         json.RawMessage(`{"tide":[]}`),
-		Indices:      json.RawMessage(`{"daily":[]}`),
-		LocationName: "港口A",
-		POIID:        "P2352",
-	}
-	b, err := json.Marshal(out)
-	if err != nil {
-		t.Fatalf("Marshal: %v", err)
-	}
-	for _, key := range []string{
-		`"current":`, `"hourly":`, `"daily":`, `"tide":`,
-		`"indices":`, `"locationName":"港口A"`, `"poiId":"P2352"`,
-	} {
-		if !strings.Contains(string(b), key) {
-			t.Errorf("JSON missing %s: %s", key, b)
-		}
 	}
 }
