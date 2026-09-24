@@ -12,7 +12,6 @@ import (
 
 	blogerrs "github.com/KanoCifer/kuroome-blog/internal/domain/blog/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
-	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/mongo/document"
 )
 
@@ -25,39 +24,13 @@ type AdminRepositoryer interface {
 	ListPostViewsData(ctx context.Context) ([]document.PostViewData, error)
 }
 
-// VisitorRepositoryer 定义 visitor_track 表的写入契约。
-type VisitorRepositoryer interface {
-	Insert(ctx context.Context, v *model.VisitorTrack) error
-}
-
-// Adminer 定义 admin 后台的用例契约。
-
 type AdminService struct {
-	repo    AdminRepositoryer
-	visitor VisitorRepositoryer
-	redis   *redis.Client
+	repo  AdminRepositoryer
+	redis *redis.Client
 }
 
-func NewAdminService(
-	repo AdminRepositoryer,
-	visitor VisitorRepositoryer,
-	redis *redis.Client,
-) *AdminService {
-	return &AdminService{
-		repo:    repo,
-		visitor: visitor,
-		redis:   redis,
-	}
-}
-
-// ptrIf 在字符串非空时返回其指针，否则返回 nil。
-// 用于把前端上报的空字符串正确入库为 NULL（schema 已改为 nullable），
-// 与 parse-ua 脚本下线后"字段缺失即无意义"的语义对齐。
-func ptrIf(s string) *string {
-	if s != "" {
-		return &s
-	}
-	return nil
+func NewAdminService(repo AdminRepositoryer, redis *redis.Client) *AdminService {
+	return &AdminService{repo: repo, redis: redis}
 }
 
 func (s *AdminService) AddPost(ctx context.Context, post dto.PostRequest) (string, error) {
@@ -159,32 +132,6 @@ func (s *AdminService) ListPostViewsData(ctx context.Context) ([]dto.PostViewRes
 		data = append(data, dto.PostViewResponse{Title: d.Title, Views: d.Views})
 	}
 	return data, nil
-}
-
-// TrackVisitor 把一次访问同步写入 PostgreSQL。
-//
-// 历史：前端曾经经 Redis app:migration_queue 缓冲，再由 Python taskiq
-// 定时任务消费落库——那条链路久经失败（缺显式 commit、browser 列约束、
-// DTO 与 schema 不对齐），所以此处改为 Go 端直写，不再依赖 Redis 跨语言消费。
-// visit_time 不使用前端传的值，由 PG default current_timestamp 填充。
-func (s *AdminService) TrackVisitor(ctx context.Context, data dto.VisitorTrackRequest) error {
-	track := &model.VisitorTrack{
-		VisitorID:        data.VisitorID,
-		PageURL:          data.PageURL,
-		PagePath:         data.PagePath,
-		Referrer:         ptrIf(data.Referrer),
-		Browser:          ptrIf(data.Browser),
-		ScreenResolution: ptrIf(data.ScreenResolution),
-		Language:         ptrIf(data.Language),
-		IPAddress:        data.IpAddress,
-		BrowserName:      ptrIf(data.BrowserName),
-		BrowserVersion:   ptrIf(data.BrowserVersion),
-		OSName:           ptrIf(data.OSName),
-		OSVersion:        ptrIf(data.OSVersion),
-		CPU:              ptrIf(data.Cpu),
-		DeviceType:       ptrIf(data.DeviceType),
-	}
-	return s.visitor.Insert(ctx, track)
 }
 
 func (s *AdminService) invalidateBlogCache(ctx context.Context) {

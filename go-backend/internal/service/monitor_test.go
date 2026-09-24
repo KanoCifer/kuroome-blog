@@ -1,11 +1,38 @@
 package service
 
 import (
+	"context"
+	"errors"
 	"testing"
 	"time"
 
+	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 )
+
+type visitorTrackerStub struct {
+	data dto.VisitorTrackRequest
+	err  error
+}
+
+func (s *visitorTrackerStub) TrackVisitor(_ context.Context, data dto.VisitorTrackRequest) error {
+	s.data = data
+	return s.err
+}
+
+func TestMonitorService_TrackVisitor_DelegatesToTracker(t *testing.T) {
+	wantErr := errors.New("track failed")
+	tracker := &visitorTrackerStub{err: wantErr}
+	svc := &MonitorService{visitorTracker: tracker}
+	data := dto.VisitorTrackRequest{VisitorID: "visitor-1", PageURL: "https://example.com", PagePath: "/"}
+
+	if err := svc.TrackVisitor(context.Background(), data); !errors.Is(err, wantErr) {
+		t.Fatalf("err = %v, want %v", err, wantErr)
+	}
+	if tracker.data != data {
+		t.Errorf("data = %+v, want %+v", tracker.data, data)
+	}
+}
 
 // ---------- hasRecentLogin ----------
 

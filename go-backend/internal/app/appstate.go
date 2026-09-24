@@ -23,6 +23,7 @@ import (
 	nomuSvc "github.com/KanoCifer/kuroome-blog/internal/service/nomu"
 	"github.com/KanoCifer/kuroome-blog/internal/service/syncbus"
 	userservice "github.com/KanoCifer/kuroome-blog/internal/service/user"
+	visitorsvc "github.com/KanoCifer/kuroome-blog/internal/service/visitor"
 	wereadSvc "github.com/KanoCifer/kuroome-blog/internal/service/weread"
 	"github.com/KanoCifer/kuroome-blog/pkg/emailtemplates"
 	"github.com/redis/go-redis/v9"
@@ -47,6 +48,7 @@ type AppState struct {
 	authSvc     *userservice.AuthService
 	userView    userservice.UserView
 	adminSvc    *service.AdminService
+	visitorSvc  *visitorsvc.Tracker
 	blogSvc     *service.BlogService
 	devTaskSvc  *service.DevTaskService
 	passkeySvc  *userservice.PasskeyService
@@ -184,6 +186,7 @@ func NewAppState(
 	authSvc := userservice.NewAuthService(userSvc, rdb, frontendURLs, cfg.Security.MaxRefreshDevices, mailer, userView)
 
 	uploadSvc := service.NewUploadService(rs.user, cfg)
+	visitorSvc := visitorsvc.NewTracker(rs.visitor)
 
 	return &AppState{
 		config:     cfg,
@@ -195,13 +198,14 @@ func NewAppState(
 		userSvc:    userSvc,
 		authSvc:    authSvc,
 		userView:   userView,
-		adminSvc:   service.NewAdminService(rs.admin, rs.visitor, rdb),
+		adminSvc:   service.NewAdminService(rs.admin, rdb),
+		visitorSvc: visitorSvc,
 		blogSvc:    service.NewBlogService(rs.blog),
 		devTaskSvc: service.NewDevTaskService(rs.devTask),
 		passkeySvc: userservice.NewPasskeyService(wa, rdb, rs.passkey, rs.user, authSvc, userView),
 		githubOAuth: userservice.NewGitHubOAuth(rdb, userSvc, authSvc,
 			cfg.GitHub.ClientID, cfg.GitHub.ClientSecret, cfg.GitHub.RedirectURI),
-		monitorSvc:  service.NewMonitorService(rs.visitor, rs.user, cfg.API.Version),
+		monitorSvc:  service.NewMonitorService(rs.visitor, rs.user, visitorSvc, cfg.API.Version),
 		systemSvc:   service.NewSystemService(rs.event),
 		wsSvc:       service.NewWSService(rdb, ifc.dispatcher),
 		fishSvc:     service.NewFishService(rs.fish),
@@ -225,6 +229,7 @@ func (a *AppState) UserSvc() *userservice.UserService       { return a.userSvc }
 func (a *AppState) AuthSvc() *userservice.AuthService       { return a.authSvc }
 func (a *AppState) UserView() userservice.UserView          { return a.userView }
 func (a *AppState) AdminSvc() *service.AdminService         { return a.adminSvc }
+func (a *AppState) VisitorTracker() *visitorsvc.Tracker     { return a.visitorSvc }
 func (a *AppState) BlogSvc() *service.BlogService           { return a.blogSvc }
 func (a *AppState) DevTaskSvc() *service.DevTaskService     { return a.devTaskSvc }
 func (a *AppState) PasskeySvc() *userservice.PasskeyService { return a.passkeySvc }

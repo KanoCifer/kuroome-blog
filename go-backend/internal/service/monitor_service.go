@@ -16,41 +16,27 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 )
 
-// Monitorer 定义 monitor handler 依赖的能力集合。
-// 由 service.Monitorer 实现；handler 仅依赖此接口，便于测试替换。
+type VisitorTracker interface {
+	TrackVisitor(ctx context.Context, data dto.VisitorTrackRequest) error
+}
 
 // MonitorService 实现 monitor 端点的业务逻辑（overview / visitors / user-logins
 // / status-detail）。
 type MonitorService struct {
-	visitor   *postgres.VisitorRepo
-	user      *postgres.UserRepo
-	version   string
-	startTime time.Time
+	visitor        *postgres.VisitorRepo
+	visitorTracker VisitorTracker
+	user           *postgres.UserRepo
+	version        string
+	startTime      time.Time
 }
 
-func NewMonitorService(visitor *postgres.VisitorRepo, user *postgres.UserRepo, version string) *MonitorService {
-	return &MonitorService{visitor: visitor, user: user, version: version, startTime: time.Now()}
+func NewMonitorService(visitor *postgres.VisitorRepo, user *postgres.UserRepo, visitorTracker VisitorTracker, version string) *MonitorService {
+	return &MonitorService{visitor: visitor, user: user, visitorTracker: visitorTracker, version: version, startTime: time.Now()}
 }
 
 // TrackVisitor 记录访客追踪数据（公开接口）。visit_time 由 PG default current_timestamp 填充。
 func (s *MonitorService) TrackVisitor(ctx context.Context, data dto.VisitorTrackRequest) error {
-	track := &model.VisitorTrack{
-		VisitorID:        data.VisitorID,
-		PageURL:          data.PageURL,
-		PagePath:         data.PagePath,
-		Referrer:         ptrIf(data.Referrer),
-		Browser:          ptrIf(data.Browser),
-		ScreenResolution: ptrIf(data.ScreenResolution),
-		Language:         ptrIf(data.Language),
-		IPAddress:        data.IpAddress,
-		BrowserName:      ptrIf(data.BrowserName),
-		BrowserVersion:   ptrIf(data.BrowserVersion),
-		OSName:           ptrIf(data.OSName),
-		OSVersion:        ptrIf(data.OSVersion),
-		CPU:              ptrIf(data.Cpu),
-		DeviceType:       ptrIf(data.DeviceType),
-	}
-	return s.visitor.Insert(ctx, track)
+	return s.visitorTracker.TrackVisitor(ctx, data)
 }
 
 // GetStatusDetail 返回服务器运行时状态概览，对齐 Python

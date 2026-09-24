@@ -12,25 +12,29 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
-// Adminer 定义 handler 依赖的管理后台能力集合。
-// 由 *service.AdminService 隐式满足。
-type Adminer interface {
+// AdminPostService 定义 handler 依赖的文章管理能力集合。
+type AdminPostService interface {
 	AddPost(ctx context.Context, post dto.PostRequest) (id string, err error)
 	UpdatePost(ctx context.Context, id string, post dto.PostUpdate) error
 	DeletePost(ctx context.Context, id string) error
-	TrackVisitor(ctx context.Context, data dto.VisitorTrackRequest) error
 	ListPostViewsData(ctx context.Context) ([]dto.PostViewResponse, error)
 }
 
-var _ Adminer = (*service.AdminService)(nil)
-
-type AdminHandler struct {
-	adminSvc Adminer
-	cfg      *config.Config
+// VisitorTracker 定义 admin handler 依赖的访客追踪能力。
+type VisitorTracker interface {
+	TrackVisitor(ctx context.Context, data dto.VisitorTrackRequest) error
 }
 
-func NewAdminHandler(adminSvc Adminer, cfg *config.Config) *AdminHandler {
-	return &AdminHandler{adminSvc: adminSvc, cfg: cfg}
+var _ AdminPostService = (*service.AdminService)(nil)
+
+type AdminHandler struct {
+	adminSvc       AdminPostService
+	visitorTracker VisitorTracker
+	cfg            *config.Config
+}
+
+func NewAdminHandler(adminSvc AdminPostService, visitorTracker VisitorTracker, cfg *config.Config) *AdminHandler {
+	return &AdminHandler{adminSvc: adminSvc, visitorTracker: visitorTracker, cfg: cfg}
 }
 
 func (h *AdminHandler) AddPost(c *gin.Context) {

@@ -53,7 +53,7 @@ func Setup(r *gin.Engine, state *app.AppState, rdb *redis.Client) {
 	userH := handler.NewUserHandler(state.UserSvc(), state.AuthSvc(), state.UserView(), state.Cfg(), refreshAuthFailLimiter)
 	userH.RegisterRoutes(v3, auth, loginCodeSendLimiter.Middleware(), loginLimiter.Middleware(), registerLimiter.Middleware())
 
-	adminH := handler.NewAdminHandler(state.AdminSvc(), state.Cfg())
+	adminH := handler.NewAdminHandler(state.AdminSvc(), state.VisitorTracker(), state.Cfg())
 	adminH.RegisterRoutes(v3, auth, adminOnly)
 
 	passkeyH := handler.NewPasskeyHandler(state.PasskeySvc(), state.Cfg())
