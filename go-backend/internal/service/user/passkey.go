@@ -7,22 +7,14 @@ import (
 	"fmt"
 	"log/slog"
 	"strings"
-	"time"
 
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
-	"github.com/redis/go-redis/v9"
 
 	passkeyerrs "github.com/KanoCifer/kuroome-blog/internal/domain/passkey/errs"
 	usererrs "github.com/KanoCifer/kuroome-blog/internal/domain/user/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
-)
-
-const (
-	challengeTTL            = 5 * time.Minute
-	registrationKeyPrefix   = "passkey:registration:challenge:"
-	authenticationKeyPrefix = "passkey:authentication:challenge:"
 )
 
 // passkeyUser 实现 webauthn.User 接口。credentials 在 discoverable login 时由 handler 填充。
@@ -72,7 +64,7 @@ type userRenderer interface {
 // PasskeyServiceer 编排 WebAuthn 注册 / 认证流程，challenge 存 Redis。
 type PasskeyService struct {
 	webauthn    *webauthn.WebAuthn
-	redis       *redis.Client
+	sessions    SessionStore
 	passkeyRepo PasskeyRepositoryer
 	userRepo    UserRepositoryer
 	// tokenSvc LoginFlow 调的 token 签发能力（必填：构造后立即用，无 nil-safe）。
@@ -83,15 +75,18 @@ type PasskeyService struct {
 
 func NewPasskeyService(
 	wa *webauthn.WebAuthn,
-	redis *redis.Client,
+	sessions SessionStore,
 	passkeyRepo PasskeyRepositoryer,
 	userRepo UserRepositoryer,
 	tokenSvc tokenIssuer,
 	userView userRenderer,
 ) *PasskeyService {
+	if sessions == nil {
+		sessions = NewRedisSessionStore(nil)
+	}
 	return &PasskeyService{
 		webauthn:    wa,
-		redis:       redis,
+		sessions:    sessions,
 		passkeyRepo: passkeyRepo,
 		userRepo:    userRepo,
 		tokenSvc:    tokenSvc,
@@ -138,7 +133,7 @@ func (s *PasskeyService) BeginRegistration(ctx context.Context, userID uint) (ma
 		return nil, fmt.Errorf("begin registration: %w", err)
 	}
 
-	s.storeRegistrationSession(ctx, userID, session)
+	_ = s.sessions.SaveRegistration(ctx, userID, session)
 
 	// 序列化 creation.Response 而非 creation：go-webauthn 的 CredentialCreation 会
 	// 多包一层 {"publicKey": {...}}，而前端 @simplewebauthn/browser 的
@@ -151,11 +146,11 @@ func (s *PasskeyService) BeginRegistration(ctx context.Context, userID uint) (ma
 
 // FinishRegistration 验证注册响应并存储凭证。
 func (s *PasskeyService) FinishRegistration(ctx context.Context, userID uint, response map[string]any) error {
-	session, err := s.getRegistrationSession(ctx, userID)
+	session, err := s.sessions.LoadRegistration(ctx, userID)
 	if err != nil {
 		return err
 	}
-	s.deleteRegistrationSession(ctx, userID)
+	_ = s.sessions.DeleteRegistration(ctx, userID)
 
 	body, err := json.Marshal(response)
 	if err != nil {
@@ -197,7 +192,7 @@ func (s *PasskeyService) BeginLogin(ctx context.Context) (map[string]any, error)
 		return nil, fmt.Errorf("begin login: %w", err)
 	}
 
-	s.storeAuthenticationSession(ctx, session.Challenge, session)
+	_ = s.sessions.SaveAuthentication(ctx, session.Challenge, session)
 
 	// 同 BeginRegistration：CredentialAssertion 会多包一层 {"publicKey": {...}}，
 	// 前端 startAuthentication 需要的是内层未拆封的 PublicKeyCredentialRequestOptionsJSON。
@@ -231,11 +226,11 @@ func (s *PasskeyService) FinishLogin(ctx context.Context, response map[string]an
 	challenge := parsed.Response.CollectedClientData.Challenge
 
 	// 取 Redis 中的 session（以 challenge 为 key），校验后消费。
-	session, err := s.getAuthenticationSession(ctx, challenge)
+	session, err := s.sessions.LoadAuthentication(ctx, challenge)
 	if err != nil {
 		return nil, err
 	}
-	s.deleteAuthenticationSession(ctx, challenge)
+	_ = s.sessions.DeleteAuthentication(ctx, challenge)
 
 	// 将已查出的凭证传入 handler,避免 ValidatePasskeyLogin 回调内重复查询。
 	_, _, err = s.webauthn.ValidatePasskeyLogin(s.discoverableHandler(cred), *session, parsed)
@@ -301,68 +296,6 @@ func (s *PasskeyService) discoverableHandler(cred *model.PasskeyCredential) weba
 			credentials: []webauthn.Credential{ToWebAuthnCredential(cred)},
 		}, nil
 	}
-}
-
-// ---------- Redis 操作 ----------
-
-func (s *PasskeyService) storeRegistrationSession(ctx context.Context, userID uint, session *webauthn.SessionData) {
-	if s.redis == nil {
-		return
-	}
-	data, _ := json.Marshal(session)
-	s.redis.Set(ctx, registrationKeyPrefix+fmt.Sprintf("%d", userID), data, challengeTTL)
-}
-
-func (s *PasskeyService) getRegistrationSession(ctx context.Context, userID uint) (*webauthn.SessionData, error) {
-	if s.redis == nil {
-		return nil, passkeyerrs.ErrInvalidPasskey
-	}
-	data, err := s.redis.Get(ctx, registrationKeyPrefix+fmt.Sprintf("%d", userID)).Bytes()
-	if err != nil {
-		return nil, passkeyerrs.ErrInvalidPasskey
-	}
-	var session webauthn.SessionData
-	if err := json.Unmarshal(data, &session); err != nil {
-		return nil, fmt.Errorf("unmarshal session: %w", err)
-	}
-	return &session, nil
-}
-
-func (s *PasskeyService) deleteRegistrationSession(ctx context.Context, userID uint) {
-	if s.redis == nil {
-		return
-	}
-	s.redis.Del(ctx, registrationKeyPrefix+fmt.Sprintf("%d", userID))
-}
-
-func (s *PasskeyService) storeAuthenticationSession(ctx context.Context, challenge string, session *webauthn.SessionData) {
-	if s.redis == nil {
-		return
-	}
-	data, _ := json.Marshal(session)
-	s.redis.Set(ctx, authenticationKeyPrefix+challenge, data, challengeTTL)
-}
-
-func (s *PasskeyService) getAuthenticationSession(ctx context.Context, challenge string) (*webauthn.SessionData, error) {
-	if s.redis == nil {
-		return nil, passkeyerrs.ErrInvalidPasskey
-	}
-	data, err := s.redis.Get(ctx, authenticationKeyPrefix+challenge).Bytes()
-	if err != nil {
-		return nil, passkeyerrs.ErrInvalidPasskey
-	}
-	var session webauthn.SessionData
-	if err := json.Unmarshal(data, &session); err != nil {
-		return nil, fmt.Errorf("unmarshal session: %w", err)
-	}
-	return &session, nil
-}
-
-func (s *PasskeyService) deleteAuthenticationSession(ctx context.Context, challenge string) {
-	if s.redis == nil {
-		return
-	}
-	s.redis.Del(ctx, authenticationKeyPrefix+challenge)
 }
 
 // ---------- 辅助 ----------

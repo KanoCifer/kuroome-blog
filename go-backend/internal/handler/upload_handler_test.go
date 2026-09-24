@@ -37,33 +37,32 @@ func mustPNG(t *testing.T) []byte {
 
 // ---------- mocks ----------
 
-type mockUpload struct {
-	fileFn    func(ctx context.Context, userID uint, filename string, src io.Reader) (string, error)
-	blogFn    func(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
-	galleryFn func(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
-	avatarFn  func(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
+type mockFileUploader struct {
+	fileFn func(ctx context.Context, userID uint, filename string, src io.Reader) (string, error)
 }
 
-func (m *mockUpload) UploadDesignImage(ctx context.Context, userID uint, src io.Reader) (string, error) {
-	if m.fileFn != nil {
-		return m.fileFn(ctx, userID, "design.jpg", src)
-	}
-	return "design/1/abc.jpg", nil
-}
-
-func (m *mockUpload) UploadFile(ctx context.Context, userID uint, filename string, src io.Reader) (string, error) {
+func (m *mockFileUploader) UploadFile(ctx context.Context, userID uint, filename string, src io.Reader) (string, error) {
 	return m.fileFn(ctx, userID, filename, src)
 }
 
-func (m *mockUpload) UploadBlogImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
+type mockImageUploader struct {
+	blogFn    func(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
+	galleryFn func(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
+}
+
+func (m *mockImageUploader) UploadBlogImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
 	return m.blogFn(ctx, userID, filename, contentType, src)
 }
 
-func (m *mockUpload) UploadGalleryImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
+func (m *mockImageUploader) UploadGalleryImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
 	return m.galleryFn(ctx, userID, filename, contentType, src)
 }
 
-func (m *mockUpload) UploadAvatar(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
+type mockAvatarUploader struct {
+	avatarFn func(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
+}
+
+func (m *mockAvatarUploader) UploadAvatar(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
 	return m.avatarFn(ctx, userID, filename, contentType, src)
 }
 
@@ -81,9 +80,9 @@ func (m *mockAvatarView) Render(u *model.User, p *model.Profile) map[string]any 
 
 // ---------- helpers ----------
 
-func setupUpload(t *testing.T, up Uploader, view *mockAvatarView) *gin.Engine {
+func setupUpload(t *testing.T, files FileUploader, images ImageUploader, avatars AvatarUploader, view *mockAvatarView) *gin.Engine {
 	t.Helper()
-	h := NewUploadHandler(up, view, view)
+	h := NewUploadHandler(files, images, avatars, view, view)
 	r := gin.New()
 	g := r.Group("/v3")
 	noopAuth := func(c *gin.Context) { c.Set("user_id", 1); c.Next() }
@@ -127,12 +126,12 @@ func requestUpload(t *testing.T, r *gin.Engine, path, field, filename, contentTy
 // ---------- Upload ----------
 
 func TestUpload_Success(t *testing.T) {
-	up := &mockUpload{
+	up := &mockFileUploader{
 		fileFn: func(ctx context.Context, userID uint, filename string, src io.Reader) (string, error) {
 			return "uploads/1/abc.png", nil
 		},
 	}
-	r := setupUpload(t, up, nil)
+	r := setupUpload(t, up, nil, nil, nil)
 
 	w := requestUpload(t, r, "/v3/upload", "file", "test.png", "image/png", mustPNG(t))
 	if w.Code != http.StatusOK {
@@ -144,10 +143,10 @@ func TestUpload_Success(t *testing.T) {
 }
 
 func TestUpload_NoFile(t *testing.T) {
-	up := &mockUpload{fileFn: func(ctx context.Context, userID uint, filename string, src io.Reader) (string, error) {
+	up := &mockFileUploader{fileFn: func(ctx context.Context, userID uint, filename string, src io.Reader) (string, error) {
 		return "", nil
 	}}
-	r := setupUpload(t, up, nil)
+	r := setupUpload(t, up, nil, nil, nil)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/v3/upload", nil)
@@ -160,12 +159,12 @@ func TestUpload_NoFile(t *testing.T) {
 }
 
 func TestUpload_SvcError(t *testing.T) {
-	up := &mockUpload{
+	up := &mockFileUploader{
 		fileFn: func(ctx context.Context, userID uint, filename string, src io.Reader) (string, error) {
 			return "", errors.New("disk full")
 		},
 	}
-	r := setupUpload(t, up, nil)
+	r := setupUpload(t, up, nil, nil, nil)
 	w := requestUpload(t, r, "/v3/upload", "file", "a.png", "image/png", mustPNG(t))
 	if w.Code != http.StatusInternalServerError {
 		t.Fatalf("expected 500, got %d", w.Code)
@@ -174,12 +173,12 @@ func TestUpload_SvcError(t *testing.T) {
 
 // type=blog 分发到 UploadBlogImage，校验类型失败应返回 400。
 func TestUpload_BlogType(t *testing.T) {
-	up := &mockUpload{
+	up := &mockImageUploader{
 		blogFn: func(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
 			return "", uploaderrs.ErrUnsupportedImageType
 		},
 	}
-	r := setupUpload(t, up, nil)
+	r := setupUpload(t, nil, up, nil, nil)
 	w := requestUpload(t, r, "/v3/upload", "file", "a.bmp", "image/bmp", mustPNG(t), map[string]string{"type": "blog"})
 	if w.Code != http.StatusBadRequest {
 		t.Fatalf("expected 400 for unsupported blog image type, got %d: %s", w.Code, w.Body.String())
@@ -188,12 +187,12 @@ func TestUpload_BlogType(t *testing.T) {
 
 // type=gallery 分发到 UploadGalleryImage，成功应返回 URL。
 func TestUpload_GalleryType(t *testing.T) {
-	up := &mockUpload{
+	up := &mockImageUploader{
 		galleryFn: func(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
 			return "gallery/1/xyz.png", nil
 		},
 	}
-	r := setupUpload(t, up, nil)
+	r := setupUpload(t, nil, up, nil, nil)
 	w := requestUpload(t, r, "/v3/upload", "file", "g.png", "image/png", mustPNG(t), map[string]string{"type": "gallery"})
 	if w.Code != http.StatusOK {
 		t.Fatalf("expected 200, got %d: %s", w.Code, w.Body.String())
@@ -205,12 +204,12 @@ func TestUpload_GalleryType(t *testing.T) {
 
 // type 为空（或未知）走 generic UploadFile 路径，不限类型。
 func TestUpload_GenericFallback(t *testing.T) {
-	up := &mockUpload{
+	up := &mockFileUploader{
 		fileFn: func(ctx context.Context, userID uint, filename string, src io.Reader) (string, error) {
 			return "uploads/1/data.bin", nil
 		},
 	}
-	r := setupUpload(t, up, nil)
+	r := setupUpload(t, up, nil, nil, nil)
 
 	// 无 type 字段 → generic
 	w := requestUpload(t, r, "/v3/upload", "file", "data.bin", "application/octet-stream", []byte("binary"))
@@ -225,12 +224,12 @@ func TestUpload_GenericFallback(t *testing.T) {
 // ---------- UploadPic ----------
 
 func TestUploadPic_Success(t *testing.T) {
-	up := &mockUpload{
+	up := &mockAvatarUploader{
 		avatarFn: func(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
 			return "pics/1/abc-256.jpg", nil
 		},
 	}
-	r := setupUpload(t, up, &mockAvatarView{photo: "pics/1/abc-256.jpg"})
+	r := setupUpload(t, nil, nil, up, &mockAvatarView{photo: "pics/1/abc-256.jpg"})
 
 	w := requestUpload(t, r, "/v3/upload-pic", "image", "avatar.png", "image/png", mustPNG(t))
 	if w.Code != http.StatusOK {
@@ -242,12 +241,12 @@ func TestUploadPic_Success(t *testing.T) {
 }
 
 func TestUploadPic_SvcBadRequest(t *testing.T) {
-	up := &mockUpload{
+	up := &mockAvatarUploader{
 		avatarFn: func(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error) {
 			return "", uploaderrs.ErrImageTooLarge
 		},
 	}
-	r := setupUpload(t, up, nil)
+	r := setupUpload(t, nil, nil, up, nil)
 	w := requestUpload(t, r, "/v3/upload-pic", "image", "big.png", "image/png", mustPNG(t))
 	if w.Code != http.StatusBadRequest {
 		t.Fatalf("expected 400 for image-too-large, got %d", w.Code)

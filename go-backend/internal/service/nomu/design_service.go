@@ -121,7 +121,7 @@ type generateResponse struct {
 // mediaPrefix 落盘图片的对外服务前缀，与 router 的 Static 挂载点一致。
 const mediaPrefix = "/v3/media/"
 
-// ImageStore 出图结果落盘能力（*service.UploadService 提供）。
+// ImageStore 是出图结果落盘能力（由 upload.ImageService 隐式满足）。
 type ImageStore interface {
 	UploadDesignImage(ctx context.Context, userID uint, src io.Reader) (string, error)
 }

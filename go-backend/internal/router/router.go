@@ -90,7 +90,7 @@ func Setup(r *gin.Engine, state *app.AppState, rdb *redis.Client) {
 	amapH := handler.NewAmapHandler(state.Cfg())
 	amapH.RegisterRoutes(v3)
 
-	weatherH := handler.NewWeatherHandler(state.WeatherSvc())
+	weatherH := handler.NewWeatherHandler(state.WeatherQuerySvc(), state.WeatherFullSvc())
 	// weather：公开访问，对齐 Python 端 /api/v2/weather/*。
 	weatherH.RegisterRoutes(v3)
 
@@ -101,7 +101,7 @@ func Setup(r *gin.Engine, state *app.AppState, rdb *redis.Client) {
 	currencyH.RegisterRoutes(v3, currencyLimiter.Middleware())
 
 	// --- 上传 & 静态媒体 ----------------------------------------------- //
-	uploadH := handler.NewUploadHandler(state.UploadSvc(), state.UserSvc(), state.UserView())
+	uploadH := handler.NewUploadHandler(state.FileSvc(), state.ImageSvc(), state.AvatarSvc(), state.UserSvc(), state.UserView())
 	uploadH.RegisterRoutes(v3, auth)
 
 	// 媒体静态服务：把上传的文件以 /v3/media/* 暴露，对齐 handler 返回的 url。

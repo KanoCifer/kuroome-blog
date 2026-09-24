@@ -20,46 +20,21 @@ func init() {
 	gin.SetMode(gin.TestMode)
 }
 
-// ── mock Weatherer ──────────────────────────────────────────────────
+// ── mock weather readers ────────────────────────────────────────────
 
 type mockWeatherService struct {
 	getTideFn func(ctx context.Context, harbor, date string) (json.RawMessage, bool, error)
 	fullFn    func(ctx context.Context, location string) (*dto.FullWeatherData, error)
-	// 其余方法本任务不测；保留占位以便编译期接口断言通过
-	_ func(ctx context.Context, location, locationID *string) (json.RawMessage, error)
 }
 
-var _ Weatherer = (*mockWeatherService)(nil)
+var _ TideReader = (*mockWeatherService)(nil)
+var _ FullWeatherReader = (*mockWeatherService)(nil)
 
 func (m *mockWeatherService) GetTide(ctx context.Context, harbor, date string) (json.RawMessage, bool, error) {
 	if m.getTideFn != nil {
 		return m.getTideFn(ctx, harbor, date)
 	}
 	return nil, false, nil
-}
-
-func (m *mockWeatherService) GetCurrent(ctx context.Context, location, locationID *string) (json.RawMessage, error) {
-	return nil, nil
-}
-
-func (m *mockWeatherService) GetHourly(ctx context.Context, hours int, location, locationID *string) (json.RawMessage, error) {
-	return nil, nil
-}
-
-func (m *mockWeatherService) GetForecast(ctx context.Context, days int, location, locationID *string) (json.RawMessage, error) {
-	return nil, nil
-}
-
-func (m *mockWeatherService) GetIndices(ctx context.Context, location, locationID *string) (json.RawMessage, error) {
-	return nil, nil
-}
-
-func (m *mockWeatherService) GetPOI(ctx context.Context, location string) (json.RawMessage, error) {
-	return nil, nil
-}
-
-func (m *mockWeatherService) GetNearbyTSTA(ctx context.Context, location string) (map[string]string, error) {
-	return nil, nil
 }
 
 func (m *mockWeatherService) GetFullWeatherData(ctx context.Context, location string) (*dto.FullWeatherData, error) {
@@ -73,8 +48,8 @@ func (m *mockWeatherService) GetFullWeatherData(ctx context.Context, location st
 
 // newWeatherRouter 构造一个独立的 gin 引擎并挂载 weather 路由，
 // 便于 httptest 直接发请求而无需经过 middleware / Trace。
-func newWeatherRouter(svc Weatherer) *gin.Engine {
-	h := NewWeatherHandler(svc)
+func newWeatherRouter(svc *mockWeatherService) *gin.Engine {
+	h := NewWeatherHandler(svc, svc)
 	r := gin.New()
 	g := r.Group("/v3")
 	h.RegisterRoutes(g)

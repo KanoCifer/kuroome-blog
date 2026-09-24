@@ -10,30 +10,23 @@ import (
 	uploaderrs "github.com/KanoCifer/kuroome-blog/internal/domain/upload/errs"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
-	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
-// Uploader 定义 handler 依赖的文件上传能力集合。
-// 由 *service.UploadService 隐式满足。
-type Uploader interface {
-	// UploadFile 保存通用文件，返回相对存储根的路径（如 uploads/1/xxx.png）。
+// FileUploader 保存通用上传文件。
+type FileUploader interface {
 	UploadFile(ctx context.Context, userID uint, filename string, src io.Reader) (string, error)
-
-	// UploadBlogImage 保存博客文章图片，校验类型后保存到 posts/{userID}/ 并返回相对路径。
-	UploadBlogImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
-
-	// UploadGalleryImage 保存图片墙图片，校验类型后保存到 gallery/{userID}/ 并返回相对路径。
-	UploadGalleryImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
-
-	// UploadAvatar 保存头像图片，回写 profile.photo 后返回相对路径。
-	UploadAvatar(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
-
-	// UploadDesignImage 保存 AI 出图结果（上游固定 output_format=jpeg），
-	// 保存到 design/{userID}/ 并返回相对路径。
-	UploadDesignImage(ctx context.Context, userID uint, src io.Reader) (string, error)
 }
 
-var _ Uploader = (*service.UploadService)(nil)
+// ImageUploader 保存博客和图片墙图片。
+type ImageUploader interface {
+	UploadBlogImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
+	UploadGalleryImage(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
+}
+
+// AvatarUploader 保存头像并回写用户资料。
+type AvatarUploader interface {
+	UploadAvatar(ctx context.Context, userID uint, filename, contentType string, src io.Reader) (string, error)
+}
 
 type avatarReader interface {
 	GetByID(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
@@ -45,14 +38,16 @@ type userRenderer interface {
 
 // UploadHandler 处理文件 / 图片上传（均需登录）。
 type UploadHandler struct {
-	uploadSvc Uploader
-	users     avatarReader
-	userView  userRenderer
+	files    FileUploader
+	images   ImageUploader
+	avatars  AvatarUploader
+	users    avatarReader
+	userView userRenderer
 }
 
 // NewUploadHandler 构造 UploadHandler。
-func NewUploadHandler(uploadSvc Uploader, users avatarReader, userView userRenderer) *UploadHandler {
-	return &UploadHandler{uploadSvc: uploadSvc, users: users, userView: userView}
+func NewUploadHandler(files FileUploader, images ImageUploader, avatars AvatarUploader, users avatarReader, userView userRenderer) *UploadHandler {
+	return &UploadHandler{files: files, images: images, avatars: avatars, users: users, userView: userView}
 }
 
 // Upload POST /upload —— 统一文件 / 图片上传入口。
@@ -93,11 +88,11 @@ func (h *UploadHandler) Upload(c *gin.Context) {
 	var rel string
 	switch uploadType {
 	case "blog":
-		rel, err = h.uploadSvc.UploadBlogImage(c.Request.Context(), userID, filename, contentType, f)
+		rel, err = h.images.UploadBlogImage(c.Request.Context(), userID, filename, contentType, f)
 	case "gallery":
-		rel, err = h.uploadSvc.UploadGalleryImage(c.Request.Context(), userID, filename, contentType, f)
+		rel, err = h.images.UploadGalleryImage(c.Request.Context(), userID, filename, contentType, f)
 	default:
-		rel, err = h.uploadSvc.UploadFile(c.Request.Context(), userID, filename, f)
+		rel, err = h.files.UploadFile(c.Request.Context(), userID, filename, f)
 	}
 
 	if respondErr(c, err, "upload", "type", uploadType) {
@@ -127,7 +122,7 @@ func (h *UploadHandler) UploadPic(c *gin.Context) {
 	defer f.Close()
 
 	userID := uint(c.GetInt("user_id"))
-	_, err = h.uploadSvc.UploadAvatar(c.Request.Context(), userID, fileHeader.Filename, fileHeader.Header.Get("Content-Type"), f)
+	_, err = h.avatars.UploadAvatar(c.Request.Context(), userID, fileHeader.Filename, fileHeader.Header.Get("Content-Type"), f)
 	if respondErr(c, err, "upload avatar") {
 		return
 	}
