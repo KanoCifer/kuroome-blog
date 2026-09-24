@@ -41,7 +41,7 @@ func (r *WeReadRepository) CreateUserToken(ctx context.Context, userID string, t
 	if err != nil {
 		return err
 	}
-	var wereadUser = document.WereadUser{
+	wereadUser := document.WereadUser{
 		UserID:    id,
 		APIKey:    token,
 		CreatedAt: time.Now().UTC(),

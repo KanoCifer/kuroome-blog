@@ -2,12 +2,11 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
 	"gorm.io/gorm"
-
-	"errors"
 
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/jackc/pgx/v5/pgconn"

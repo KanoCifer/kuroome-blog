@@ -16,7 +16,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/db"
 	"github.com/KanoCifer/kuroome-blog/internal/logger"
 	"github.com/KanoCifer/kuroome-blog/internal/router"
-	"github.com/KanoCifer/kuroome-blog/internal/service"
+	userservice "github.com/KanoCifer/kuroome-blog/internal/service/user"
 	"github.com/KanoCifer/kuroome-blog/pkg/notification"
 )
 
@@ -55,7 +55,7 @@ func main() {
 		slog.Warn("set trusted proxies", "error", err.Error())
 	}
 
-	wa, err := service.NewWebAuthn(config.Cfg.WebAuthn.RPID, config.Cfg.WebAuthn.Origin)
+	wa, err := userservice.NewWebAuthn(config.Cfg.WebAuthn.RPID, config.Cfg.WebAuthn.Origin)
 	if err != nil {
 		slog.Error("init webauthn", "error", err)
 	}
@@ -69,6 +69,7 @@ func main() {
 	)
 	// 退出时关闭共享 pubsub 连接（幂等）。
 	defer func() { _ = state.PubSub().Close() }()
+	defer state.EventBus().CloseBus()
 
 	router.Setup(r, state, db.GetRedis())
 	sendBootNotification()

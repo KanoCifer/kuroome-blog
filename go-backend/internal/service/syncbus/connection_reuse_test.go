@@ -8,7 +8,8 @@ import (
 // waitSub 轮询等待某 channel 在连接上的订阅数达到 want。
 func waitSub(t *testing.T, mr interface {
 	PubSubNumSub(...string) map[string]int
-}, channel string, want int) {
+}, channel string, want int,
+) {
 	t.Helper()
 	deadline := time.Now().Add(2 * time.Second)
 	for time.Now().Before(deadline) {

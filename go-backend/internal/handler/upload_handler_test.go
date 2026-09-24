@@ -75,15 +75,15 @@ func (m *mockAvatarView) GetByID(ctx context.Context, userID uint) (*model.User,
 	return &model.User{}, &model.Profile{Photo: m.photo}, nil
 }
 
-func (m *mockAvatarView) UserToDict(u *model.User, p *model.Profile) map[string]any {
+func (m *mockAvatarView) Render(u *model.User, p *model.Profile) map[string]any {
 	return map[string]any{"photo": m.photo}
 }
 
 // ---------- helpers ----------
 
-func setupUpload(t *testing.T, up Uploader, view avatarViewer) *gin.Engine {
+func setupUpload(t *testing.T, up Uploader, view *mockAvatarView) *gin.Engine {
 	t.Helper()
-	h := NewUploadHandler(up, view)
+	h := NewUploadHandler(up, view, view)
 	r := gin.New()
 	g := r.Group("/v3")
 	noopAuth := func(c *gin.Context) { c.Set("user_id", 1); c.Next() }

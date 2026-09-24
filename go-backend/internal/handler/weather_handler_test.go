@@ -37,24 +37,31 @@ func (m *mockWeatherService) GetTide(ctx context.Context, harbor, date string) (
 	}
 	return nil, false, nil
 }
+
 func (m *mockWeatherService) GetCurrent(ctx context.Context, location, locationID *string) (json.RawMessage, error) {
 	return nil, nil
 }
+
 func (m *mockWeatherService) GetHourly(ctx context.Context, hours int, location, locationID *string) (json.RawMessage, error) {
 	return nil, nil
 }
+
 func (m *mockWeatherService) GetForecast(ctx context.Context, days int, location, locationID *string) (json.RawMessage, error) {
 	return nil, nil
 }
+
 func (m *mockWeatherService) GetIndices(ctx context.Context, location, locationID *string) (json.RawMessage, error) {
 	return nil, nil
 }
+
 func (m *mockWeatherService) GetPOI(ctx context.Context, location string) (json.RawMessage, error) {
 	return nil, nil
 }
+
 func (m *mockWeatherService) GetNearbyTSTA(ctx context.Context, location string) (map[string]string, error) {
 	return nil, nil
 }
+
 func (m *mockWeatherService) GetFullWeatherData(ctx context.Context, location string) (*dto.FullWeatherData, error) {
 	if m.fullFn != nil {
 		return m.fullFn(ctx, location)

@@ -1,15 +1,13 @@
-package service
+// Package user 聚合用户账户、认证会话和外部身份登录能力。
+package user
 
 import (
 	"context"
 	"crypto/rand"
 	"crypto/subtle"
-	"encoding/hex"
 	"fmt"
 	"log/slog"
 	"math/big"
-	"slices"
-	"strings"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -33,12 +31,12 @@ const (
 	//   email_login_code:<email>:nomu             6 位验证码，TTL 5min
 	//   email_login_attempts:<email>:nomu         单码失败计数，TTL 与 code 同步
 	//   email_login_send_cooldown:<email>:nomu    发码冷却 60s（防邮件轰炸）
-	emailLoginCodeKeyFmt        = "email_login_code:%s:%s"
-	emailLoginAttemptsKeyFmt    = "email_login_attempts:%s:%s"
-	emailLoginCooldownKeyFmt    = "email_login_send_cooldown:%s:%s"
-	emailLoginCooldown          = time.Second * 60
-	emailLoginMaxAttempts       = 5
-	emailLoginCodeLength        = 6
+	emailLoginCodeKeyFmt     = "email_login_code:%s:%s"
+	emailLoginAttemptsKeyFmt = "email_login_attempts:%s:%s"
+	emailLoginCooldownKeyFmt = "email_login_send_cooldown:%s:%s"
+	emailLoginCooldown       = time.Second * 60
+	emailLoginMaxAttempts    = 5
+	emailLoginCodeLength     = 6
 
 	// bcryptCost 密码 hash cost。12 = 2^12 key schedule rounds，
 	// 2026 年推荐值（bcrypt.DefaultCost=10 已偏弱）。
@@ -85,41 +83,31 @@ type registerBonuser interface {
 	GrantRegisterBonus(ctx context.Context, userID uint, meta map[string]any) (*model.CreditTransaction, error)
 }
 
+// AuthUserServiceer 是认证模块依赖的窄用户能力。
+// 定义在 service 包内，避免 UserService 与 AuthService 互相持有对方。
+type AuthUserServiceer interface {
+	GetByUsername(ctx context.Context, username string) (*model.User, *model.Profile, error)
+	GetByEmail(ctx context.Context, email string) (*model.User, *model.Profile, error)
+	UpdatePasswordHash(ctx context.Context, userID uint, passwordHash string) error
+}
+
 type UserService struct {
-	repo         UserRepositoryer
-	redis        *redis.Client
-	adminUserIDs []int
-	frontendURLs map[string]string
-	maxDevices   int
+	repo UserRepositoryer
 	// bonusSvc RegisterFlow 调的注册赠送积分（可选，nil 时跳过赠送，测试/未装配兜底）。
 	bonusSvc registerBonuser
-	// mailer 邮件发送器（SendEmailCode / SendMagicLoginEmail 都走它）。
+	// mailer 邮件发送器（注册验证码与密码重置邮件都走它）。
 	// nil 时静默跳过发送，行为对齐"mailer 未装配 / SMTP 未配置"。
+	redis  *redis.Client
 	mailer *emailtemplates.Mailer
 }
 
 func NewUserService(
 	repo UserRepositoryer,
 	redis *redis.Client,
-	adminUserIDs []int,
-	frontendURLs map[string]string,
-	maxDevices int,
 	bonusSvc registerBonuser,
 	mailer *emailtemplates.Mailer,
 ) *UserService {
-	trimmed := make(map[string]string, len(frontendURLs))
-	for k, v := range frontendURLs {
-		trimmed[k] = strings.TrimRight(v, "/")
-	}
-	return &UserService{
-		repo:         repo,
-		redis:        redis,
-		adminUserIDs: adminUserIDs,
-		frontendURLs: trimmed,
-		maxDevices:   maxDevices,
-		bonusSvc:     bonusSvc,
-		mailer:       mailer,
-	}
+	return &UserService{repo: repo, redis: redis, bonusSvc: bonusSvc, mailer: mailer}
 }
 
 // ---------- 查询 ----------
@@ -144,6 +132,22 @@ func (s *UserService) GetByUsername(ctx context.Context, username string) (*mode
 		return nil, nil, nil
 	}
 	return u, u.Profile, nil
+}
+
+func (s *UserService) GetByEmail(ctx context.Context, email string) (*model.User, *model.Profile, error) {
+	return s.repo.GetByEmail(ctx, email)
+}
+
+func (s *UserService) UpdatePasswordHash(ctx context.Context, userID uint, passwordHash string) error {
+	u, err := s.repo.GetByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if u == nil {
+		return usererrs.ErrUserNotFound
+	}
+	u.PasswordHash = passwordHash
+	return s.repo.Update(ctx, u)
 }
 
 // ---------- 注册 ----------
@@ -172,11 +176,14 @@ func (s *UserService) CreateUser(ctx context.Context, username, password, email,
 		PasswordHash: string(hash),
 	}
 	var p *model.Profile
+	if email != "" || avatarURL != "" {
+		p = &model.Profile{}
+	}
 	if email != "" {
-		p = &model.Profile{Email: &email}
+		p.Email = &email
 	}
 	if avatarURL != "" {
-		p = &model.Profile{Photo: avatarURL}
+		p.Photo = avatarURL
 	}
 	if err := s.repo.Create(ctx, u, p); err != nil {
 		return nil, nil, err
@@ -208,103 +215,9 @@ func (s *UserService) RegisterFlow(
 	return u, p, nil
 }
 
-
-// ResetPasswordFlow 给指定邮箱发密码重置邮件，并把一次性 challenge 写到
-// redis 独立命名空间（不与 email code 共用 key），把 challenge return 给
-// handler，由 handler 回给浏览器。浏览器要在 confirm 请求里把 challenge
-// 原样回传，作为"我刚刚申请过重置"的不可伪造证明。
-//
-// challenge 不进邮件（邮件只有 6 位 code），因为：
-//   - 攻击者拿到邮件就能拿到 challenge，等于没设防；
-//   - 真正的防御点是：只有真正请求 reset 的浏览器才持有 challenge。
-//
-// mode=blog/nomu 决定走博客版还是 Nomu 版邮件模板（无 mode 校验步骤；
-// 邮箱不存在也照常返 200 防枚举，但邮件不会送达）。
-func (s *UserService) ResetPasswordFlow(ctx context.Context, email, mode string) (challenge string, err error) {
-	if email == "" {
-		return "", usererrs.ErrEmailRequired
-	}
-	mode = normalizeMode(mode)
-
-	b := make([]byte, 4) // 32 bit = 8 hex chars
-	if _, err := rand.Read(b); err != nil {
-		return "", err
-	}
-	challenge = hex.EncodeToString(b)
-
-	// 独立 redis key，与 email code 互不干扰；TTL 同 emailCodeExpire。
-	chKey := fmt.Sprintf(emailResetChallengeCacheKeyFmt, email, mode)
-	if err := s.redis.Set(ctx, chKey, challenge, emailCodeExpire).Err(); err != nil {
-		slog.ErrorContext(ctx, "reset challenge redis set failed",
-			"err", err, "email", email, "mode", mode)
-	}
-
-	emailCtx , cancel := context.WithTimeout(ctx, time.Second*30)
-	defer cancel()
-	go s.sendPasswordReset(emailCtx, email, mode)
-	return challenge, nil
-}
-
-// ConfirmPasswordReset 用邮箱验证码 + 新密码完成密码重置。
-//
-// 校验顺序：邮箱必填 → 用户存在 → 新密码不能复用旧值 → email code 正确
-//
-//	→ challenge 正确 → bcrypt 重哈希 → 写回 User.PasswordHash。
-//
-// 任一步骤失败回退并返回错误。challenge 与 email code 都在"对应校验成功
-// 之后、写库之前"一次性消费：业务拒绝（同旧密码 / 验证码错）时不会误删，
-// 用户改正输入再提交还能复用。
-func (s *UserService) ConfirmPasswordReset(ctx context.Context, email, code, newPassword, mode, challenge string) (err error) {
-	if email == "" {
-		return usererrs.ErrEmailRequired
-	}
-	if challenge == "" {
-		return usererrs.ErrInvalidToken
-	}
-	mode = normalizeMode(mode)
-
-	u, _, err := s.repo.GetByEmail(ctx, email)
-	if err != nil {
-		slog.ErrorContext(ctx, "password reset get-by-email failed",
-			"err", err, "email", email)
-		return err
-	}
-	// 不暴露邮箱是否注册：未注册走 ErrInvalidEmailCode（400 + "验证码无效"），
-	// 与错码错误同响应码 + 同文案，攻击者无法靠 HTTP code 区分。
-	if u == nil {
-		return usererrs.ErrInvalidEmailCode
-	}
-
-	// 同旧密码的拒绝路径必须早于 challenge 消费，否则用户改正密码再提交
-	// 时 challenge 已被 Del，会被误判 ErrInvalidToken。
-	if s.CheckPassword(u, newPassword) {
-		return usererrs.ErrPasswordHashExists
-	}
-
-	if !s.verifyEmailCode(ctx, email, code, mode, true) {
-		return usererrs.ErrInvalidEmailCode
-	}
-
-	if !challengeMatches(ctx, s.redis, email, mode, challenge) {
-		return usererrs.ErrInvalidToken
-	}
-
-	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcryptCost)
-	if err != nil {
-		return err
-	}
-	u.PasswordHash = string(hash)
-
-	if err := s.repo.Update(ctx, u); err != nil {
-		slog.ErrorContext(ctx, "password reset update failed", "err", err, "user_id", u.ID)
-		return err
-	}
-	return nil
-}
-
 func (s *UserService) SendEmailCode(ctx context.Context, email, mode string) bool {
 	mode = normalizeMode(mode)
-	if s.mailer == nil {
+	if s.redis == nil || s.mailer == nil {
 		return false
 	}
 	code := generateCode()
@@ -317,6 +230,43 @@ func (s *UserService) SendEmailCode(ctx context.Context, email, mode string) boo
 	return s.mailer.SendVerificationCode(ctx, email, mode, code)
 }
 
+func (s *UserService) CreateOAuthUser(ctx context.Context, githubID int, username, email, avatarURL string) (*model.User, error) {
+	if email != "" && s.repo.EmailExists(ctx, email) {
+		return nil, usererrs.ErrEmailExists
+	}
+	username = uniqueUsername(username, func(candidate string) bool {
+		return s.repo.UsernameExists(ctx, candidate)
+	})
+	hash, err := bcrypt.GenerateFromPassword([]byte(randomPassword()), bcryptCost)
+	if err != nil {
+		return nil, err
+	}
+	u := &model.User{Username: username, PasswordHash: string(hash), GithubID: &githubID}
+	var p *model.Profile
+	if email != "" || avatarURL != "" {
+		p = &model.Profile{Photo: avatarURL}
+		if email != "" {
+			p.Email = &email
+		}
+	}
+	if err := s.repo.Create(ctx, u, p); err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
+func (s *UserService) GetByGithubID(ctx context.Context, githubID int) (*model.User, error) {
+	return s.repo.GetByGithubID(ctx, githubID)
+}
+
+func (s *UserService) LinkGitHub(ctx context.Context, userID uint, githubID int) error {
+	return s.repo.SetGithubID(ctx, userID, githubID)
+}
+
+func (s *UserService) UnlinkGitHub(ctx context.Context, userID uint) error {
+	return s.repo.ClearGithubID(ctx, userID)
+}
+
 // ---------- 邮箱验证码登录（Nomu 专用） ----------
 
 // emailLoginKey / attemptsKey / cooldownKey 是登录验证码三段 redis key 的拼装。
@@ -326,9 +276,11 @@ func (s *UserService) SendEmailCode(ctx context.Context, email, mode string) boo
 func emailLoginKey(email string) string {
 	return fmt.Sprintf(emailLoginCodeKeyFmt, email, modeNomu)
 }
+
 func emailLoginAttemptsKey(email string) string {
 	return fmt.Sprintf(emailLoginAttemptsKeyFmt, email, modeNomu)
 }
+
 func emailLoginCooldownKey(email string) string {
 	return fmt.Sprintf(emailLoginCooldownKeyFmt, email, modeNomu)
 }
@@ -363,167 +315,6 @@ if attempts >= tonumber(ARGV[2]) then
 end
 return 0
 `)
-
-// SendLoginEmailCode 申请 Nomu 邮箱验证码登录：
-//   - 仅对已注册账户真正写 redis + 发邮件（未知邮箱静默吞掉，防枚举）；
-//   - 60s 内同邮箱重复申请不发新码（per-email cooldown），跨 IP 仍生效；
-//   - 邮件发送失败时清理已写入的 code / cooldown key，不留可登录凭证。
-//
-// 返回 true 表示「已成功发出或该邮箱无需发邮件」；false 表示「redis / mailer
-// 不可用或发送失败」。handler 不关心细节，统一对外回成功响应防枚举。
-func (s *UserService) SendLoginEmailCode(ctx context.Context, email string) bool {
-	if s.redis == nil || s.mailer == nil {
-		return false
-	}
-
-	u, _, err := s.repo.GetByEmail(ctx, email)
-	if err != nil || u == nil {
-		// 未知邮箱静默成功；仓库故障同样静默以防侧信道。
-		slog.InfoContext(ctx, "login email code: email not registered, silent skip",
-			"mode", modeNomu)
-		return true
-	}
-
-	// 60s 冷却：避免跨 IP 邮件轰炸。SETNX 不覆盖仍在倒计的窗口。
-	ok, err := s.redis.SetNX(ctx, emailLoginCooldownKey(email), "1", emailLoginCooldown).Result()
-	if err != nil {
-		slog.ErrorContext(ctx, "login email code cooldown set failed",
-			"err", err)
-		return false
-	}
-	if !ok {
-		// 冷却中：仍按"已发"对待，对客户端统一响应。code 不覆盖旧值。
-		slog.InfoContext(ctx, "login email code send skipped by cooldown",
-			"mode", modeNomu)
-		return true
-	}
-
-	code := generateCode()
-	codeKey := emailLoginKey(email)
-	if err := s.redis.Set(ctx, codeKey, code, emailCodeExpire).Err(); err != nil {
-		// redis 写失败：清掉 cooldown 放行重试，避免 cooldown 卡死。
-		s.redis.Del(ctx, emailLoginCooldownKey(email))
-		slog.ErrorContext(ctx, "login email code redis set failed",
-			"err", err)
-		return false
-	}
-
-	if !s.mailer.SendEmailCodeLogin(ctx, email, code) {
-		// 发送失败：清理已落 redis 的 code + cooldown，让调用方下一次重试有机会成功。
-		s.redis.Del(ctx, codeKey, emailLoginCooldownKey(email))
-		slog.ErrorContext(ctx, "login email code mail send failed",
-			"err", "mailer returned false")
-		return false
-	}
-
-	slog.InfoContext(ctx, "login email code sent", "user_id", u.ID)
-	return true
-}
-
-// AuthenticateEmailCode 用邮箱 + 6 位验证码登录 Nomu。
-//
-// 流程：
-//   1. redis 为 nil → fail closed（ErrInvalidEmailCode，避免缺 redis 时跳过验证）；
-//   2. 仓库按邮箱查 user，未注册 → ErrInvalidEmailCode（与错码同响应，隐藏存在性）；
-//   3. Lua 脚本原子核验 + 错误计数 + 消费；返回 0/-1/1，分别对应：
-//      0 = 验证码错但未到上限；-1 = 验证码错且达到 5 次上限（code 被清）；
-//      1 = 验证码正确（code 被一次性消费）；
-//   4. 成功 → 返回 user/profile，由 handler 走 CreateTokens 流程。
-//
-// 错误码与未知账户同响应：service 透传 ErrInvalidEmailCode，handler → 400。
-func (s *UserService) AuthenticateEmailCode(
-	ctx context.Context,
-	email, code string,
-) (*model.User, *model.Profile, error) {
-	if s.redis == nil || email == "" || code == "" {
-		return nil, nil, usererrs.ErrInvalidEmailCode
-	}
-	if len(code) != emailLoginCodeLength {
-		return nil, nil, usererrs.ErrInvalidEmailCode
-	}
-
-	u, p, err := s.repo.GetByEmail(ctx, email)
-	if err != nil {
-		slog.ErrorContext(ctx, "auth email code get-by-email failed",
-			"err", err, "mode", modeNomu)
-		// 仓库故障 → 返回内部错误而不是 ErrInvalidEmailCode，
-		// 避免把 DB 故障误表为验证码错（隐藏账户存在性不能盖过排障线索）。
-		return nil, nil, err
-	}
-	if u == nil {
-		return nil, nil, usererrs.ErrInvalidEmailCode
-	}
-
-	res, err := loginCodeVerifyScript.Run(ctx, s.redis,
-		[]string{emailLoginKey(email), emailLoginAttemptsKey(email)},
-		code, emailLoginMaxAttempts,
-	).Int()
-	if err != nil {
-		slog.ErrorContext(ctx, "auth email code redis script failed",
-			"err", err, "mode", modeNomu)
-		return nil, nil, err
-	}
-	if res != 1 {
-		return nil, nil, usererrs.ErrInvalidEmailCode
-	}
-
-	// 命中：清掉 cooldown，让用户能立即重发（避免上次的 60s 限制误伤正常用户）。
-	s.redis.Del(ctx, emailLoginCooldownKey(email))
-	slog.InfoContext(ctx, "email code login consumed", "user_id", u.ID)
-	return u, p, nil
-}
-
-func (s *UserService) sendPasswordReset(ctx context.Context, email, mode string) bool {
-	mode = normalizeMode(mode)
-	if s.mailer == nil {
-		return false
-	}
-	code := generateCode()
-
-	key := emailCodeKey(email, mode, true)
-	if err := s.redis.Set(ctx, key, code, emailCodeExpire).Err(); err != nil {
-		slog.ErrorContext(ctx, "email reset redis set failed", "err", err, "email", email, "mode", mode)
-	}
-
-	return s.mailer.SendPasswordResetCode(ctx, email, mode, code)
-}
-
-// ---------- 响应构造 ----------
-
-func (s *UserService) IsAdmin(u *model.User) bool {
-	return slices.Contains(s.adminUserIDs, int(u.ID))
-}
-
-func (s *UserService) UserToDict(u *model.User, p *model.Profile) map[string]any {
-	d := map[string]any{
-		"id":           u.ID,
-		"username":     u.Username,
-		"name":         u.Name,
-		"is_admin":     s.IsAdmin(u),
-		"login_count":  u.LoginCount,
-		"active":       u.Active,
-		"has_passkey":  u.PasskeyCredential != nil,
-		"github_bound": u.GithubID != nil,
-	}
-	if u.GithubID != nil {
-		d["github_id"] = *u.GithubID
-	}
-	if p != nil && p.ID != 0 {
-		if p.Email != nil {
-			d["email"] = *p.Email
-		}
-		if p.Gender != nil {
-			d["gender"] = *p.Gender
-		}
-		if p.Mobile != nil {
-			d["mobile"] = *p.Mobile
-		}
-		if p.Photo != "" {
-			d["photo"] = p.Photo
-		}
-	}
-	return d
-}
 
 // normalizeMode 兜底非法 mode 为 blog。email code 和 magic login 共用。
 func normalizeMode(mode string) string {
@@ -588,6 +379,27 @@ func generateCode() string {
 		return "000000"
 	}
 	return fmt.Sprintf("%06d", n.Int64())
+}
+
+func uniqueUsername(base string, exists func(string) bool) string {
+	if !exists(base) {
+		return base
+	}
+	for range 5 {
+		candidate := base + "_" + randomSuffix(4)
+		if !exists(candidate) {
+			return candidate
+		}
+	}
+	return base + "_" + randomSuffix(8)
+}
+
+func randomSuffix(n int) string {
+	return randomHex(n)[:n]
+}
+
+func randomPassword() string {
+	return randomHex(16)
 }
 
 // gormModel 快速构造仅带 ID 的 model.User。包内测试大量复用。

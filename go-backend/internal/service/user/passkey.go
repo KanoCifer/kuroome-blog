@@ -1,4 +1,4 @@
-package service
+package user
 
 import (
 	"context"
@@ -63,7 +63,10 @@ type PasskeyRepositoryer interface {
 // （*UserService 满足）。本地窄接口，避免 passkey ← user 的包方向反转。
 type tokenIssuer interface {
 	CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
-	UserToDict(u *model.User, p *model.Profile) map[string]any
+}
+
+type userRenderer interface {
+	Render(u *model.User, p *model.Profile) map[string]any
 }
 
 // PasskeyServiceer 编排 WebAuthn 注册 / 认证流程，challenge 存 Redis。
@@ -72,8 +75,10 @@ type PasskeyService struct {
 	redis       *redis.Client
 	passkeyRepo PasskeyRepositoryer
 	userRepo    UserRepositoryer
-	// tokenSvc LoginFlow 调的 token 签发与字段铺平（必填：构造后立即用，无 nil-safe）。
+	// tokenSvc LoginFlow 调的 token 签发能力（必填：构造后立即用，无 nil-safe）。
 	tokenSvc tokenIssuer
+	// userView 负责登录响应中的用户字段拼装。
+	userView userRenderer
 }
 
 func NewPasskeyService(
@@ -82,6 +87,7 @@ func NewPasskeyService(
 	passkeyRepo PasskeyRepositoryer,
 	userRepo UserRepositoryer,
 	tokenSvc tokenIssuer,
+	userView userRenderer,
 ) *PasskeyService {
 	return &PasskeyService{
 		webauthn:    wa,
@@ -89,6 +95,7 @@ func NewPasskeyService(
 		passkeyRepo: passkeyRepo,
 		userRepo:    userRepo,
 		tokenSvc:    tokenSvc,
+		userView:    userView,
 	}
 }
 
@@ -263,7 +270,7 @@ func (s *PasskeyService) LoginFlow(
 	if err != nil {
 		return nil, nil, err
 	}
-	return tokens, s.tokenSvc.UserToDict(user, user.Profile), nil
+	return tokens, s.userView.Render(user, user.Profile), nil
 }
 
 // DeletePasskey 删除用户 Passkey 凭证。

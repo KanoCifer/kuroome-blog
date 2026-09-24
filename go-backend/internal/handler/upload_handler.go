@@ -35,22 +35,24 @@ type Uploader interface {
 
 var _ Uploader = (*service.UploadService)(nil)
 
-// avatarViewer 是 UploadPic 成功后回读用户字典所需的最小接口。
-// service.Userer 满足此接口；handler 以窄接口注入，便于 mock 测试。
-type avatarViewer interface {
+type avatarReader interface {
 	GetByID(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
-	UserToDict(u *model.User, p *model.Profile) map[string]any
+}
+
+type userRenderer interface {
+	Render(u *model.User, p *model.Profile) map[string]any
 }
 
 // UploadHandler 处理文件 / 图片上传（均需登录）。
 type UploadHandler struct {
-	uploadSvc  Uploader
-	avatarView avatarViewer
+	uploadSvc Uploader
+	users     avatarReader
+	userView  userRenderer
 }
 
 // NewUploadHandler 构造 UploadHandler。
-func NewUploadHandler(uploadSvc Uploader, avatarView avatarViewer) *UploadHandler {
-	return &UploadHandler{uploadSvc: uploadSvc, avatarView: avatarView}
+func NewUploadHandler(uploadSvc Uploader, users avatarReader, userView userRenderer) *UploadHandler {
+	return &UploadHandler{uploadSvc: uploadSvc, users: users, userView: userView}
 }
 
 // Upload POST /upload —— 统一文件 / 图片上传入口。
@@ -130,12 +132,12 @@ func (h *UploadHandler) UploadPic(c *gin.Context) {
 		return
 	}
 
-	u, p, err := h.avatarView.GetByID(c.Request.Context(), userID)
+	u, p, err := h.users.GetByID(c.Request.Context(), userID)
 	if respondErr(c, err, "get user after avatar upload", "user_id", userID) {
 		return
 	}
 
-	response.Success(c, h.avatarView.UserToDict(u, p), "头像上传成功")
+	response.Success(c, h.userView.Render(u, p), "头像上传成功")
 }
 
 // RegisterRoutes 挂载上传端点，全部需要 AuthMiddleware。

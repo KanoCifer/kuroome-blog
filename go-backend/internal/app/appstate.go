@@ -13,6 +13,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/KanoCifer/kuroome-blog/internal/config"
+	"github.com/KanoCifer/kuroome-blog/internal/infra/eventbus"
 	"github.com/KanoCifer/kuroome-blog/internal/infra/httpclient"
 	"github.com/KanoCifer/kuroome-blog/internal/infra/pubsub"
 	"github.com/KanoCifer/kuroome-blog/internal/infra/qweather"
@@ -21,6 +22,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 	nomuSvc "github.com/KanoCifer/kuroome-blog/internal/service/nomu"
 	"github.com/KanoCifer/kuroome-blog/internal/service/syncbus"
+	userservice "github.com/KanoCifer/kuroome-blog/internal/service/user"
 	wereadSvc "github.com/KanoCifer/kuroome-blog/internal/service/weread"
 	"github.com/KanoCifer/kuroome-blog/pkg/emailtemplates"
 	"github.com/redis/go-redis/v9"
@@ -38,14 +40,17 @@ type AppState struct {
 	// infra
 	syncBus    *syncbus.Bus
 	dispatcher *pubsub.Dispatcher
+	eventBus   eventbus.Bus
 
 	// services
-	userSvc     *service.UserService
+	userSvc     *userservice.UserService
+	authSvc     *userservice.AuthService
+	userView    userservice.UserView
 	adminSvc    *service.AdminService
 	blogSvc     *service.BlogService
 	devTaskSvc  *service.DevTaskService
-	passkeySvc  *service.PasskeyService
-	githubOAuth *service.GitHubOAuth
+	passkeySvc  *userservice.PasskeyService
+	githubOAuth *userservice.GitHubOAuth
 	monitorSvc  *service.MonitorService
 	systemSvc   *service.SystemService
 	wsSvc       *service.WSService
@@ -102,6 +107,7 @@ type infra struct {
 	qweatherSigner *qweather.Signer
 	dispatcher     *pubsub.Dispatcher
 	syncBus        *syncbus.Bus
+	eventBus       eventbus.Bus
 }
 
 func buildInfra(cfg *config.Config, rdb *redis.Client) infra {
@@ -132,6 +138,7 @@ func buildInfra(cfg *config.Config, rdb *redis.Client) infra {
 	dispatcher := pubsub.NewDispatcher(rdb)
 	syncBus := syncbus.NewSyncBus(rdb, dispatcher)
 	syncBus.Register(syncbus.DuplicateSnapshotHandler{})
+	eventBus := eventbus.NewEventBus()
 
 	return infra{
 		httpCli:        httpCli,
@@ -140,6 +147,7 @@ func buildInfra(cfg *config.Config, rdb *redis.Client) infra {
 		qweatherSigner: signer,
 		dispatcher:     dispatcher,
 		syncBus:        syncBus,
+		eventBus:       eventBus,
 	}
 }
 
@@ -157,9 +165,9 @@ func NewAppState(
 	rs := buildRepos(db, mongoDB)
 	ifc := buildInfra(cfg, rdb)
 
-	// mailer 邮件发送器。UserService 通过它发验证码 / 魔法登录链接；
-	// SMTP 未配置时 Mailer.Send* 自身返回 false，与旧 EmailChannel 行为对齐。
+	// mailer 只暴露业务语义；生产发送先进入 EventBus，再由 handler 执行 SMTP。
 	mailer := emailtemplates.NewMailer()
+	mailer.RegisterEventBus(ifc.eventBus)
 
 	// creditSvc 在 userService.RegisterFlow 收尾处调 GrantRegisterBonus 赠送 100 积分；
 	// 只走密码注册 handler 这一条路径，GitHub 自动建号 / magic-login 不发。
@@ -167,10 +175,13 @@ func NewAppState(
 
 	// frontendURLs 按 mode 索引：blog → kanocifer.chat（/auth/magic），
 	// nomu → nomu.kanocifer.chat（/nomu/login），两个独立 origin。
-	userSvc := service.NewUserService(rs.user, rdb, cfg.Admin.UserIDs, map[string]string{
+	frontendURLs := map[string]string{
 		"blog": cfg.Frontend.URLs.Blog,
 		"nomu": cfg.Frontend.URLs.Nomu,
-	}, cfg.Security.MaxRefreshDevices, creditSvc, mailer)
+	}
+	userView := userservice.NewUserView(cfg.Admin.UserIDs)
+	userSvc := userservice.NewUserService(rs.user, rdb, creditSvc, mailer)
+	authSvc := userservice.NewAuthService(userSvc, rdb, frontendURLs, cfg.Security.MaxRefreshDevices, mailer, userView)
 
 	uploadSvc := service.NewUploadService(rs.user, cfg)
 
@@ -179,13 +190,16 @@ func NewAppState(
 		userRepo:   rs.user,
 		syncBus:    ifc.syncBus,
 		dispatcher: ifc.dispatcher,
+		eventBus:   ifc.eventBus,
 
 		userSvc:    userSvc,
+		authSvc:    authSvc,
+		userView:   userView,
 		adminSvc:   service.NewAdminService(rs.admin, rs.visitor, rdb),
 		blogSvc:    service.NewBlogService(rs.blog),
 		devTaskSvc: service.NewDevTaskService(rs.devTask),
-		passkeySvc: service.NewPasskeyService(wa, rdb, rs.passkey, rs.user, userSvc),
-		githubOAuth: service.NewGitHubOAuth(rdb, rs.user, userSvc,
+		passkeySvc: userservice.NewPasskeyService(wa, rdb, rs.passkey, rs.user, authSvc, userView),
+		githubOAuth: userservice.NewGitHubOAuth(rdb, userSvc, authSvc,
 			cfg.GitHub.ClientID, cfg.GitHub.ClientSecret, cfg.GitHub.RedirectURI),
 		monitorSvc:  service.NewMonitorService(rs.visitor, rs.user, cfg.API.Version),
 		systemSvc:   service.NewSystemService(rs.event),
@@ -205,27 +219,30 @@ func NewAppState(
 }
 
 // Dependency Injection
-func (a *AppState) Cfg() *config.Config                   { return a.config }
-func (a *AppState) UserRepo() *postgres.UserRepo          { return a.userRepo }
-func (a *AppState) UserSvc() *service.UserService         { return a.userSvc }
-func (a *AppState) AdminSvc() *service.AdminService       { return a.adminSvc }
-func (a *AppState) BlogSvc() *service.BlogService         { return a.blogSvc }
-func (a *AppState) DevTaskSvc() *service.DevTaskService   { return a.devTaskSvc }
-func (a *AppState) PasskeySvc() *service.PasskeyService   { return a.passkeySvc }
-func (a *AppState) WSSvc() *service.WSService             { return a.wsSvc }
-func (a *AppState) MonitorSvc() *service.MonitorService   { return a.monitorSvc }
-func (a *AppState) SystemSvc() *service.SystemService     { return a.systemSvc }
-func (a *AppState) GitHubOAuth() *service.GitHubOAuth     { return a.githubOAuth }
-func (a *AppState) FishSvc() *service.FishService         { return a.fishSvc }
-func (a *AppState) UploadSvc() *service.UploadService     { return a.uploadSvc }
-func (a *AppState) MomentSvc() *service.MomentService     { return a.momentSvc }
-func (a *AppState) WeatherSvc() *service.WeatherService   { return a.weatherSvc }
-func (a *AppState) WereadSvc() wereadSvc.Reader           { return a.wereadSvc }
-func (a *AppState) CurrencySvc() *service.CurrencyService { return a.currencySvc }
-func (a *AppState) CreditSvc() *service.CreditService     { return a.creditSvc }
-func (a *AppState) DesignSvc() *nomuSvc.DesignService     { return a.designSvc }
-func (a *AppState) NomuSvc() *service.NomuServiceStruct   { return a.nomuSvc }
-func (a *AppState) SyncBus() *syncbus.Bus                 { return a.syncBus }
-func (a *AppState) Mailer() *emailtemplates.Mailer        { return a.mailer }
+func (a *AppState) Cfg() *config.Config                     { return a.config }
+func (a *AppState) UserRepo() *postgres.UserRepo            { return a.userRepo }
+func (a *AppState) UserSvc() *userservice.UserService       { return a.userSvc }
+func (a *AppState) AuthSvc() *userservice.AuthService       { return a.authSvc }
+func (a *AppState) UserView() userservice.UserView          { return a.userView }
+func (a *AppState) AdminSvc() *service.AdminService         { return a.adminSvc }
+func (a *AppState) BlogSvc() *service.BlogService           { return a.blogSvc }
+func (a *AppState) DevTaskSvc() *service.DevTaskService     { return a.devTaskSvc }
+func (a *AppState) PasskeySvc() *userservice.PasskeyService { return a.passkeySvc }
+func (a *AppState) WSSvc() *service.WSService               { return a.wsSvc }
+func (a *AppState) MonitorSvc() *service.MonitorService     { return a.monitorSvc }
+func (a *AppState) SystemSvc() *service.SystemService       { return a.systemSvc }
+func (a *AppState) GitHubOAuth() *userservice.GitHubOAuth   { return a.githubOAuth }
+func (a *AppState) FishSvc() *service.FishService           { return a.fishSvc }
+func (a *AppState) UploadSvc() *service.UploadService       { return a.uploadSvc }
+func (a *AppState) MomentSvc() *service.MomentService       { return a.momentSvc }
+func (a *AppState) WeatherSvc() *service.WeatherService     { return a.weatherSvc }
+func (a *AppState) WereadSvc() wereadSvc.Reader             { return a.wereadSvc }
+func (a *AppState) CurrencySvc() *service.CurrencyService   { return a.currencySvc }
+func (a *AppState) CreditSvc() *service.CreditService       { return a.creditSvc }
+func (a *AppState) DesignSvc() *nomuSvc.DesignService       { return a.designSvc }
+func (a *AppState) NomuSvc() *service.NomuServiceStruct     { return a.nomuSvc }
+func (a *AppState) SyncBus() *syncbus.Bus                   { return a.syncBus }
+func (a *AppState) EventBus() eventbus.Bus                  { return a.eventBus }
+func (a *AppState) Mailer() *emailtemplates.Mailer          { return a.mailer }
 
 func (a *AppState) PubSub() *pubsub.Dispatcher { return a.dispatcher }

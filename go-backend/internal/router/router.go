@@ -50,7 +50,7 @@ func Setup(r *gin.Engine, state *app.AppState, rdb *redis.Client) {
 	auth := middleware.AuthMiddleware()
 	adminOnly := middleware.AdminMiddleware(state.Cfg().Admin.UserIDs)
 
-	userH := handler.NewUserHandler(state.UserSvc(), state.Cfg(), refreshAuthFailLimiter)
+	userH := handler.NewUserHandler(state.UserSvc(), state.AuthSvc(), state.UserView(), state.Cfg(), refreshAuthFailLimiter)
 	userH.RegisterRoutes(v3, auth, loginCodeSendLimiter.Middleware(), loginLimiter.Middleware(), registerLimiter.Middleware())
 
 	adminH := handler.NewAdminHandler(state.AdminSvc(), state.Cfg())
@@ -101,7 +101,7 @@ func Setup(r *gin.Engine, state *app.AppState, rdb *redis.Client) {
 	currencyH.RegisterRoutes(v3, currencyLimiter.Middleware())
 
 	// --- 上传 & 静态媒体 ----------------------------------------------- //
-	uploadH := handler.NewUploadHandler(state.UploadSvc(), state.UserSvc())
+	uploadH := handler.NewUploadHandler(state.UploadSvc(), state.UserSvc(), state.UserView())
 	uploadH.RegisterRoutes(v3, auth)
 
 	// 媒体静态服务：把上传的文件以 /v3/media/* 暴露，对齐 handler 返回的 url。

@@ -14,12 +14,12 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
-	"github.com/KanoCifer/kuroome-blog/internal/service"
+	userservice "github.com/KanoCifer/kuroome-blog/internal/service/user"
 	"github.com/KanoCifer/kuroome-blog/internal/util"
 )
 
 // GitHubOAuther 定义 handler 依赖的 GitHub OAuth 业务能力。
-// 由 *service.GitHubOAuth 隐式满足。
+// 由 *userservice.GitHubOAuth 隐式满足。
 type GitHubOAuther interface {
 	// AuthURL 构造 GitHub 授权地址。 mode="login" | "bind"。
 	AuthURL(ctx context.Context, mode string, userID uint) (string, error)
@@ -32,7 +32,7 @@ type GitHubOAuther interface {
 	UnbindGitHub(ctx context.Context, userID uint) error
 }
 
-var _ GitHubOAuther = (*service.GitHubOAuth)(nil)
+var _ GitHubOAuther = (*userservice.GitHubOAuth)(nil)
 
 // GitHubHandler 持有 GitHub OAuth 服务。
 type GitHubHandler struct {

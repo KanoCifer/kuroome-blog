@@ -31,7 +31,7 @@ type mockPasskeyService struct {
 	deletePasskeyFn      func(ctx context.Context, userID uint) error
 	hasPasskeyFn         func(ctx context.Context, userID uint) bool
 	// loginFlowFn 可选：nil 时 LoginFlow 默认走 FinishLogin + 构造固定 tokens/空 userData。
-	// 端到端测试可注入真实 tokenSvc（*service.UserService）验证完整路径。
+	// 端到端测试可注入真实 tokenSvc（*userservice.AuthService）验证完整路径。
 	loginFlowFn func(ctx context.Context, assertion map[string]any) (*dto.TokensResponse, map[string]any, error)
 }
 

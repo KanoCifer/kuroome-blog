@@ -69,7 +69,6 @@ func (c *CurrencyService) GetExchange(ctx context.Context, baseCurrency string) 
 }
 
 func (c *CurrencyService) getExchangeRaw(ctx context.Context, baseCurrency string, cacheKey string, ttl time.Duration) (raw json.RawMessage, err error) {
-
 	if c.redis != nil {
 		cached, err := c.redis.Get(ctx, cacheKey).Bytes()
 		if err == nil && len(cached) > 0 {

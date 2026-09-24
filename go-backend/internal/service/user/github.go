@@ -5,7 +5,7 @@
 //  2. HandleCallback(state, code) → 校验 state, 用 code 换 access_token, 取 GitHub 用户信息。
 //     - state 里存的是 0 → login 流程: 按 github_id 找用户, 找到则登录, 找不到则自动创建;
 //     - state 里存的是 userID → bind 流程: 把 github_id 绑到该用户。
-package service
+package user
 
 import (
 	"context"
@@ -27,10 +27,17 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 )
 
-// UserSvcer 定义 github 服务依赖的用户业务能力。
-type UserSvcer interface {
+// GitHubAccountManager 定义 GitHub 模块依赖的用户业务能力。
+type GitHubAccountManager interface {
+	GetByID(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
+	GetByGithubID(ctx context.Context, githubID int) (*model.User, error)
+	CreateOAuthUser(ctx context.Context, githubID int, username, email, avatarURL string) (*model.User, error)
+	LinkGitHub(ctx context.Context, userID uint, githubID int) error
+	UnlinkGitHub(ctx context.Context, userID uint) error
+}
+
+type SessionIssuer interface {
 	CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
-	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error)
 }
 
 // GitHubOAuther 定义 github handler 依赖的业务能力。
@@ -41,8 +48,8 @@ type UserSvcer interface {
 // 直接读取全局 config.Cfg。
 type GitHubOAuth struct {
 	redis        *redis.Client
-	userRepo     UserRepositoryer
-	userSvc      UserSvcer
+	accounts     GitHubAccountManager
+	auth         SessionIssuer
 	httpCli      *http.Client
 	clientID     string
 	clientSecret string
@@ -52,14 +59,14 @@ type GitHubOAuth struct {
 // NewGitHubOAuth 构造一个 gitHubOAuth 实例, state TTL 10 分钟。
 func NewGitHubOAuth(
 	redis *redis.Client,
-	userRepo UserRepositoryer,
-	userSvc UserSvcer,
+	accounts GitHubAccountManager,
+	auth SessionIssuer,
 	clientID, clientSecret, redirectURI string,
 ) *GitHubOAuth {
 	return &GitHubOAuth{
 		redis:        redis,
-		userRepo:     userRepo,
-		userSvc:      userSvc,
+		accounts:     accounts,
+		auth:         auth,
 		httpCli:      &http.Client{Timeout: 10 * time.Second},
 		clientID:     clientID,
 		clientSecret: clientSecret,
@@ -134,7 +141,7 @@ func (g *GitHubOAuth) AuthURL(ctx context.Context, mode string, userID uint) (st
 // 出错时返回 (nil, nil, err)。
 func (g *GitHubOAuth) HandleCallback(ctx context.Context, state, code string) (*model.User, *dto.TokensResponse, error) {
 	// 1. 校验 state
-	if state == "" || code == "" {
+	if state == "" || code == "" || g.redis == nil {
 		return nil, nil, githuberrs.ErrInvalidOAuthState
 	}
 	userIDVal, err := g.redis.Get(ctx, statePrefix+state).Result()
@@ -164,53 +171,41 @@ func (g *GitHubOAuth) HandleCallback(ctx context.Context, state, code string) (*
 
 // loginByGitHub 按 github_id 查找或自动创建用户, 并签发 token。
 func (g *GitHubOAuth) loginByGitHub(ctx context.Context, gh *ghUser) (*model.User, *dto.TokensResponse, error) {
-	existing, err := g.userRepo.GetByGithubID(ctx, gh.ID)
+	existing, err := g.accounts.GetByGithubID(ctx, gh.ID)
 	if err != nil {
 		return nil, nil, err
 	}
-	if existing != nil {
-		tokens, err := g.userSvc.CreateTokens(ctx, existing)
+	if existing == nil {
+		email := gh.Email
+		if email == "" {
+			email = gh.Login + "@github.com"
+		}
+		existing, err = g.accounts.CreateOAuthUser(ctx, gh.ID, gh.Login, email, gh.AvatarURL)
 		if err != nil {
 			return nil, nil, err
 		}
-		return existing, tokens, nil
+		slog.InfoContext(ctx, "github login", "user_id", existing.ID, "github_id", gh.ID)
 	}
-
-	// 自动创建用户(与 Python 端 handle_github_login_callback 行为一致)
-	username := uniqueUsername(gh.Login, func(s string) bool { return g.userRepo.UsernameExists(ctx, s) })
-	email := gh.Email
-	if email == "" {
-		email = gh.Login + "@github.com"
-	}
-	avatarURL := gh.AvatarURL
-	u, _, err := g.userSvc.CreateUser(ctx, username, randomPassword(), email, "", avatarURL, "")
+	tokens, err := g.auth.CreateTokens(ctx, existing)
 	if err != nil {
 		return nil, nil, err
 	}
-	if err := g.userRepo.SetGithubID(ctx, u.ID, gh.ID); err != nil {
-		return nil, nil, err
-	}
-	tokens, err := g.userSvc.CreateTokens(ctx, u)
-	if err != nil {
-		return nil, nil, err
-	}
-	slog.InfoContext(ctx, "github login", "user_id", u.ID, "github_id", gh.ID)
-	return u, tokens, nil
+	return existing, tokens, nil
 }
 
 // bindGitHub 把 github_id 绑到指定用户。
 func (g *GitHubOAuth) bindGitHub(ctx context.Context, userID uint, gh *ghUser) (*model.User, *dto.TokensResponse, error) {
-	existing, err := g.userRepo.GetByGithubID(ctx, gh.ID)
+	existing, err := g.accounts.GetByGithubID(ctx, gh.ID)
 	if err != nil {
 		return nil, nil, err
 	}
 	if existing != nil {
 		return nil, nil, githuberrs.ErrGitHubAlreadyBound
 	}
-	if err := g.userRepo.SetGithubID(ctx, userID, gh.ID); err != nil {
+	if err := g.accounts.LinkGitHub(ctx, userID, gh.ID); err != nil {
 		return nil, nil, err
 	}
-	user, err := g.userRepo.GetByID(ctx, userID)
+	user, _, err := g.accounts.GetByID(ctx, userID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -220,7 +215,7 @@ func (g *GitHubOAuth) bindGitHub(ctx context.Context, userID uint, gh *ghUser) (
 
 // UnbindGitHub 解除用户与 GitHub 的绑定。
 func (g *GitHubOAuth) UnbindGitHub(ctx context.Context, userID uint) error {
-	if err := g.userRepo.ClearGithubID(ctx, userID); err != nil {
+	if err := g.accounts.UnlinkGitHub(ctx, userID); err != nil {
 		return err
 	}
 	slog.InfoContext(ctx, "github unbound", "user_id", userID)
@@ -288,35 +283,4 @@ func (g *GitHubOAuth) fetchUser(ctx context.Context, accessToken string) (*ghUse
 		return nil, err
 	}
 	return &u, nil
-}
-
-// uniqueUsername 若 base 已被占用, 追加 _xxxx 后缀直到唯一。
-func uniqueUsername(base string, exists func(string) bool) string {
-	if !exists(base) {
-		return base
-	}
-	for range 5 {
-		suffix := "_" + randomSuffix(4)
-		candidate := base + suffix
-		if !exists(candidate) {
-			return candidate
-		}
-	}
-	// 兜底: 长随机后缀
-	return base + "_" + randomSuffix(8)
-}
-
-// randomSuffix 生成 n 字符的 url-safe 随机字符串。
-func randomSuffix(n int) string {
-	b := make([]byte, n)
-	rand.Read(b)
-	return hex.EncodeToString(b)[:n]
-}
-
-// randomPassword 生成 32 字节随机 hex 作为自动创建用户的密码。
-// 该用户后续通过 GitHub OAuth 登录, 此密码仅作占位。
-func randomPassword() string {
-	b := make([]byte, 32)
-	rand.Read(b)
-	return hex.EncodeToString(b)
 }

@@ -42,7 +42,6 @@ func (h *CurrencyHandler) GetExchangeRate(c *gin.Context) {
 	}
 
 	response.Success(c, res, "汇率获取成功")
-
 }
 
 func (h *CurrencyHandler) RegisterRoutes(r *gin.RouterGroup, mw ...gin.HandlerFunc) {

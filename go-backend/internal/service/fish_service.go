@@ -57,7 +57,7 @@ func (s *FishService) GetFishingSpotByID(ctx context.Context, id string) (*dto.F
 	if err != nil {
 		return nil, err
 	}
-	var out = &dto.FishingSpotResponse{
+	out := &dto.FishingSpotResponse{
 		ID:          doc.ID,
 		Name:        doc.Name,
 		Description: doc.Description,

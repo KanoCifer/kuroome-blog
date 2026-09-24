@@ -1,11 +1,13 @@
-package service
+package user
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"testing"
 
 	"github.com/KanoCifer/kuroome-blog/internal/config"
+	githuberrs "github.com/KanoCifer/kuroome-blog/internal/domain/github/errs"
 )
 
 func TestAuthURL_ContainsRequiredParams(t *testing.T) {
@@ -43,6 +45,15 @@ func TestAuthURL_RejectsWhenNotConfigured(t *testing.T) {
 	_, err := svc.AuthURL(context.Background(), "login", 0)
 	if err == nil {
 		t.Fatal("expected error when GITHUB_CLIENT_ID is empty")
+	}
+}
+
+func TestHandleCallback_RejectsWhenRedisUnavailable(t *testing.T) {
+	svc := NewGitHubOAuth(nil, nil, nil, "client", "secret", "http://localhost/callback")
+
+	_, _, err := svc.HandleCallback(context.Background(), "state", "code")
+	if !errors.Is(err, githuberrs.ErrInvalidOAuthState) {
+		t.Fatalf("error = %v, want %v", err, githuberrs.ErrInvalidOAuthState)
 	}
 }
 
