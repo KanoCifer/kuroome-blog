@@ -22,6 +22,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
+	userservice "github.com/KanoCifer/kuroome-blog/internal/service/user"
 	"github.com/KanoCifer/kuroome-blog/pkg/jwt"
 )
 
@@ -56,14 +57,18 @@ type mockUserService struct {
 	sendEmailCodeFn         func(ctx context.Context, email, mode string) bool
 	sendLoginEmailCodeFn    func(ctx context.Context, email string) bool
 	sendMagicLoginEmailFn   func(ctx context.Context, email, mode, deviceID string) bool
-	pollNomuLoginFn         func(ctx context.Context, deviceID string) (*service.NomuLoginState, error)
+	pollNomuLoginFn         func(ctx context.Context, deviceID string) (*userservice.NomuLoginState, error)
 	userToDictFn            func(u *model.User, p *model.Profile) map[string]any
 	// bonusSvc 可选：注入后 RegisterFlow 默认实现会调它 GrantRegisterBonus。
 	// nil 时跳过赠送（与真实 UserService 的 bonusSvc=nil 行为一致）。
 	bonusSvc mockRegisterBonuser
 }
 
-var _ Userer = (*mockUserService)(nil)
+var (
+	_ AccountService = (*mockUserService)(nil)
+	_ Authenticator  = (*mockUserService)(nil)
+	_ UserRenderer   = (*mockUserService)(nil)
+)
 
 func (m *mockUserService) Authenticate(ctx context.Context, username, password string) (*model.User, error) {
 	return m.authenticateFn(ctx, username, password)
@@ -152,7 +157,7 @@ func (m *mockUserService) SendMagicLoginEmail(ctx context.Context, email, mode, 
 	return true
 }
 
-func (m *mockUserService) PollNomuLogin(ctx context.Context, deviceID string) (*service.NomuLoginState, error) {
+func (m *mockUserService) PollNomuLogin(ctx context.Context, deviceID string) (*userservice.NomuLoginState, error) {
 	if m.pollNomuLoginFn != nil {
 		return m.pollNomuLoginFn(ctx, deviceID)
 	}
@@ -166,7 +171,7 @@ func (m *mockUserService) AuthenticateMagicLogin(ctx context.Context, token stri
 	return nil, nil, usererrs.ErrInvalidMagicToken
 }
 
-func (m *mockUserService) UserToDict(u *model.User, p *model.Profile) map[string]any {
+func (m *mockUserService) Render(u *model.User, p *model.Profile) map[string]any {
 	if m.userToDictFn != nil {
 		return m.userToDictFn(u, p)
 	}
@@ -230,7 +235,7 @@ func TestLogin_Success(t *testing.T) {
 			return &model.User{Model: gormModel(1), Username: "alice"}, nil
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.Login, http.MethodPost, "/login", jsonBody(t, dto.LoginRequest{
 		Username: "alice",
@@ -261,7 +266,7 @@ func TestLogin_InvalidCredentials(t *testing.T) {
 			return nil, usererrs.ErrInvalidCredentials
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.Login, http.MethodPost, "/login", jsonBody(t, dto.LoginRequest{
 		Username: "alice",
@@ -279,7 +284,7 @@ func TestLogin_InvalidBody(t *testing.T) {
 			return &model.User{}, nil
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.Login, http.MethodPost, "/login", []byte("not json"))
 
@@ -297,7 +302,7 @@ func TestLogin_TokenError(t *testing.T) {
 			return nil, errors.New("jwt error")
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.Login, http.MethodPost, "/login", jsonBody(t, dto.LoginRequest{
 		Username: "alice",
@@ -317,7 +322,7 @@ func TestRegister_Success(t *testing.T) {
 			return &model.User{Model: gormModel(5), Username: username}, nil, nil
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.Register, http.MethodPost, "/register", jsonBody(t, dto.RegisterRequest{
 		Username:  "bob",
@@ -350,7 +355,7 @@ func TestRegister_Success_GrantsRegisterBonus(t *testing.T) {
 			return &model.User{Model: gormModel(42), Username: username}, nil, nil
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.Register, http.MethodPost, "/register", jsonBody(t, dto.RegisterRequest{
 		Username:  "bob",
@@ -390,7 +395,7 @@ func TestRegister_RegisterBonus_NotGrantedOnCreateError(t *testing.T) {
 			return nil, nil, usererrs.ErrUserExists
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.Register, http.MethodPost, "/register", jsonBody(t, dto.RegisterRequest{
 		Username:  "bob",
@@ -416,7 +421,7 @@ func TestRegister_UserExists(t *testing.T) {
 			return nil, nil, usererrs.ErrUserExists
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.Register, http.MethodPost, "/register", jsonBody(t, dto.RegisterRequest{
 		Username:  "bob",
@@ -436,7 +441,7 @@ func TestRegister_EmailExists(t *testing.T) {
 			return nil, nil, usererrs.ErrEmailExists
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.Register, http.MethodPost, "/register", jsonBody(t, dto.RegisterRequest{
 		Username:  "bob",
@@ -456,7 +461,7 @@ func TestRegister_InvalidEmailCode(t *testing.T) {
 			return nil, nil, usererrs.ErrInvalidEmailCode
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.Register, http.MethodPost, "/register", jsonBody(t, dto.RegisterRequest{
 		Username:  "bob",
@@ -476,7 +481,7 @@ func TestRegister_InvalidBody(t *testing.T) {
 			return &model.User{}, nil, nil
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.Register, http.MethodPost, "/register", []byte("not json"))
 
@@ -489,7 +494,7 @@ func TestRegister_InvalidBody(t *testing.T) {
 
 func TestEmailCode_Success(t *testing.T) {
 	svc := &mockUserService{}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.EmailCode, http.MethodPost, "/email/code",
 		jsonBody(t, dto.EmailCodeRequest{Email: "alice@example.com"}))
@@ -501,7 +506,7 @@ func TestEmailCode_Success(t *testing.T) {
 
 func TestEmailCode_InvalidEmail(t *testing.T) {
 	svc := &mockUserService{}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.EmailCode, http.MethodPost, "/email/code",
 		jsonBody(t, dto.EmailCodeRequest{Email: "not-an-email"}))
@@ -514,7 +519,7 @@ func TestEmailCode_InvalidEmail(t *testing.T) {
 func TestEmailCode_BadMode(t *testing.T) {
 	// oneof 拦截非法 mode（h5 不是 blog / nomu）。
 	svc := &mockUserService{}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.EmailCode, http.MethodPost, "/email/code",
 		jsonBody(t, dto.EmailCodeRequest{Email: "alice@example.com", Mode: "h5"}))
@@ -544,7 +549,7 @@ func TestEmailCode_PassesModeToService(t *testing.T) {
 					return true
 				},
 			}
-			h := NewUserHandler(svc, config.Cfg, nil)
+			h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 			w := doRequest(h.EmailCode, http.MethodPost, "/email/code",
 				jsonBody(t, dto.EmailCodeRequest{Email: "alice@example.com", Mode: c.mode}))
@@ -579,7 +584,7 @@ func TestRegister_PassesModeToService(t *testing.T) {
 					return &model.User{Model: gormModel(1), Username: "alice"}, nil, nil
 				},
 			}
-			h := NewUserHandler(svc, config.Cfg, nil)
+			h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 			w := doRequest(h.Register, http.MethodPost, "/register",
 				jsonBody(t, dto.RegisterRequest{
@@ -608,7 +613,7 @@ func TestRegister_PassesModeToService(t *testing.T) {
 func TestRegister_BadMode(t *testing.T) {
 	// oneof 拦截非法 mode。
 	svc := &mockUserService{}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.Register, http.MethodPost, "/register",
 		jsonBody(t, dto.RegisterRequest{
@@ -632,7 +637,7 @@ func TestMe_Success(t *testing.T) {
 			return &model.User{Model: gormModel(7), Username: "alice"}, nil, nil
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
@@ -651,7 +656,7 @@ func TestMe_UserNotFound(t *testing.T) {
 			return nil, nil, usererrs.ErrUserNotFound
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
@@ -686,7 +691,7 @@ func TestLogout_CallsService(t *testing.T) {
 			calledJTI = jti
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
@@ -715,7 +720,7 @@ func TestLogout_NoCookie_EmptyJTI(t *testing.T) {
 	svc := &mockUserService{
 		logoutFn: func(ctx context.Context, userID uint, jti string) { calledJTI = jti },
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
@@ -739,7 +744,7 @@ func TestRefreshToken_Success(t *testing.T) {
 			return &dto.TokensResponse{AccessToken: "new-access", RefreshToken: "new-refresh"}, nil
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	body, _ := json.Marshal(map[string]string{"refresh_token": "old-refresh"})
 	w := doRequest(h.RefreshToken, http.MethodPost, "/refresh-token", body)
@@ -759,7 +764,7 @@ func TestRefreshToken_InvalidToken(t *testing.T) {
 			return nil, usererrs.ErrInvalidToken
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	body, _ := json.Marshal(map[string]string{"refresh_token": "bad"})
 	w := doRequest(h.RefreshToken, http.MethodPost, "/refresh-token", body)
@@ -776,7 +781,7 @@ func TestRefreshToken_MissingField(t *testing.T) {
 			return &dto.TokensResponse{}, nil
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	// 缺少 refresh_token 字段且 cookie 中也没有 → 401（与 Python 行为一致）
 	body, _ := json.Marshal(map[string]string{})
@@ -796,7 +801,7 @@ func TestRefreshToken_FromCookie(t *testing.T) {
 			return &dto.TokensResponse{AccessToken: "new-access", RefreshToken: "new-refresh"}, nil
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	req, _ := http.NewRequest(http.MethodPost, "/refresh-token", nil)
 	req.AddCookie(&http.Cookie{Name: "refresh_token", Value: "cookie-refresh"})
@@ -818,7 +823,7 @@ func TestRefreshToken_FromCookie(t *testing.T) {
 
 func TestMagicLoginEmail_InvalidEmail(t *testing.T) {
 	svc := &mockUserService{}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.MagicLoginEmail, http.MethodPost, "/email/magic-login",
 		jsonBody(t, dto.MagicLoginEmailRequest{Email: "not-an-email", Mode: "blog"}))
@@ -831,7 +836,7 @@ func TestMagicLoginEmail_InvalidEmail(t *testing.T) {
 func TestMagicLoginEmail_MissingMode(t *testing.T) {
 	// mode 字段为 DTO binding required，缺省直接 400。
 	svc := &mockUserService{}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.MagicLoginEmail, http.MethodPost, "/email/magic-login",
 		jsonBody(t, map[string]string{"email": "alice@example.com"}))
@@ -844,7 +849,7 @@ func TestMagicLoginEmail_MissingMode(t *testing.T) {
 func TestMagicLoginEmail_BadMode(t *testing.T) {
 	// oneof 拦截非法 mode。
 	svc := &mockUserService{}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.MagicLoginEmail, http.MethodPost, "/email/magic-login",
 		jsonBody(t, dto.MagicLoginEmailRequest{Email: "alice@example.com", Mode: "h5"}))
@@ -859,7 +864,7 @@ func TestMagicLoginEmail_AlwaysReturns200(t *testing.T) {
 	svc := &mockUserService{
 		sendMagicLoginEmailFn: func(_ context.Context, _ string, _ string, _ string) bool { return true },
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.MagicLoginEmail, http.MethodPost, "/email/magic-login",
 		jsonBody(t, dto.MagicLoginEmailRequest{Email: "nobody@example.com", Mode: "blog"}))
@@ -882,7 +887,7 @@ func TestMagicLoginEmail_PassesModeToService(t *testing.T) {
 					return true
 				},
 			}
-			h := NewUserHandler(svc, config.Cfg, nil)
+			h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 			w := doRequest(h.MagicLoginEmail, http.MethodPost, "/email/magic-login",
 				jsonBody(t, dto.MagicLoginEmailRequest{Email: "alice@example.com", Mode: mode}))
@@ -911,7 +916,7 @@ func TestMagicLoginConsume_BlogSuccess(t *testing.T) {
 			return &model.User{Model: gormModel(8), Username: "alice"}, nil, nil
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.MagicLoginConsume, http.MethodPost, "/magic-login/consume",
 		jsonBody(t, dto.MagicLoginConsumeRequest{Token: "abc-token:blog", Mode: "blog"}))
@@ -935,7 +940,7 @@ func TestMagicLoginConsume_NomuSuccess(t *testing.T) {
 			return &model.User{Model: gormModel(8), Username: "alice"}, nil, nil
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.MagicLoginConsume, http.MethodPost, "/nomu/magic-login",
 		jsonBody(t, dto.MagicLoginConsumeRequest{Token: "abc-token:nomu", Mode: "nomu"}))
@@ -960,7 +965,7 @@ func TestMagicLoginConsume_NomuSuccess(t *testing.T) {
 // TestMagicLoginConsume_MissingToken 空 token 直接 400（binding required）。
 func TestMagicLoginConsume_MissingToken(t *testing.T) {
 	svc := &mockUserService{}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.MagicLoginConsume, http.MethodPost, "/magic-login/consume",
 		jsonBody(t, dto.MagicLoginConsumeRequest{Token: ""}))
@@ -977,7 +982,7 @@ func TestMagicLoginConsume_InvalidToken(t *testing.T) {
 			return nil, nil, usererrs.ErrInvalidMagicToken
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.MagicLoginConsume, http.MethodPost, "/magic-login/consume",
 		jsonBody(t, dto.MagicLoginConsumeRequest{Token: "bad", Mode: "blog"}))
@@ -994,7 +999,7 @@ func TestMagicLoginConsume_UserNotFound(t *testing.T) {
 			return nil, nil, usererrs.ErrUserNotFound
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.MagicLoginConsume, http.MethodPost, "/magic-login/consume",
 		jsonBody(t, dto.MagicLoginConsumeRequest{Token: "expired", Mode: "blog"}))
@@ -1011,7 +1016,7 @@ func TestMagicLoginConsume_DefaultMode(t *testing.T) {
 			return &model.User{Model: gormModel(1), Username: "alice"}, nil, nil
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.MagicLoginConsume, http.MethodPost, "/magic-login/consume",
 		jsonBody(t, dto.MagicLoginConsumeRequest{Token: "abc-token"}))
@@ -1029,11 +1034,11 @@ func TestMagicLoginConsume_DefaultMode(t *testing.T) {
 // TestPollNomuLogin_Done 轮询到 done 槽位 → 200 + 状态 + token。
 func TestPollNomuLogin_Done(t *testing.T) {
 	svc := &mockUserService{
-		pollNomuLoginFn: func(_ context.Context, deviceID string) (*service.NomuLoginState, error) {
-			return &service.NomuLoginState{Status: "done", AccessToken: "acc", RefreshToken: "ref"}, nil
+		pollNomuLoginFn: func(_ context.Context, deviceID string) (*userservice.NomuLoginState, error) {
+			return &userservice.NomuLoginState{Status: "done", AccessToken: "acc", RefreshToken: "ref"}, nil
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
@@ -1053,7 +1058,7 @@ func TestPollNomuLogin_Done(t *testing.T) {
 // TestPollNomuLogin_MissingDeviceID 缺 device_id → 400。
 func TestPollNomuLogin_MissingDeviceID(t *testing.T) {
 	svc := &mockUserService{}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
@@ -1093,7 +1098,7 @@ func TestLogin_LogPropagatesTraceID(t *testing.T) {
 			return nil, usererrs.ErrInvalidCredentials
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	r := gin.New()
 	r.Use(middleware.Trace())
@@ -1145,7 +1150,7 @@ func TestLoginEmailCode_Success(t *testing.T) {
 			return &model.User{Model: gormModel(11), Username: "alice"}, &model.Profile{}, nil
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.LoginEmailCode, http.MethodPost, "/login/email-code",
 		jsonBody(t, dto.LoginEmailCodeRequest{Email: "alice@example.com", EmailCode: "654321"}))
@@ -1175,7 +1180,7 @@ func TestLoginEmailCode_InvalidCode(t *testing.T) {
 			return nil, nil, usererrs.ErrInvalidEmailCode
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.LoginEmailCode, http.MethodPost, "/login/email-code",
 		jsonBody(t, dto.LoginEmailCodeRequest{Email: "alice@example.com", EmailCode: "000000"}))
@@ -1188,7 +1193,7 @@ func TestLoginEmailCode_InvalidCode(t *testing.T) {
 func TestLoginEmailCode_InvalidBody(t *testing.T) {
 	// 任何 binding 失败都 400。
 	svc := &mockUserService{}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	cases := []struct {
 		name string
@@ -1220,7 +1225,7 @@ func TestLoginEmailCode_InvalidBody(t *testing.T) {
 func TestLoginEmailCode_BadMode(t *testing.T) {
 	// DTO oneof=nomu 拦截 blog。
 	svc := &mockUserService{}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.LoginEmailCode, http.MethodPost, "/login/email-code",
 		jsonBody(t, dto.LoginEmailCodeRequest{Email: "alice@example.com", EmailCode: "123456", Mode: "blog"}))
@@ -1240,7 +1245,7 @@ func TestLoginEmailCode_TokenErrorReturns500(t *testing.T) {
 			return nil, errors.New("jwt signing failed")
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.LoginEmailCode, http.MethodPost, "/login/email-code",
 		jsonBody(t, dto.LoginEmailCodeRequest{Email: "alice@example.com", EmailCode: "123456"}))
@@ -1261,7 +1266,7 @@ func TestSendLoginEmailCode_Success(t *testing.T) {
 			return true
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.SendLoginEmailCode, http.MethodPost, "/email/login-code",
 		jsonBody(t, dto.LoginEmailCodeSendRequest{Email: "alice@example.com"}))
@@ -1281,7 +1286,7 @@ func TestSendLoginEmailCode_Success(t *testing.T) {
 
 func TestSendLoginEmailCode_InvalidBody(t *testing.T) {
 	svc := &mockUserService{}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	cases := []struct {
 		name string
@@ -1310,7 +1315,7 @@ func TestSendLoginEmailCode_InvalidBody(t *testing.T) {
 func TestSendLoginEmailCode_BadMode(t *testing.T) {
 	// DTO oneof=nomu 拦截 blog。
 	svc := &mockUserService{}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.SendLoginEmailCode, http.MethodPost, "/email/login-code",
 		jsonBody(t, dto.LoginEmailCodeSendRequest{Email: "alice@example.com", Mode: "blog"}))
@@ -1335,7 +1340,7 @@ func TestSendLoginEmailCode_AlwaysReturns200(t *testing.T) {
 			svc := &mockUserService{
 				sendLoginEmailCodeFn: func(_ context.Context, _ string) bool { return c.ret },
 			}
-			h := NewUserHandler(svc, config.Cfg, nil)
+			h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 			w := doRequest(h.SendLoginEmailCode, http.MethodPost, "/email/login-code",
 				jsonBody(t, dto.LoginEmailCodeSendRequest{Email: "nobody@example.com"}))
@@ -1356,7 +1361,7 @@ func TestSendLoginEmailCode_PassesEmailToService(t *testing.T) {
 			return true
 		},
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	w := doRequest(h.SendLoginEmailCode, http.MethodPost, "/email/login-code",
 		jsonBody(t, dto.LoginEmailCodeSendRequest{Email: "alice@example.com", Mode: "nomu"}))
@@ -1384,7 +1389,7 @@ func TestRegisterRoutes_WiresLoginCodeEndpoints(t *testing.T) {
 		},
 		sendLoginEmailCodeFn: func(_ context.Context, _ string) bool { return true },
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	gin.SetMode(gin.TestMode)
 	r := gin.New()
@@ -1425,7 +1430,7 @@ func TestRegisterRoutes_LoginCodeSendAcceptsNilLimiter(t *testing.T) {
 	svc := &mockUserService{
 		sendLoginEmailCodeFn: func(_ context.Context, _ string) bool { return true },
 	}
-	h := NewUserHandler(svc, config.Cfg, nil)
+	h := NewUserHandler(svc, svc, svc, config.Cfg, nil)
 
 	gin.SetMode(gin.TestMode)
 	r := gin.New()

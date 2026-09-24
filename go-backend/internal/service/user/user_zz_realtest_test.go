@@ -1,4 +1,4 @@
-package service
+package user
 
 import (
 	"context"
@@ -77,7 +77,7 @@ func TestEmailCode_RealSend_ToOutlook(t *testing.T) {
 			return nil, nil, nil
 		},
 	}
-	svc := NewUserService(repo, rdb, nil, nil, 0, nil, nil)
+	svc := NewUserService(repo, rdb, nil, nil)
 
 	t.Logf(">>> 真发邮件到 %s 通过 %s:%d（QQ SMTP），请查收",
 		target, cfg.Mail.Server, cfg.Mail.Port)
@@ -216,9 +216,11 @@ func TestMagicLogin_RealSend_BlogMode(t *testing.T) {
 				nil
 		},
 	}
-	svc := NewUserService(repo, rdb, nil, map[string]string{
+	mailer := emailtemplates.NewMailer()
+	users := NewUserService(repo, rdb, nil, mailer)
+	svc := NewAuthService(users, rdb, map[string]string{
 		"blog": "https://kanocifer.chat",
-	}, 0, nil, emailtemplates.NewMailer())
+	}, 0, mailer, NewUserView(nil))
 
 	t.Logf(">>> 真发魔法登录邮件（blog 模式）到 %s，请查收", target)
 	if !svc.SendMagicLoginEmail(context.Background(), target, "blog", "") {

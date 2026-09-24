@@ -12,12 +12,12 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
-	"github.com/KanoCifer/kuroome-blog/internal/service"
+	userservice "github.com/KanoCifer/kuroome-blog/internal/service/user"
 	"github.com/KanoCifer/kuroome-blog/internal/util"
 )
 
 // Passkeyer 定义 handler 依赖的 Passkey 业务能力。
-// 由 *service.PasskeyService 隐式满足。
+// 由 *userservice.PasskeyService 隐式满足。
 type Passkeyer interface {
 	HasPasskey(ctx context.Context, userID uint) bool
 	BeginRegistration(ctx context.Context, userID uint) (map[string]any, error)
@@ -30,7 +30,7 @@ type Passkeyer interface {
 	LoginFlow(ctx context.Context, assertion map[string]any) (*dto.TokensResponse, map[string]any, error)
 }
 
-var _ Passkeyer = (*service.PasskeyService)(nil)
+var _ Passkeyer = (*userservice.PasskeyService)(nil)
 
 // PasskeyHandler 持有 passkeySvc（cookie 设置等 HTTP 关注点留在 handler）。
 type PasskeyHandler struct {

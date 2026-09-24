@@ -12,41 +12,47 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/middleware"
 	"github.com/KanoCifer/kuroome-blog/internal/model"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
-	"github.com/KanoCifer/kuroome-blog/internal/service"
+	userservice "github.com/KanoCifer/kuroome-blog/internal/service/user"
 	"github.com/KanoCifer/kuroome-blog/internal/util"
 	"github.com/KanoCifer/kuroome-blog/pkg/jwt"
 )
 
-// Userer 定义 handler 依赖的用户业务能力集合。
-// 由 *service.UserService 隐式满足。接口在消费方（handler）一侧定义，
-// 遵循 Go 的 "accept interfaces, return structs" 惯例。
-type Userer interface {
+type AccountService interface {
 	GetByID(ctx context.Context, userID uint) (*model.User, *model.Profile, error)
-	GetByUsername(ctx context.Context, username string) (*model.User, *model.Profile, error)
-	CreateUser(ctx context.Context, username, password, email, emailCode, avatarURL, mode string) (*model.User, *model.Profile, error)
 	SendEmailCode(ctx context.Context, email, mode string) bool
-	SendLoginEmailCode(ctx context.Context, email string) bool
-	SendMagicLoginEmail(ctx context.Context, email, mode, deviceID string) bool
+	RegisterFlow(ctx context.Context, username, password, email, emailCode, mode string) (*model.User, *model.Profile, error)
+}
+
+type Authenticator interface {
 	Authenticate(ctx context.Context, username, password string) (*model.User, error)
 	AuthenticateEmailCode(ctx context.Context, email, code string) (*model.User, *model.Profile, error)
 	AuthenticateMagicLogin(ctx context.Context, token string) (*model.User, *model.Profile, error)
 	CreateTokens(ctx context.Context, u *model.User) (*dto.TokensResponse, error)
 	RefreshTokens(ctx context.Context, refreshToken string) (*dto.TokensResponse, error)
 	Logout(ctx context.Context, userID uint, jti string)
-	UserToDict(u *model.User, p *model.Profile) map[string]any
-	PollNomuLogin(ctx context.Context, deviceID string) (*service.NomuLoginState, error)
-	// RegisterFlow 是 register handler 的编排入口：建账号 + 注册赠送积分。
-	RegisterFlow(ctx context.Context, username, password, email, emailCode, mode string) (*model.User, *model.Profile, error)
+	SendLoginEmailCode(ctx context.Context, email string) bool
+	SendMagicLoginEmail(ctx context.Context, email, mode, deviceID string) bool
+	PollNomuLogin(ctx context.Context, deviceID string) (*userservice.NomuLoginState, error)
 	ResetPasswordFlow(ctx context.Context, email, mode string) (challenge string, err error)
 	ConfirmPasswordReset(ctx context.Context, email, code, newPassword, mode, challenge string) error
 }
 
-var _ Userer = (*service.UserService)(nil)
+type UserRenderer interface {
+	Render(u *model.User, p *model.Profile) map[string]any
+}
+
+var (
+	_ AccountService = (*userservice.UserService)(nil)
+	_ Authenticator  = (*userservice.AuthService)(nil)
+	_ UserRenderer   = userservice.UserView{}
+)
 
 // UserHandler 持有业务服务，gin 路由方法挂在其上。
 type UserHandler struct {
-	userSvc Userer
-	cfg     *config.Config
+	userSvc  AccountService
+	authSvc  Authenticator
+	userView UserRenderer
+	cfg      *config.Config
 	// refreshAuthFailLimiter RefreshToken 失败路径专用, 与 ws 失败限流解耦(两个 scope,
 	// 即同一坏客户端把坏循环挪到 /refresh-token 也会被同一套机制挡)。
 	// nil-safe: 测试 / 未配置 Redis 场景下 Fail() 直接放行。
@@ -55,12 +61,16 @@ type UserHandler struct {
 
 // NewUserHandler 构造 user handler。refreshLimiter 可为 nil(nil-safe)。
 func NewUserHandler(
-	userSvc Userer,
+	userSvc AccountService,
+	authSvc Authenticator,
+	userView UserRenderer,
 	cfg *config.Config,
 	refreshLimiter *middleware.AuthFailLimiter,
 ) *UserHandler {
 	return &UserHandler{
 		userSvc:                userSvc,
+		authSvc:                authSvc,
+		userView:               userView,
 		cfg:                    cfg,
 		refreshAuthFailLimiter: refreshLimiter,
 	}
@@ -72,12 +82,12 @@ func (h *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	user, err := h.userSvc.Authenticate(c.Request.Context(), req.Username, req.Password)
+	user, err := h.authSvc.Authenticate(c.Request.Context(), req.Username, req.Password)
 	if respondErr(c, err, "login failed", "username", req.Username) {
 		return
 	}
 
-	tokens, err := h.userSvc.CreateTokens(c.Request.Context(), user)
+	tokens, err := h.authSvc.CreateTokens(c.Request.Context(), user)
 	if respondErr(c, err, "create tokens error", "user_id", user.ID) {
 		return
 	}
@@ -86,7 +96,7 @@ func (h *UserHandler) Login(c *gin.Context) {
 	util.SetRefreshCookie(c, h.cfg, tokens.RefreshToken)
 
 	// 用户字段铺平到 data 顶层（与 Python 端 user_to_dict 形状一致）。
-	userData := h.userSvc.UserToDict(user, user.Profile)
+	userData := h.userView.Render(user, user.Profile)
 	userData["access_token"] = tokens.AccessToken
 	userData["refresh_token"] = tokens.RefreshToken
 	response.Success(c, userData, "登录成功")
@@ -121,7 +131,7 @@ func (h *UserHandler) Me(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, h.userSvc.UserToDict(u, p))
+	response.Success(c, h.userView.Render(u, p))
 }
 
 func (h *UserHandler) Logout(c *gin.Context) {
@@ -134,7 +144,7 @@ func (h *UserHandler) Logout(c *gin.Context) {
 	// 从 cookie 取 refresh token 解析 jti，删自己的 device field。
 	userID := uint(c.GetInt("user_id"))
 	jti := h.currentRefreshJTI(c)
-	h.userSvc.Logout(c.Request.Context(), userID, jti)
+	h.authSvc.Logout(c.Request.Context(), userID, jti)
 
 	// 清除 refresh_token cookie（与 Python 端一致）。
 	util.ClearRefreshCookie(c, h.cfg)
@@ -173,7 +183,7 @@ func (h *UserHandler) RefreshToken(c *gin.Context) {
 		return
 	}
 
-	tokens, err := h.userSvc.RefreshTokens(c.Request.Context(), refreshToken)
+	tokens, err := h.authSvc.RefreshTokens(c.Request.Context(), refreshToken)
 	if err != nil {
 		slog.WarnContext(c.Request.Context(), "refresh token failed", "reason", "invalid_token")
 		h.rejectRefreshInvalid(c, err)
@@ -252,7 +262,7 @@ func (h *UserHandler) SendLoginEmailCode(c *gin.Context) {
 		return
 	}
 	// fire-and-forget；WithoutCancel 避免 handler 返回后 ctx 取消导致发送中断
-	go h.userSvc.SendLoginEmailCode(context.WithoutCancel(c.Request.Context()), req.Email)
+	go h.authSvc.SendLoginEmailCode(context.WithoutCancel(c.Request.Context()), req.Email)
 	response.Success(c, nil, "若该邮箱已注册，验证码已发送")
 }
 
@@ -269,18 +279,18 @@ func (h *UserHandler) LoginEmailCode(c *gin.Context) {
 		return
 	}
 
-	u, p, err := h.userSvc.AuthenticateEmailCode(c.Request.Context(), req.Email, req.EmailCode)
+	u, p, err := h.authSvc.AuthenticateEmailCode(c.Request.Context(), req.Email, req.EmailCode)
 	if respondErr(c, err, "email code login failed", "mode", "nomu") {
 		return
 	}
 
-	tokens, err := h.userSvc.CreateTokens(c.Request.Context(), u)
+	tokens, err := h.authSvc.CreateTokens(c.Request.Context(), u)
 	if respondErr(c, err, "create tokens error", "user_id", u.ID) {
 		return
 	}
 
 	util.SetRefreshCookie(c, h.cfg, tokens.RefreshToken)
-	userData := h.userSvc.UserToDict(u, p)
+	userData := h.userView.Render(u, p)
 	userData["access_token"] = tokens.AccessToken
 	userData["refresh_token"] = tokens.RefreshToken
 	response.Success(c, userData, "登录成功")
@@ -296,7 +306,7 @@ func (h *UserHandler) MagicLoginEmail(c *gin.Context) {
 		return
 	}
 
-	go h.userSvc.SendMagicLoginEmail(context.WithoutCancel(c.Request.Context()), req.Email, req.Mode, req.DeviceID)
+	go h.authSvc.SendMagicLoginEmail(context.WithoutCancel(c.Request.Context()), req.Email, req.Mode, req.DeviceID)
 	response.Success(c, nil, "若该邮箱已注册，登录链接已发送")
 }
 
@@ -307,7 +317,7 @@ func (h *UserHandler) PollNomuLogin(c *gin.Context) {
 		response.APIError(c, "device_id 不能为空", 400)
 		return
 	}
-	state, err := h.userSvc.PollNomuLogin(c.Request.Context(), deviceID)
+	state, err := h.authSvc.PollNomuLogin(c.Request.Context(), deviceID)
 	if respondErr(c, err, "nomu poll error") {
 		return
 	}
@@ -327,7 +337,7 @@ func (h *UserHandler) MagicLoginConsume(c *gin.Context) {
 		return
 	}
 
-	u, p, err := h.userSvc.AuthenticateMagicLogin(c.Request.Context(), req.Token)
+	u, p, err := h.authSvc.AuthenticateMagicLogin(c.Request.Context(), req.Token)
 	if respondErr(c, err, "magic login failed") {
 		return
 	}
@@ -339,12 +349,12 @@ func (h *UserHandler) MagicLoginConsume(c *gin.Context) {
 	}
 
 	// blog：浏览器域下，写 refresh cookie + 返完整登录数据。
-	tokens, err := h.userSvc.CreateTokens(c.Request.Context(), u)
+	tokens, err := h.authSvc.CreateTokens(c.Request.Context(), u)
 	if respondErr(c, err, "magic login create tokens error", "user_id", u.ID) {
 		return
 	}
 	util.SetRefreshCookie(c, h.cfg, tokens.RefreshToken)
-	userData := h.userSvc.UserToDict(u, p)
+	userData := h.userView.Render(u, p)
 	userData["access_token"] = tokens.AccessToken
 	userData["refresh_token"] = tokens.RefreshToken
 	response.Success(c, userData, "登录成功")
@@ -356,7 +366,7 @@ func (h *UserHandler) ResetPassword(c *gin.Context) {
 		return
 	}
 
-	challenge, err := h.userSvc.ResetPasswordFlow(c.Request.Context(), req.Email, req.Mode)
+	challenge, err := h.authSvc.ResetPasswordFlow(c.Request.Context(), req.Email, req.Mode)
 	if respondErr(c, err, "reset password failed", "email", req.Email) {
 		return
 	}
@@ -370,7 +380,7 @@ func (h *UserHandler) ConfirmPasswordReset(c *gin.Context) {
 		return
 	}
 
-	err := h.userSvc.ConfirmPasswordReset(c.Request.Context(),
+	err := h.authSvc.ConfirmPasswordReset(c.Request.Context(),
 		req.Email, req.EmailCode, req.NewPassword, req.Mode, req.Challenge)
 	if respondErr(c, err, "confirm password reset failed", "email", req.Email) {
 		return

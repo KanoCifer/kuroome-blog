@@ -1,4 +1,4 @@
-package service
+package user
 
 import (
 	"bytes"
@@ -27,12 +27,30 @@ import (
 	"github.com/KanoCifer/kuroome-blog/pkg/notification"
 )
 
+func ptr[T any](v T) *T { return &v }
+
+func TestSendEmailCode_ReturnsFalseWhenRedisUnavailable(t *testing.T) {
+	svc := NewUserService(nil, nil, nil, emailtemplates.NewMailer())
+
+	if svc.SendEmailCode(context.Background(), "test@example.com", modeBlog) {
+		t.Fatal("SendEmailCode should return false when Redis is unavailable")
+	}
+}
+
+func TestResetPasswordFlow_ReturnsErrorWhenRedisUnavailable(t *testing.T) {
+	svc := NewAuthService(nil, nil, nil, 0, nil, NewUserView(nil))
+
+	if _, err := svc.ResetPasswordFlow(context.Background(), "test@example.com", modeBlog); err == nil {
+		t.Fatal("ResetPasswordFlow should return an error when Redis is unavailable")
+	}
+}
+
 func TestCheckPassword_Correct(t *testing.T) {
 	hash, err := bcrypt.GenerateFromPassword([]byte("secret123"), bcrypt.DefaultCost)
 	if err != nil {
 		t.Fatalf("hash error: %v", err)
 	}
-	svc := &UserService{}
+	svc := &AuthService{}
 	u := &model.User{PasswordHash: string(hash)}
 	if !svc.CheckPassword(u, "secret123") {
 		t.Error("CheckPassword should return true for correct password")
@@ -44,7 +62,7 @@ func TestCheckPassword_Wrong(t *testing.T) {
 	if err != nil {
 		t.Fatalf("hash error: %v", err)
 	}
-	svc := &UserService{}
+	svc := &AuthService{}
 	u := &model.User{PasswordHash: string(hash)}
 	if svc.CheckPassword(u, "wrong") {
 		t.Error("CheckPassword should return false for wrong password")
@@ -52,52 +70,35 @@ func TestCheckPassword_Wrong(t *testing.T) {
 }
 
 func TestCheckPassword_EmptyHash(t *testing.T) {
-	svc := &UserService{}
+	svc := &AuthService{}
 	u := &model.User{PasswordHash: ""}
 	if svc.CheckPassword(u, "anything") {
 		t.Error("CheckPassword should return false when hash is empty")
 	}
 }
 
-func TestBoolToInt_Helper(t *testing.T) {
-	// 复用 service.boolToInt 目前在 admin_test.go 未覆盖，此处顺手测。
-	// 注意 boolToInt 为包内小写，需在 package service 内测试。
-	tests := []struct {
-		in   bool
-		want int
-	}{
-		{true, 1},
-		{false, 0},
-	}
-	for _, tt := range tests {
-		if got := boolToInt(tt.in); got != tt.want {
-			t.Errorf("boolToInt(%v) = %d, want %d", tt.in, got, tt.want)
-		}
-	}
-}
-
 // ---------- IsAdmin ----------
 
 func TestIsAdmin_InList(t *testing.T) {
-	svc := &UserService{adminUserIDs: []int{1, 42, 99}}
+	view := NewUserView([]int{1, 42, 99})
 	u := &model.User{Model: gormModel(42)}
-	if !svc.IsAdmin(u) {
+	if !view.IsAdmin(u) {
 		t.Error("IsAdmin should return true for user in adminUserIDs")
 	}
 }
 
 func TestIsAdmin_NotInList(t *testing.T) {
-	svc := &UserService{adminUserIDs: []int{1, 42, 99}}
+	view := NewUserView([]int{1, 42, 99})
 	u := &model.User{Model: gormModel(7)}
-	if svc.IsAdmin(u) {
+	if view.IsAdmin(u) {
 		t.Error("IsAdmin should return false for user not in adminUserIDs")
 	}
 }
 
 func TestIsAdmin_EmptyList(t *testing.T) {
-	svc := &UserService{adminUserIDs: []int{}}
+	view := NewUserView(nil)
 	u := &model.User{Model: gormModel(1)}
-	if svc.IsAdmin(u) {
+	if view.IsAdmin(u) {
 		t.Error("IsAdmin should return false when adminUserIDs is empty")
 	}
 }
@@ -105,7 +106,7 @@ func TestIsAdmin_EmptyList(t *testing.T) {
 // ---------- UserToDict ----------
 
 func TestUserToDict_BasicFields(t *testing.T) {
-	svc := &UserService{adminUserIDs: []int{1}}
+	view := NewUserView([]int{1})
 	email := "test@example.com"
 	profile := &model.Profile{ID: 1, Email: &email}
 	u := &model.User{
@@ -117,7 +118,7 @@ func TestUserToDict_BasicFields(t *testing.T) {
 		PasskeyCredential: &model.PasskeyCredential{},
 	}
 
-	d := svc.UserToDict(u, profile)
+	d := view.Render(u, profile)
 
 	if d["id"] != uint(1) {
 		t.Errorf("id = %v, want 1", d["id"])
@@ -137,7 +138,7 @@ func TestUserToDict_BasicFields(t *testing.T) {
 }
 
 func TestUserToDict_GitHubBound(t *testing.T) {
-	svc := &UserService{adminUserIDs: []int{}}
+	view := NewUserView(nil)
 	githubID := 12345
 	u := &model.User{
 		Model:    gormModel(2),
@@ -145,7 +146,7 @@ func TestUserToDict_GitHubBound(t *testing.T) {
 		GithubID: &githubID,
 	}
 
-	d := svc.UserToDict(u, nil)
+	d := view.Render(u, nil)
 
 	if d["github_bound"] != true {
 		t.Errorf("github_bound = %v, want true", d["github_bound"])
@@ -156,10 +157,10 @@ func TestUserToDict_GitHubBound(t *testing.T) {
 }
 
 func TestUserToDict_NilProfileOmitsFields(t *testing.T) {
-	svc := &UserService{adminUserIDs: []int{}}
+	view := NewUserView(nil)
 	u := &model.User{Model: gormModel(3), Username: "carol"}
 
-	d := svc.UserToDict(u, nil)
+	d := view.Render(u, nil)
 
 	if _, ok := d["email"]; ok {
 		t.Error("email should not be present when profile is nil")
@@ -171,22 +172,32 @@ func TestUserToDict_NilProfileOmitsFields(t *testing.T) {
 
 func TestUserToDict_ProfileWithZeroID(t *testing.T) {
 	// profile.ID == 0 视为"无有效 profile"，不输出 profile 字段
-	svc := &UserService{adminUserIDs: []int{}}
+	view := NewUserView(nil)
 	email := "x@test.com"
 	u := &model.User{Model: gormModel(4), Username: "dave"}
 	p := &model.Profile{ID: 0, Email: &email}
 
-	d := svc.UserToDict(u, p)
+	d := view.Render(u, p)
 
 	if _, ok := d["email"]; ok {
 		t.Error("email should not be present when profile.ID == 0")
 	}
 }
 
+func newTestUserService(repo UserRepositoryer, rdb *redis.Client, bonus registerBonuser, mailer *emailtemplates.Mailer) *UserService {
+	return NewUserService(repo, rdb, bonus, mailer)
+}
+
+func newTestAuthService(repo UserRepositoryer, rdb *redis.Client, frontend map[string]string, maxDevices int, mailer *emailtemplates.Mailer) *AuthService {
+	users := NewUserService(repo, rdb, nil, mailer)
+	return NewAuthService(users, rdb, frontend, maxDevices, mailer, NewUserView(nil))
+}
+
 // ---------- GetByID ----------
 
 // mockUserRepo 为 GetByID / Authenticate 测试提供最小 UserRepositoryer 实现。
 type mockUserRepo struct {
+	createFn        func(ctx context.Context, user *model.User, profile *model.Profile) error
 	getByIDFn       func(ctx context.Context, id uint) (*model.User, error)
 	getByUsernameFn func(ctx context.Context, username string) (*model.User, error)
 	getByEmailFn    func(ctx context.Context, email string) (*model.User, *model.Profile, error)
@@ -196,6 +207,9 @@ type mockUserRepo struct {
 }
 
 func (m *mockUserRepo) Create(ctx context.Context, user *model.User, profile *model.Profile) error {
+	if m.createFn != nil {
+		return m.createFn(ctx, user, profile)
+	}
 	return nil
 }
 
@@ -271,7 +285,7 @@ func TestGetByID_NotFound(t *testing.T) {
 	repo := &mockUserRepo{
 		getByIDFn: func(ctx context.Context, id uint) (*model.User, error) { return nil, nil },
 	}
-	svc := NewUserService(repo, nil, nil, nil, 0, nil, nil)
+	svc := newTestUserService(repo, nil, nil, nil)
 
 	_, _, err := svc.GetByID(context.Background(), 999)
 	if !errors.Is(err, usererrs.ErrUserNotFound) {
@@ -285,7 +299,7 @@ func TestGetByID_RepoError(t *testing.T) {
 			return nil, errors.New("db error")
 		},
 	}
-	svc := NewUserService(repo, nil, nil, nil, 0, nil, nil)
+	svc := newTestUserService(repo, nil, nil, nil)
 
 	_, _, err := svc.GetByID(context.Background(), 1)
 	if err == nil {
@@ -299,7 +313,7 @@ func TestGetByID_Success(t *testing.T) {
 			return &model.User{Model: gormModel(id), Username: "alice"}, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil, nil, 0, nil, nil)
+	svc := newTestUserService(repo, nil, nil, nil)
 
 	u, p, err := svc.GetByID(context.Background(), uint(1))
 	if err != nil {
@@ -313,6 +327,40 @@ func TestGetByID_Success(t *testing.T) {
 	}
 }
 
+func TestCreateOAuthUserPersistsIdentityWithProfile(t *testing.T) {
+	var createdUser *model.User
+	var createdProfile *model.Profile
+	repo := &mockUserRepo{
+		createFn: func(_ context.Context, user *model.User, profile *model.Profile) error {
+			user.ID = 7
+			createdUser = user
+			createdProfile = profile
+			return nil
+		},
+	}
+	svc := NewUserService(repo, nil, nil, nil)
+
+	user, err := svc.CreateOAuthUser(context.Background(), 4242, "octocat", "octocat@example.com", "https://example.com/avatar.png")
+	if err != nil {
+		t.Fatalf("CreateOAuthUser: %v", err)
+	}
+	if user.ID != 7 || createdUser != user {
+		t.Fatalf("created user not returned/captured: id=%d", user.ID)
+	}
+	if user.GithubID == nil || *user.GithubID != 4242 {
+		t.Fatalf("github id = %v, want 4242", user.GithubID)
+	}
+	if createdProfile == nil || createdProfile.Email == nil || *createdProfile.Email != "octocat@example.com" {
+		t.Fatalf("profile email not persisted: %+v", createdProfile)
+	}
+	if createdProfile.Photo != "https://example.com/avatar.png" {
+		t.Fatalf("profile photo = %q", createdProfile.Photo)
+	}
+	if user.PasswordHash == "" || user.PasswordHash[:min(7, len(user.PasswordHash))] != "$2a$12$" {
+		t.Fatalf("oauth user password hash = %q", user.PasswordHash)
+	}
+}
+
 // ---------- Authenticate ----------
 
 func TestAuthenticate_UserNotFound(t *testing.T) {
@@ -321,7 +369,7 @@ func TestAuthenticate_UserNotFound(t *testing.T) {
 			return nil, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil, nil, 0, nil, nil)
+	svc := newTestAuthService(repo, nil, nil, 0, nil)
 
 	_, err := svc.Authenticate(context.Background(), "ghost", "pass")
 	if !errors.Is(err, usererrs.ErrInvalidCredentials) {
@@ -336,7 +384,7 @@ func TestAuthenticate_WrongPassword(t *testing.T) {
 			return &model.User{Model: gormModel(1), PasswordHash: string(hash)}, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil, nil, 0, nil, nil)
+	svc := newTestAuthService(repo, nil, nil, 0, nil)
 
 	_, err := svc.Authenticate(context.Background(), "alice", "wrong")
 	if !errors.Is(err, usererrs.ErrInvalidCredentials) {
@@ -351,7 +399,7 @@ func TestAuthenticate_Success(t *testing.T) {
 			return &model.User{Model: gormModel(1), Username: "alice", PasswordHash: string(hash)}, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil, nil, 0, nil, nil)
+	svc := newTestAuthService(repo, nil, nil, 0, nil)
 
 	u, err := svc.Authenticate(context.Background(), "alice", "secret")
 	if err != nil {
@@ -378,7 +426,7 @@ func TestAuthenticate_LogPropagatesTraceID(t *testing.T) {
 			return &model.User{Model: gormModel(1), Username: "alice", PasswordHash: string(hash)}, nil
 		},
 	}
-	svc := NewUserService(repo, nil, nil, nil, 0, nil, nil)
+	svc := newTestAuthService(repo, nil, nil, 0, nil)
 
 	ctx := logger.WithTraceID(context.Background(), "trace-xyz")
 	if _, err := svc.Authenticate(ctx, "alice", "secret"); err != nil {
@@ -407,7 +455,7 @@ func TestCreateTokens_NilRedis(t *testing.T) {
 	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
 	t.Cleanup(func() { config.Cfg = prevCfg })
 
-	svc := &UserService{redis: nil, maxDevices: 5}
+	svc := &AuthService{redis: nil, maxDevices: 5}
 	u := &model.User{Model: gormModel(1)}
 	toks, err := svc.CreateTokens(context.Background(), u)
 	if err != nil {
@@ -431,7 +479,7 @@ func TestCreateTokens_MultiDeviceHash_EvictOldest(t *testing.T) {
 	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
 	t.Cleanup(func() { config.Cfg = prevCfg })
 
-	svc := &UserService{redis: rdb, maxDevices: 3}
+	svc := &AuthService{redis: rdb, maxDevices: 3}
 	u := &model.User{Model: gormModel(10)}
 
 	// 记录第 1 个 jti（最早）
@@ -486,7 +534,7 @@ func TestCreateTokens_NoLimitWhenMaxDevicesZero(t *testing.T) {
 	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
 	t.Cleanup(func() { config.Cfg = prevCfg })
 
-	svc := &UserService{redis: rdb, maxDevices: 0}
+	svc := &AuthService{redis: rdb, maxDevices: 0}
 	u := &model.User{Model: gormModel(20)}
 
 	for i := range 10 {
@@ -518,7 +566,7 @@ func TestRefreshTokens_HashFieldMatch(t *testing.T) {
 	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
 	t.Cleanup(func() { config.Cfg = prevCfg })
 
-	svc := &UserService{redis: rdb, maxDevices: 5}
+	svc := &AuthService{redis: rdb, maxDevices: 5}
 	u := &model.User{Model: gormModel(1)}
 
 	// 设备 A 登录，记录旧 token
@@ -562,7 +610,7 @@ func TestRefreshTokens_StaleJTIRejected(t *testing.T) {
 	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
 	t.Cleanup(func() { config.Cfg = prevCfg })
 
-	svc := &UserService{redis: rdb, maxDevices: 5}
+	svc := &AuthService{redis: rdb, maxDevices: 5}
 	u := &model.User{Model: gormModel(1)}
 
 	old, err := svc.CreateTokens(context.Background(), u)
@@ -593,7 +641,7 @@ func TestRefreshTokens_RotationSwapsField(t *testing.T) {
 	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
 	t.Cleanup(func() { config.Cfg = prevCfg })
 
-	svc := &UserService{redis: rdb, maxDevices: 5}
+	svc := &AuthService{redis: rdb, maxDevices: 5}
 	u := &model.User{Model: gormModel(1)}
 
 	old, err := svc.CreateTokens(context.Background(), u)
@@ -622,7 +670,7 @@ func TestRefreshTokens_RotationSwapsField(t *testing.T) {
 
 func TestLogout_NilRedis(t *testing.T) {
 	// redis 为 nil 时不应 panic
-	svc := &UserService{redis: nil}
+	svc := &AuthService{redis: nil}
 	svc.Logout(context.Background(), 1, "jti-old") // should not panic
 }
 
@@ -630,7 +678,7 @@ func TestLogout_WithRedis(t *testing.T) {
 	// 用真实 redis 客户端验证 Logout 调用 HDel（需要 redis 可用，这里仅验证不 panic）
 	// 完整集成测试留到 e2e；此处验证 nil 安全与接口签名
 	var r *redis.Client
-	svc := &UserService{redis: r}
+	svc := &AuthService{redis: r}
 	svc.Logout(context.Background(), 1, "jti-old")
 }
 
@@ -647,7 +695,7 @@ func TestLogout_OnlyDeletesOwnDevice(t *testing.T) {
 	config.Cfg = &config.Config{Security: config.SecurityConfig{SecretKey: "test-secret"}}
 	t.Cleanup(func() { config.Cfg = prevCfg })
 
-	svc := &UserService{redis: rdb, maxDevices: 5}
+	svc := &AuthService{redis: rdb, maxDevices: 5}
 	u := &model.User{Model: gormModel(1)}
 
 	tokA, err := svc.CreateTokens(context.Background(), u)
@@ -768,7 +816,7 @@ func TestEmailCode_CrossModeIsolation(t *testing.T) {
 // 防止枚举；不调用 redis。
 func TestSendMagicLoginEmail_EmailNotRegistered(t *testing.T) {
 	repo := &mockUserRepo{emailExists: false}
-	svc := NewUserService(repo, nil, nil, nil, 0, nil, nil)
+	svc := newTestAuthService(repo, nil, nil, 0, nil)
 
 	if !svc.SendMagicLoginEmail(context.Background(), "ghost@example.com", "blog", "") {
 		t.Error("SendMagicLoginEmail should return true (silent success) for unregistered email")
@@ -777,7 +825,7 @@ func TestSendMagicLoginEmail_EmailNotRegistered(t *testing.T) {
 
 // TestAuthenticateMagicLogin_NilRedis 无 redis 直接 401 等价。
 func TestAuthenticateMagicLogin_NilRedis(t *testing.T) {
-	svc := NewUserService(&mockUserRepo{}, nil, nil, nil, 0, nil, nil)
+	svc := newTestAuthService(&mockUserRepo{}, nil, nil, 0, nil)
 	_, _, err := svc.AuthenticateMagicLogin(context.Background(), "any-token:blog")
 	if !errors.Is(err, usererrs.ErrInvalidMagicToken) {
 		t.Errorf("err = %v, want ErrInvalidMagicToken", err)
@@ -787,7 +835,7 @@ func TestAuthenticateMagicLogin_NilRedis(t *testing.T) {
 // TestAuthenticateMagicLogin_BadLengthToken 长度不符直接拒绝，避免污染 key。
 // 缺冒号、缺 mode 段、hex 长度不对都视为非法 token。
 func TestAuthenticateMagicLogin_BadLengthToken(t *testing.T) {
-	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil, nil, 0, nil, nil)
+	svc := newTestAuthService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil, 0, nil)
 	bad := []string{
 		"short",                           // 无冒号、无 mode
 		"short:blog",                      // hex 段太短
@@ -807,7 +855,7 @@ func TestAuthenticateMagicLogin_BadLengthToken(t *testing.T) {
 
 // TestAuthenticateMagicLogin_EmptyToken 空 token 立即拒绝。
 func TestAuthenticateMagicLogin_EmptyToken(t *testing.T) {
-	svc := NewUserService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil, nil, 0, nil, nil)
+	svc := newTestAuthService(&mockUserRepo{}, redis.NewClient(&redis.Options{}), nil, 0, nil)
 	_, _, err := svc.AuthenticateMagicLogin(context.Background(), "")
 	if !errors.Is(err, usererrs.ErrInvalidMagicToken) {
 		t.Errorf("err = %v, want ErrInvalidMagicToken", err)
@@ -868,7 +916,7 @@ func TestSplitMagicLoginToken(t *testing.T) {
 // TestMagicLoginLink_BlogHost 校验 blog mode 拼出的链接：
 // <blogHost>/auth/magic?token=<token>。
 func TestMagicLoginLink_BlogHost(t *testing.T) {
-	svc := &UserService{frontendURLs: map[string]string{
+	svc := &AuthService{frontendURLs: map[string]string{
 		"blog": "https://kanocifer.chat",
 		"nomu": "https://nomu.kanocifer.chat",
 	}}
@@ -883,7 +931,7 @@ func TestMagicLoginLink_BlogHost(t *testing.T) {
 // <nomuHost>/nomu/login?token=<token>。nomu 回调页部署在独立的
 // nomu.kanocifer.chat 落地页站点上。
 func TestMagicLoginLink_NomuHost(t *testing.T) {
-	svc := &UserService{frontendURLs: map[string]string{
+	svc := &AuthService{frontendURLs: map[string]string{
 		"blog": "https://kanocifer.chat",
 		"nomu": "https://nomu.kanocifer.chat",
 	}}
@@ -897,7 +945,7 @@ func TestMagicLoginLink_NomuHost(t *testing.T) {
 // TestMagicLoginLink_HostMissing 未注入对应 mode 的 host 时回退为相对路径，
 // 方便 dev / 配置漂移时排查。
 func TestMagicLoginLink_HostMissing(t *testing.T) {
-	svc := &UserService{frontendURLs: map[string]string{}}
+	svc := &AuthService{frontendURLs: map[string]string{}}
 	if got := svc.magicLoginLink("h:blog", "blog"); got != "/auth/magic?token=h:blog" {
 		t.Errorf("missing host blog = %q", got)
 	}
@@ -909,9 +957,9 @@ func TestMagicLoginLink_HostMissing(t *testing.T) {
 // TestMagicLoginLink_HostTrailingSlash host 末尾的 "/" 应被 TrimRight 掉，
 // 避免 https://nomu.kanocifer.chat//nomu/login 这种双斜杠。
 func TestMagicLoginLink_HostTrailingSlash(t *testing.T) {
-	svc := NewUserService(&mockUserRepo{}, nil, nil, map[string]string{
+	svc := newTestAuthService(&mockUserRepo{}, nil, map[string]string{
 		"nomu": "https://nomu.kanocifer.chat/",
-	}, 0, nil, nil)
+	}, 0, nil)
 	link := svc.magicLoginLink("h:nomu", "nomu")
 	if strings.Contains(link, "//nomu/login") {
 		t.Errorf("double slash detected: %q", link)
@@ -935,7 +983,7 @@ func TestAuthenticateMagicLogin_CrossModeIsolation(t *testing.T) {
 			return &model.User{Model: gormModel(1), Username: "alice"}, nil, nil
 		},
 	}
-	svc := NewUserService(repo, rdb, nil, nil, 0, nil, nil)
+	svc := newTestAuthService(repo, rdb, nil, 0, nil)
 
 	const hex = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 	emailKey := "magiclogintoken:" + hex + ":blog"
@@ -989,7 +1037,7 @@ func TestPollNomuLogin_DoneAfterConfirm(t *testing.T) {
 			return &model.User{Model: gormModel(1), Username: "alice"}, nil, nil
 		},
 	}
-	svc := NewUserService(repo, rdb, nil, nil, 0, nil, nil)
+	svc := newTestAuthService(repo, rdb, nil, 0, nil)
 
 	const hex = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 	const deviceID = "nomu-device-abc"
@@ -1038,7 +1086,7 @@ func TestPollNomuLogin_PendingWhenMissing(t *testing.T) {
 	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
 	t.Cleanup(func() { _ = rdb.Close() })
 
-	svc := NewUserService(&mockUserRepo{}, rdb, nil, nil, 0, nil, nil)
+	svc := newTestAuthService(&mockUserRepo{}, rdb, nil, 0, nil)
 	st, err := svc.PollNomuLogin(context.Background(), "no-such-device")
 	if err != nil {
 		t.Fatalf("PollNomuLogin: %v", err)
@@ -1050,7 +1098,7 @@ func TestPollNomuLogin_PendingWhenMissing(t *testing.T) {
 
 // TestPollNomuLogin_PendingWhenNilRedis redis 未配置同样回 pending，禁止 500。
 func TestPollNomuLogin_PendingWhenNilRedis(t *testing.T) {
-	svc := NewUserService(&mockUserRepo{}, nil, nil, nil, 0, nil, nil)
+	svc := newTestAuthService(&mockUserRepo{}, nil, nil, 0, nil)
 	st, err := svc.PollNomuLogin(context.Background(), "dev")
 	if err != nil {
 		t.Fatalf("PollNomuLogin: %v", err)
@@ -1425,6 +1473,7 @@ func TestConfirmPasswordReset_Success(t *testing.T) {
 	var updated *model.User
 	updateCalls := 0
 	repo := &mockUserRepo{
+		getByIDFn: func(ctx context.Context, id uint) (*model.User, error) { return u, nil },
 		getByEmailFn: func(ctx context.Context, e string) (*model.User, *model.Profile, error) {
 			if e != email {
 				return nil, nil, nil
@@ -1437,7 +1486,7 @@ func TestConfirmPasswordReset_Success(t *testing.T) {
 			return nil
 		},
 	}
-	svc := &UserService{repo: repo, redis: rdb}
+	svc := newTestAuthService(repo, rdb, nil, 0, nil)
 
 	// 模拟 sendPasswordReset 写 reset 验证码 + challenge（两个独立 key）
 	key := emailCodeKey(email, modeBlog, true)
@@ -1503,7 +1552,7 @@ func TestConfirmPasswordReset_RejectsSamePassword(t *testing.T) {
 			return nil
 		},
 	}
-	svc := &UserService{repo: repo, redis: rdb}
+	svc := newTestAuthService(repo, rdb, nil, 0, nil)
 	key := emailCodeKey(email, modeBlog, true)
 	if err := rdb.Set(context.Background(), key, code, emailCodeExpire).Err(); err != nil {
 		t.Fatalf("seed reset key: %v", err)
@@ -1558,11 +1607,12 @@ func TestConfirmPasswordReset_WrongCodeDoesNotBurnChallenge(t *testing.T) {
 	u := &model.User{Model: gormModel(9), PasswordHash: string(oldHash)}
 
 	repo := &mockUserRepo{
+		getByIDFn: func(ctx context.Context, id uint) (*model.User, error) { return u, nil },
 		getByEmailFn: func(ctx context.Context, e string) (*model.User, *model.Profile, error) {
 			return u, &model.Profile{UserID: u.ID, Email: ptr(email)}, nil
 		},
 	}
-	svc := &UserService{repo: repo, redis: rdb}
+	svc := newTestAuthService(repo, rdb, nil, 0, nil)
 
 	// 写 rightCode 入 redis（不是 wrongCode）
 	key := emailCodeKey(email, modeBlog, true)
@@ -1615,7 +1665,7 @@ func TestConfirmPasswordReset_EmailNotRegisteredNoEnumeration(t *testing.T) {
 			return nil, nil, nil // 邮箱未注册
 		},
 	}
-	svc := &UserService{repo: repo, redis: rdb}
+	svc := newTestAuthService(repo, rdb, nil, 0, nil)
 	key := emailCodeKey(email, modeBlog, true)
 	_ = rdb.Set(context.Background(), key, code, emailCodeExpire).Err()
 	chKey := fmt.Sprintf(emailResetChallengeCacheKeyFmt, email, modeBlog)
@@ -1661,7 +1711,7 @@ func (b *bool32) Store(v bool) { b.v.Store(v) }
 //
 // 返回 (svc, miniredis, redis.Client, fakeChannel) —— redis 客户端和 fakeChannel 都
 // 暴露给测试，便于直接断言 key 状态 / 计数。
-func newLoginCodeSvc(t *testing.T, repo *mockUserRepo, mailOK bool) (*UserService, *miniredis.Miniredis, *redis.Client, *fakeChannel) {
+func newLoginCodeSvc(t *testing.T, repo *mockUserRepo, mailOK bool) (*AuthService, *miniredis.Miniredis, *redis.Client, *fakeChannel) {
 	t.Helper()
 	mr, err := miniredis.Run()
 	if err != nil {
@@ -1675,12 +1725,8 @@ func newLoginCodeSvc(t *testing.T, repo *mockUserRepo, mailOK bool) (*UserServic
 	ch.ok.Store(mailOK)
 	mailer := emailtemplates.NewMailerWithChannel(ch)
 
-	svc := &UserService{
-		repo:       repo,
-		redis:      rdb,
-		mailer:     mailer,
-		maxDevices: 5,
-	}
+	users := NewUserService(repo, rdb, nil, mailer)
+	svc := NewAuthService(users, rdb, nil, 5, mailer, NewUserView(nil))
 	return svc, mr, rdb, ch
 }
 
@@ -1712,7 +1758,7 @@ func seedLoginCode(t *testing.T, mr *miniredis.Miniredis, rdb *redis.Client, ema
 
 // TestSendLoginEmailCode_NilRedisFailClosed 无 redis → 拒绝（fail closed）。
 func TestSendLoginEmailCode_NilRedisFailClosed(t *testing.T) {
-	svc := &UserService{redis: nil, mailer: &emailtemplates.Mailer{}}
+	svc := &AuthService{redis: nil, mailer: &emailtemplates.Mailer{}}
 	if svc.SendLoginEmailCode(context.Background(), "x@y.com") {
 		t.Error("SendLoginEmailCode should return false when redis is nil")
 	}
@@ -1804,7 +1850,7 @@ func TestSendLoginEmailCode_CooldownSkipsResend(t *testing.T) {
 
 // TestAuthenticateEmailCode_NilRedisFailClosed 无 redis → 一律拒绝，不签发登录态。
 func TestAuthenticateEmailCode_NilRedisFailClosed(t *testing.T) {
-	svc := &UserService{redis: nil, repo: registeredRepo("alice@example.com", 1)}
+	svc := newTestAuthService(registeredRepo("alice@example.com", 1), nil, nil, 0, nil)
 	_, _, err := svc.AuthenticateEmailCode(context.Background(), "alice@example.com", "123456")
 	if !errors.Is(err, usererrs.ErrInvalidEmailCode) {
 		t.Errorf("err = %v, want ErrInvalidEmailCode (fail closed when redis nil)", err)
@@ -1817,7 +1863,7 @@ func TestAuthenticateEmailCode_EmptyParamsFail(t *testing.T) {
 	t.Cleanup(mr.Close)
 	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
 	t.Cleanup(func() { _ = rdb.Close() })
-	svc := &UserService{redis: rdb, repo: registeredRepo("alice@example.com", 1)}
+	svc := newTestAuthService(registeredRepo("alice@example.com", 1), rdb, nil, 0, nil)
 
 	cases := []struct{ email, code string }{
 		{"", "123456"},
@@ -1836,7 +1882,7 @@ func TestAuthenticateEmailCode_BadCodeLength(t *testing.T) {
 	t.Cleanup(mr.Close)
 	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
 	t.Cleanup(func() { _ = rdb.Close() })
-	svc := &UserService{redis: rdb, repo: registeredRepo("alice@example.com", 1)}
+	svc := newTestAuthService(registeredRepo("alice@example.com", 1), rdb, nil, 0, nil)
 
 	badCodes := []string{"12345", "1234567", "abcdef", "  123456  "}
 	for _, c := range badCodes {
@@ -1857,7 +1903,7 @@ func TestAuthenticateEmailCode_UnknownEmailHideExistence(t *testing.T) {
 	repo := &mockUserRepo{
 		getByEmailFn: func(_ context.Context, _ string) (*model.User, *model.Profile, error) { return nil, nil, nil },
 	}
-	svc := &UserService{redis: rdb, repo: repo}
+	svc := newTestAuthService(repo, rdb, nil, 0, nil)
 
 	_, _, err := svc.AuthenticateEmailCode(context.Background(), "ghost@example.com", "123456")
 	if !errors.Is(err, usererrs.ErrInvalidEmailCode) {
@@ -1879,7 +1925,7 @@ func TestAuthenticateEmailCode_RepoErrorSurfaceInternalErr(t *testing.T) {
 	repo := &mockUserRepo{
 		getByEmailFn: func(_ context.Context, _ string) (*model.User, *model.Profile, error) { return nil, nil, dbErr },
 	}
-	svc := &UserService{redis: rdb, repo: repo}
+	svc := newTestAuthService(repo, rdb, nil, 0, nil)
 
 	_, _, err := svc.AuthenticateEmailCode(context.Background(), "alice@example.com", "123456")
 	if !errors.Is(err, dbErr) {
@@ -1972,10 +2018,7 @@ func TestAuthenticateEmailCode_RejectsCrossPurposeCodes(t *testing.T) {
 	t.Cleanup(mr.Close)
 	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
 	t.Cleanup(func() { _ = rdb.Close() })
-	svc := &UserService{
-		redis: rdb,
-		repo:  registeredRepo("alice@example.com", 42),
-	}
+	svc := newTestAuthService(registeredRepo("alice@example.com", 42), rdb, nil, 0, nil)
 	const code = "654321"
 	ctx := context.Background()
 
@@ -2095,11 +2138,8 @@ func TestSendLoginEmailCode_KeyIsolation(t *testing.T) {
 
 	ch := &fakeChannel{}
 	ch.ok.Store(true)
-	svc := &UserService{
-		redis:  rdb,
-		repo:   registeredRepo(email, 42),
-		mailer: emailtemplates.NewMailerWithChannel(ch),
-	}
+	users := NewUserService(registeredRepo(email, 42), rdb, nil, nil)
+	svc := &AuthService{redis: rdb, users: users, mailer: emailtemplates.NewMailerWithChannel(ch)}
 	if !svc.SendLoginEmailCode(context.Background(), email) {
 		t.Fatal("SendLoginEmailCode should succeed")
 	}
@@ -2127,11 +2167,7 @@ func TestSendLoginEmailCode_NoMailer(t *testing.T) {
 	t.Cleanup(mr.Close)
 	rdb := redis.NewClient(&redis.Options{Addr: mr.Addr()})
 	t.Cleanup(func() { _ = rdb.Close() })
-	svc := &UserService{
-		redis:  rdb,
-		repo:   registeredRepo("alice@example.com", 42),
-		mailer: nil,
-	}
+	svc := newTestAuthService(registeredRepo("alice@example.com", 42), rdb, nil, 0, nil)
 	if svc.SendLoginEmailCode(context.Background(), "alice@example.com") {
 		t.Error("should return false when mailer is nil")
 	}
