@@ -12,32 +12,35 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/dto"
 	"github.com/KanoCifer/kuroome-blog/internal/middleware"
 	"github.com/KanoCifer/kuroome-blog/internal/response"
-	"github.com/KanoCifer/kuroome-blog/internal/service"
 )
 
-// Monitorer 定义 monitor handler 依赖的能力集合。
-// 由 *service.MonitorService 隐式满足。
-type Monitorer interface {
+type VisitorAnalytics interface {
 	GetOverview(ctx context.Context, days int) (dto.OverviewResponse, error)
 	GetVisitors(ctx context.Context, days, page, pageSize int) (dto.VisitorListResponse, error)
-	GetUserLogins(ctx context.Context, days, page, pageSize int) (dto.UserLoginsResponse, error)
-	GetServerStatus() (dto.ServerStatusResponse, error)
-	StreamServerStatus(ctx context.Context) (<-chan dto.ServerStatusResponse, error)
-	TrackVisitor(ctx context.Context, data dto.VisitorTrackRequest) error
-	GetStatusDetail(ctx context.Context) (dto.StatusDetailResponse, error)
 }
 
-var _ Monitorer = (*service.MonitorService)(nil)
+type UserLoginAnalytics interface {
+	GetUserLogins(ctx context.Context, days, page, pageSize int) (dto.UserLoginsResponse, error)
+}
+
+type SystemMonitor interface {
+	GetStatusDetail(ctx context.Context) (dto.StatusDetailResponse, error)
+	GetServerStatus() (dto.ServerStatusResponse, error)
+	StreamServerStatus(ctx context.Context) (<-chan dto.ServerStatusResponse, error)
+}
 
 var errNotNumber = errors.New("not a number")
 
 type MonitorHandler struct {
-	svc Monitorer
-	cfg *config.Config
+	visitorTracker     VisitorTracker
+	visitorAnalytics   VisitorAnalytics
+	userLoginAnalytics UserLoginAnalytics
+	systemMonitor      SystemMonitor
+	cfg                *config.Config
 }
 
-func NewMonitorHandler(svc Monitorer, cfg *config.Config) *MonitorHandler {
-	return &MonitorHandler{svc: svc, cfg: cfg}
+func NewMonitorHandler(visitorTracker VisitorTracker, visitorAnalytics VisitorAnalytics, userLoginAnalytics UserLoginAnalytics, systemMonitor SystemMonitor, cfg *config.Config) *MonitorHandler {
+	return &MonitorHandler{visitorTracker: visitorTracker, visitorAnalytics: visitorAnalytics, userLoginAnalytics: userLoginAnalytics, systemMonitor: systemMonitor, cfg: cfg}
 }
 
 const (
@@ -100,7 +103,7 @@ func (h *MonitorHandler) GetOverview(c *gin.Context) {
 	if !ok {
 		return
 	}
-	data, err := h.svc.GetOverview(c.Request.Context(), days)
+	data, err := h.visitorAnalytics.GetOverview(c.Request.Context(), days)
 	if respondErr(c, err, "monitor query failed") {
 		return
 	}
@@ -117,7 +120,7 @@ func (h *MonitorHandler) GetVisitors(c *gin.Context) {
 	if !ok {
 		return
 	}
-	data, err := h.svc.GetVisitors(c.Request.Context(), days, page, pageSize)
+	data, err := h.visitorAnalytics.GetVisitors(c.Request.Context(), days, page, pageSize)
 	if respondErr(c, err, "monitor query failed") {
 		return
 	}
@@ -134,7 +137,7 @@ func (h *MonitorHandler) GetUserLogins(c *gin.Context) {
 	if !ok {
 		return
 	}
-	data, err := h.svc.GetUserLogins(c.Request.Context(), days, page, pageSize)
+	data, err := h.userLoginAnalytics.GetUserLogins(c.Request.Context(), days, page, pageSize)
 	if respondErr(c, err, "monitor query failed") {
 		return
 	}
@@ -143,7 +146,7 @@ func (h *MonitorHandler) GetUserLogins(c *gin.Context) {
 
 // ServerStatus 处理 GET /status/server/status，返回实时 CPU/内存/磁盘指标。
 func (h *MonitorHandler) ServerStatus(c *gin.Context) {
-	data, err := h.svc.GetServerStatus()
+	data, err := h.systemMonitor.GetServerStatus()
 	if respondErr(c, err, "monitor query failed") {
 		return
 	}
@@ -157,7 +160,7 @@ func (h *MonitorHandler) ServerStatusStream(c *gin.Context) {
 	c.Header("Cache-Control", "no-cache")
 	c.Header("Connection", "keep-alive")
 
-	ch, err := h.svc.StreamServerStatus(c.Request.Context())
+	ch, err := h.systemMonitor.StreamServerStatus(c.Request.Context())
 	if respondErr(c, err, "monitor query failed") {
 		return
 	}
@@ -187,7 +190,7 @@ func (h *MonitorHandler) TrackVisitor(c *gin.Context) {
 		return
 	}
 	req.IpAddress = middleware.ClientIP(c)
-	if err := h.svc.TrackVisitor(c.Request.Context(), req); respondErr(c, err, "track visitor") {
+	if err := h.visitorTracker.TrackVisitor(c.Request.Context(), req); respondErr(c, err, "track visitor") {
 		return
 	}
 	c.Status(204)
@@ -195,7 +198,7 @@ func (h *MonitorHandler) TrackVisitor(c *gin.Context) {
 
 // GetStatusDetail 处理 GET /status/detail —— 返回版本、服务、系统状态概览（公开）。
 func (h *MonitorHandler) GetStatusDetail(c *gin.Context) {
-	data, err := h.svc.GetStatusDetail(c.Request.Context())
+	data, err := h.systemMonitor.GetStatusDetail(c.Request.Context())
 	if respondErr(c, err, "monitor query failed") {
 		return
 	}

@@ -82,7 +82,7 @@ func Setup(r *gin.Engine, state *app.AppState, rdb *redis.Client) {
 	deployH := handler.NewDeployHandler(state.Cfg())
 	deployH.RegisterRoutes(v3)
 
-	monitorH := handler.NewMonitorHandler(state.MonitorSvc(), state.Cfg())
+	monitorH := handler.NewMonitorHandler(state.VisitorTracker(), state.VisitorAnalytics(), state.UserLoginAnalytics(), state.SystemMonitor(), state.Cfg())
 	monitorH.RegisterRoutes(v3, auth, adminOnly)
 	// 向后兼容：旧版 /track → 新的 /status/track。
 	v3.POST("/track", monitorH.TrackVisitor)

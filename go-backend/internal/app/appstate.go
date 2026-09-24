@@ -20,6 +20,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/repository/mongodb"
 	"github.com/KanoCifer/kuroome-blog/internal/repository/postgres"
 	"github.com/KanoCifer/kuroome-blog/internal/service"
+	monitorsvc "github.com/KanoCifer/kuroome-blog/internal/service/monitor"
 	nomuSvc "github.com/KanoCifer/kuroome-blog/internal/service/nomu"
 	"github.com/KanoCifer/kuroome-blog/internal/service/syncbus"
 	userservice "github.com/KanoCifer/kuroome-blog/internal/service/user"
@@ -44,27 +45,29 @@ type AppState struct {
 	eventBus   eventbus.Bus
 
 	// services
-	userSvc     *userservice.UserService
-	authSvc     *userservice.AuthService
-	userView    userservice.UserView
-	adminSvc    *service.AdminService
-	visitorSvc  *visitorsvc.Tracker
-	blogSvc     *service.BlogService
-	devTaskSvc  *service.DevTaskService
-	passkeySvc  *userservice.PasskeyService
-	githubOAuth *userservice.GitHubOAuth
-	monitorSvc  *service.MonitorService
-	systemSvc   *service.SystemService
-	wsSvc       *service.WSService
-	fishSvc     *service.FishService
-	uploadSvc   *service.UploadService
-	momentSvc   *service.MomentService
-	weatherSvc  *service.WeatherService
-	wereadSvc   wereadSvc.Reader
-	currencySvc *service.CurrencyService
-	creditSvc   *service.CreditService
-	designSvc   *nomuSvc.DesignService
-	nomuSvc     *service.NomuServiceStruct
+	userSvc            *userservice.UserService
+	authSvc            *userservice.AuthService
+	userView           userservice.UserView
+	adminSvc           *service.AdminService
+	visitorSvc         *visitorsvc.Tracker
+	blogSvc            *service.BlogService
+	devTaskSvc         *service.DevTaskService
+	passkeySvc         *userservice.PasskeyService
+	githubOAuth        *userservice.GitHubOAuth
+	visitorAnalytics   *monitorsvc.VisitorAnalytics
+	userLoginAnalytics *monitorsvc.UserLoginAnalytics
+	systemMonitor      *monitorsvc.SystemMetrics
+	systemSvc          *service.SystemService
+	wsSvc              *service.WSService
+	fishSvc            *service.FishService
+	uploadSvc          *service.UploadService
+	momentSvc          *service.MomentService
+	weatherSvc         *service.WeatherService
+	wereadSvc          wereadSvc.Reader
+	currencySvc        *service.CurrencyService
+	creditSvc          *service.CreditService
+	designSvc          *nomuSvc.DesignService
+	nomuSvc            *service.NomuServiceStruct
 
 	// mailer 邮件发送器，注入到 UserService.SendEmailCode / SendMagicLoginEmail。
 	mailer *emailtemplates.Mailer
@@ -205,49 +208,53 @@ func NewAppState(
 		passkeySvc: userservice.NewPasskeyService(wa, rdb, rs.passkey, rs.user, authSvc, userView),
 		githubOAuth: userservice.NewGitHubOAuth(rdb, userSvc, authSvc,
 			cfg.GitHub.ClientID, cfg.GitHub.ClientSecret, cfg.GitHub.RedirectURI),
-		monitorSvc:  service.NewMonitorService(rs.visitor, rs.user, visitorSvc, cfg.API.Version),
-		systemSvc:   service.NewSystemService(rs.event),
-		wsSvc:       service.NewWSService(rdb, ifc.dispatcher),
-		fishSvc:     service.NewFishService(rs.fish),
-		uploadSvc:   uploadSvc,
-		momentSvc:   service.NewMomentService(rs.moment),
-		weatherSvc:  service.NewWeatherService(ifc.httpCli, rdb, cfg.Weather, ifc.qweatherSigner),
-		wereadSvc:   wereadSvc.New(ifc.httpCli, rdb, rs.weread),
-		currencySvc: service.NewCurrencyService(ifc.httpCli, rdb),
-		creditSvc:   creditSvc,
-		designSvc:   nomuSvc.NewDesignService(ifc.designHTTP, ifc.designRouter, uploadSvc, creditSvc),
-		nomuSvc:     service.NewNomuService(rs.nomu),
+		visitorAnalytics:   monitorsvc.NewVisitorAnalytics(rs.visitor),
+		userLoginAnalytics: monitorsvc.NewUserLoginAnalytics(rs.user),
+		systemMonitor:      monitorsvc.NewSystemMetrics(rs.visitor, cfg.API.Version),
+		systemSvc:          service.NewSystemService(rs.event),
+		wsSvc:              service.NewWSService(rdb, ifc.dispatcher),
+		fishSvc:            service.NewFishService(rs.fish),
+		uploadSvc:          uploadSvc,
+		momentSvc:          service.NewMomentService(rs.moment),
+		weatherSvc:         service.NewWeatherService(ifc.httpCli, rdb, cfg.Weather, ifc.qweatherSigner),
+		wereadSvc:          wereadSvc.New(ifc.httpCli, rdb, rs.weread),
+		currencySvc:        service.NewCurrencyService(ifc.httpCli, rdb),
+		creditSvc:          creditSvc,
+		designSvc:          nomuSvc.NewDesignService(ifc.designHTTP, ifc.designRouter, uploadSvc, creditSvc),
+		nomuSvc:            service.NewNomuService(rs.nomu),
 
 		mailer: mailer,
 	}
 }
 
 // Dependency Injection
-func (a *AppState) Cfg() *config.Config                     { return a.config }
-func (a *AppState) UserRepo() *postgres.UserRepo            { return a.userRepo }
-func (a *AppState) UserSvc() *userservice.UserService       { return a.userSvc }
-func (a *AppState) AuthSvc() *userservice.AuthService       { return a.authSvc }
-func (a *AppState) UserView() userservice.UserView          { return a.userView }
-func (a *AppState) AdminSvc() *service.AdminService         { return a.adminSvc }
-func (a *AppState) VisitorTracker() *visitorsvc.Tracker     { return a.visitorSvc }
-func (a *AppState) BlogSvc() *service.BlogService           { return a.blogSvc }
-func (a *AppState) DevTaskSvc() *service.DevTaskService     { return a.devTaskSvc }
-func (a *AppState) PasskeySvc() *userservice.PasskeyService { return a.passkeySvc }
-func (a *AppState) WSSvc() *service.WSService               { return a.wsSvc }
-func (a *AppState) MonitorSvc() *service.MonitorService     { return a.monitorSvc }
-func (a *AppState) SystemSvc() *service.SystemService       { return a.systemSvc }
-func (a *AppState) GitHubOAuth() *userservice.GitHubOAuth   { return a.githubOAuth }
-func (a *AppState) FishSvc() *service.FishService           { return a.fishSvc }
-func (a *AppState) UploadSvc() *service.UploadService       { return a.uploadSvc }
-func (a *AppState) MomentSvc() *service.MomentService       { return a.momentSvc }
-func (a *AppState) WeatherSvc() *service.WeatherService     { return a.weatherSvc }
-func (a *AppState) WereadSvc() wereadSvc.Reader             { return a.wereadSvc }
-func (a *AppState) CurrencySvc() *service.CurrencyService   { return a.currencySvc }
-func (a *AppState) CreditSvc() *service.CreditService       { return a.creditSvc }
-func (a *AppState) DesignSvc() *nomuSvc.DesignService       { return a.designSvc }
-func (a *AppState) NomuSvc() *service.NomuServiceStruct     { return a.nomuSvc }
-func (a *AppState) SyncBus() *syncbus.Bus                   { return a.syncBus }
-func (a *AppState) EventBus() eventbus.Bus                  { return a.eventBus }
-func (a *AppState) Mailer() *emailtemplates.Mailer          { return a.mailer }
+func (a *AppState) Cfg() *config.Config                                { return a.config }
+func (a *AppState) UserRepo() *postgres.UserRepo                       { return a.userRepo }
+func (a *AppState) UserSvc() *userservice.UserService                  { return a.userSvc }
+func (a *AppState) AuthSvc() *userservice.AuthService                  { return a.authSvc }
+func (a *AppState) UserView() userservice.UserView                     { return a.userView }
+func (a *AppState) AdminSvc() *service.AdminService                    { return a.adminSvc }
+func (a *AppState) VisitorTracker() *visitorsvc.Tracker                { return a.visitorSvc }
+func (a *AppState) BlogSvc() *service.BlogService                      { return a.blogSvc }
+func (a *AppState) DevTaskSvc() *service.DevTaskService                { return a.devTaskSvc }
+func (a *AppState) PasskeySvc() *userservice.PasskeyService            { return a.passkeySvc }
+func (a *AppState) WSSvc() *service.WSService                          { return a.wsSvc }
+func (a *AppState) VisitorAnalytics() *monitorsvc.VisitorAnalytics     { return a.visitorAnalytics }
+func (a *AppState) UserLoginAnalytics() *monitorsvc.UserLoginAnalytics { return a.userLoginAnalytics }
+func (a *AppState) SystemMonitor() *monitorsvc.SystemMetrics           { return a.systemMonitor }
+func (a *AppState) SystemSvc() *service.SystemService                  { return a.systemSvc }
+func (a *AppState) GitHubOAuth() *userservice.GitHubOAuth              { return a.githubOAuth }
+func (a *AppState) FishSvc() *service.FishService                      { return a.fishSvc }
+func (a *AppState) UploadSvc() *service.UploadService                  { return a.uploadSvc }
+func (a *AppState) MomentSvc() *service.MomentService                  { return a.momentSvc }
+func (a *AppState) WeatherSvc() *service.WeatherService                { return a.weatherSvc }
+func (a *AppState) WereadSvc() wereadSvc.Reader                        { return a.wereadSvc }
+func (a *AppState) CurrencySvc() *service.CurrencyService              { return a.currencySvc }
+func (a *AppState) CreditSvc() *service.CreditService                  { return a.creditSvc }
+func (a *AppState) DesignSvc() *nomuSvc.DesignService                  { return a.designSvc }
+func (a *AppState) NomuSvc() *service.NomuServiceStruct                { return a.nomuSvc }
+func (a *AppState) SyncBus() *syncbus.Bus                              { return a.syncBus }
+func (a *AppState) EventBus() eventbus.Bus                             { return a.eventBus }
+func (a *AppState) Mailer() *emailtemplates.Mailer                     { return a.mailer }
 
 func (a *AppState) PubSub() *pubsub.Dispatcher { return a.dispatcher }
