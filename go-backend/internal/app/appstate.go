@@ -213,7 +213,7 @@ func NewAppState(
 		visitorSvc: visitorSvc,
 		blogSvc:    service.NewBlogService(rs.blog),
 		devTaskSvc: service.NewDevTaskService(rs.devTask),
-		passkeySvc: userservice.NewPasskeyService(wa, rdb, rs.passkey, rs.user, authSvc, userView),
+		passkeySvc: userservice.NewPasskeyService(wa, userservice.NewRedisSessionStore(rdb), rs.passkey, rs.user, authSvc, userView),
 		githubOAuth: userservice.NewGitHubOAuth(rdb, userSvc, authSvc,
 			cfg.GitHub.ClientID, cfg.GitHub.ClientSecret, cfg.GitHub.RedirectURI),
 		visitorAnalytics:   monitorsvc.NewVisitorAnalytics(rs.visitor),
