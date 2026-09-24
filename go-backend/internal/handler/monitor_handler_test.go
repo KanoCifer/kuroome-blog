@@ -76,8 +76,8 @@ func (m *mockMonitorService) StreamServerStatus(ctx context.Context) (<-chan dto
 
 // ---------- helpers ----------
 
-func setupMonitor(svc Monitorer, adminMW gin.HandlerFunc) *gin.Engine {
-	h := NewMonitorHandler(svc, config.Cfg)
+func setupMonitor(svc *mockMonitorService, adminMW gin.HandlerFunc) *gin.Engine {
+	h := NewMonitorHandler(svc, svc, svc, svc, config.Cfg)
 	r := gin.New()
 	g := r.Group("/v3")
 	noopAuth := func(c *gin.Context) { c.Set("user_id", 1); c.Next() }
@@ -362,7 +362,7 @@ func TestOldTrackRedirect(t *testing.T) {
 	svc := &mockMonitorService{
 		trackVisitorFn: func(ctx context.Context, data dto.VisitorTrackRequest) error { return nil },
 	}
-	h := NewMonitorHandler(svc, config.Cfg)
+	h := NewMonitorHandler(svc, svc, svc, svc, config.Cfg)
 	r := gin.New()
 	g := r.Group("/v3")
 	h.RegisterRoutes(g, func(c *gin.Context) { c.Set("user_id", 1); c.Next() }, func(c *gin.Context) { c.Next() })

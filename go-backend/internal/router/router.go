@@ -53,7 +53,7 @@ func Setup(r *gin.Engine, state *app.AppState, rdb *redis.Client) {
 	userH := handler.NewUserHandler(state.UserSvc(), state.AuthSvc(), state.UserView(), state.Cfg(), refreshAuthFailLimiter)
 	userH.RegisterRoutes(v3, auth, loginCodeSendLimiter.Middleware(), loginLimiter.Middleware(), registerLimiter.Middleware())
 
-	adminH := handler.NewAdminHandler(state.AdminSvc(), state.Cfg())
+	adminH := handler.NewAdminHandler(state.AdminSvc(), state.VisitorTracker(), state.Cfg())
 	adminH.RegisterRoutes(v3, auth, adminOnly)
 
 	passkeyH := handler.NewPasskeyHandler(state.PasskeySvc(), state.Cfg())
@@ -82,7 +82,7 @@ func Setup(r *gin.Engine, state *app.AppState, rdb *redis.Client) {
 	deployH := handler.NewDeployHandler(state.Cfg())
 	deployH.RegisterRoutes(v3)
 
-	monitorH := handler.NewMonitorHandler(state.MonitorSvc(), state.Cfg())
+	monitorH := handler.NewMonitorHandler(state.VisitorTracker(), state.VisitorAnalytics(), state.UserLoginAnalytics(), state.SystemMonitor(), state.Cfg())
 	monitorH.RegisterRoutes(v3, auth, adminOnly)
 	// 向后兼容：旧版 /track → 新的 /status/track。
 	v3.POST("/track", monitorH.TrackVisitor)
@@ -114,7 +114,7 @@ func Setup(r *gin.Engine, state *app.AppState, rdb *redis.Client) {
 	// design：出图按张预扣积分（余额不足 402，失败退款），要求登录。
 	designH.RegisterRoutes(v3, auth)
 
-	nomuH := handler.NewNomuHandler(state.NomuSvc())
+	nomuH := handler.NewNomuHandler(state.NomuConfigSyncSvc(), state.NomuBlobProxySvc())
 	// nomu config sync：云端配置同步，要求登录。
 	nomuH.RegisterRoutes(v3, auth)
 
