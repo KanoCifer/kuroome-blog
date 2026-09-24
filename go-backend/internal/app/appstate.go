@@ -25,6 +25,7 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/service/nomu/blobproxy"
 	"github.com/KanoCifer/kuroome-blog/internal/service/nomu/configsync"
 	"github.com/KanoCifer/kuroome-blog/internal/service/syncbus"
+	uploadsvc "github.com/KanoCifer/kuroome-blog/internal/service/upload"
 	userservice "github.com/KanoCifer/kuroome-blog/internal/service/user"
 	visitorsvc "github.com/KanoCifer/kuroome-blog/internal/service/visitor"
 	wereadSvc "github.com/KanoCifer/kuroome-blog/internal/service/weread"
@@ -62,7 +63,9 @@ type AppState struct {
 	systemSvc          *service.SystemService
 	wsSvc              *service.WSService
 	fishSvc            *service.FishService
-	uploadSvc          *service.UploadService
+	fileSvc            *uploadsvc.FileService
+	imageSvc           *uploadsvc.ImageService
+	avatarSvc          *uploadsvc.AvatarService
 	momentSvc          *service.MomentService
 	weatherSvc         *service.WeatherService
 	wereadSvc          wereadSvc.Reader
@@ -191,7 +194,9 @@ func NewAppState(
 	userSvc := userservice.NewUserService(rs.user, rdb, creditSvc, mailer)
 	authSvc := userservice.NewAuthService(userSvc, rdb, frontendURLs, cfg.Security.MaxRefreshDevices, mailer, userView)
 
-	uploadSvc := service.NewUploadService(rs.user, cfg)
+	fileSvc := uploadsvc.NewFileService(&cfg.Upload)
+	imageSvc := uploadsvc.NewImageService(&cfg.Upload)
+	avatarSvc := uploadsvc.NewAvatarService(rs.user, &cfg.Upload)
 	visitorSvc := visitorsvc.NewTracker(rs.visitor)
 
 	return &AppState{
@@ -217,13 +222,15 @@ func NewAppState(
 		systemSvc:          service.NewSystemService(rs.event),
 		wsSvc:              service.NewWSService(rdb, ifc.dispatcher),
 		fishSvc:            service.NewFishService(rs.fish),
-		uploadSvc:          uploadSvc,
+		fileSvc:            fileSvc,
+		imageSvc:           imageSvc,
+		avatarSvc:          avatarSvc,
 		momentSvc:          service.NewMomentService(rs.moment),
 		weatherSvc:         service.NewWeatherService(ifc.httpCli, rdb, cfg.Weather, ifc.qweatherSigner),
 		wereadSvc:          wereadSvc.New(ifc.httpCli, rdb, rs.weread),
 		currencySvc:        service.NewCurrencyService(ifc.httpCli, rdb),
 		creditSvc:          creditSvc,
-		designSvc:          nomuSvc.NewDesignService(ifc.designHTTP, ifc.designRouter, uploadSvc, creditSvc),
+		designSvc:          nomuSvc.NewDesignService(ifc.designHTTP, ifc.designRouter, imageSvc, creditSvc),
 		nomuConfigSyncSvc:  configsync.NewService(rs.nomu),
 		nomuBlobProxySvc:   blobproxy.NewService(),
 
@@ -249,7 +256,9 @@ func (a *AppState) SystemMonitor() *monitorsvc.SystemMetrics           { return 
 func (a *AppState) SystemSvc() *service.SystemService                  { return a.systemSvc }
 func (a *AppState) GitHubOAuth() *userservice.GitHubOAuth              { return a.githubOAuth }
 func (a *AppState) FishSvc() *service.FishService                      { return a.fishSvc }
-func (a *AppState) UploadSvc() *service.UploadService                  { return a.uploadSvc }
+func (a *AppState) FileSvc() *uploadsvc.FileService                    { return a.fileSvc }
+func (a *AppState) ImageSvc() *uploadsvc.ImageService                  { return a.imageSvc }
+func (a *AppState) AvatarSvc() *uploadsvc.AvatarService                { return a.avatarSvc }
 func (a *AppState) MomentSvc() *service.MomentService                  { return a.momentSvc }
 func (a *AppState) WeatherSvc() *service.WeatherService                { return a.weatherSvc }
 func (a *AppState) WereadSvc() wereadSvc.Reader                        { return a.wereadSvc }
