@@ -114,7 +114,7 @@ func Setup(r *gin.Engine, state *app.AppState, rdb *redis.Client) {
 	// design：出图按张预扣积分（余额不足 402，失败退款），要求登录。
 	designH.RegisterRoutes(v3, auth)
 
-	nomuH := handler.NewNomuHandler(state.NomuSvc())
+	nomuH := handler.NewNomuHandler(state.NomuConfigSyncSvc(), state.NomuBlobProxySvc())
 	// nomu config sync：云端配置同步，要求登录。
 	nomuH.RegisterRoutes(v3, auth)
 

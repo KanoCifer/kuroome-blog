@@ -11,26 +11,32 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/KanoCifer/kuroome-blog/internal/response"
-	"github.com/KanoCifer/kuroome-blog/internal/service"
+	"github.com/KanoCifer/kuroome-blog/internal/service/nomu/blobproxy"
+	"github.com/KanoCifer/kuroome-blog/internal/service/nomu/configsync"
 )
 
-// NomuService 定义 handler 依赖的配置同步 / blob 代理能力。
-// 由 *service.NomuServiceStruct 隐式满足。
-type NomuService interface {
-	SyncNomuConfig(ctx context.Context, userId uint, local []service.NomuSyncItem, lastSyncAt *time.Time) ([]service.NomuSyncItem, error)
-	// ProxyBlob 拉取上游 blob。返回的 body 未读，由调用方负责 Close；
-	// 不要在函数内 defer Close——那会在调用方读到数据前就掐断连接。
+// ConfigSyncer is the config synchronization capability needed by NomuHandler.
+type ConfigSyncer interface {
+	SyncNomuConfig(ctx context.Context, userId uint, local []configsync.Item, lastSyncAt *time.Time) ([]configsync.Item, error)
+}
+
+// BlobProxy fetches an upstream blob. The returned body must be closed by the caller.
+type BlobProxy interface {
 	ProxyBlob(ctx context.Context, url *url.URL) (contentLength int64, contentType string, body io.ReadCloser, extraHeaders map[string]string, err error)
 }
 
-var _ NomuService = (*service.NomuServiceStruct)(nil)
+var (
+	_ ConfigSyncer = (*configsync.Service)(nil)
+	_ BlobProxy    = (*blobproxy.Service)(nil)
+)
 
 type NomuHandler struct {
-	svc NomuService
+	configSyncer ConfigSyncer
+	blobProxy    BlobProxy
 }
 
-func NewNomuHandler(svc NomuService) *NomuHandler {
-	return &NomuHandler{svc: svc}
+func NewNomuHandler(configSyncer ConfigSyncer, blobProxy BlobProxy) *NomuHandler {
+	return &NomuHandler{configSyncer: configSyncer, blobProxy: blobProxy}
 }
 
 // RegisterRoutes 挂载 /nomu 路由。配置同步需登录。
@@ -52,7 +58,7 @@ func nomuProxyCORS() gin.HandlerFunc {
 // SyncNomuRequest 配置同步请求：以本地为基准全量 push，服务端返云端全量供对齐。
 type SyncNomuRequest struct {
 	// Local 本地配置全量（Dexie configs 表的每行）。
-	Local []service.NomuSyncItem `json:"local" binding:"required"`
+	Local []configsync.Item `json:"local" binding:"required"`
 	// LastSyncAt 上次成功同步的时间（RFC3339），服务端仅返回该时间后的变更；
 	// 省略则返回全量。
 	LastSyncAt *time.Time `json:"lastSyncAt,omitempty"`
@@ -70,7 +76,7 @@ func (h *NomuHandler) ProxyBlob(c *gin.Context) {
 		return
 	}
 
-	contentLength, contentType, body, extraHeaders, err := h.svc.ProxyBlob(c.Request.Context(), u)
+	contentLength, contentType, body, extraHeaders, err := h.blobProxy.ProxyBlob(c.Request.Context(), u)
 	if respondErr(c, err, "nomu proxy error") {
 		return
 	}
@@ -86,7 +92,7 @@ func (h *NomuHandler) SyncNomuConfig(c *gin.Context) {
 	}
 
 	userID := c.GetInt("user_id")
-	cloud, err := h.svc.SyncNomuConfig(c.Request.Context(), uint(userID), req.Local, req.LastSyncAt)
+	cloud, err := h.configSyncer.SyncNomuConfig(c.Request.Context(), uint(userID), req.Local, req.LastSyncAt)
 	if respondErr(c, err, "nomu config sync failed", "user_id", userID) {
 		return
 	}

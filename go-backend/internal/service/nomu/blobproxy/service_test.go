@@ -1,4 +1,4 @@
-package service
+package blobproxy
 
 import (
 	"io"
@@ -11,12 +11,9 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/security"
 )
 
-// ProxyBlob 必须把上游 body 原样交给调用方读完，不能在函数内提前 Close。
-// 回归背景：曾经 defer resp.Body.Close()，函数返回即掐断连接，
-// 下游 io.Copy 一个字都读不到（http2: response body closed）。
-func TestProxyBlob_BodyReadableAfterReturn(t *testing.T) {
+func TestProxyBlobBodyReadableAfterReturn(t *testing.T) {
 	defer func(prev bool) { security.AllowPrivateIP = prev }(security.AllowPrivateIP)
-	security.AllowPrivateIP = true // httptest 监听在 127.0.0.1
+	security.AllowPrivateIP = true
 
 	const payload = "fake-jpeg-bytes"
 	upstream := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -25,18 +22,14 @@ func TestProxyBlob_BodyReadableAfterReturn(t *testing.T) {
 	}))
 	defer upstream.Close()
 
-	// TLS 测试证书不被信任，单独换掉 Transport；其余走真实 ProxyBlob 路径。
-	saved := proxyClient
-	proxyClient = upstream.Client()
-	proxyClient.CheckRedirect = saved.CheckRedirect
-	defer func() { proxyClient = saved }()
+	svc := NewService()
+	svc.client = upstream.Client()
 
 	u, err := url.Parse(upstream.URL + "/img.jpg")
 	if err != nil {
 		t.Fatalf("parse upstream url: %v", err)
 	}
 
-	svc := &NomuServiceStruct{}
 	contentLength, contentType, body, _, err := svc.ProxyBlob(t.Context(), u)
 	if err != nil {
 		t.Fatalf("ProxyBlob: %v", err)
@@ -59,8 +52,23 @@ func TestProxyBlob_BodyReadableAfterReturn(t *testing.T) {
 	}
 }
 
-// 非 200 上游必须回错，且不能把响应体泄漏给调用方。
-func TestProxyBlob_NonOKStatus(t *testing.T) {
+type trackingBody struct {
+	io.ReadCloser
+	closed bool
+}
+
+func (b *trackingBody) Close() error {
+	b.closed = true
+	return b.ReadCloser.Close()
+}
+
+type roundTripFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
+	return f(req)
+}
+
+func TestProxyBlobNonOKStatusClosesBody(t *testing.T) {
 	defer func(prev bool) { security.AllowPrivateIP = prev }(security.AllowPrivateIP)
 	security.AllowPrivateIP = true
 
@@ -69,17 +77,31 @@ func TestProxyBlob_NonOKStatus(t *testing.T) {
 	}))
 	defer upstream.Close()
 
-	saved := proxyClient
-	proxyClient = upstream.Client()
-	proxyClient.CheckRedirect = saved.CheckRedirect
-	defer func() { proxyClient = saved }()
+	svc := NewService()
+	upstreamBody := &trackingBody{}
+	upstreamClient := upstream.Client()
+	svc.client = &http.Client{Transport: roundTripFunc(func(req *http.Request) (*http.Response, error) {
+		resp, err := upstreamClient.Transport.RoundTrip(req)
+		if err == nil {
+			upstreamBody.ReadCloser = resp.Body
+			resp.Body = upstreamBody
+		}
+		return resp, err
+	})}
 
 	u, _ := url.Parse(upstream.URL + "/missing.jpg")
-	svc := &NomuServiceStruct{}
 	_, _, body, _, err := svc.ProxyBlob(t.Context(), u)
 	if err == nil {
-		body.Close()
+		if body != nil {
+			_ = body.Close()
+		}
 		t.Fatal("expected error for 404 upstream")
+	}
+	if body != nil {
+		t.Errorf("body = %#v, want nil", body)
+	}
+	if !upstreamBody.closed {
+		t.Error("upstream body was not closed")
 	}
 	if !strings.Contains(err.Error(), "404") {
 		t.Errorf("err = %v, want it to mention 404", err)

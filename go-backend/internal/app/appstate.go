@@ -22,6 +22,8 @@ import (
 	"github.com/KanoCifer/kuroome-blog/internal/service"
 	monitorsvc "github.com/KanoCifer/kuroome-blog/internal/service/monitor"
 	nomuSvc "github.com/KanoCifer/kuroome-blog/internal/service/nomu"
+	"github.com/KanoCifer/kuroome-blog/internal/service/nomu/blobproxy"
+	"github.com/KanoCifer/kuroome-blog/internal/service/nomu/configsync"
 	"github.com/KanoCifer/kuroome-blog/internal/service/syncbus"
 	userservice "github.com/KanoCifer/kuroome-blog/internal/service/user"
 	visitorsvc "github.com/KanoCifer/kuroome-blog/internal/service/visitor"
@@ -67,7 +69,8 @@ type AppState struct {
 	currencySvc        *service.CurrencyService
 	creditSvc          *service.CreditService
 	designSvc          *nomuSvc.DesignService
-	nomuSvc            *service.NomuServiceStruct
+	nomuConfigSyncSvc  *configsync.Service
+	nomuBlobProxySvc   *blobproxy.Service
 
 	// mailer 邮件发送器，注入到 UserService.SendEmailCode / SendMagicLoginEmail。
 	mailer *emailtemplates.Mailer
@@ -221,7 +224,8 @@ func NewAppState(
 		currencySvc:        service.NewCurrencyService(ifc.httpCli, rdb),
 		creditSvc:          creditSvc,
 		designSvc:          nomuSvc.NewDesignService(ifc.designHTTP, ifc.designRouter, uploadSvc, creditSvc),
-		nomuSvc:            service.NewNomuService(rs.nomu),
+		nomuConfigSyncSvc:  configsync.NewService(rs.nomu),
+		nomuBlobProxySvc:   blobproxy.NewService(),
 
 		mailer: mailer,
 	}
@@ -252,7 +256,8 @@ func (a *AppState) WereadSvc() wereadSvc.Reader                        { return 
 func (a *AppState) CurrencySvc() *service.CurrencyService              { return a.currencySvc }
 func (a *AppState) CreditSvc() *service.CreditService                  { return a.creditSvc }
 func (a *AppState) DesignSvc() *nomuSvc.DesignService                  { return a.designSvc }
-func (a *AppState) NomuSvc() *service.NomuServiceStruct                { return a.nomuSvc }
+func (a *AppState) NomuConfigSyncSvc() *configsync.Service             { return a.nomuConfigSyncSvc }
+func (a *AppState) NomuBlobProxySvc() *blobproxy.Service               { return a.nomuBlobProxySvc }
 func (a *AppState) SyncBus() *syncbus.Bus                              { return a.syncBus }
 func (a *AppState) EventBus() eventbus.Bus                             { return a.eventBus }
 func (a *AppState) Mailer() *emailtemplates.Mailer                     { return a.mailer }
