@@ -71,13 +71,29 @@ class DraftLocalizedItem(BaseModel):
 
     title: str | None = Field(None, description="该语言的商品标题")
     description: str | None = Field(None, description="该语言的商品描述")
+    bullets: list[str] = Field(
+        default_factory=list, max_length=12, description="该语言的商品卖点"
+    )
+
+
+class DraftDimensions(BaseModel):
+    """来源商品尺寸重量；无法确认的字段不输出。"""
+
+    length: str | None = Field(None, max_length=100)
+    width: str | None = Field(None, max_length=100)
+    height: str | None = Field(None, max_length=100)
+    weight: str | None = Field(None, max_length=100)
 
 
 class DraftLocalized(BaseModel):
     """英文/阿拉伯语翻译，供扩展端 ``LocalizedContent``（localized.en/ar）。"""
 
-    en: DraftLocalizedItem | None = Field(None, description="英文标题/描述")
-    ar: DraftLocalizedItem | None = Field(None, description="阿拉伯语标题/描述")
+    en: DraftLocalizedItem | None = Field(
+        None, description="英文标题/描述/卖点"
+    )
+    ar: DraftLocalizedItem | None = Field(
+        None, description="阿拉伯语标题/描述/卖点"
+    )
 
 
 class ProductDraft(BaseModel):
@@ -85,16 +101,51 @@ class ProductDraft(BaseModel):
 
     title: str | None = Field(None, description="商品标题（源语言，去除促销/物流噪声）")
     description: str | None = Field(None, description="商品描述/卖点，纯文本")
-    # brand 不让 LLM 填：行上 brand 是 Noon 品牌 code 维度，自由文本会变假 code，由用户手动选
+    # 不输出 Product.brand：它是 Noon brand code，来源品牌名称只能进入 source.brand。
+    source_brand: str | None = Field(
+        None,
+        max_length=300,
+        description="来源商品品牌名称；不是 Noon brand code",
+    )
+    features: list[str] = Field(
+        default_factory=list, max_length=20, description="来源商品卖点列表"
+    )
+    attributes: dict[str, str] = Field(
+        default_factory=dict, max_length=50, description="来源商品属性键值对"
+    )
+    category: str | None = Field(
+        None, max_length=300, description="来源商品类目名称"
+    )
+    dimensions: DraftDimensions | None = Field(
+        None, description="来源商品尺寸重量"
+    )
+    barcode: str | None = Field(
+        None, max_length=128, description="来源商品条码，留空"
+    )
+    availability: bool | None = Field(None, description="来源商品是否可售")
+    item_image_urls: list[str] = Field(
+        default_factory=list,
+        max_length=9,
+        description="选中的商品主图，必须逐字来自候选 URL 列表",
+    )
+    detail_image_urls: list[str] = Field(
+        default_factory=list,
+        max_length=9,
+        description="选中的详情图，必须逐字来自候选 URL 列表",
+    )
     localized: DraftLocalized | None = Field(
-        None, description="en/ar 语言的标题与描述翻译；无法可靠翻译时置 null"
+        None,
+        description="en/ar 语言的标题、描述与卖点翻译；无法可靠翻译时置 null",
     )
     price: str | None = Field(
         None, description="价格数字字符串（不含货币符号/千分位）；无法确定则为 null"
     )
-    currency: str | None = Field(None, description="ISO 4217 货币代码（USD/EUR/GBP…）")
+    currency: str | None = Field(
+        None, max_length=8, description="ISO 4217 货币代码（USD/EUR/GBP…）"
+    )
     image_urls: list[str] = Field(
         default_factory=list,
+        max_length=9,
         description="选中的商品图，必须逐字来自候选 URL 列表，主图在前，最多 9 张",
     )
     unknown_fields: list[str] = Field(

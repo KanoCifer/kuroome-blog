@@ -39,8 +39,21 @@ def test_product_row_matches_extension_shape():
 
     row = build_product_row(req, draft)
 
-    assert set(row) == {"id", "revision", "partnerSku", "title", "description", "images", "source", "status", "createdAt", "updatedAt"}
+    assert set(row) == {
+        "id",
+        "revision",
+        "partnerSku",
+        "title",
+        "description",
+        "images",
+        "source",
+        "status",
+        "variantRole",
+        "createdAt",
+        "updatedAt",
+    }
     assert row["revision"] == 0 and row["partnerSku"] == "" and row["status"] == "draft"
+    assert row["variantRole"] == "single"
     assert row["title"] == "Silk Scarf" and row["description"] == "100% mulberry silk"
     assert row["source"]["platform"] == "other"
     assert row["source"]["url"] == req.source_url
@@ -54,6 +67,51 @@ def test_product_row_matches_extension_shape():
     ]
     assert row["images"][0]["isPrimary"] is True
     assert all(i["source"] == "source" for i in row["images"])
+
+
+def test_product_row_preserves_detailed_source_metadata():
+    from app.schemas.nomu import (
+        DraftDimensions,
+        DraftLocalized,
+        DraftLocalizedItem,
+    )
+
+    req = _request()
+    draft = ProductDraft(
+        title="Cotton Shirt",
+        source_brand="Example Brand",
+        features=["breathable", "machine washable"],
+        attributes={"Material": "100% cotton", "": "ignored"},
+        category="Men's Shirts",
+        dimensions=DraftDimensions(length="30 cm", width="20 cm"),
+        barcode="1234567890123",
+        availability=True,
+        item_image_urls=["https://cdn.example.com/a.jpg"],
+        detail_image_urls=["https://cdn.example.com/b.jpg"],
+        localized=DraftLocalized(
+            en=DraftLocalizedItem(title="Cotton Shirt", bullets=["Breathable"]),
+        ),
+    )
+
+    row = build_product_row(req, draft)
+
+    assert row["barcode"] == "1234567890123"
+    assert row["source"]["brand"] == "Example Brand"
+    assert row["source"]["features"] == ["breathable", "machine washable"]
+    assert row["source"]["attributes"] == {"Material": "100% cotton"}
+    assert row["source"]["category"] == "Men's Shirts"
+    assert row["source"]["dimensions"] == {"length": "30 cm", "width": "20 cm"}
+    assert row["source"]["availability"] is True
+    assert row["source"]["itemImages"] == ["https://cdn.example.com/a.jpg"]
+    assert row["source"]["detailImages"] == [
+        "https://cdn.example.com/a.jpg",
+        "https://cdn.example.com/b.jpg",
+    ]
+    assert row["localized"]["en"]["bullets"] == ["Breathable"]
+    assert [image["url"] for image in row["images"]] == [
+        "https://cdn.example.com/a.jpg",
+        "https://cdn.example.com/b.jpg",
+    ]
 
 
 def test_product_row_drops_hallucinated_urls():
