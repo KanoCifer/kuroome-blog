@@ -84,6 +84,25 @@ func SafeClient() *http.Client {
 	}
 }
 
+// SafeProxyClient 返回一个经 proxyURL 转发、同时在 URL 层保持 SSRF 防护的
+// http.Client。CheckRedirect 与 SafeClient 共用：每一次跳转前仍对新 URL 调
+// ValidateURL，代理不能成为绕过入口的重定向通道。
+//
+// ponytail: 故意不挂 SafeDialContext。挂上后拨号对象从目标域名变成代理
+// 地址本身（本地代理常见 127.0.0.1），ipAllowed 会把代理判成 loopback 而
+// 全部拒掉；且目标域名由代理侧解析，拨号期复检在这里本就无从施加。代价是
+// 代理链路丢掉了 DNS rebinding 兜底，ValidateURL 仍是主防线。要补齐的话
+// 需在 proxyURL 的 host 上单独做一次解析校验。
+func SafeProxyClient(proxyURL *url.URL) *http.Client {
+	t := http.DefaultTransport.(*http.Transport).Clone()
+	t.Proxy = http.ProxyURL(proxyURL)
+	return &http.Client{
+		Transport:     t,
+		CheckRedirect: safeCheckRedirect,
+		Timeout:       30 * time.Second,
+	}
+}
+
 // SafeDialContext 返回一个 DialContext：每次连接前解析目标 host 的
 // 当前 IP 并拒绝私网地址，挡 DNS rebinding（解析时间不一致）。
 //

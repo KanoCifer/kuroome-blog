@@ -25,6 +25,12 @@ type Config struct {
 	Weather  WeatherConfig
 	Upload   UploadConfig
 	Design   DesignConfig
+	Http     HttpConfig
+}
+
+type HttpConfig struct {
+	Timeout int    `mapstructure:"TIMEOUT"`
+	Proxy   string `mapstructure:"PROXY"`
 }
 
 // DesignConfig 设计出图服务商接入参数。
@@ -238,6 +244,10 @@ func defaultConfig() Config {
 			Provider:     "ark",
 			APIKey:       "",
 			APIYIBaseURL: "https://api.apiyi.com/v1",
+		},
+		Http: HttpConfig{
+			Timeout: 30,
+			Proxy:   "http://127.0.0.1:12450",
 		},
 	}
 }

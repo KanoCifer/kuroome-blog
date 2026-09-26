@@ -114,19 +114,21 @@ func buildRepos(db *gorm.DB, mongoDB *mongo.Database) repos {
 
 // infra 集中持有跨切面基础设施：HTTP 客户端、pubsub 总线、各类签名器 / 路由器。
 type infra struct {
-	httpCli        *httpclient.Client
-	designHTTP     *httpclient.Client
-	designRouter   *nomuSvc.Router
-	qweatherSigner *qweather.Signer
-	dispatcher     *pubsub.Dispatcher
-	syncBus        *syncbus.Bus
-	eventBus       eventbus.Bus
+	httpCli          *httpclient.Client
+	httpCliWithProxy *httpclient.Client
+	designHTTP       *httpclient.Client
+	designRouter     *nomuSvc.Router
+	qweatherSigner   *qweather.Signer
+	dispatcher       *pubsub.Dispatcher
+	syncBus          *syncbus.Bus
+	eventBus         eventbus.Bus
 }
 
 func buildInfra(cfg *config.Config, rdb *redis.Client) infra {
 	// 通用 HTTP 客户端：trace_id 注入 + 出站日志 + 超时。
 	// weather / 未来其它出站调用都复用这一份，不另起 *http.Client。
 	httpCli := httpclient.New()
+	httpCliWithProxy := httpclient.New(httpclient.WithHttpProxy(cfg.Http.Proxy))
 	designHTTP := httpclient.WithLongTimeout()
 
 	// design 出图服务商：同时注册方舟与 apiyi，前端按 model 自动路由
@@ -154,13 +156,14 @@ func buildInfra(cfg *config.Config, rdb *redis.Client) infra {
 	eventBus := eventbus.NewEventBus()
 
 	return infra{
-		httpCli:        httpCli,
-		designHTTP:     designHTTP,
-		designRouter:   designRouter,
-		qweatherSigner: signer,
-		dispatcher:     dispatcher,
-		syncBus:        syncBus,
-		eventBus:       eventBus,
+		httpCli:          httpCli,
+		httpCliWithProxy: httpCliWithProxy,
+		designHTTP:       designHTTP,
+		designRouter:     designRouter,
+		qweatherSigner:   signer,
+		dispatcher:       dispatcher,
+		syncBus:          syncBus,
+		eventBus:         eventBus,
 	}
 }
 
@@ -238,7 +241,7 @@ func NewAppState(
 		creditSvc:          creditSvc,
 		designSvc:          nomuSvc.NewDesignService(ifc.designHTTP, ifc.designRouter, imageSvc, creditSvc),
 		nomuConfigSyncSvc:  configsync.NewService(rs.nomu),
-		nomuBlobProxySvc:   blobproxy.NewService(),
+		nomuBlobProxySvc:   blobproxy.NewService(cfg.Http.Proxy),
 
 		mailer: mailer,
 	}

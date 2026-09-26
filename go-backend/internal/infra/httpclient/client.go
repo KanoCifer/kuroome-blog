@@ -13,6 +13,7 @@ import (
 	"context"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/KanoCifer/kuroome-blog/internal/logger"
@@ -39,6 +40,19 @@ type Option func(*Client)
 func WithTimeout(d time.Duration) Option {
 	return func(c *Client) {
 		c.base.Timeout = d
+	}
+}
+
+// WithHttpProxy 配置 HTTP 代理。
+func WithHttpProxy(rawurl string) Option {
+	proxyURL, err := url.Parse(rawurl)
+	if err != nil {
+		proxyURL = nil
+	}
+	return func(c *Client) {
+		c.base.Transport = &http.Transport{
+			Proxy: http.ProxyURL(proxyURL),
+		}
 	}
 }
 
@@ -85,7 +99,8 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (*http.Response, err
 	latency := time.Since(start)
 
 	if err != nil {
-		c.logger.Error("outbound request failed",
+		c.logger.Error(
+			"outbound request failed",
 			slog.String("method", req.Method),
 			slog.String("url", req.URL.Redacted()),
 			slog.Duration("latency", latency),
@@ -94,7 +109,8 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (*http.Response, err
 		return resp, err
 	}
 
-	c.logger.Info("outbound request",
+	c.logger.Info(
+		"outbound request",
 		slog.String("method", req.Method),
 		slog.String("url", req.URL.Redacted()),
 		slog.Int("status", resp.StatusCode),
