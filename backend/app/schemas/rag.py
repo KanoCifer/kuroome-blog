@@ -9,7 +9,6 @@ class AskRequest(BaseModel):
     """RAG 问答请求体"""
 
     question: str = Field(..., min_length=1, description="用户问题")
-    top_k: int = Field(default=5, ge=1, le=20, description="检索段落数")
     session_id: str | None = Field(
         default=None, description="会话 ID（多轮对话复用）"
     )

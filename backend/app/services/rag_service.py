@@ -1,25 +1,22 @@
-"""RAG Knowledge 服务 — 本地文档知识库问答。
+"""RAG 知识库服务 — 基于 :class:`QaService` 的文档问答。
 
-基于 Agno Knowledge + PgVector 混合检索（向量 + BM25），
-文档源来自 ``KNOWLEDGE_SOURCE_DIR`` 目录下的 Markdown 文件。
+只负责「知识库」这一层：文档入库 + 混合检索 + 把检索结果拼进 prompt。
+流式问答与会话回读全部复用通用问答服务。
 """
 
 from __future__ import annotations
 
 import asyncio
-import time
 from collections.abc import AsyncIterator
 from pathlib import Path
 
-from agno.agent import RunOutputEvent
+from agno.db.postgres import AsyncPostgresDb
 from agno.knowledge.chunking.markdown import MarkdownChunking
 from agno.knowledge.knowledge import Knowledge
 from agno.knowledge.reader.markdown_reader import MarkdownReader
-from agno.run.agent import ReasoningContentDeltaEvent
 
-from app.core.llm_factory import create_agent, create_llm_model
 from app.core.logger import logger
-from app.services.llm_usage_service import record_llm_usage
+from app.services.qa_service import QaService
 
 # LLM usage 记录的 source 词表值
 LLM_USAGE_SOURCE = "rag_qa"
@@ -55,20 +52,29 @@ def _format_search_results(results) -> str:
     return "\n\n".join(formatted)
 
 
-def search_nomu_docs(query: str, max_results: int = 5) -> str:
-    """搜索 Nomu 文档知识库并返回格式化结果（Agno tool 用）。"""
-    from app.core.llm_factory import get_knowledge
+class RagService(QaService):
+    """文档入库 + 混合检索 + 知识库问答。"""
 
-    results = get_knowledge().search(query, max_results=max_results)
-    return _format_search_results(results)
-
-
-class RagService:
-    """RAG 知识库服务：文档入库 + 混合检索 + 流式问答。"""
-
-    def __init__(self, knowledge: Knowledge, source_dir: str) -> None:
+    def __init__(
+        self,
+        knowledge: Knowledge,
+        source_dir: str,
+        db: AsyncPostgresDb | None = None,
+    ) -> None:
+        super().__init__(
+            instructions=_RAG_SYSTEM_PROMPT,
+            usage_source=LLM_USAGE_SOURCE,
+            tools=[self.search_nomu_docs],
+            db=db,
+        )
         self.knowledge = knowledge
         self.source_dir = Path(source_dir)
+
+    def search_nomu_docs(self, query: str, max_results: int = DEFAULT_TOP_K) -> str:
+        """搜索 Nomu 文档知识库并返回格式化结果（Agno tool 用）。"""
+        return _format_search_results(
+            self.knowledge.search(query, max_results=max_results)
+        )
 
     # ── 文档入库 ───────────────────────────────────────────────────── #
 
@@ -116,7 +122,7 @@ class RagService:
         logger.debug("ingested file", file=file_path.name)
         return 0
 
-    # ── 流式问答 ───────────────────────────────────────────────────── #
+    # ── 知识库问答 ─────────────────────────────────────────────────── #
 
     async def ask(
         self,
@@ -129,20 +135,20 @@ class RagService:
 
         策略：首轮 service 层先检索注入 context，后续 agent 可按需调
         ``search_nomu_docs`` 工具补充检索（多轮对话场景）。
-
-        Yields:
-            {type: "reasoning"|"content", content: str, is_end: bool}
         """
-        if not question.strip():
-            yield {
-                "type": "content",
-                "content": "[ERROR] 问题不能为空",
-                "is_end": True,
-            }
-            return
+        async for chunk in super().ask(
+            self._build_prompt(question, top_k),
+            session_id=session_id,
+            user_id=user_id,
+            meta={"question": question[:200], "top_k": top_k},
+        ):
+            yield chunk
 
-        # ── 首轮检索：service 层直接查，注入 prompt ───────────────
-        retrieved = self._search_knowledge(question, top_k)
+    def _build_prompt(self, question: str, top_k: int) -> str:
+        """首轮检索注入参考段落，拼成最终 prompt。"""
+        retrieved = _format_search_results(
+            self.knowledge.search(question, max_results=top_k)
+        )
         if retrieved:
             context_block = (
                 "以下是知识库中相关的参考段落，请基于它们回答用户问题。\n\n"
@@ -156,83 +162,7 @@ class RagService:
                 "知识库中未找到直接相关的内容，你可以调用 "
                 "``search_nomu_docs`` 工具尝试其他关键词搜索。\n\n---\n\n"
             )
-
-        full_prompt = f"{context_block}用户问题：{question}"
-
-        model = create_llm_model()
-        agent = create_agent(
-            model=model,
-            instructions=_RAG_SYSTEM_PROMPT,
-            tools=[search_nomu_docs],  # 后续补充检索工具
-        )
-
-        start_time = time.monotonic()
-        input_tokens = output_tokens = total_tokens = 0
-
-        try:
-            async for event in agent.arun(
-                full_prompt,
-                stream=True,
-                stream_events=True,
-                user_id=user_id,
-                session_id=session_id,
-            ):
-                if (
-                    isinstance(event, ReasoningContentDeltaEvent)
-                    and event.reasoning_content
-                ):
-                    yield {
-                        "type": "reasoning",
-                        "content": str(event.reasoning_content),
-                    }
-                elif isinstance(event, RunOutputEvent) and event.content:
-                    yield {
-                        "type": "content",
-                        "content": str(event.content),
-                    }
-
-            # 从 agent 运行结果提取 usage
-            run_output = agent.get_last_run_output()
-            if run_output and run_output.metrics:
-                metrics = run_output.metrics
-                input_tokens = getattr(metrics, "input_tokens", 0) or 0
-                output_tokens = getattr(metrics, "output_tokens", 0) or 0
-                total_tokens = getattr(metrics, "total_tokens", 0) or 0
-
-        except Exception as exc:
-            logger.error(f"❌ RAG 问答失败: {exc!r}")
-            yield {
-                "type": "content",
-                "content": "[ERROR] 知识库问答服务暂时不可用，请稍后重试",
-                "is_end": True,
-            }
-            return
-        finally:
-            # 异步记录 usage，不阻塞响应
-            duration_ms = round((time.monotonic() - start_time) * 1000)
-            if total_tokens > 0:
-                # user_id 形如 "123"（登录用户）或 "anon:ip"（匿名），仅前者可转 int
-                numeric_id = int(user_id) if user_id and user_id.isdigit() else None
-                await record_llm_usage(
-                    source=LLM_USAGE_SOURCE,
-                    model=model.id,
-                    input_tokens=input_tokens,
-                    output_tokens=output_tokens,
-                    total_tokens=total_tokens,
-                    user_id=numeric_id,
-                    duration_ms=duration_ms,
-                    meta={"question": question[:200], "top_k": top_k},
-                )
-
-        yield {"type": "content", "content": "", "is_end": True}
-
-    @staticmethod
-    def _search_knowledge(query: str, top_k: int) -> str:
-        """检索知识库并格式化结果（首轮 service 层直接查，注入 prompt）。"""
-        from app.core.llm_factory import get_knowledge
-
-        results = get_knowledge().search(query, max_results=top_k)
-        return _format_search_results(results)
+        return f"{context_block}用户问题：{question}"
 
     # ── 状态查询 ───────────────────────────────────────────────────── #
 

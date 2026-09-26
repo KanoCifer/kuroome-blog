@@ -1,25 +1,43 @@
 """v2 Knowledge API — RAG 知识库问答。
 
 端点契约：
-- ``POST /v2/knowledge/ask``       → SSE 流式问答（混合检索 + LLM 生成）
-- ``POST /v2/knowledge/ingest``    → 触发文档入库（扫描 KNOWLEDGE_SOURCE_DIR）
-- ``GET  /v2/knowledge/status``    → 知识库状态（文档数 / 段落数）
+- ``GET  /v2/knowledge/session``     → 按 session_id 取得完整会话消息
+- ``POST /v2/knowledge/ask``         → SSE 流式问答（混合检索 + LLM 生成）
+- ``POST /v2/knowledge/ingest``      → 触发文档入库（扫描 KNOWLEDGE_SOURCE_DIR）
+- ``GET  /v2/knowledge/status``      → 知识库状态（文档数 / 段落数）
 """
 
 from __future__ import annotations
 
 import asyncio
 
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, Query, Request, status
 from fastapi.sse import EventSourceResponse
 
 from app.api.des.auth import optional_user
 from app.api.des.limiter import client_key, limiter
 from app.appstate import AppState, get_app_state
 from app.core.response import APIResponse
-from app.schemas.rag import AskRequest, IngestResponse, KnowledgeStatus
+from app.schemas.rag import AskRequest, KnowledgeStatus
 
 router = APIRouter(prefix="/knowledge", tags=["knowledge"])
+
+
+@router.get("/session")
+async def get_session(
+    session_id: str = Query(..., min_length=1, description="会话 ID"),
+    state: AppState = Depends(get_app_state),
+):
+    """根据 session_id 返回该会话的完整消息列表（时间升序）。"""
+    messages = await state.rag_svc.get_session(session_id)
+    if messages is None:
+        return APIResponse(
+            data={"session_id": session_id, "messages": []},
+            message="session not found",
+        )
+    return APIResponse(
+        data={"session_id": session_id, "messages": messages}, message="success"
+    )
 
 
 @router.post("/ask", response_class=EventSourceResponse)
@@ -31,15 +49,12 @@ async def ask(
     state: AppState = Depends(get_app_state),
 ):
     """RAG 流式问答：混合检索文档 + LLM 生成回答。
-
-    ``top_k`` 控制检索段落数（1-20，默认 5）。
     ``session_id`` 可选，多轮对话复用同一会话。
     """
     user_id = str(user) if user else f"anon:{client_key(request)}"
 
     async for chunk in state.rag_svc.ask(
         question=payload.question,
-        top_k=payload.top_k,
         session_id=payload.session_id,
         user_id=user_id,
     ):
